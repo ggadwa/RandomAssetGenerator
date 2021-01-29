@@ -1,0 +1,16 @@
+- the random color scheme
+- lights
+   - regular
+   - color changing
+   - chasing (4 that go on and off)
+- bitmaps
+   - pipe, needs random line & random screw line
+- decorations
+   - don't repeat decorations for connected rooms
+   - pool decorations
+   - moving blocks (half size of segmentSize, in random circular motion)
+   - better uv for pillars
+   - control panel decorations
+   - connectors for pipes
+
+
