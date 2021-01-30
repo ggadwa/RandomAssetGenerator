@@ -43,33 +43,34 @@ public class BitmapBase
     public static final RagColor COLOR_BLACK=new RagColor(0.0f,0.0f,0.0f);
     public static final RagColor COLOR_WHITE=new RagColor(1.0f,1.0f,1.0f);
         
-    public static final RagColor[] COLOR_PRIMARY_LIST={
-                                        new RagColor(0.7f,0.0f,0.0f),   // red
-                                        new RagColor(0.0f,0.7f,0.0f),   // green
-                                        new RagColor(0.0f,0.0f,0.7f),   // blue
-                                        new RagColor(0.7f,0.7f,0.0f),   // yellow
-                                        new RagColor(0.8f,0.0f,0.8f),   // purple
-                                        new RagColor(0.8f,0.8f,0.0f),   // light blue
-                                        new RagColor(0.0f,0.9f,0.6f),   // sea green
-                                        new RagColor(1.0f,0.4f,0.0f),   // orange
-                                        new RagColor(0.7f,0.4f,0.0f),   // brown
-                                        new RagColor(0.8f,0.6f,0.0f),   // gold
-                                        new RagColor(0.8f,0.6f,0.8f),   // lavender
-                                        new RagColor(1.0f,0.8f,0.8f),   // pink
-                                        new RagColor(0.6f,0.9f,0.0f),   // lime
-                                        new RagColor(0.2f,0.5f,0.0f),   // tree green
-                                        new RagColor(0.5f,0.5f,0.5f),   // gray
-                                        new RagColor(0.6f,0.0f,0.9f),   // dark purple
-                                        new RagColor(0.0f,0.3f,0.5f),   // slate blue
-                                        new RagColor(0.9f,0.6f,0.4f),   // peach
-                                        new RagColor(0.9f,0.0f,0.4f),   // muave
-                                        new RagColor(0.8f,0.5f,0.5f)    // dull red
+    public static final float[][] COLOR_PRIMARY_LIST={
+                                        {0.7f,0.0f,0.0f},   // red
+                                        {0.0f,0.7f,0.0f},   // green
+                                        {0.0f,0.0f,0.7f},   // blue
+                                        {0.7f,0.7f,0.0f},   // yellow
+                                        {0.8f,0.0f,0.8f},   // purple
+                                        {0.8f,0.8f,0.0f},   // light blue
+                                        {0.0f,0.9f,0.6f},   // sea green
+                                        {1.0f,0.4f,0.0f},   // orange
+                                        {0.7f,0.4f,0.0f},   // brown
+                                        {0.8f,0.6f,0.0f},   // gold
+                                        {0.8f,0.6f,0.8f},   // lavender
+                                        {1.0f,0.8f,0.8f},   // pink
+                                        {0.6f,0.9f,0.0f},   // lime
+                                        {0.2f,0.5f,0.0f},   // tree green
+                                        {0.5f,0.5f,0.5f},   // gray
+                                        {0.6f,0.0f,0.9f},   // dark purple
+                                        {0.0f,0.3f,0.5f},   // slate blue
+                                        {0.9f,0.6f,0.4f},   // peach
+                                        {0.9f,0.0f,0.4f},   // muave
+                                        {0.8f,0.5f,0.5f}    // dull red
                                     };
     
-    protected int           colorScheme,bitmapTextureSize;
+    protected int           colorScheme,textureSize;
     protected boolean       hasNormal,hasSpecular,hasGlow;
     protected RagVector     specularFactor,emissiveFactor;
-    protected byte[]        colorData,normalData,specularData,glowData;
+    protected float[]       colorData,normalData,specularData,glowData,
+                            perlinNoiseColorFactor,noiseNormals;
     
     public BitmapBase(int colorScheme)
     {
@@ -77,7 +78,7 @@ public class BitmapBase
         
             // will be reset in children classes
            
-        bitmapTextureSize=512;
+        textureSize=512;
         hasNormal=true;
         hasSpecular=true;
         hasGlow=false;
@@ -96,69 +97,66 @@ public class BitmapBase
         
             // noise
             
-    //    this.perlinNoiseColorFactor=null;
-    //    this.noiseNormals=null;
+        perlinNoiseColorFactor=null;
+        noiseNormals=null;
     }
     
-    
-
-/*    
         //
         // colors
         //
         
-    getRandomColor()
+    protected RagColor getRandomColor()
     {
-        let col,darken;
-        let color,midPoint;
+        int             idx;
+        float           f,midPoint,darken;
+        float[]         col;
         
-        switch (this.colorScheme) {
+        switch (colorScheme) {
             
                 // random primary colors
                 
-            case this.COLOR_SCHEME_RANDOM:
-                col=this.primaryColorList[this.core.randomIndex(this.primaryColorList.length)];
-                darken=0.1-(this.core.random()*0.2);
-                return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
+            case COLOR_SCHEME_RANDOM:
+                idx=(int)((float)COLOR_PRIMARY_LIST.length*Math.random());
+                col=COLOR_PRIMARY_LIST[idx];
+                darken=0.1f-(float)(Math.random()*0.2);
+                return(new RagColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
                 
                 // doom browns and green
                 
-            case this.COLOR_SCHEME_DOOM:
-                if (this.core.randomPercentage(0.5)) {
-                    color=new ColorClass(0.6,0.3,0.0);
-                    this.adjustColorRandom(color,0.7,1,0);
-                }
-                else {
-                    col=this.core.randomFloat(0.0,0.1);
-                    color=new ColorClass(col,this.core.randomFloat(0.4,0.2),col);
-                }
-                return(color);
+            case COLOR_SCHEME_DOOM:
+                if (Math.random()<0.5) return(adjustColorRandom(new RagColor(0.6f,0.3f,0.0f),0.7f,1.0f));
+
+                f=(float)(Math.random()*0.1);
+                return(new RagColor(f,(0.4f+(float)(Math.random()*0.2)),f));
             
                 // black and white
                 
-            case this.COLOR_SCHEME_GRAY:
-                col=this.core.randomFloat(0.3,0.7);
-                return(new ColorClass(col,col,col));
+            case COLOR_SCHEME_GRAY:
+                return(getRandomGray(0.3f,0.7f));
                 
                 // pastel primary colors
                 
-            case this.COLOR_SCHEME_PASTEL:
-                col=this.primaryColorList[this.core.randomIndex(this.primaryColorList.length)];
-                midPoint=(col[0]+col[1]+col[2])/3.0;
-                color=new ColorClass((col[0]+(midPoint-col[0])*0.8),(col[1]+(midPoint-col[1])*0.8),(col[2]+(midPoint-col[2])*0.8));
-                color.fixOverflow();
-                return(color);
+            case COLOR_SCHEME_PASTEL:
+                idx=(int)((float)COLOR_PRIMARY_LIST.length*Math.random());
+                col=COLOR_PRIMARY_LIST[idx];
+                midPoint=(col[0]+col[1]+col[2])*0.33f;
+                return(new RagColor((col[0]+(midPoint-col[0])*0.8f),(col[1]+(midPoint-col[1])*0.8f),(col[2]+(midPoint-col[2])*0.8f)));
                 
         }
+        
+        return(null);
     }
     
-    getRandomColorDull(dullFactor)
+    protected RagColor getRandomColorDull(float dullFactor)
     {
-        let color=this.getRandomColor();
+        float               midPoint;
+        RagColor            color;
+        
+        color=getRandomColor();
         
             // find the midpoint
             
-        let midPoint=(color.r+color.g+color.b)/3.0;
+        midPoint=(color.r+color.g+color.b)*0.33f;
         
             // move towards it
             
@@ -168,55 +166,53 @@ public class BitmapBase
 
         return(color);
     }
-    
-    getRandomGray(minFactor,maxFactor)
+
+    protected RagColor getRandomGray(float minFactor,float maxFactor)
     {
-        let col=this.core.randomFloat(minFactor,(maxFactor-minFactor));
-        return(new ColorClass(col,col,col));
+        float       col;
+        
+        col=minFactor+((float)Math.random()*(maxFactor-minFactor));
+        return(new RagColor(col,col,col));
+    }
+
+    protected RagColor adjustColor(RagColor color,float factor)
+    {
+        return(new RagColor((color.r*factor),(color.g*factor),(color.b*factor)));
     }
     
-    adjustColor(color,factor)
+    protected RagColor adjustColorRandom(RagColor color,float minFactor,float maxFactor)
     {
-        let col=new ColorClass((color.r*factor),(color.g*factor),(color.b*factor));
+        float       f;
         
-        col.fixOverflow();
-        return(col);
-    }
-    
-    adjustColorRandom(color,minFactor,maxFactor)
-    {
-        let f=this.core.randomFloat(minFactor,(maxFactor-minFactor));
-        let col=new ColorClass((color.r*f),(color.g*f),(color.b*f));
-        
-        col.fixOverflow();
-        return(col);
+        f=minFactor+((float)Math.random()*(maxFactor-minFactor));
+        return(new RagColor((color.r*f),(color.g*f),(color.b*f)));
     }
 
         //
         // blur
         //
 
-    blur(data,lft,top,rgt,bot,blurCount,clamp)
+    protected void blur(float[] data,int lft,int top,int rgt,int bot,int blurCount,boolean clamp)
     {
-        let n,idx;
-        let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
-        let r,g,b;
-        let blurData;
+        int             n,x,y,idx,
+                        cx,cy,cxs,cxe,cys,cye,dx,dy;
+        float           r,g,b;
+        float[]         blurData;
         
         if ((lft>=rgt) || (top>=bot)) return;
         
-        blurData=new Uint8ClampedArray(data.length);
+        blurData=new float[data.length];
         
             // blur pixels to count
 
-        for (n=0;n!==blurCount;n++) {
+        for (n=0;n!=blurCount;n++) {
             
-            for (y=top;y!==bot;y++) {
+            for (y=top;y!=bot;y++) {
 
                 cys=y-1;
                 cye=y+2;
 
-                for (x=lft;x!==rgt;x++) {
+                for (x=lft;x!=rgt;x++) {
 
                         // get blur from 8 surrounding pixels
 
@@ -225,7 +221,7 @@ public class BitmapBase
                     cxs=x-1;
                     cxe=x+2;
 
-                    for (cy=cys;cy!==cye;cy++) {
+                    for (cy=cys;cy!=cye;cy++) {
                         
                         dy=cy;
                         if (!clamp) {
@@ -237,8 +233,8 @@ public class BitmapBase
                             if (dy>=bot) dy=bot-1;
                         }
                         
-                        for (cx=cxs;cx!==cxe;cx++) {
-                            if ((cy===y) && (cx===x)) continue;       // ignore self
+                        for (cx=cxs;cx!=cxe;cx++) {
+                            if ((cy==y) && (cx==x)) continue;       // ignore self
                             
                             dx=cx;
                             if (!clamp) {
@@ -253,7 +249,7 @@ public class BitmapBase
                                 // add up blur from the
                                 // original pixels
 
-                            idx=((dy*this.colorImgData.width)+dx)*4;
+                            idx=((dy*textureSize)+dx)*4;
 
                             r+=data[idx];
                             g+=data[idx+1];
@@ -261,19 +257,19 @@ public class BitmapBase
                         }
                     }
                     
-                    idx=((y*this.colorImgData.width)+x)*4;
+                    idx=((y*textureSize)+x)*4;
 
-                    blurData[idx]=r*0.125;
-                    blurData[idx+1]=g*0.125;
-                    blurData[idx+2]=b*0.125;
+                    blurData[idx]=r*0.125f;     // divide by 8.0f
+                    blurData[idx+1]=g*0.125f;
+                    blurData[idx+2]=b*0.125f;
                 }
             }
 
                 // transfer over the changed pixels
 
-            for (y=top;y!==bot;y++) {
-                idx=((y*this.colorImgData.width)+lft)*4;
-                for (x=lft;x!==rgt;x++) {       
+            for (y=top;y!=bot;y++) {
+                idx=((y*textureSize)+lft)*4;
+                for (x=lft;x!=rgt;x++) {       
                     data[idx]=blurData[idx];
                     data[idx+1]=blurData[idx+1];
                     data[idx+2]=blurData[idx+2];
@@ -282,132 +278,128 @@ public class BitmapBase
             }
         } 
     }
-    
+
         //
         // noise
         //
     
-    getDotGridVector(vectors,gridX,gridY,gridWid,gridHigh,x,y)
+    private float getDotGridVector(RagVector[][] vectors,int gridX,int gridY,int gridWid,int gridHigh,int x,int y)
     {
-        let dx=(x-(gridX*gridWid))/gridWid;
-        let dy=(y-(gridY*gridHigh))/gridHigh;
+        float       dx,dy;
+        
+        dx=(float)(x-(gridX*gridWid))/gridWid;
+        dy=(float)(y-(gridY*gridHigh))/gridHigh;
         
         return((dx*vectors[gridY][gridX].x)+(dy*vectors[gridY][gridX].y));
     }
     
-    lerp(a,b,w)
+    private float lerp(float a,float b,float w)
     {
-        let f=(Math.pow(w,2)*3)-(Math.pow(w,3)*2);
-        return(((1.0-f)*a)+(f*b));
+        double      d;
+        
+        d=(Math.pow(w,2)*3)-(Math.pow(w,3)*2);
+        return((float)(((1.0-d)*a)+(d*b)));
     }
     
-    createPerlinNoiseData(gridXSize,gridYSize)
+    protected void createPerlinNoiseData(int gridXSize,int gridYSize)
     {
-        let x,y,ix0,ix1,sx,sy;
-        let gridWid,gridHigh,gridX0,gridX1,gridY0,gridY1;
-        let vectors,rowVectors,normal;
-        let n0,n1,idx,k;
-        let gridDist;
+        int             x,y,gridWid,gridHigh,
+                        gridX0,gridX1,gridY0,gridY1;
+        float           sx,sy,ix0,ix1,n0,n1;
+        RagVector       normal;
+        RagVector[][]   vectors;
         
             // the grid
             // it must be evenly divisible
             
-        if (((this.colorImgData.width%gridXSize)!==0) || ((this.colorImgData.height%gridYSize)!==0)) {
-            console.log('perlin noise grid must be divisible by texture size');
-            return;
-        }
-            
-        gridWid=Math.trunc(this.colorImgData.width/gridXSize);
-        gridHigh=Math.trunc(this.colorImgData.height/gridYSize);
-        gridDist=Math.sqrt((gridWid*gridWid)+(gridHigh*gridHigh));
+        gridWid=(int)(textureSize/gridXSize);
+        gridHigh=(int)(textureSize/gridYSize);
         
             // noise data arrays
+            // this is a single float
             
-        this.perlinNoiseColorFactor=new Float32Array(this.colorImgData.width*this.colorImgData.height);
+        this.perlinNoiseColorFactor=new float[textureSize*textureSize];
         
             // generate the random grid vectors
+            // these need to wrap around so textures can tile
             
-        vectors=[];
+        vectors=new RagVector[gridXSize+1][gridYSize+1];
         
-        for (y=0;y!==gridYSize;y++) {
+        for (y=0;y!=gridYSize;y++) {
             
-            rowVectors=[];
-            
-            for (x=0;x!==gridXSize;x++) {
-                normal=new PointClass(this.core.randomNegativeOneToOne(),this.core.randomNegativeOneToOne(),0);
+            for (x=0;x!=gridXSize;x++) {
+                normal=new RagVector((float)((Math.random()*2.0)-1.0),(float)((Math.random()*2.0)-1.0),0);
                 normal.normalize2D();
-                rowVectors.push(normal);
+                vectors[x][y]=normal;
             }
             
-            rowVectors.push(rowVectors[0]);     // wrap around
-            
-            vectors.push(rowVectors);
+            vectors[gridXSize][y]=vectors[0][y];
         }
         
-        vectors.push(vectors[0]);           // wrap around
+        for (x=0;x!=gridXSize;x++) {
+            vectors[x][gridYSize]=vectors[x][0];
+        }
         
-        vectors[gridYSize][gridXSize].setFromPoint(vectors[0][0]);      // final wrap around from top-left to top-right
+        vectors[gridYSize][gridXSize]=vectors[0][0];      // final wrap around from top-left to top-right
 
             // create the noise arrays
             
         gridY0=0;
-        normal=new PointClass(0,0,0);
+        normal=new RagVector(0.0f,0.0f,0.0f);
         
-        for (y=0;y!==this.colorCanvas.height;y++) {
+        for (y=0;y!=textureSize;y++) {
             
-            gridY0=Math.trunc(y/gridHigh);
+            gridY0=y/gridHigh;
             gridY1=gridY0+1;
             
-            for (x=0;x!==this.colorCanvas.width;x++) {
-                idx=((y*this.colorCanvas.width)+x)*4;
-                
-                gridX0=Math.trunc(x/gridWid);
+            for (x=0;x!=textureSize;x++) {
+                gridX0=x/gridWid;
                 gridX1=gridX0+1;
                 
                     // interpolate the grid normals and take
                     // the dot product to get a -1->1 elevation
                     
-                sx=(x-(gridX0*gridWid))/gridWid;
-                sy=(y-(gridY0*gridHigh))/gridHigh;
+                sx=(float)(x-(gridX0*gridWid))/gridWid;
+                sy=(float)(y-(gridY0*gridHigh))/gridHigh;
                 
                 n0=this.getDotGridVector(vectors,gridX0,gridY0,gridWid,gridHigh,x,y);
                 n1=this.getDotGridVector(vectors,gridX1,gridY0,gridWid,gridHigh,x,y);
-                ix0=this.lerp(n0,n1,sx);
+                ix0=lerp(n0,n1,sx);
                 
                 n0=this.getDotGridVector(vectors,gridX0,gridY1,gridWid,gridHigh,x,y);
                 n1=this.getDotGridVector(vectors,gridX1,gridY1,gridWid,gridHigh,x,y);
-                ix1=this.lerp(n0,n1,sx);
+                ix1=lerp(n0,n1,sx);
                 
                     // turn this into a color factor for the base color
                 
-                this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]=(this.lerp(ix0,ix1,sy)+1.0)*0.5;      // get it in 0..1
+                perlinNoiseColorFactor[(y*textureSize)+x]=(lerp(ix0,ix1,sy)+1.0f)*0.5f;      // get it in 0..1
             }
         }
     }
-    
-    getPerlineColorFactorForPosition(x,y)
+
+    protected float getPerlineColorFactorForPosition(int x,int y)
     {
-        return(this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]);
+        return(this.perlinNoiseColorFactor[(y*textureSize)+x]);
     }
     
-    drawPerlinNoiseRect(lft,top,rgt,bot,colorFactorMin,colorFactorMax)
+    protected void drawPerlinNoiseRect(int lft,int top,int rgt,int bot,float colorFactorMin,float colorFactorMax)
     {
-        let x,y,idx,colFactor;
-        let colorFactorAdd=colorFactorMax-colorFactorMin;
-        let colorData=this.colorImgData.data;
+        int         x,y,idx;
+        float       colFactor,colorFactorAdd;
+        
+        colorFactorAdd=colorFactorMax-colorFactorMin;
        
-        for (y=top;y!==bot;y++) {
-            for (x=lft;x!==rgt;x++) {
+        for (y=top;y!=bot;y++) {
+            for (x=lft;x!=rgt;x++) {
                 
                     // the perlin color factor (a single float)
-                    
-                idx=(y*this.colorCanvas.width)+x;
-                colFactor=colorFactorMin+(colorFactorAdd*this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]);
-                
-                idx*=4;
+
+                colFactor=colorFactorMin+(colorFactorAdd*perlinNoiseColorFactor[(y*textureSize)+x]);
                 
                     // now merge with bitmap color
                     
+                idx=((y*textureSize)+x)*4;
+                
                 colorData[idx]=colorData[idx]*colFactor;
                 colorData[idx+1]=colorData[idx+1]*colFactor;
                 colorData[idx+2]=colorData[idx+2]*colFactor;
@@ -415,20 +407,21 @@ public class BitmapBase
         }
     }
     
-    drawStaticNoiseRect(lft,top,rgt,bot,colorFactorMin,colorFactorMax)
+    protected void drawStaticNoiseRect(int lft,int top,int rgt,int bot,float colorFactorMin,float colorFactorMax)
     {
-        let x,y,idx,colFactor;
-        let colorFactorAdd=colorFactorMax-colorFactorMin;
-        let colorData=this.colorImgData.data;
-
-        for (y=top;y!==bot;y++) {
-            for (x=lft;x!==rgt;x++) {
+        int         x,y,idx;
+        float       colFactor,colorFactorAdd;
+        
+        colorFactorAdd=colorFactorMax-colorFactorMin;
+        
+        for (y=top;y!=bot;y++) {
+            for (x=lft;x!=rgt;x++) {
                 
                     // the static random color factor
                     
-                colFactor=colorFactorMin+(colorFactorAdd*this.core.random());
+                colFactor=colorFactorMin+(colorFactorAdd*(float)Math.random());
 
-                idx=((y*this.colorCanvas.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 
                 colorData[idx]=colorData[idx]*colFactor;
                 colorData[idx+1]=colorData[idx+1]*colFactor;
@@ -436,138 +429,145 @@ public class BitmapBase
              }
         }
     }
-    
-    createNormalNoiseDataSinglePolygonLine(x,y,x2,y2,normal)
+
+    private void createNormalNoiseDataSinglePolygonLine(int x,int y,int x2,int y2,RagVector normal)
     {
-        let xLen,yLen,sp,ep,dx,dy,wx,wy,slope,idx;
-        let normalData=this.noiseNormals;
-        let r=Math.trunc((normal.x+1.0)*127.0);
-        let g=Math.trunc((normal.y+1.0)*127.0);
-        let b=Math.trunc((normal.z+1.0)*127.0);
+        int         xLen,yLen,sp,ep,dx,dy,wx,wy,idx;
+        float       slope,f,r,g,b;
+        
+        r=(normal.x+1.0f)*0.5f;
+        g=(normal.y+1.0f)*0.5f;
+        b=(normal.z+1.0f)*0.5f;
         
             // the line
             
         xLen=Math.abs(x2-x);
         yLen=Math.abs(y2-y);
         
-        if ((xLen===0) && (yLen===0)) return;
+        if ((xLen==0) && (yLen==0)) return;
             
         if (xLen>yLen) {
-            slope=yLen/xLen;
+            slope=(float)yLen/(float)xLen;
             
             if (x<x2) {
                 sp=x;
                 ep=x2;
-                dy=y;
-                slope*=Math.sign(y2-y);
+                f=y;
+                slope*=Math.signum(y2-y);
             }
             else {
                 sp=x2;
                 ep=x;
-                dy=y2;
-                slope*=Math.sign(y-y2);
+                f=y2;
+                slope*=Math.signum(y-y2);
             }
             
-            for (dx=sp;dx!==ep;dx++) {
+            for (dx=sp;dx!=ep;dx++) {
                 wx=dx;
-                if (wx<0) wx=this.colorImgData.width+wx;
-                if (wx>=this.colorImgData.width) wx-=this.colorImgData.width;        // wrap around
+                if (wx<0) wx=textureSize+wx;
+                if (wx>=textureSize) wx-=textureSize;        // wrap around
 
-                wy=dy;
-                if (wy<0) wy=this.colorImgData.height+wy;
-                if (wy>=this.colorImgData.height) wy-=this.colorImgData.height;        // wrap around
+                wy=(int)f;
+                if (wy<0) wy=textureSize+wy;
+                if (wy>=textureSize) wy-=textureSize;        // wrap around
 
-                idx=((Math.trunc(wy)*this.colorImgData.width)+wx)*4;
-                normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
-                normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
-                normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                idx=((wy*textureSize)+wx)*4;
+                noiseNormals[idx]=(noiseNormals[idx]*0.5f)+(r*0.5f);
+                noiseNormals[idx+1]=(noiseNormals[idx+1]*0.5f)+(g*0.5f);
+                noiseNormals[idx+2]=(noiseNormals[idx+2]*0.5f)+(b*0.5f);
                 
-                dy+=slope;
+                f+=slope;
             }
         }
         else {
-            slope=xLen/yLen;
+            slope=(float)xLen/(float)yLen;
             
             if (y<y2) {
                 sp=y;
                 ep=y2;
-                dx=x;
-                slope*=Math.sign(x2-x);
+                f=x;
+                slope*=Math.signum(x2-x);
             }
             else {
                 sp=y2;
                 ep=y;
-                dx=x2;
-                slope*=Math.sign(x-x2);
+                f=x2;
+                slope*=Math.signum(x-x2);
             }
             
-            for (dy=sp;dy!==ep;dy++) {
-                wx=dx;
-                if (wx<0) wx=this.colorImgData.width+wx;
-                if (wx>=this.colorImgData.width) wx-=this.colorImgData.width;        // wrap around
+            for (dy=sp;dy!=ep;dy++) {
+                wx=(int)f;
+                if (wx<0) wx=textureSize+wx;
+                if (wx>=textureSize) wx-=textureSize;        // wrap around
 
                 wy=dy;
-                if (wy<0) wy=this.colorImgData.height+wy;
-                if (wy>=this.colorImgData.height) wy-=this.colorImgData.height;        // wrap around
+                if (wy<0) wy=textureSize+wy;
+                if (wy>=textureSize) wy-=textureSize;        // wrap around
 
-                idx=((wy*this.colorImgData.width)+Math.trunc(wx))*4;
-                normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
-                normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
-                normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                idx=((wy*textureSize)+wx)*4;
+                noiseNormals[idx]=(noiseNormals[idx]*0.5f)+(r*0.5f);
+                noiseNormals[idx+1]=(noiseNormals[idx+1]*0.5f)+(g*0.5f);
+                noiseNormals[idx+2]=(noiseNormals[idx+2]*0.5f)+(b*0.5f);
                 
-                dx+=slope;
+                f+=slope;
             }
         }
     }
     
-    createNormalNoiseDataSinglePolygon(lft,top,rgt,bot,normalZFactor,flipNormals)
+    private void createNormalNoiseDataSinglePolygon(int lft,int top,int rgt,int bot,float normalZFactor,boolean flipNormals)
     {
-        let n,k,x,y,sx,sy,lx,ly,fx,fy,rad,idx;
-        let normal,nFactor;
-        let mx=Math.trunc((lft+rgt)*0.5);
-        let my=Math.trunc((top+bot)*0.5);
-        let halfWid=Math.trunc((rgt-lft)*0.5);
-        let halfHigh=Math.trunc((bot-top)*0.5);
-        let startArc,endArc,lineSize;
-        let rx=new Int32Array(36);
-        let ry=new Int32Array(36);
+        int         n,k,idx,x,y,lx,ly,
+                    lineSize,startArc,endArc,
+                    mx,my,halfWid,halfHigh;
+        int[]       rx,ry;
+        float       rad,fx,fy,nFactor;
+        RagVector   normal;
         
         if ((rgt<=lft) || (bot<=top)) return;
         
             // random settings
             
-        lineSize=this.core.randomInt(2,3);
-        startArc=this.core.randomInt(0,36);
-        endArc=this.core.randomInt(startArc,36);
+        lineSize=2+(int)(Math.random()*3.0f);
+        startArc=(int)(Math.random()*36.0f);
+        endArc=startArc+(int)(Math.random()*36.0f);
+        
+        mx=(lft+rgt)/2;
+        my=(top+bot)/2;
+        halfWid=(rgt-lft)/2;
+        halfHigh=(bot-top)/2;
         
             // create randomized points
             // for oval
             
+        rx=new int[36];
+        ry=new int[36];
+        
         for (n=0;n!=36;n++) {
-            rx[n]=this.core.randomInt(0,20)-10;
-            ry[n]=this.core.randomInt(0,20)-10;
+            rx[n]=(int)(Math.random()*20.0f)-10;
+            ry[n]=(int)(Math.random()*20.0f)-10;
         }
 
             // build the polygon/oval
             
-        normal=new PointClass(0,0,0);
+        lx=ly=0;
+        normal=new RagVector(0.0f,0.0f,0.0f);
         
         for (n=0;n!=lineSize;n++) {
             
             for (k=startArc;k<endArc;k++) {
                 idx=k%36;
-                rad=(Math.PI*2.0)*(idx/36);
+                rad=(float)((Math.PI*2.0)*(double)(idx/36.0f));
 
-                fx=Math.sin(rad);
-                x=(mx+Math.trunc(halfWid*fx))+rx[idx];
+                fx=(float)Math.sin(rad);
+                x=(mx+(int)((float)halfWid*fx))+rx[idx];
 
-                fy=Math.cos(rad);
-                y=(my-Math.trunc(halfHigh*fy))+ry[idx];
+                fy=(float)Math.cos(rad);
+                y=(my-(int)((float)halfHigh*fy))+ry[idx];
                 
-                nFactor=1.0-(n/lineSize);
-                normal.x=(fx*nFactor)+(normal.x*(1.0-nFactor));
-                normal.y=(fy*nFactor)+(normal.y*(1.0-nFactor));
-                normal.z=(normalZFactor*nFactor)+(normal.z*(1.0-nFactor));
+                nFactor=1.0f-((float)n/(float)lineSize);
+                normal.x=(fx*nFactor)+(normal.x*(1.0f-nFactor));
+                normal.y=(fy*nFactor)+(normal.y*(1.0f-nFactor));
+                normal.z=(normalZFactor*nFactor)+(normal.z*(1.0f-nFactor));
                 if (flipNormals) {
                     normal.x=-normal.x;
                     normal.y=-normal.y;
@@ -575,12 +575,8 @@ public class BitmapBase
 
                 normal.normalize();
 
-                if (k!==startArc) {
+                if (k!=startArc) {
                     this.createNormalNoiseDataSinglePolygonLine(lx,ly,x,y,normal);
-                }
-                else {
-                    sx=x;
-                    sy=y;
                 }
 
                 lx=x;
@@ -588,67 +584,64 @@ public class BitmapBase
             }
             
             halfWid--;
-            if (halfWid===0) break;
+            if (halfWid==0) break;
 
             halfHigh--;
-            if (halfHigh===0) break;
+            if (halfHigh==0) break;
         }
     }
-    
-    createNormalNoiseData(density,normalZFactor)
+
+    public void createNormalNoiseData(float density,float normalZFactor)
     {
-        let n,x,y,wid,high,pixelSize,idx;
-        let nCount;
+        int         n,x,y,wid,high,
+                    pixelSize,nCount;
         
             // initialize the noise data
             
-        pixelSize=this.colorImgData.height*this.colorImgData.width;
-        this.noiseNormals=new Uint8ClampedArray(pixelSize*4);
+        pixelSize=(textureSize*textureSize)*4;
+        noiseNormals=new float[pixelSize];
         
-        idx=0;
-        
-        for (n=0;n!==pixelSize;n++) {
-            this.noiseNormals[idx]=127;
-            this.noiseNormals[idx+1]=127;
-            this.noiseNormals[idx+2]=255;
-            idx+=4;
+        for (n=0;n!=pixelSize;n+=4) {
+            noiseNormals[n]=0.5f;
+            noiseNormals[n+1]=0.5f;
+            noiseNormals[n+2]=1.0f;
         }
         
             // create the random normal chunks
             
-        nCount=Math.trunc((this.colorImgData.width*0.5)*density);
+        nCount=(int)(((float)textureSize*0.5f)*density);
         
-        for (n=0;n!==nCount;n++) {
-            x=this.core.randomInt(0,(this.colorImgData.width-1));
-            y=this.core.randomInt(0,(this.colorImgData.height-1));
-            wid=this.core.randomInt(20,40);
-            high=this.core.randomInt(20,40);
+        for (n=0;n!=nCount;n++) {
+            x=(int)(Math.random()*(textureSize-1));
+            y=(int)(Math.random()*(textureSize-1));
+            wid=20+(int)(Math.random()*40.f);
+            high=20+(int)(Math.random()*40.f);
             
-            this.createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,this.core.randomPercentage(0.5));
+            createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,(Math.random()<0.5f));
         }
         
             // blur to fix any missing pixels and make the
             // height change not as drastic
             
-        this.blur(this.noiseNormals,0,0,this.colorImgData.width,this.colorImgData.height,5,false);
+        blur(noiseNormals,0,0,textureSize,textureSize,5,false);
     }
-    
-    drawNormalNoiseRect(lft,top,rgt,bot)
-    {
-        let x,y,idx;
-        let normalData=this.normalImgData.data;
 
-        for (y=top;y!==bot;y++) {
-            for (x=lft;x!==rgt;x++) {
-                idx=((y*this.colorCanvas.width)+x)*4;
+    public void drawNormalNoiseRect(int lft,int top,int rgt,int bot)
+    {
+        int         x,y,idx;
+
+        for (y=top;y!=bot;y++) {
+            for (x=lft;x!=rgt;x++) {
+                idx=((y*textureSize)+x)*4;
                 
-                normalData[idx]=this.noiseNormals[idx];
-                normalData[idx+1]=this.noiseNormals[idx+1];
-                normalData[idx+2]=this.noiseNormals[idx+2];
+                normalData[idx]=noiseNormals[idx];
+                normalData[idx+1]=noiseNormals[idx+1];
+                normalData[idx+2]=noiseNormals[idx+2];
              }
         }
     }
-    
+
+    /*
         //
         // distortions
         //
@@ -738,20 +731,20 @@ public class BitmapBase
         if ((lft>=rgt) || (top>=bot)) return;
 
         for (y=top;y<=bot;y++) {
-            if ((y<0) || (y>=bitmapTextureSize)) continue;
+            if ((y<0) || (y>=textureSize)) continue;
             
             for (x=lft;x<=rgt;x++) {
-                if ((x<0) || (x>=bitmapTextureSize)) continue;
+                if ((x<0) || (x>=textureSize)) continue;
                 
-                idx=((y*bitmapTextureSize)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 
-                colorData[idx]=(byte)(color.r*255.0f);
-                colorData[idx+1]=(byte)(color.g*255.0f);
-                colorData[idx+2]=(byte)(color.b*255.0f);
+                colorData[idx]=color.r;
+                colorData[idx+1]=color.g;
+                colorData[idx+2]=color.b;
 
-                normalData[idx]=(byte)((this.NORMAL_CLEAR.x+1.0)*127.0f);
-                normalData[idx+1]=(byte)((this.NORMAL_CLEAR.y+1.0)*127.0f);
-                normalData[idx+2]=(byte)((this.NORMAL_CLEAR.z+1.0)*127.0f);
+                normalData[idx]=(NORMAL_CLEAR.x+1.0f)*0.5f;
+                normalData[idx+1]=(NORMAL_CLEAR.y+1.0f)*0.5f;
+                normalData[idx+2]=(NORMAL_CLEAR.z+1.0f)*0.5f;
             }
         }
     }
@@ -2122,27 +2115,26 @@ public class BitmapBase
         // specular routines
         //
 
-    public void createSpecularMap(int contrast,float clamp)
+    public void createSpecularMap(float contrast,float clamp)
     {
-        int     n,idx,nPixel;
-        byte    b;
+        int     n,idx,pixelSize;
         float   f,min,max,expandFactor,contrastFactor;
         
-        nPixel=bitmapTextureSize*bitmapTextureSize;
+        pixelSize=textureSize*textureSize;
         
             // get the contrast factor
             
-        contrastFactor=(259*(contrast+255))/(255*(259-contrast));
+        contrastFactor=(1.02f*(contrast+1.0f))/(1.0f*(1.02f-contrast));
         
             // find a min-max across the entire map, we do this
             // so we can readjust the contrast to be 0..1
             
-        min=max=(float)(colorData[0]+colorData[1]+colorData[2])*0.33f;
+        min=max=(colorData[0]+colorData[1]+colorData[2])*0.33f;
 
         idx=0;
         
-        for (n=0;n!=nPixel;n++) {
-            f=(float)(colorData[idx]+colorData[idx+1]+colorData[idx+2])*0.33f;
+        for (n=0;n!=pixelSize;n++) {
+            f=(colorData[idx]+colorData[idx+1]+colorData[idx+2])*0.33f;
             if (f<min) min=f;
             if (f>max) max=f;
 
@@ -2154,33 +2146,33 @@ public class BitmapBase
             min=0.0f;
         }
         else {
-            expandFactor=255.0f/(max-min);
+            expandFactor=1.0f/(max-min);
         }
         
             // now run the contrast
             
         idx=0;
         
-        for (n=0;n!=nPixel;n++) {
+        for (n=0;n!=pixelSize;n++) {
             
                 // get the pixel back into 0..1
                 
-            f=(float)(colorData[idx]+colorData[idx+1]+colorData[idx+2])*0.33f;
+            f=(colorData[idx]+colorData[idx+1]+colorData[idx+2])*0.33f;
             f=(f-min)*expandFactor;
             
                 // apply the contrast and
                 // clamp it
                 
-            f=((contrastFactor*(f-128.0f))+128.0f);
+            f=((contrastFactor*(f-0.5f))+0.5f);
             if (f<0.0f) f=0.0f;
-            if (f>255.0f) f=255.0f;
+            if (f>1.0f) f=1.0f;
             
-            b=(byte)((int)(f*clamp));
+            f*=clamp;
                     
-            specularData[idx++]=b;
-            specularData[idx++]=b;
-            specularData[idx++]=b;
-            specularData[idx++]=(byte)255;
+            specularData[idx++]=f;
+            specularData[idx++]=f;
+            specularData[idx++]=f;
+            specularData[idx++]=1.0f;
         } 
     }
 
@@ -2188,7 +2180,7 @@ public class BitmapBase
         // clear and write images
         //
         
-    private void clearImageData(byte[] imgData,byte r,byte g,byte b,byte a)
+    private void clearImageData(float[] imgData,float r,float g,float b,float a)
     {
         int     n;
         
@@ -2200,16 +2192,30 @@ public class BitmapBase
         }
     }
     
-    private void writeImageData(byte[] imgData,String path)
+    private void writeImageData(float[] imgData,String path)
     {
+        int                 n,k;
+        byte[]              imgDataByte;
         DataBuffer          dataBuffer;
         WritableRaster      writeRaster;
         ColorModel          colorModel;
         BufferedImage       bufImage;
         
+            // image data if all floats, so covert to bytes here
+            
+        imgDataByte=new byte[imgData.length];
+        
+        for (n=0;n!=imgData.length;n++) {
+            k=(int)(imgData[n]*255.0f);
+            if (k<0) k=0;
+            if (k>255) k=255;
+            
+            imgDataByte[n]=(byte)k;
+        }
+        
         try {
-            dataBuffer=new DataBufferByte(imgData,imgData.length);
-            writeRaster=Raster.createInterleavedRaster(dataBuffer,bitmapTextureSize,bitmapTextureSize,(bitmapTextureSize*4),4,new int[]{0,1,2,3},(Point)null);
+            dataBuffer=new DataBufferByte(imgDataByte,imgDataByte.length);
+            writeRaster=Raster.createInterleavedRaster(dataBuffer,textureSize,textureSize,(textureSize*4),4,new int[]{0,1,2,3},(Point)null);
             colorModel=new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB),true,true,Transparency.OPAQUE,DataBuffer.TYPE_BYTE);
             bufImage=new BufferedImage(colorModel,writeRaster,true,null);
             ImageIO.write(bufImage,"png",new File(path));
@@ -2228,12 +2234,12 @@ public class BitmapBase
     {
         int         mid;
         
-        mid=bitmapTextureSize/2;
+        mid=textureSize/2;
         
         drawRect(0,0,mid,mid,new RagColor(1.0f,1.0f,0.0f));
-        drawRect(mid,0,bitmapTextureSize,mid,new RagColor(1.0f,0.0f,0.0f));
-        drawRect(0,mid,mid,bitmapTextureSize,new RagColor(0.0f,1.0f,0.0f));
-        drawRect(mid,mid,bitmapTextureSize,bitmapTextureSize,new RagColor(0.0f,0.0f,1.0f));
+        drawRect(mid,0,textureSize,mid,new RagColor(1.0f,0.0f,0.0f));
+        drawRect(0,mid,mid,textureSize,new RagColor(0.0f,1.0f,0.0f));
+        drawRect(mid,mid,textureSize,textureSize,new RagColor(0.0f,0.0f,1.0f));
     }
 
     public void generate(int variationMode,String name)
@@ -2242,17 +2248,17 @@ public class BitmapBase
         
             // setup all the bitmaps for drawing
             
-        imgSize=(bitmapTextureSize*4)*bitmapTextureSize;
+        imgSize=(textureSize*4)*textureSize;
         
-        colorData=new byte[imgSize];
-        normalData=new byte[imgSize];
-        specularData=new byte[imgSize];
-        glowData=new byte[imgSize];
+        colorData=new float[imgSize];
+        normalData=new float[imgSize];
+        specularData=new float[imgSize];
+        glowData=new float[imgSize];
 
-        clearImageData(colorData,(byte)255,(byte)255,(byte)255,(byte)255);
-        clearImageData(normalData,(byte)0,(byte)0,(byte)255,(byte)255);
-        clearImageData(specularData,(byte)0,(byte)0,(byte)0,(byte)255);
-        clearImageData(glowData,(byte)0,(byte)0,(byte)0,(byte)255);
+        clearImageData(colorData,1.0f,1.0f,1.0f,1.0f);
+        clearImageData(normalData,0.5f,0.5f,1.0f,1.0f);
+        clearImageData(specularData,0.0f,0.0f,0.0f,1.0f);
+        clearImageData(glowData,0.0f,0.0f,0.0f,1.0f);
 
             // run the internal generator
 

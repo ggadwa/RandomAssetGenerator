@@ -1,5 +1,7 @@
 package com.klinksoftware.rag.bitmaps;
 
+import com.klinksoftware.rag.utility.*;
+
 public class BitmapBrick extends BitmapBase
 {
     public final int VARIATION_NONE=0;
@@ -94,21 +96,26 @@ public class BitmapBrick extends BitmapBase
         
         let edgeSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
         let paddingSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
+        */
         
-        let brickColor=this.getRandomColor();
-        let altBrickColor=this.getRandomColor();
-        let groutColor=this.getRandomGray(0.4,0.6);
+        RagColor            brickColor,altBrickColor,groutColor;
+        
+        brickColor=getRandomColor();
+        altBrickColor=getRandomColor();
+        groutColor=getRandomGray(0.4f,0.6f);
         
             // create noise data
         
-        this.createPerlinNoiseData(32,32);
-        this.createNormalNoiseData(1.5,0.5);
+        createPerlinNoiseData(32,32);
+        createNormalNoiseData(1.5f,0.5f);
         
             // grout is a static noise color
             
-        this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,groutColor);
-        this.drawStaticNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,1.0,1.4);
-        this.blur(this.colorImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,1,false);
+        this.drawRect(0,0,textureSize,textureSize,groutColor);
+        this.drawStaticNoiseRect(0,0,textureSize,textureSize,1.0f,1.4f);
+        this.blur(colorData,0,0,textureSize,textureSize,1,false);
+         
+         /*
         
             // draw the bricks
             
@@ -165,11 +172,10 @@ public class BitmapBrick extends BitmapBase
             top+=yAdd;
             halfBrick=!halfBrick;
         }
-        
+        */
             // finish with the specular
 
-        createSpecularMap(125,0.4f);
-*/
+        createSpecularMap(0.5f,0.4f);
     }
 
 }

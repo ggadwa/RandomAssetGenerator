@@ -1,14 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.klinksoftware.rag.utility;
 
-/**
- *
- * @author ggadwa
- */
 public class RagVector
 {
     public float        x,y,z;
@@ -18,5 +9,28 @@ public class RagVector
         this.x=x;
         this.y=y;
         this.z=z;
+    }
+    
+    public void normalize()
+    {
+        float       f;
+        
+        f=(float)Math.sqrt((x*x)+(y*y)+(z*z));
+        if (f!=0.0f) f=1.0f/f;
+        
+        x*=f;
+        y*=f;
+        z*=f;
+    }
+    
+    public void normalize2D()
+    {
+        float       f;
+        
+        f=(float)Math.sqrt((x*x)+(y*y));
+        if (f!=0.0f) f=1.0f/f;
+        
+        x*=f;
+        y*=f;
     }
 }
