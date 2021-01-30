@@ -8,6 +8,7 @@ public class GeneratorMain
     {
         (new BitmapBase(BitmapBase.COLOR_SCHEME_RANDOM)).generate(0,"base");
         (new BitmapBrick(BitmapBase.COLOR_SCHEME_RANDOM)).generate(0,"brick");
+        (new BitmapStone(BitmapBase.COLOR_SCHEME_RANDOM)).generate(0,"stone");
         System.out.println("done!");
     }
 }

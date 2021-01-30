@@ -11,41 +11,42 @@ public class BitmapBrick extends BitmapBase
         super(colorScheme);
         
         hasNormal=true;
-        hasSpecular=true;
+        hasMetallicRoughness=true;
         hasGlow=false;
     }
-/*    
+   
         //
         // brick bitmaps
         //
 
-    generateSingleBrick(lft,top,rgt,bot,edgeSize,paddingSize,brickColor,altBrickColor,isHalf,isSmall,isLarge)
+    private void generateSingleBrick(int lft,int top,int rgt,int bot,int edgeSize,int paddingSize,RagColor brickColor,RagColor altBrickColor,boolean isHalf,boolean isSmall,boolean isLarge)
     {
-        let f,sx,ex,streakWid;
-        let drawBrickColor,drawFrameColor,lineColor,streakColor;
+        int         sx,ex,streakWid;
+        float       f;
+        RagColor    drawBrickColor,drawFrameColor,lineColor,streakColor;
 
             // the brick
 
-        f=1.0;
-        if (!((lft<0) || (rgt>this.colorImgData.width))) {        // don't darken bricks that fall off edges
-            f=0.6+(this.core.random()*0.4);
+        f=1.0f;
+        if (!((lft<0) || (rgt>textureSize))) {        // don't darken bricks that fall off edges
+            f=0.6f+(float)(Math.random()*0.4);
         }
 
         if (isLarge) {
-            drawBrickColor=this.adjustColor(altBrickColor,f);
-            drawFrameColor=this.adjustColorRandom(drawBrickColor,0.85,0.95);
-            this.drawRect(0,top,this.colorImgData.width,(bot-paddingSize),drawBrickColor);
-            this.draw3DFrameRect(-edgeSize,top,(this.colorImgData.width+edgeSize),(bot-paddingSize),edgeSize,drawFrameColor,true);
-            this.drawPerlinNoiseRect(0,(top+edgeSize),this.colorImgData.width,(bot-(edgeSize+paddingSize)),0.8,1.3);
-            this.drawNormalNoiseRect(0,(top+edgeSize),this.colorImgData.width,(bot-(edgeSize+paddingSize)));
+            drawBrickColor=adjustColor(altBrickColor,f);
+            drawFrameColor=adjustColorRandom(drawBrickColor,0.85f,0.95f);
+            drawRect(0,top,textureSize,(bot-paddingSize),drawBrickColor);
+            draw3DFrameRect(-edgeSize,top,(textureSize+edgeSize),(bot-paddingSize),edgeSize,drawFrameColor,true);
+            drawPerlinNoiseRect(0,(top+edgeSize),textureSize,(bot-(edgeSize+paddingSize)),0.8f,1.3f);
+            drawNormalNoiseRect(0,(top+edgeSize),textureSize,(bot-(edgeSize+paddingSize)));
         }
         else {
-            drawBrickColor=this.adjustColor((isSmall?altBrickColor:brickColor),f);
-            drawFrameColor=this.adjustColorRandom(drawBrickColor,0.85,0.95);
-            this.drawRect(lft,top,(rgt-paddingSize),(bot-paddingSize),drawBrickColor);
-            this.draw3DFrameRect(lft,top,(rgt-paddingSize),(bot-paddingSize),edgeSize,drawFrameColor,true);
-            this.drawPerlinNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-(edgeSize+paddingSize)),(bot-(edgeSize+paddingSize)),0.8,1.3);
-            this.drawNormalNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-(edgeSize+paddingSize)),(bot-(edgeSize+paddingSize)));
+            drawBrickColor=adjustColor((isSmall?altBrickColor:brickColor),f);
+            drawFrameColor=adjustColorRandom(drawBrickColor,0.85f,0.95f);
+            drawRect(lft,top,(rgt-paddingSize),(bot-paddingSize),drawBrickColor);
+            draw3DFrameRect(lft,top,(rgt-paddingSize),(bot-paddingSize),edgeSize,drawFrameColor,true);
+            drawPerlinNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-(edgeSize+paddingSize)),(bot-(edgeSize+paddingSize)),0.8f,1.3f);
+            drawNormalNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-(edgeSize+paddingSize)),(bot-(edgeSize+paddingSize)));
         }
 
             // any streaks/stains/cracks
@@ -60,49 +61,46 @@ public class BitmapBrick extends BitmapBase
 
                 // any cracks
 
-            if (this.core.randomPercentage(0.1)) {
+            if (Math.random()<0.1) {
                 if ((rgt-lft)>45) {
-                    sx=this.core.randomInBetween((lft+15),(rgt-15));
-                    ex=sx+(this.core.randomInt(5,25)-15);
+                    sx=(lft+15)+(int)(Math.random()*(double)((rgt-15)-(lft+15)));
+                    ex=sx+((5+(int)(Math.random()*25.0))-15);
 
-                    lineColor=this.adjustColorRandom(drawBrickColor,0.65,0.75);
-                    this.drawVerticalCrack(sx,top,bot,lft,rgt,this.core.randomSign(),10,lineColor,true);
+                    lineColor=adjustColorRandom(drawBrickColor,0.65f,0.75f);
+                    drawVerticalCrack(sx,top,bot,lft,rgt,(int)Math.signum(Math.random()-0.5),10,lineColor,true);
                 }
             }
 
                 // streaks
 
-            if (this.core.randomPercentage(0.2)) {
-                streakWid=this.core.randomInBetween(Math.trunc((rgt-lft)*0.3),Math.trunc((rgt-lft)*0.6));
+            if (Math.random()<0.2) {
+                streakWid=(int)((float)(rgt-lft)*0.3f)+(int)(Math.random()*((double)(rgt-lft)*0.3));
                 if (streakWid<10) streakWid=10;
-                if (streakWid>(this.colorImgData.width*0.1)) streakWid=this.colorImgData.width*0.1;
+                if (streakWid>(int)((float)textureSize*0.1f)) streakWid=(int)((float)textureSize*0.1f);
 
-                sx=this.core.randomInt(lft,((rgt-lft)-streakWid));
+                sx=lft+(int)(Math.random()*(double)((rgt-lft)-streakWid));
                 ex=sx+streakWid;
 
-                streakColor=this.adjustColorRandom(drawBrickColor,0.65,0.75);
-                this.drawStreakDirt(sx,top,ex,bot,5,0.25,0.35,streakColor);
+                streakColor=adjustColorRandom(drawBrickColor,0.65f,0.75f);
+                drawStreakDirt(sx,top,ex,bot,5,0.25f,0.45f,streakColor);
             }
         }
     }
-    */
     
     @Override
     public void generateInternal(int variationMode)
     {
-        /*
-        let x,y,xCount,xAdd,yCount,yAdd;
-        let halfWid,halfBrick,lft,top;
-        
-        let edgeSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
-        let paddingSize=this.core.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
-        */
-        
+        int                 x,y,xCount,xAdd,yCount,yAdd,
+                            halfWid,lft,top,edgeSize,paddingSize;
+        boolean             halfBrick;
         RagColor            brickColor,altBrickColor,groutColor;
         
         brickColor=getRandomColor();
         altBrickColor=getRandomColor();
         groutColor=getRandomGray(0.4f,0.6f);
+        
+        edgeSize=(int)((float)textureSize*0.005)+(int)(Math.random()*((float)textureSize*0.0125));
+        paddingSize=(int)((float)textureSize*0.005)+(int)(Math.random()*((float)textureSize*0.0125));
         
             // create noise data
         
@@ -114,35 +112,33 @@ public class BitmapBrick extends BitmapBase
         this.drawRect(0,0,textureSize,textureSize,groutColor);
         this.drawStaticNoiseRect(0,0,textureSize,textureSize,1.0f,1.4f);
         this.blur(colorData,0,0,textureSize,textureSize,1,false);
-         
-         /*
         
             // draw the bricks
             
-        xCount=this.core.randomInt(4,4);
-        xAdd=Math.trunc(this.colorImgData.width/xCount);
-        halfWid=Math.trunc(xAdd/2);
+        xCount=4+(int)(Math.random()*4.0);
+        xAdd=textureSize/xCount;
+        halfWid=xAdd/2;
 
-        yCount=this.core.randomInt(4,5);
-        yAdd=Math.trunc(this.colorImgData.height/yCount);
+        yCount=4+(int)(Math.random()*5.0);
+        yAdd=textureSize/yCount;
 
         top=0;
         halfBrick=false;
 
-        for (y=0;y!==yCount;y++) {
+        for (y=0;y!=yCount;y++) {
 
                 // special lines (full line or double bricks)
                 
-            if (this.core.randomPercentage(0.2)) {
-                if (this.core.randomPercentage(0.5)) {
-                    this.generateSingleBrick(0,top,(this.colorImgData.width-1),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,false,true);
+            if (Math.random()<0.2) {
+                if (Math.random()<0.5) {
+                    generateSingleBrick(0,top,(textureSize-1),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,false,true);
                 }
                 else {
                     lft=0;
                     
-                    for (x=0;x!==xCount;x++) {
-                        this.generateSingleBrick(lft,top,(lft+halfWid),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
-                        this.generateSingleBrick((lft+halfWid),top,((x===(xCount-1))?(this.colorImgData.width-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
+                    for (x=0;x!=xCount;x++) {
+                        generateSingleBrick(lft,top,(lft+halfWid),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
+                        generateSingleBrick((lft+halfWid),top,((x==(xCount-1))?(textureSize-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
                         lft+=xAdd;
                     }
                 }
@@ -154,16 +150,16 @@ public class BitmapBrick extends BitmapBase
                 if (halfBrick) {
                     lft=-halfWid;
 
-                    for (x=0;x!==(xCount+1);x++) {
-                        this.generateSingleBrick(lft,top,(lft+xAdd),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,((x===0)||(x===xCount)),false,false);
+                    for (x=0;x!=(xCount+1);x++) {
+                        generateSingleBrick(lft,top,(lft+xAdd),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,((x==0)||(x==xCount)),false,false);
                         lft+=xAdd;
                     }
                 }
                 else {
                    lft=0;
 
-                    for (x=0;x!==xCount;x++) {
-                        this.generateSingleBrick(lft,top,((x===(xCount-1))?(this.colorImgData.width-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,(lft<0),false,false);
+                    for (x=0;x!=xCount;x++) {
+                        generateSingleBrick(lft,top,((x==(xCount-1))?(textureSize-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,(lft<0),false,false);
                         lft+=xAdd;
                     }
                 }
@@ -172,10 +168,10 @@ public class BitmapBrick extends BitmapBase
             top+=yAdd;
             halfBrick=!halfBrick;
         }
-        */
-            // finish with the specular
 
-        createSpecularMap(0.5f,0.4f);
+            // finish with the metallic-roughness
+
+        createMetallicRoughnessMap(0.5f,0.4f);
     }
 
 }
