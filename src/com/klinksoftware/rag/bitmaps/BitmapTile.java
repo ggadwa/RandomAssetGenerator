@@ -1,32 +1,27 @@
-import ColorClass from '../../utility/color.js';
-import BitmapClass from '../../bitmap/bitmap.js';
-import GenerateBitmapBaseClass from './generate_bitmap_base.js';
+package com.klinksoftware.rag.bitmaps;
 
-//
-// generate tile bitmap class
-//
+import com.klinksoftware.rag.utility.*;
 
-export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
+public class BitmapTile extends BitmapBase
 {
-    constructor(core,colorScheme)
+    public final int VARIATION_NONE=0;
+    
+    public BitmapTile(int colorScheme)
     {
-        super(core,colorScheme);
+        super(colorScheme);
         
-        this.VARIATION_NONE=0;
-        
-        this.hasNormal=true;
-        this.hasSpecular=true;
-        this.hasGlow=false;
-        
-        Object.seal(this);
+        hasNormal=true;
+        hasMetallicRoughness=true;
+        hasGlow=false;
     }
-        
+    
         //
         // tile bitmaps
         //
-        
-    generateTilePiece(lft,top,rgt,bot,tileColor,designColor,splitCount,complex)
+
+    private void generateTilePiece(int lft,int top,int rgt,int bot,RagColor[] tileColor,RagColor designColor,int splitCount,boolean complex)
     {
+        /*
         let x,y,sx,sy,ex,ey,dLft,dTop,dRgt,dBot,tileWid,tileHigh,tileStyle;
         let col,frameCol,edgeSize,padding;
         let crackSegCount,crackXVarient,crackYVarient;
@@ -158,44 +153,47 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                 }
             }
         }
+*/
     }
 
-    generateInternal(variationMode)
+    @Override
+    public void generateInternal(int variationMode)
     {
-        let splitCount,designColor,groutColor;
-        let complex,small;
-        let tileColor=[];
+        int             splitCount;
+        boolean         complex,small;
+        RagColor[]      tileColor;
+        RagColor        designColor,groutColor;
         
             // get splits
             
-        complex=this.core.randomPercentage(0.5);
+        complex=(Math.random()<0.5);
         
         small=false;
-        if (!complex) small=this.core.randomPercentage(0.5);
+        if (!complex) small=(Math.random()<0.5);
 
         if (!small) {
-            splitCount=this.core.randomInt(2,2);
+            splitCount=2+(int)(Math.random()*2.0);
         }
         else {
-            splitCount=this.core.randomInt(6,4);
+            splitCount=6+(int)(Math.random()*4.0);
         }
         
             // colors
             
-        tileColor[0]=this.getRandomColor();
-        tileColor[1]=this.getRandomColor();
-        designColor=this.getRandomColor();
-        groutColor=this.getRandomColorDull(tileColor[0],0.7);
+        tileColor=new RagColor[2];
+        tileColor[0]=getRandomColor();
+        tileColor[1]=getRandomColor();
+        designColor=getRandomColor();
+        groutColor=getRandomColorDull(0.7f);
         
-        this.createPerlinNoiseData(16,16);
+        createPerlinNoiseData(16,16);
 
             // original splits
 
-        this.generateTilePiece(0,0,this.colorImgData.width,this.colorImgData.height,tileColor,designColor,splitCount,complex);
+        generateTilePiece(0,0,textureSize,textureSize,tileColor,designColor,splitCount,complex);
 
-            // finish with the specular
+            // finish with the metallic-roughness
 
-        this.createSpecularMap(120,0.4);
+        createMetallicRoughnessMap(0.45f,0.4f);
     }
-
 }

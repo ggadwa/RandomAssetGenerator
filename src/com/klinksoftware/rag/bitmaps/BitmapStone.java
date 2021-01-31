@@ -19,25 +19,25 @@ public class BitmapStone extends BitmapBase
         // stone bitmaps
         //
 
-   @Override
+    @Override
     public void generateInternal(int variationMode)
     {
         int             y,yCount,yAdd,xOff,yOff,edgeSize,
                         lft,rgt,top,bot;
         float           xRoundFactor,yRoundFactor,normalZFactor;
+        float[]         backgroundData,stoneCopyData;
         RagColor        stoneColor,altStoneColor,drawStoneColor,groutColor,outlineColor;
         
         stoneColor=getRandomColor();
         altStoneColor=getRandomColor();
         groutColor=getRandomGray(0.35f,0.55f);
-        outlineColor=null; // this.adjustColor(groutColor,0.95);        // this doesn't make it any better
         
             // the noise grout
             
         drawRect(0,0,textureSize,textureSize,groutColor);
-        createPerlinNoiseData(16,16);
-        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.4f,1.2f);
-        drawStaticNoiseRect(0,0,textureSize,textureSize,0.7f,1.1f);
+        createPerlinNoiseData(32,32);
+        drawStaticNoiseRect(0,0,textureSize,textureSize,0.5f,0.8f);
+        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.1f,0.8f);
         blur(colorData,0,0,textureSize,textureSize,1,false);
         
         createNormalNoiseData(2.5f,0.5f);
@@ -49,6 +49,13 @@ public class BitmapStone extends BitmapBase
         this.createPerlinNoiseData(32,32);
         this.createNormalNoiseData(5.0f,0.3f);
         
+            // we draw the stones all alone on the noise
+            // background so we can distort the stones and
+            // only catch the background
+            
+        backgroundData=colorData.clone();
+        stoneCopyData=colorData.clone();
+        
             // draw the stones
             
         yCount=4+(int)(Math.random()*4.0);
@@ -57,18 +64,19 @@ public class BitmapStone extends BitmapBase
         top=0;
         
         for (y=0;y!=yCount;y++) {
-            bot=(y==(yCount-1))?textureSize:(top+yAdd);
+            bot=(y==(yCount-1))?(textureSize-1):(top+yAdd);
+            if (bot>=textureSize) bot=textureSize-1;
             
             lft=0;
             
             while (true) {
                 rgt=lft+(yAdd+(int)(Math.random()*((double)yAdd*0.8)));
-                if (rgt>textureSize) rgt=textureSize;
+                if (rgt>=textureSize) rgt=textureSize-1;
 
                     // special check if next stone would be too small,
                     // so enlarge this stone to cover it
                     
-                if ((textureSize-rgt)<yAdd) rgt=textureSize;
+                if ((textureSize-rgt)<yAdd) rgt=textureSize-1;
                 
                     // the stone itself
                     
@@ -81,22 +89,35 @@ public class BitmapStone extends BitmapBase
                 xRoundFactor=0.02f+(float)(Math.random()*0.05);
                 yRoundFactor=0.02f+(float)(Math.random()*0.05);
                 normalZFactor=(float)(Math.random()*0.2);           // different z depths
-
-                drawOval((lft+xOff),(top+yOff),(rgt+xOff),(bot+yOff),0.0f,1.0f,xRoundFactor,yRoundFactor,edgeSize,0.5f,drawStoneColor,outlineColor,normalZFactor,false,true,0.4f,1.2f);
+                
+                    // draw on the background
+                    
+                colorData=backgroundData.clone();
+                
+                outlineColor=adjustColor(drawStoneColor,0.5f);
+                drawOval((lft+xOff),(top+yOff),rgt,bot,0.0f,1.0f,xRoundFactor,yRoundFactor,edgeSize,0.5f,drawStoneColor,outlineColor,normalZFactor,false,true,0.4f,1.2f);
 
                     // gravity distortions to make stones unique
                     
-                //gravityDistortEdges((lft+xOff),(top+yOff),(rgt+xOff),(bot+yOff),5,20,5);
+                gravityDistortEdges((lft+xOff),(top+yOff),rgt,bot,10,25,8);
+                
+                    // and copy over
+                    
+                blockCopy(colorData,(lft+xOff),(top+yOff),rgt,bot,stoneCopyData);
 
                 lft=rgt;
-                if (rgt==textureSize) break;
+                if (rgt==(textureSize-1)) break;
             }
             
             top+=yAdd;
         }
+        
+            // finally push over the stone copy version
+            
+        colorData=stoneCopyData;
 
             // finish with the metallic-roughness
 
-        this.createMetallicRoughnessMap(0.5f,0.5f);
+        createMetallicRoughnessMap(0.5f,0.5f);
     }
 }

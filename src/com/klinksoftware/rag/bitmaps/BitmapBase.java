@@ -181,6 +181,25 @@ public class BitmapBase
         f=minFactor+((float)Math.random()*(maxFactor-minFactor));
         return(new RagColor((color.r*f),(color.g*f),(color.b*f)));
     }
+    
+        //
+        // block copy
+        //
+    
+    protected void blockCopy(float[] fromData,int lft,int top,int rgt,int bot,float[] toData)
+    {
+        int     x,y,idx,rowCount;
+        
+        rowCount=(rgt-lft)*4;
+
+        for (y=top;y!=bot;y++) {
+            idx=((y*textureSize)+lft)*4;
+
+            for (x=0;x!=rowCount;x++) {
+                toData[idx]=fromData[idx++];
+            }
+        }         
+    }
 
         //
         // blur
@@ -635,73 +654,77 @@ public class BitmapBase
         }
     }
 
-    /*
         //
         // distortions
         //
     
-    gravityDistortEdges(lft,top,rgt,bot,distortCount,distortRadius,distortSize)
+    protected void gravityDistortEdges(int lft,int top,int rgt,int bot,int distortCount,int distortRadius,int distortSize)
     {
-        let n,x,y,d,dx,dy,gx,gy;
-        let sx,sy,idx,idx2;
-        let colorData=this.colorImgData.data;
-        let colorDataCopy=new Uint8Array(colorData);
-        let normalData=this.normalImgData.data;
-        let normalDataCopy=new Uint8Array(normalData);
+        int         n,x,y,gx,gy,sx,sy,dx,dy,
+                    idx,idx2;
+        float       d;
+        float[]     colorDataCopy,normalDataCopy;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+            // color and normal copies
+            
+        colorDataCopy=colorData.clone();
+        normalDataCopy=normalData.clone();
         
             // run a number of gravity distortions
             
-        for (n=0;n!==distortCount;n++) {
+        for (n=0;n!=distortCount;n++) {
 
                 // find a gravity point on an edge
 
-            switch (this.core.randomIndex(4)) {
+            switch ((int)(Math.random()*4.0)) {
                 case 0:
                     gx=lft+distortSize;
-                    gy=this.core.randomInBetween(top,bot);
+                    gy=top+(int)(Math.random()*(double)(bot-top));
                     break;
                 case 1:
                     gx=rgt-distortSize;
-                    gy=this.core.randomInBetween(top,bot);
+                    gy=top+(int)(Math.random()*(double)(bot-top));
                     break;
                 case 2:
-                    gx=this.core.randomInBetween(lft,rgt);
+                    gx=lft+(int)(Math.random()*(double)(rgt-lft));
                     gy=top+distortSize;
                     break;
                 default:
-                    gx=this.core.randomInBetween(lft,rgt);
+                    gx=lft+(int)(Math.random()*(double)(rgt-lft));
                     gy=bot-distortSize;
                     break;
             }
         
                 // distort bitmap
                 
-            for (y=top;y!==bot;y++) {
-                for (x=lft;x!==rgt;x++) {
+            for (y=top;y!=bot;y++) {
+                for (x=lft;x!=rgt;x++) {
 
                     sx=x;
                     sy=y;
                         
                     dx=gx-x;
                     dy=gy-y;
-                    d=Math.sqrt((dx*dx)+(dy*dy));
+                    d=(float)Math.sqrt((dx*dx)+(dy*dy));
 
-                    if (d<distortRadius) {
-                        d=1.0-(d/distortRadius);
-                        sx=sx-Math.trunc((Math.sign(dx)*distortSize)*d);
-                        sy=sy-Math.trunc((Math.sign(dy)*distortSize)*d);
+                    if (d<(float)distortRadius) {
+                        d=1.0f-(d/(float)distortRadius);
+                        sx=sx-(int)(((float)Math.signum(dx)*(float)distortSize)*d);
+                        sy=sy-(int)(((float)Math.signum(dy)*(float)distortSize)*d);
                         
-                        if (sx<0) sx=this.colorImgData.width+sx;
-                        if (sx>=this.colorImgData.width) sx=this.colorImgData.width-sx;
-                        if (sy<0) sy=this.colorImgData.height+sy;
-                        if (sy>=this.colorImgData.height) sy=this.colorImgData.height-sy;
+                        if (sx<0) sx=0;
+                        if (sx>=textureSize) sx=textureSize-1;
+                        if (sy<0) sy=0;
+                        if (sy>=textureSize) sy=textureSize-1;
                     }
                 
                         // shift the pixels
 
-                    idx=((y*this.colorImgData.width)+x)*4;
-                    idx2=((sy*this.colorImgData.width)+sx)*4;
-
+                    idx=((y*textureSize)+x)*4;
+                    idx2=((sy*textureSize)+sx)*4;
+                    
                     colorData[idx]=colorDataCopy[idx2];
                     colorData[idx+1]=colorDataCopy[idx2+1];
                     colorData[idx+2]=colorDataCopy[idx2+2];
@@ -713,7 +736,7 @@ public class BitmapBase
             }
         }
     }
-*/
+
         //
         // shape drawing
         //
@@ -837,37 +860,31 @@ public class BitmapBase
 
     protected void drawOval(int lft,int top,int rgt,int bot,float startArc,float endArc,float xRoundFactor,float yRoundFactor,int edgeSize,float edgeColorFactor,RagColor color,RagColor outlineColor,float normalZFactor,boolean flipNormals,boolean addNoise,float colorFactorMin,float colorFactorMax)
     {
-        /*
-        let n,x,y,mx,my,halfWid,halfHigh;
-        let rad,fx,fy,idx;
-        let nFactor;
-        let wid,high,edgeCount;
-        let origNormalData;
-        let colorFactorAdd=colorFactorMax-colorFactorMin;
-        let normal=new PointClass(0,0,0);
-        let colorData=this.colorImgData.data;
-        let normalData=this.normalImgData.data;
-        let perlinColorData=this.perlinNoiseColorFactor;
-        let noiseNormalData=this.noiseNormals;
-        let colFactor;
-        let col=new ColorClass(0,0,0);
+        int         n,x,y,mx,my,wid,high,idx,
+                    edgeCount,drawStartArc,drawEndArc;
+        float       fx,fy,halfWid,halfHigh,rad,
+                    colorFactorAdd,colorFactor,nFactor;
+        RagColor    col;
+        RagVector   normal;
         
         if ((lft>=rgt) || (top>=bot)) return;
         
             // start and end arc
             
-        startArc=Math.trunc(startArc*1000);
-        endArc=Math.trunc(endArc*1000);
-        if (startArc>=endArc) return;
+        drawStartArc=(int)(startArc*1000.0f);
+        drawEndArc=(int)(endArc*1000.0f);
+        if (drawStartArc>=drawEndArc) return;
         
             // the drawing size
             
         wid=(rgt-lft)-1;
         high=(bot-top)-1;         // avoids clipping on bottom from being on wid,high
-        mx=lft+Math.trunc(wid*0.5);
-        my=top+Math.trunc(high*0.5);
-
-        origNormalData=new Uint8Array(normalData);
+        mx=lft+(int)((float)wid*0.5f);
+        my=top+(int)((float)high*0.5f);
+        
+        col=new RagColor(0.0f,0.0f,0.0f);
+        normal=new RagVector(0.0f,0.0f,0.0f);
+        colorFactorAdd=colorFactorMax-colorFactorMin;
 
         edgeCount=edgeSize;
         
@@ -875,64 +892,63 @@ public class BitmapBase
 
         while ((wid>0) && (high>0)) {
 
-            halfWid=wid*0.5;
-            halfHigh=high*0.5;
+            halfWid=(float)wid*0.5f;
+            halfHigh=(float)high*0.5f;
             
-            for (n=startArc;n<endArc;n++) {
-                rad=(Math.PI*2.0)*(n*0.001);
+            for (n=drawStartArc;n<drawEndArc;n++) {
+                rad=(float)(Math.PI*2.0)*((float)n*0.001f);
 
-                fx=Math.sin(rad);
+                fx=(float)Math.sin(rad);
                 fx+=(fx*xRoundFactor);
-                if (fx>1.0) fx=1.0;
-                if (fx<-1.0) fx=-1.0;
+                if (fx>1.0f) fx=1.0f;
+                if (fx<-1.0f) fx=-1.0f;
                 
-                x=mx+Math.trunc(halfWid*fx);
-                if ((x<0) || (x>=this.colorImgData.width)) continue;
+                x=mx+(int)(halfWid*fx);
+                if ((x<0) || (x>=textureSize)) continue;
 
-                fy=Math.cos(rad);
+                fy=(float)Math.cos(rad);
                 fy+=(fy*yRoundFactor);
-                if (fy>1.0) fy=1.0;
-                if (fy<-1.0) fy=-1.0;
+                if (fy>1.0f) fy=1.0f;
+                if (fy<-1.0f) fy=-1.0f;
                 
-                y=my-Math.trunc(halfHigh*fy);
-                if ((y<0) || (y>=this.colorImgData.height)) continue;
+                y=my-(int)(halfHigh*fy);
+                if ((y<0) || (y>=textureSize)) continue;
                 
                     // edge darkening
                     
                 col.setFromColor(color);
                 
                 if (edgeCount>0) {
-                    colFactor=edgeColorFactor+((1.0-(edgeCount/edgeSize))*(1.0-edgeColorFactor));
-                    col.factor(colFactor);
+                    colorFactor=edgeColorFactor+((1.0f-((float)edgeCount/(float)edgeSize))*(1.0f-edgeColorFactor));
+                    col.factor(colorFactor);
                 }
                 
                 if (addNoise) {
-                    colFactor=colorFactorMin+(colorFactorAdd*perlinColorData[(y*this.colorImgData.width)+x]);
-                    col.factor(colFactor);
+                    colorFactor=colorFactorMin+(colorFactorAdd*perlinNoiseColorFactor[(y*textureSize)+x]);
+                    col.factor(colorFactor);
                 }
 
                     // the color
                 
-                idx=((y*this.colorImgData.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 
-                colorData[idx]=Math.trunc(col.r*255.0);
-                colorData[idx+1]=Math.trunc(col.g*255.0);
-                colorData[idx+2]=Math.trunc(col.b*255.0);
-                colorData[idx+3]=255;
+                colorData[idx]=col.r;
+                colorData[idx+1]=col.g;
+                colorData[idx+2]=col.b;
 
                     // get a normal for the pixel change
                     // if we are outside the edge, gradually fade it
                     // to the default pointing out normal
 
-                normal.x=0;
-                normal.y=0;
-                normal.z=1.0;
+                normal.x=0.0f;
+                normal.y=0.0f;
+                normal.z=1.0f;
                 
                 if (edgeCount>0) {
-                    nFactor=edgeCount/edgeSize;
-                    normal.x=(fx*nFactor)+(normal.x*(1.0-nFactor));
-                    normal.y=(fy*nFactor)+(normal.y*(1.0-nFactor));
-                    normal.z=(normalZFactor*nFactor)+(normal.z*(1.0-nFactor));
+                    nFactor=(float)edgeCount/(float)edgeSize;
+                    normal.x=(fx*nFactor)+(normal.x*(1.0f-nFactor));
+                    normal.y=(fy*nFactor)+(normal.y*(1.0f-nFactor));
+                    normal.z=(normalZFactor*nFactor)+(normal.z*(1.0f-nFactor));
                     if (flipNormals) {
                         normal.x=-normal.x;
                         normal.y=-normal.y;
@@ -942,16 +958,16 @@ public class BitmapBase
                     // add in noise normal
                     
                 if (addNoise) {
-                    normal.x=(((noiseNormalData[idx]/127.0)-1.0)*0.4)+(normal.x*0.6);
-                    normal.y=(((noiseNormalData[idx+1]/127.0)-1.0)*0.4)+(normal.y*0.6);
-                    normal.z=(((noiseNormalData[idx+2]/127.0)-1.0)*0.4)+(normal.z*0.6);
+                    normal.x=(((noiseNormals[idx]*0.5f)-1.0f)*0.4f)+(normal.x*0.6f);
+                    normal.y=(((noiseNormals[idx+1]*0.5f)-1.0f)*0.4f)+(normal.y*0.6f);
+                    normal.z=(((noiseNormals[idx+2]*0.5f)-1.0f)*0.4f)+(normal.z*0.6f);
                 }
                 
                 normal.normalize();
 
-                normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
-                normalData[idx+1]=(normal.y+1.0)*127.0;
-                normalData[idx+2]=(normal.z+1.0)*127.0;
+                normalData[idx]=(normal.x+1.0f)*0.5f;           // normals are -1...1 packed into a byte
+                normalData[idx+1]=(normal.y+1.0f)*0.5f;
+                normalData[idx+2]=(normal.z+1.0f)*0.5f;
             }
 
             if (edgeCount>0) edgeCount--;
@@ -962,43 +978,42 @@ public class BitmapBase
         
             // any outline
             
-        if (outlineColor!==null) {
+        if (outlineColor!=null) {
             wid=(rgt-lft)-1;
             high=(bot-top)-1;         // avoids clipping on bottom from being on wid,high
 
-            halfWid=wid*0.5;
-            halfHigh=high*0.5;
+            halfWid=(float)wid*0.5f;
+            halfHigh=(float)high*0.5f;
             
-            for (n=startArc;n<endArc;n++) {
-                rad=(Math.PI*2.0)*(n*0.001);
+            for (n=drawStartArc;n<drawEndArc;n++) {
+                rad=(float)(Math.PI*2.0)*((float)n*0.001f);
 
-                fx=Math.sin(rad);
+                fx=(float)Math.sin(rad);
                 fx+=(fx*xRoundFactor);
-                if (fx>1.0) fx=1.0;
-                if (fx<-1.0) fx=-1.0;
+                if (fx>1.0f) fx=1.0f;
+                if (fx<-1.0f) fx=-1.0f;
                 
-                x=mx+Math.trunc(halfWid*fx);
-                if ((x<0) || (x>=this.colorImgData.width)) continue;
+                x=mx+(int)(halfWid*fx);
+                if ((x<0) || (x>=textureSize)) continue;
 
-                fy=Math.cos(rad);
+                fy=(float)Math.cos(rad);
                 fy+=(fy*yRoundFactor);
-                if (fy>1.0) fy=1.0;
-                if (fy<-1.0) fy=-1.0;
+                if (fy>1.0f) fy=1.0f;
+                if (fy<-1.0f) fy=-1.0f;
                 
-                y=my-Math.trunc(halfHigh*fy);
-                if ((y<0) || (y>=this.colorImgData.height)) continue;
+                y=my-(int)(halfHigh*fy);
+                if ((y<0) || (y>=textureSize)) continue;
                 
                     // the color pixel
 
-                idx=((y*this.colorImgData.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
 
-                colorData[idx]=Math.trunc(outlineColor.r*255.0);
-                colorData[idx+1]=Math.trunc(outlineColor.g*255.0);
-                colorData[idx+2]=Math.trunc(outlineColor.b*255.0);
-                colorData[idx+3]=255;
+                colorData[idx]=outlineColor.r;
+                colorData[idx+1]=outlineColor.g;
+                colorData[idx+2]=outlineColor.b;
             }
         }
-        */
+
     }
     /*
     drawOvalGlow(lft,top,rgt,bot,color)
