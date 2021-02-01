@@ -4,7 +4,7 @@ import com.klinksoftware.rag.utility.*;
 
 public class BitmapBrick extends BitmapBase
 {
-    public final int VARIATION_NONE=0;
+    public final static int VARIATION_NONE=0;
     
     public BitmapBrick(int colorScheme)
     {

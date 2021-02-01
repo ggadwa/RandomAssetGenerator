@@ -4,7 +4,7 @@ import com.klinksoftware.rag.utility.*;
 
 public class BitmapStone extends BitmapBase
 {
-    public final int VARIATION_NONE=0;
+    public final static int VARIATION_NONE=0;
     
     public BitmapStone(int colorScheme)
     {
@@ -29,15 +29,15 @@ public class BitmapStone extends BitmapBase
         RagColor        stoneColor,altStoneColor,drawStoneColor,groutColor,outlineColor;
         
         stoneColor=getRandomColor();
-        altStoneColor=getRandomColor();
+        altStoneColor=getRandomColorDull(0.9f);
         groutColor=getRandomGray(0.35f,0.55f);
         
             // the noise grout
             
         drawRect(0,0,textureSize,textureSize,groutColor);
         createPerlinNoiseData(32,32);
-        drawStaticNoiseRect(0,0,textureSize,textureSize,0.5f,0.8f);
-        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.1f,0.8f);
+        drawStaticNoiseRect(0,0,textureSize,textureSize,0.5f,1.1f);
+        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.3f,0.9f);
         blur(colorData,0,0,textureSize,textureSize,1,false);
         
         createNormalNoiseData(2.5f,0.5f);
@@ -99,7 +99,7 @@ public class BitmapStone extends BitmapBase
 
                     // gravity distortions to make stones unique
                     
-                gravityDistortEdges((lft+xOff),(top+yOff),rgt,bot,10,25,8);
+                gravityDistortEdges((lft+xOff),(top+yOff),rgt,bot,10,35,5);
                 
                     // and copy over
                     

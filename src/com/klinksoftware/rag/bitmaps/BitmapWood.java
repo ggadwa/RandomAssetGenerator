@@ -1,33 +1,28 @@
-import ColorClass from '../../utility/color.js';
-import BitmapClass from '../../bitmap/bitmap.js';
-import GenerateBitmapBaseClass from './generate_bitmap_base.js';
+package com.klinksoftware.rag.bitmaps;
 
-//
-// generate wood bitmap class
-//
+import com.klinksoftware.rag.utility.*;
 
-export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
+public class BitmapWood extends BitmapBase
 {
-    constructor(core,colorScheme)
+    public final static int VARIATION_NONE=0;
+    public final static int VARIATION_BOX=1;
+    
+    public BitmapWood(int colorScheme)
     {
-        super(core,colorScheme);
+        super(colorScheme);
         
-        this.VARIATION_NONE=0;
-        this.VARIATION_BOX=1;
-        
-        this.hasNormal=true;
-        this.hasSpecular=true;
-        this.hasGlow=false;
-        
-        Object.seal(this);
+        hasNormal=true;
+        hasMetallicRoughness=true;
+        hasGlow=false;
     }
     
         //
         // wood bitmaps
         //
     
-    generateWoodDrawBoard(lft,top,rgt,bot,edgeSize,woodColor)
+    private void generateWoodDrawBoard(int lft,int top,int rgt,int bot,int edgeSize,RagColor woodColor)
     {
+        /*
         let col=this.adjustColorRandom(woodColor,0.7,1.2);
         let frameColor=this.adjustColorRandom(col,0.65,0.75);
         
@@ -52,10 +47,13 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
             
         this.blur(this.colorImgData.data,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),2,true);
         this.blur(this.normalImgData.data,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),5,true);
+*/
     }
 
-    generateInternal(variationMode)
+    @Override
+    public void generateInternal(int variationMode)
     {
+        /*
         let n,y,ty,by,lft,rgt;
         let boardType;
         
@@ -118,10 +116,9 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
             this.generateWoodDrawBoard(boardSize,0,(this.colorImgData.width-boardSize),boardSize,edgeSize,woodColor);
             this.generateWoodDrawBoard(boardSize,(this.colorImgData.height-boardSize),(this.colorImgData.width-boardSize),this.colorImgData.height,edgeSize,woodColor);
         }
-        
-            // finish with the specular
+    */    
+            // finish with the metallic-roughness
 
-        this.createSpecularMap(100,0.2);
+        createMetallicRoughnessMap(0.4f,0.2f);
     }
-
 }

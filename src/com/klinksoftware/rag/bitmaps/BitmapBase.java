@@ -708,17 +708,16 @@ public class BitmapBase
                     dx=gx-x;
                     dy=gy-y;
                     d=(float)Math.sqrt((dx*dx)+(dy*dy));
+                    if (d>(float)distortRadius) continue;
 
-                    if (d<(float)distortRadius) {
-                        d=1.0f-(d/(float)distortRadius);
-                        sx=sx-(int)(((float)Math.signum(dx)*(float)distortSize)*d);
-                        sy=sy-(int)(((float)Math.signum(dy)*(float)distortSize)*d);
-                        
-                        if (sx<0) sx=0;
-                        if (sx>=textureSize) sx=textureSize-1;
-                        if (sy<0) sy=0;
-                        if (sy>=textureSize) sy=textureSize-1;
-                    }
+                    d=1.0f-(d/(float)distortRadius);
+                    sx=sx-(int)(((float)Math.signum(dx)*(float)distortSize)*d);
+                    sy=sy-(int)(((float)Math.signum(dy)*(float)distortSize)*d);
+
+                    if (sx<0) sx=0;
+                    if (sx>=textureSize) sx=textureSize-1;
+                    if (sy<0) sy=0;
+                    if (sy>=textureSize) sy=textureSize-1;
                 
                         // shift the pixels
 
@@ -1069,78 +1068,73 @@ public class BitmapBase
             high--;
         }
     }
-    
-    drawDiamond(lft,top,rgt,bot,color)
+    */
+    protected void drawDiamond(int lft,int top,int rgt,int bot,RagColor color)
     {
-        let x,y,lx,rx,f,idx;
-        let mx,my,halfWid;
-        let colorData=this.colorImgData.data;
-        let frameColor;
+        int         x,y,lx,rx,mx,my,idx;
+        float       f,halfWid;
+        RagColor    frameColor;
         
         if ((lft>=rgt) || (top>=bot)) return;
         
             // the fill
 
-        mx=Math.trunc((lft+rgt)*0.5);
-        my=Math.trunc((top+bot)*0.5);
-        halfWid=Math.trunc((rgt-lft)*0.5);
+        mx=(lft+rgt)/2;
+        my=(top+bot)/2;
+        halfWid=(float)(rgt-lft)*0.5f;
         
-        for (y=top;y!==bot;y++) {
+        for (y=top;y!=bot;y++) {
             
             if (y<my) {
-                f=1.0-((my-y)/(my-top));
-                lx=mx-Math.trunc(halfWid*f);
-                rx=mx+Math.trunc(halfWid*f);
+                f=1.0f-((float)(my-y)/(float)(my-top));
+                lx=mx-(int)(halfWid*f);
+                rx=mx+(int)(halfWid*f);
             }
             else {
-                f=1.0-((y-my)/(my-top));
-                lx=mx-Math.trunc(halfWid*f);
-                rx=mx+Math.trunc(halfWid*f);
+                f=1.0f-((float)(y-my)/(float)(my-top));
+                lx=mx-(int)(halfWid*f);
+                rx=mx+(int)(halfWid*f);
             }
             
             if (lx>=rx) continue;
             
-            for (x=lx;x!==rx;x++) {
-                idx=((y*this.colorImgData.width)+x)*4;
+            for (x=lx;x!=rx;x++) {
+                idx=((y*textureSize)+x)*4;
                 
-                colorData[idx]=color.r*255.0;
-                colorData[idx+1]=color.g*255.0;
-                colorData[idx+2]=color.b*255.0;
+                colorData[idx]=color.r;
+                colorData[idx+1]=color.g;
+                colorData[idx+2]=color.b;
             }
         }
         
             // the border
             
-        frameColor=this.adjustColorRandom(color,0.85,0.95);
+        frameColor=adjustColorRandom(color,0.85f,0.95f);
         
-        this.drawLineColor((mx+1),top,(lft+1),my,frameColor);
-        this.drawLineColor(mx,top,lft,my,frameColor);
-        this.drawLineNormal((mx+1),top,(lft+1),my,this.NORMAL_TOP_LEFT_45);
-        this.drawLineNormal(mx,top,lft,my,this.NORMAL_TOP_LEFT_45);
+        drawLineColor((mx+1),top,(lft+1),my,frameColor);
+        drawLineColor(mx,top,lft,my,frameColor);
+        drawLineNormal((mx+1),top,(lft+1),my,NORMAL_TOP_LEFT_45);
+        drawLineNormal(mx,top,lft,my,NORMAL_TOP_LEFT_45);
 
-        this.drawLineColor((mx-1),top,(rgt-1),my,frameColor);
-        this.drawLineColor(mx,top,rgt,my,frameColor);
-        this.drawLineNormal((mx-1),top,(rgt-1),my,this.NORMAL_TOP_RIGHT_45);
-        this.drawLineNormal(mx,top,rgt,my,this.NORMAL_TOP_RIGHT_45);
+        drawLineColor((mx-1),top,(rgt-1),my,frameColor);
+        drawLineColor(mx,top,rgt,my,frameColor);
+        drawLineNormal((mx-1),top,(rgt-1),my,NORMAL_TOP_RIGHT_45);
+        drawLineNormal(mx,top,rgt,my,NORMAL_TOP_RIGHT_45);
         
-        this.drawLineColor((lft+1),my,(mx+1),bot,frameColor);
-        this.drawLineColor(lft,my,mx,bot,frameColor);
-        this.drawLineNormal((lft+1),my,(mx+1),bot,this.NORMAL_BOTTOM_LEFT_45);
-        this.drawLineNormal(lft,my,mx,bot,this.NORMAL_TOP_LEFT_45);
+        drawLineColor((lft+1),my,(mx+1),bot,frameColor);
+        drawLineColor(lft,my,mx,bot,frameColor);
+        drawLineNormal((lft+1),my,(mx+1),bot,NORMAL_BOTTOM_LEFT_45);
+        drawLineNormal(lft,my,mx,bot,NORMAL_TOP_LEFT_45);
 
-        this.drawLineColor((rgt-1),my,(mx-1),bot,frameColor);
-        this.drawLineColor(lft,my,mx,bot,frameColor);
-        this.drawLineNormal((rgt-1),my,(mx-1),bot,this.NORMAL_BOTTOM_RIGHT_45);
-        this.drawLineNormal(rgt,my,mx,bot,this.NORMAL_TOP_RIGHT_45);
+        drawLineColor((rgt-1),my,(mx-1),bot,frameColor);
+        drawLineColor(lft,my,mx,bot,frameColor);
+        drawLineNormal((rgt-1),my,(mx-1),bot,NORMAL_BOTTOM_RIGHT_45);
+        drawLineNormal(rgt,my,mx,bot,NORMAL_TOP_RIGHT_45);
     }
     
-    drawTriangle(x0,y0,x1,y1,x2,y2,color)
+    protected void drawTriangle(int x0,int y0,int x1,int y1,int x2,int y2,RagColor color)
     {
-        let y,ty,my,by;
-        let x,lx,rx,tyX,myX,byX;
-        let idx;
-        let colorData=this.colorImgData.data;
-        let normalData=this.normalImgData.data;
+        int         x,y,lx,rx,ty,my,by,tyX,myX,byX,idx;
         
         if ((y0<=y1) && (y0<=y2)) {
             ty=y0;
@@ -1153,7 +1147,7 @@ public class BitmapBase
             }
             else {
                 my=y2;
-                myX=y2;
+                myX=x2;
                 by=y1;
                 byX=x1;
             }
@@ -1196,31 +1190,31 @@ public class BitmapBase
             // top half
 
         for (y=ty;y<my;y++) {
-            if ((y<0) || (y>this.colorImgData.height)) continue;
+            if ((y<0) || (y>textureSize)) continue;
             
             if (myX<tyX) {
-                lx=tyX+Math.trunc(((myX-tyX)*(y-ty))/(my-ty));
-                rx=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
+                lx=tyX+(int)((float)((myX-tyX)*(y-ty))/(float)(my-ty));
+                rx=tyX+(int)((float)((byX-tyX)*(y-ty))/(float)(by-ty));
             }
             else {
-                lx=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
-                rx=tyX+Math.trunc(((myX-tyX)*(y-ty))/(my-ty));
+                lx=tyX+(int)((float)((byX-tyX)*(y-ty))/(float)(by-ty));
+                rx=tyX+(int)((float)((myX-tyX)*(y-ty))/(float)(my-ty));
             }
             
             if (lx<0) lx=0;
-            if (rx>this.colorImgData.width) rx=this.colorImgData.width;
+            if (rx>textureSize) rx=textureSize;
             if (lx>rx) continue;
             
-            idx=((y*this.colorImgData.width)+lx)*4;
+            idx=((y*textureSize)+lx)*4;
                 
             for (x=lx;x<rx;x++) {
-                colorData[idx]=color.r*255.0;
-                colorData[idx+1]=color.g*255.0;
-                colorData[idx+2]=color.b*255.0;
+                colorData[idx]=color.r;
+                colorData[idx+1]=color.g;
+                colorData[idx+2]=color.b;
                 
-                normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
-                normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
-                normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
+                normalData[idx]=(NORMAL_CLEAR.x+1.0f)*0.5f;
+                normalData[idx+1]=(NORMAL_CLEAR.y+1.0f)*0.5f;
+                normalData[idx+2]=(NORMAL_CLEAR.z+1.0f)*0.5f;
                 
                 idx+=4;
             }
@@ -1229,37 +1223,37 @@ public class BitmapBase
             // bottom half
         
         for (y=my;y<by;y++) {
-            if ((y<0) || (y>this.colorImgData.height)) continue;
+            if ((y<0) || (y>textureSize)) continue;
             
             if (myX<tyX) {
-                lx=myX+Math.trunc(((byX-myX)*(y-my))/(by-my));
-                rx=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
+                lx=myX+(int)((float)((byX-myX)*(y-my))/(float)(by-my));
+                rx=tyX+(int)((float)((byX-tyX)*(y-ty))/(float)(by-ty));
             }
             else {
-                lx=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
-                rx=myX+Math.trunc(((byX-myX)*(y-my))/(by-my));
+                lx=tyX+(int)((float)((byX-tyX)*(y-ty))/(float)(by-ty));
+                rx=myX+(int)((float)((byX-myX)*(y-my))/(float)(by-my));
             }
             
             if (lx<0) lx=0;
-            if (rx>this.colorImgData.width) rx=this.colorImgData.width;
+            if (rx>textureSize) rx=textureSize;
             if (lx>rx) continue;
             
-            idx=((y*this.colorImgData.width)+lx)*4;
+            idx=((y*textureSize)+lx)*4;
                 
             for (x=lx;x<rx;x++) {
-                colorData[idx]=color.r*255.0;
-                colorData[idx+1]=color.g*255.0;
-                colorData[idx+2]=color.b*255.0;
+                colorData[idx]=color.r;
+                colorData[idx+1]=color.g;
+                colorData[idx+2]=color.b;
                 
-                normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
-                normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
-                normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
+                normalData[idx]=(NORMAL_CLEAR.x+1.0f)*0.5f;
+                normalData[idx+1]=(NORMAL_CLEAR.y+1.0f)*0.5f;
+                normalData[idx+2]=(NORMAL_CLEAR.z+1.0f)*0.5f;
                 
                 idx+=4;
             }
         }
     }
-    
+    /*
     drawHexagon(lft,top,rgt,bot,pointSize,edgeSize,color)
     {
         let n,lx,rx,my;
@@ -1353,8 +1347,8 @@ public class BitmapBase
             for (y=top;y!==bot;y++) {
                 
                 if (this.core.randomInt(0,100)<density) {
-                    if ((lx>=0) && (lx<this.colorImgData.width)) {
-                        idx=((y*this.colorImgData.width)+lx)*4;
+                    if ((lx>=0) && (lx<textureSize)) {
+                        idx=((y*textureSize)+lx)*4;
                         colorData[idx]=Math.trunc(baseColor.r*255.0);
                         colorData[idx+1]=Math.trunc(baseColor.g*255.0);
                         colorData[idx+2]=Math.trunc(baseColor.b*255.0);
@@ -1362,8 +1356,8 @@ public class BitmapBase
                 }
                 
                 if (this.core.randomInt(0,100)<density) {
-                    if ((rx>=0) && (rx<this.colorImgData.width)) {
-                        idx=((y*this.colorImgData.width)+rx)*4;
+                    if ((rx>=0) && (rx<textureSize)) {
+                        idx=((y*textureSize)+rx)*4;
                         colorData[idx]=Math.trunc(baseColor.r*255.0);
                         colorData[idx+1]=Math.trunc(baseColor.g*255.0);
                         colorData[idx+2]=Math.trunc(baseColor.b*255.0);
@@ -1402,7 +1396,7 @@ public class BitmapBase
     }
     */
         //
-        // streaks
+        // streaks and stains
         //
         
     private void drawStreakDirtSingle(int lft,int top,int rgt,int bot,float minMix,float addMix,RagColor color,float minXReduce)
@@ -1468,6 +1462,73 @@ public class BitmapBase
             drawStreakDirtSingle(sx,top,ex,bot,minMix,addMix,color,0.1f);
         }
     }
+    
+    protected void drawOvalStain(int lft,int top,int rgt,int bot,float outerPercentage,float innerPercentage,float darken)
+    {
+        int         n,x,y,mx,my,wid,high,idx;
+        float       halfWid,halfHigh,rad,
+                    percentageAdd,curPercentage;
+        float[]     origColorData;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+            // we darken against the original
+            // bitmap as ovals tend to overdraw
+            
+        origColorData=colorData.clone();
+        
+            // the drawing size
+            
+        wid=(rgt-lft)-1;
+        high=(bot-top)-1;         // avoids clipping on bottom from being on wid,high
+        mx=lft+(int)((float)wid*0.5f);
+        my=top+(int)((float)high*0.5f);
+        
+            // the random pixel percentages
+            
+        if (wid>high) {
+            percentageAdd=(innerPercentage-outerPercentage)/wid;
+        }
+        else {
+            percentageAdd=(innerPercentage-outerPercentage)/high;
+        }
+        
+        curPercentage=outerPercentage;
+        
+            // fill the oval
+
+        while ((wid>0) && (high>0)) {
+
+            halfWid=(float)wid*0.5f;
+            halfHigh=(float)high*0.5f;
+            
+            for (n=0;n!=1000;n++) {
+                if (Math.random()>curPercentage) continue;
+                
+                rad=(float)(Math.PI*2.0)*((float)n*0.001f);
+
+                x=mx+(int)(halfWid*(float)Math.sin(rad));
+                if ((x<0) || (x>=textureSize)) continue;
+
+                y=my-(int)(halfHigh*(float)Math.cos(rad));
+                if ((y<0) || (y>=textureSize)) continue;
+
+                    // the color
+                
+                idx=((y*textureSize)+x)*4;
+                
+                colorData[idx]=origColorData[idx]*darken;
+                colorData[idx+1]=origColorData[idx+1]*darken;
+                colorData[idx+2]=origColorData[idx+2]*darken;
+            }
+            
+            wid--;
+            high--;
+            
+            curPercentage+=percentageAdd;
+        }
+    }
+
     /*
         //
         // color stripes, gradients, waves
@@ -1511,7 +1572,7 @@ public class BitmapBase
                 ny=(1.0-ny)*127.0;
             }
 
-            idx=((y*this.colorImgData.width)+lft)*4;
+            idx=((y*textureSize)+lft)*4;
 
             for (x=lft;x!==rgt;x++) {
                 colorData[idx]=r;
@@ -1566,7 +1627,7 @@ public class BitmapBase
             }
 
             for (y=top;y!==bot;y++) {
-                idx=((y*this.colorImgData.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 colorData[idx]=r;
                 colorData[idx+1]=g;
                 colorData[idx+2]=b;
@@ -1615,7 +1676,7 @@ public class BitmapBase
             }
             
             for (y=top;y!==bot;y++) {
-                idx=((y*this.colorImgData.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 normalData[idx]=xb;
                 normalData[idx+1]=yb;
                 normalData[idx+2]=zb;
@@ -1634,7 +1695,7 @@ public class BitmapBase
         
         for (x=lft;x<rgt;x+=waveAdd) {
             for (y=top;y!==bot;y++) {
-                idx=((y*this.colorImgData.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
                 normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
                 normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
@@ -1683,7 +1744,7 @@ public class BitmapBase
             }
             
             for (x=lft;x!==rgt;x++) {
-                idx=((y*this.colorImgData.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 normalData[idx]=xb;
                 normalData[idx+1]=yb;
                 normalData[idx+2]=zb;
@@ -1702,7 +1763,7 @@ public class BitmapBase
         
         for (y=top;y<bot;y+=waveAdd) {
             for (x=lft;x!==rgt;x++) {
-                idx=((y*this.colorImgData.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
                 normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
                 normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
@@ -2084,35 +2145,35 @@ public class BitmapBase
             sy=ey;
         }
     }
-    /*
-    drawSimpleCrack(sx,sy,ex,ey,segCount,lineXVariant,lineYVarient,color)
+
+    protected void drawSimpleCrack(int sx,int sy,int ex,int ey,int segCount,int lineXVarient,int lineYVarient,RagColor color)
     {
-        let n,dx,dy,dx2,dy2;
+        int         n,dx,dy,dx2,dy2;
         
         dx=sx;
         dy=sy;
         
-        for (n=0;n!==segCount;n++) {
+        for (n=0;n!=segCount;n++) {
             
-            if ((n+1)===segCount) {
+            if ((n+1)==segCount) {
                 dx2=ex;
                 dy2=ey;
             }
             else {
-                dx2=Math.trunc(sx+(((ex-sx)*(n+1))/segCount))+this.core.randomInt(0,lineXVariant);
-                dy2=Math.trunc(sy+(((ey-sy)*(n+1))/segCount))+this.core.randomInt(0,lineYVarient);
+                dx2=(int)(sx+((float)((ex-sx)*(n+1))/(float)segCount))+(int)(Math.random()*(double)lineXVarient);
+                dy2=(int)(sy+((float)((ey-sy)*(n+1))/(float)segCount))+(int)(Math.random()*(double)lineYVarient);
             }
             
             this.drawLineColor(dx,dy,dx2,dy2,color);
-            this.drawLineNormal(dx,dy,dx2,dy2,this.NORMAL_CLEAR);
-            this.drawLineNormal((dx-1),dy,(dx2-1),dy2,this.NORMAL_RIGHT_45);
-            this.drawLineNormal((dx+1),dy,(dx2+1),dy2,this.NORMAL_LEFT_45);
+            this.drawLineNormal(dx,dy,dx2,dy2,NORMAL_CLEAR);
+            this.drawLineNormal((dx-1),dy,(dx2-1),dy2,NORMAL_RIGHT_45);
+            this.drawLineNormal((dx+1),dy,(dx2+1),dy2,NORMAL_LEFT_45);
              
             dx=dx2;
             dy=dy2;
         }
     }
-    */
+
         //
         // metallic-roughness routines
         //
