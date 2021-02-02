@@ -1,33 +1,30 @@
-import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateBitmapConcreteClass from './generate_bitmap_concrete.js';
-import GenerateBitmapBrickClass from './generate_bitmap_brick.js';
-import GenerateBitmapStoneClass from './generate_bitmap_stone.js';
-import GenerateBitmapMetalClass from './generate_bitmap_metal.js';
-import GenerateBitmapWoodClass from './generate_bitmap_wood.js';
-import GenerateBitmapTileClass from './generate_bitmap_tile.js';
-import GenerateBitmapMosaicClass from './generate_bitmap_mosaic.js';
-import GenerateBitmapHexagonClass from './generate_bitmap_hexagon.js';
-import GenerateBitmapComputerClass from './generate_bitmap_computer.js';
+package com.klinksoftware.rag.map;
 
-export default class GenerateBitmapRunClass
+import com.klinksoftware.rag.bitmaps.*;
+
+public class MapBitmapCache
 {
-    constructor(core,colorScheme)
+    private int         colorScheme;
+    private BitmapBase  wallBitmap,floorBitmap,ceilingBitmap,stepBitmap,
+                        platformBitmap,pillarBitmap,boxBitmap,computerBitmap,
+                        pipeBitmap;
+    
+    public MapBitmapCache(int colorScheme)
     {
-        this.core=core;
         this.colorScheme=colorScheme;
         
-        this.wallBitmap=null;
-        this.floorBitmap=null;
-        this.ceilingBitmap=null;
-        this.platformBitmap=null;
-        this.stepBitmap=null;
-        this.pillarBitmap=null;
-        this.boxBitmap=null;
-        this.computerBitmap=null;
-        this.pipeBitmap=null;
+        wallBitmap=null;
+        floorBitmap=null;
+        ceilingBitmap=null;
+        platformBitmap=null;
+        stepBitmap=null;
+        pillarBitmap=null;
+        boxBitmap=null;
+        computerBitmap=null;
+        pipeBitmap=null;
     }
-    
-    generateWall()
+    /*
+    public BitmapBase generateWall()
     {
         let variationMode=0;
         let genBitmap;
@@ -54,7 +51,7 @@ export default class GenerateBitmapRunClass
         return(this.wallBitmap);
     }
     
-    generateFloor()
+    public BitmapBase generateFloor()
     {
         let variationMode=0;
         let genBitmap;
@@ -84,7 +81,7 @@ export default class GenerateBitmapRunClass
         return(this.floorBitmap);
     }
     
-    generateCeiling()
+    public BitmapBase generateCeiling()
     {
         let variationMode=0;
         let genBitmap;
@@ -108,7 +105,7 @@ export default class GenerateBitmapRunClass
         return(this.ceilingBitmap);
     }
     
-    generatePlatform()
+    public BitmapBase generatePlatform()
     {
         let variationMode=0;
         let genBitmap;
@@ -132,7 +129,7 @@ export default class GenerateBitmapRunClass
         return(this.platformBitmap);
     }
     
-    generateStep()
+    public BitmapBase generateStep()
     {
         let variationMode=0;
         let genBitmap;
@@ -156,7 +153,7 @@ export default class GenerateBitmapRunClass
         return(this.stepBitmap);
     }
     
-    generatePillar()
+    public BitmapBase generatePillar()
     {
         let variationMode=0;
         let genBitmap;
@@ -183,7 +180,7 @@ export default class GenerateBitmapRunClass
         return(this.pillarBitmap);
     }
     
-    generateBox()
+    public BitmapBase generateBox()
     {
         let variationMode=0;
         let genBitmap;
@@ -206,7 +203,7 @@ export default class GenerateBitmapRunClass
         return(this.boxBitmap);
     }
     
-    generateComputer()
+    public BitmapBase generateComputer()
     {
         let genBitmap;
         
@@ -218,7 +215,7 @@ export default class GenerateBitmapRunClass
         return(this.computerBitmap);
     }
     
-    generatePipe()
+    public BitmapBase generatePipe()
     {
         let genBitmap;
         
@@ -229,4 +226,6 @@ export default class GenerateBitmapRunClass
         
         return(this.pipeBitmap);
     }
+*/
+    
 }

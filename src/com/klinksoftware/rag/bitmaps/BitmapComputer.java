@@ -1,32 +1,27 @@
-import ColorClass from '../../utility/color.js';
-import BitmapClass from '../../bitmap/bitmap.js';
-import GenerateBitmapBaseClass from './generate_bitmap_base.js';
+package com.klinksoftware.rag.bitmaps;
 
-//
-// generate computer bitmap class
-//
+import com.klinksoftware.rag.utility.*;
 
-export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
+public class BitmapComputer extends BitmapBase
 {
-    constructor(core,colorScheme)
+    public final static int VARIATION_COMPUTER_BANK=0;
+    public final static int VARIATION_CONTROL_PANEL=1;
+    
+    public BitmapComputer(int colorScheme)
     {
-        super(core,colorScheme);
+        super(colorScheme);
         
-        this.VARIATION_NONE=0;
-        this.VARIATION_CONTROL_PANEL=0;    
-        
-        this.bitmapTextureSize=1024;
-        this.hasNormal=true;
-        this.hasSpecular=true;
-        this.hasGlow=true;
-        
-        Object.seal(this);
+        textureSize=1024;
+        hasNormal=true;
+        hasMetallicRoughness=true;
+        hasGlow=true;
+        hasAlpha=false;
     }
     
         //
         // components
         //
-        
+    /*    
     generateComputerComponentWires(lft,top,rgt,bot,edgeSize)
     {
         let n,nLine;
@@ -332,9 +327,9 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         lightCount=0;
         buttonCount=0;
         
-        minPanelSize=Math.trunc(this.colorImgData.width*0.1);
-        extraPanelSize=Math.trunc(this.colorImgData.width*0.04);
-        skipPanelSize=Math.trunc(this.colorImgData.width*0.05);
+        minPanelSize=Math.trunc(textureSize*0.1);
+        extraPanelSize=Math.trunc(textureSize*0.04);
+        skipPanelSize=Math.trunc(textureSize*0.05);
         
         while (true) {
             
@@ -432,36 +427,39 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             if ((mx>=(rgt-edgeSize)) || (my>=(bot-edgeSize))) break;
         }
     }
+    */
+        //
+        // computer bitmaps
+        //
     
-        //
-        // computer
-        //
-        
-    generateInternal(variationMode)
+    @Override
+    public void generateInternal(int variationMode)
     {
-        let offset=Math.trunc(this.colorImgData.width*0.5);
-        let panelColor=this.getRandomColor();
-        let panelInsideColor=this.adjustColor(panelColor,1.1);
+        int         offset,panelEdgeSize,panelInsideEdgeSize;
+        RagColor    panelColor,panelInsideColor;
         
-        let panelEdgeSize=this.core.randomInt(2,3);
-        let panelInsideEdgeSize=this.core.randomInt(2,2);
+        offset=(int)((float)textureSize*0.5);
+        panelEdgeSize=2+(int)(Math.random()*3.0);
+        panelInsideEdgeSize=2+(int)(Math.random()*2.0);
+        
+        panelColor=getRandomColor();
+        panelInsideColor=adjustColor(panelColor,1.1f);
        
             // this is a collection of plates that are
             // used to wrap the object around cubes
             
-        this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,panelColor);
+        drawRect(0,0,textureSize,textureSize,panelColor);
         
-        this.generateComputerComponents(0,0,offset,offset,panelInsideColor,panelInsideEdgeSize);      // left and right
-        this.generateComputerComponents(offset,0,this.colorImgData.width,offset,panelInsideColor,panelInsideEdgeSize);        // front and back
-        this.draw3DFrameRect(0,offset,offset,this.colorImgData.height,panelEdgeSize,panelColor,true);       // top and bottom
+        //generateComputerComponents(0,0,offset,offset,panelInsideColor,panelInsideEdgeSize);      // left and right
+        //generateComputerComponents(offset,0,textureSize,offset,panelInsideColor,panelInsideEdgeSize);        // front and back
+        draw3DFrameRect(0,offset,offset,textureSize,panelEdgeSize,panelColor,true);                         // top and bottom
         
             // set the emissive
             
-        this.emissiveFactor=new ColorClass(1,1,1);
-        
-            // finish with the specular
+        emissiveFactor=new RagVector(1.0f,1.0f,1.0f);
+   
+            // finish with the metallic-roughness
 
-        this.createSpecularMap(200,0.4);
+        createMetallicRoughnessMap(0.75f,0.4f);
     }
-
 }

@@ -13,6 +13,7 @@ public class BitmapTile extends BitmapBase
         hasNormal=true;
         hasMetallicRoughness=true;
         hasGlow=false;
+        hasAlpha=false;
     }
     
         //

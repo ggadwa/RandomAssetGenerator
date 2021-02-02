@@ -13,6 +13,7 @@ public class BitmapConcrete extends BitmapBase
         hasNormal=true;
         hasMetallicRoughness=true;
         hasGlow=false;
+        hasAlpha=false;
     }
     
         //

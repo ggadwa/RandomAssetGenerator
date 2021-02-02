@@ -13,6 +13,7 @@ public class BitmapBrick extends BitmapBase
         hasNormal=true;
         hasMetallicRoughness=true;
         hasGlow=false;
+        hasAlpha=false;
     }
    
         //

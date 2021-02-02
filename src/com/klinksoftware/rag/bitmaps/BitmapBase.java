@@ -61,7 +61,7 @@ public class BitmapBase
                                     };
     
     protected int           colorScheme,textureSize;
-    protected boolean       hasNormal,hasMetallicRoughness,hasGlow;
+    protected boolean       hasNormal,hasMetallicRoughness,hasGlow,hasAlpha;
     protected RagVector     specularFactor,emissiveFactor;
     protected float[]       colorData,normalData,metallicRoughnessData,glowData,
                             perlinNoiseColorFactor,noiseNormals;
@@ -76,6 +76,7 @@ public class BitmapBase
         hasNormal=true;
         hasMetallicRoughness=true;
         hasGlow=false;
+        hasAlpha=false;
         
         specularFactor=new RagVector(5,5,5);
         emissiveFactor=new RagVector(1,1,1);
@@ -1310,16 +1311,15 @@ public class BitmapBase
             this.drawLineNormal((rx-n),(bot-n),(rgt-n),my,this.NORMAL_BOTTOM_RIGHT_45);
         }
     }
-    
+    */
         //
         // metals
         //
         
-    drawMetalShineLine(x,top,bot,shineWid,baseColor)
+    private void drawMetalShineLine(int x,int top,int bot,int shineWid,RagColor baseColor)
     {
-        let n,lx,rx,y,idx;
-        let colorData=this.colorImgData.data;
-        let density,densityReduce;
+        int         n,lx,rx,y,idx;
+        double      density,densityReduce;
         
         if (top>=bot) return;
         if (shineWid<=0) return;
@@ -1327,40 +1327,40 @@ public class BitmapBase
             // since we draw the shines from both sides,
             // we need to move the X into the middle and cut width in half
             
-        shineWid=Math.trunc(shineWid*0.5);
+        shineWid=shineWid/2;
             
         x+=shineWid;
         
             // start with 100 density and reduce
             // as we go across the width
             
-        density=100;
-        densityReduce=Math.trunc(90/shineWid);
+        density=1.0;
+        densityReduce=0.9/(double)shineWid;
         
             // write the shine lines
             
-        for (n=0;n!==shineWid;n++) {
+        for (n=0;n!=shineWid;n++) {
             
             lx=x-n;
             rx=x+n;
             
-            for (y=top;y!==bot;y++) {
+            for (y=top;y!=bot;y++) {
                 
-                if (this.core.randomInt(0,100)<density) {
+                if (Math.random()<density) {
                     if ((lx>=0) && (lx<textureSize)) {
                         idx=((y*textureSize)+lx)*4;
-                        colorData[idx]=Math.trunc(baseColor.r*255.0);
-                        colorData[idx+1]=Math.trunc(baseColor.g*255.0);
-                        colorData[idx+2]=Math.trunc(baseColor.b*255.0);
+                        colorData[idx]=baseColor.r;
+                        colorData[idx+1]=baseColor.g;
+                        colorData[idx+2]=baseColor.b;
                     }
                 }
                 
-                if (this.core.randomInt(0,100)<density) {
+                if (Math.random()<density) {
                     if ((rx>=0) && (rx<textureSize)) {
                         idx=((y*textureSize)+rx)*4;
-                        colorData[idx]=Math.trunc(baseColor.r*255.0);
-                        colorData[idx+1]=Math.trunc(baseColor.g*255.0);
-                        colorData[idx+2]=Math.trunc(baseColor.b*255.0);
+                        colorData[idx]=baseColor.r;
+                        colorData[idx+1]=baseColor.g;
+                        colorData[idx+2]=baseColor.b;
                     }
                 }
             
@@ -1370,31 +1370,32 @@ public class BitmapBase
         }
     }
     
-    drawMetalShine(lft,top,rgt,bot,metalColor)
+    protected void drawMetalShine(int lft,int top,int rgt,int bot,RagColor metalColor)
     {
-        let x,shineWid,shineColor;
-        let wid=rgt-lft;
+        int         x,wid,shineWid;
+        RagColor    shineColor;
         
         x=lft;
+        wid=rgt-lft;
         
         while (true) {
-            shineWid=this.core.randomInt(Math.trunc(wid*0.035),Math.trunc(wid*0.15));
+            shineWid=(int)((float)wid*0.035f)+(int)(Math.random()*0.15);
             if ((x+shineWid)>rgt) shineWid=rgt-x;
             
                 // small % are no lines
                 
-            if (this.core.randomPercentage(0.9)) {
-                shineColor=this.adjustColorRandom(metalColor,0.7,1.3);
+            if (Math.random()<0.9) {
+                shineColor=adjustColorRandom(metalColor,0.7f,1.3f);
                 this.drawMetalShineLine(x,top,bot,shineWid,shineColor);
             }
             
-            x+=(shineWid+this.core.randomInt(Math.trunc(wid*0.03),Math.trunc(wid*0.05)));
+            x+=(shineWid+((int)((float)wid*0.03f)+(int)(Math.random()*0.05)));
             if (x>=rgt) break;
         }
         
-        this.blur(this.colorImgData.data,lft,top,rgt,bot,3,true);
+        this.blur(colorData,lft,top,rgt,bot,3,true);
     }
-    */
+
         //
         // streaks and stains
         //
@@ -1528,53 +1529,52 @@ public class BitmapBase
             curPercentage+=percentageAdd;
         }
     }
-
-    /*
+    
         //
         // color stripes, gradients, waves
         //
         
-    drawColorStripeHorizontal(lft,top,rgt,bot,factor,baseColor)
+    protected void drawColorStripeHorizontal(int lft,int top,int rgt,int bot,float factor,RagColor baseColor)
     {
-        let x,y,nx,ny,nz,idx;
-        let f,r,g,b,count,normal;
-        let colorData=this.colorImgData.data;
-        let normalData=this.normalImgData.data;
+        int                 x,y,count,idx;
+        float               f,r,g,b,nx,ny,nz;
+        RagVector           normal;
 
         if ((rgt<=lft) || (bot<=top)) return;
         
             // the rotating normal
             
-        normal=new PointClass(0,0.1,1.0);
+        normal=new RagVector(0.0f,0.1f,1.0f);
         normal.normalize();
         
-        nx=(normal.x+1.0)*127.0;
-        ny=(normal.y+1.0)*127.0;
-        nz=(normal.z+1.0)*127.0;
+        nx=(normal.x+1.0f)*0.5f;
+        ny=(normal.y+1.0f)*0.5f;
+        nz=(normal.z+1.0f)*0.5f;
         
             // write the stripes
             
         count=1;
+        r=g=b=0.0f;
 
-        for (y=top;y!==bot;y++) {
+        for (y=top;y!=bot;y++) {
 
             count--;
             if (count<=0) {
-                count=this.core.randomInt(2,4);
+                count=2+(int)(Math.random()*4.0);
                 
-                f=1.0+((1.0-(this.core.random()*2.0))*factor);
+                f=1.0f+((1.0f-(float)(Math.random()*2.0))*factor);
                 
-                r=Math.trunc((baseColor.r*f)*255.0);
-                g=Math.trunc((baseColor.g*f)*255.0);
-                b=Math.trunc((baseColor.b*f)*255.0);
+                r=baseColor.r*f;
+                g=baseColor.g*f;
+                b=baseColor.b*f;
                 
-                ny=(ny/127.0)-1.0;
-                ny=(1.0-ny)*127.0;
+                ny=(ny/0.5f)-1.0f;
+                ny=(1.0f-ny)*0.5f;
             }
 
             idx=((y*textureSize)+lft)*4;
 
-            for (x=lft;x!==rgt;x++) {
+            for (x=lft;x!=rgt;x++) {
                 colorData[idx]=r;
                 colorData[idx+1]=g;
                 colorData[idx+2]=b;
@@ -1588,45 +1588,45 @@ public class BitmapBase
         }
     }
 
-    drawColorStripeVertical(lft,top,rgt,bot,factor,baseColor)
+    protected void drawColorStripeVertical(int lft,int top,int rgt,int bot,float factor,RagColor baseColor)
     {
-        let x,y,nx,ny,nz,idx;
-        let f,r,g,b,count,normal;
-        let colorData=this.colorImgData.data;
-        let normalData=this.normalImgData.data;
+        int                 x,y,count,idx;
+        float               f,r,g,b,nx,ny,nz;
+        RagVector           normal;
 
         if ((rgt<=lft) || (bot<=top)) return;
         
             // the rotating normal
             
-        normal=new PointClass(0.1,0,1.0);
+        normal=new RagVector(0.1f,0.0f,1.0f);
         normal.normalize();
         
-        nx=(normal.x+1.0)*127.0;
-        ny=(normal.y+1.0)*127.0;
-        nz=(normal.z+1.0)*127.0;
+        nx=(normal.x+1.0f)*0.5f;
+        ny=(normal.y+1.0f)*0.5f;
+        nz=(normal.z+1.0f)*0.5f;
         
             // write the stripes
             
         count=1;
+        r=g=b=0.0f;
             
-        for (x=lft;x!==rgt;x++) {
+        for (x=lft;x!=rgt;x++) {
             
             count--;
             if (count<=0) {
-                count=this.core.randomInt(2,4);
+                count=2+(int)(Math.random()*4.0);
                 
-                f=1.0+((1.0-(this.core.random()*2.0))*factor);
+                f=1.0f+((1.0f-(float)(Math.random()*2.0))*factor);
                 
-                r=Math.trunc((baseColor.r*f)*255.0);
-                g=Math.trunc((baseColor.g*f)*255.0);
-                b=Math.trunc((baseColor.b*f)*255.0);
+                r=baseColor.r*f;
+                g=baseColor.g*f;
+                b=baseColor.b*f;
                 
-                nx=(nx/127.0)-1.0;
-                nx=(1.0-nx)*127.0;
+                nx=(nx/0.5f)-1.0f;
+                nx=(1.0f-nx)*0.5f;
             }
 
-            for (y=top;y!==bot;y++) {
+            for (y=top;y!=bot;y++) {
                 idx=((y*textureSize)+x)*4;
                 colorData[idx]=r;
                 colorData[idx+1]=g;
@@ -1638,7 +1638,7 @@ public class BitmapBase
             }
         }
     }
-    
+    /*
     drawNormalWaveHorizontal(lft,top,rgt,bot,color,lineColor,waveCount)
     {
         let x,y,idx;
@@ -2254,31 +2254,62 @@ public class BitmapBase
         }
     }
     
+    private void clampImageData(float[] imgData)
+    {
+        int     n;
+        
+        for (n=0;n!=imgData.length;n++) {
+            if (imgData[n]<0.0f) imgData[n]=0.0f;
+            if (imgData[n]>1.0f) imgData[n]=1.0f;
+        }
+    }
+    
     private void writeImageData(float[] imgData,String path)
     {
-        int                 n,k;
+        int                 n,k,idx,channelCount;
+        int[]               channelOffsets;
         byte[]              imgDataByte;
         DataBuffer          dataBuffer;
         WritableRaster      writeRaster;
         ColorModel          colorModel;
         BufferedImage       bufImage;
         
+            // clamp all the floats
+            
+        clampImageData(imgData);
+        
             // image data if all floats, so covert to bytes here
             
-        imgDataByte=new byte[imgData.length];
-        
-        for (n=0;n!=imgData.length;n++) {
-            k=(int)(imgData[n]*255.0f);
-            if (k<0) k=0;
-            if (k>255) k=255;
-            
-            imgDataByte[n]=(byte)k;
+        if (hasAlpha) {
+            channelCount=4;
+            channelOffsets=new int[]{0,1,2,3};
+
+            imgDataByte=new byte[imgData.length];
+
+            for (n=0;n!=imgData.length;n++) {
+                imgDataByte[n]=(byte)((int)(imgData[n]*255.0f));
+            }
+        }
+        else {
+            channelCount=3;
+            channelOffsets=new int[]{0,1,2};
+
+            idx=0;
+            imgDataByte=new byte[(imgData.length/4)*3];
+
+            for (n=0;n!=imgData.length;n+=4) {
+                imgDataByte[idx++]=(byte)((int)(imgData[n]*255.0f));
+                imgDataByte[idx++]=(byte)((int)(imgData[n+1]*255.0f));
+                imgDataByte[idx++]=(byte)((int)(imgData[n+2]*255.0f));
+            }
         }
         
+            // save to PNG
+            
         try {
             dataBuffer=new DataBufferByte(imgDataByte,imgDataByte.length);
-            writeRaster=Raster.createInterleavedRaster(dataBuffer,textureSize,textureSize,(textureSize*4),4,new int[]{0,1,2,3},(Point)null);
-            colorModel=new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB),true,true,Transparency.OPAQUE,DataBuffer.TYPE_BYTE);
+            writeRaster=Raster.createInterleavedRaster(dataBuffer,textureSize,textureSize,(textureSize*channelCount),channelCount,channelOffsets,(Point)null);
+            colorModel=new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_sRGB),hasAlpha,true,Transparency.OPAQUE,DataBuffer.TYPE_BYTE);
             bufImage=new BufferedImage(colorModel,writeRaster,true,null);
             ImageIO.write(bufImage,"png",new File(path));
         }
