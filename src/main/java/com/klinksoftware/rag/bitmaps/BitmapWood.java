@@ -73,9 +73,9 @@ public class BitmapWood extends BitmapBase
 
         lft=0;
         
-        y=(int)(textureSize*0.5);
-        ty=(int)(textureSize*0.33);
-        by=(int)(textureSize*0.66);
+        y=(int)((float)textureSize*0.5);
+        ty=(int)((float)textureSize*0.33);
+        by=(int)((float)textureSize*0.66);
 
         for (n=0;n!=boardCount;n++) {
             rgt=lft+boardSize;

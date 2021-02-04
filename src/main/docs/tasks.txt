@@ -4,7 +4,9 @@
    - color changing
    - chasing (4 that go on and off)
 - bitmaps
-   - pipe, needs random line & random screw line
+   - pipe, needs random line (seam) & random screw line
+   - metal - screws get random rotated cross or straight line
+   - computer needs panel variation
 - decorations
    - don't repeat decorations for connected rooms
    - pool decorations

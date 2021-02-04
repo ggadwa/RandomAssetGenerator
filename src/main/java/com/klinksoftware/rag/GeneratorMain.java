@@ -20,7 +20,7 @@ public class GeneratorMain
         (new BitmapMetal(BitmapBase.COLOR_SCHEME_RANDOM)).generate(BitmapMetal.VARIATION_PIPE,"metal_pipe");
         (new BitmapMetal(BitmapBase.COLOR_SCHEME_RANDOM)).generate(BitmapMetal.VARIATION_HEXAGON,"metal_hexagon");
         (new BitmapComputer(BitmapBase.COLOR_SCHEME_RANDOM)).generate(BitmapComputer.VARIATION_COMPUTER_BANK,"computer_bank");
-        (new BitmapComputer(BitmapBase.COLOR_SCHEME_RANDOM)).generate(BitmapComputer.VARIATION_CONTROL_PANEL,"control_panel");
+        (new BitmapComputer(BitmapBase.COLOR_SCHEME_RANDOM)).generate(BitmapComputer.VARIATION_CONTROL_PANEL,"computer_panel");
         
         (new Export()).export("test");
         System.out.println("done!");

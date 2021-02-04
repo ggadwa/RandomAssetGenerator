@@ -32,45 +32,46 @@ public class BitmapMetal extends BitmapBase
   
     private void generateMetalCorrugation(int lft,int top,int rgt,int bot,RagColor metalColor)
     {
-        /*
-
-        let x,y,dx,dy,sx,sy,ex,ey,idx,line;
-        let corrCount,corrWid,corrHigh;
-        let lineStyle,lineWid,lineHigh;
-        let metalCorrColor;
-        let wid=rgt-lft;
-        let high=bot-top;
+        int         x,y,dx,dy,sx,sy,ex,ey,wid,high,idx,
+                    corrCount,corrWid,corrHigh,
+                    lineStyle;
+        float       lineWid,lineHigh;
+        float[][]   line;
+        RagColor    metalCorrColor;
+        
+        wid=rgt-lft;
+        high=bot-top;
         
         if ((wid<=0) || (high<=0)) return;
         
-        metalCorrColor=adjustColorRandom(metalColor,0.6,0.7);
+        metalCorrColor=adjustColorRandom(metalColor,0.6f,0.7f);
 
-        corrCount=this.core.randomInt(Math.trunc(wid*0.06),Math.trunc(wid*0.03));
-        corrWid=Math.trunc(wid/corrCount);
-        corrHigh=Math.trunc(high/corrCount);
+        corrCount=(int)((float)wid*0.06f)+(int)(Math.random()*((double)wid*0.03));
+        corrWid=wid/corrCount;
+        corrHigh=high/corrCount;
 
-        lineWid=corrWid-4;
-        lineHigh=corrHigh-4;
+        lineWid=(float)(corrWid-4);
+        lineHigh=(float)(corrHigh-4);
 
-        lineStyle=this.core.randomIndex(CORRUGATION_LINES.length);
+        lineStyle=(int)(Math.random()*(double)CORRUGATION_LINES.length);
 
             // corrugations
 
-        dy=top+Math.trunc((high-(corrHigh*corrCount))*0.5);
+        dy=top+((high-(corrHigh*corrCount))/2);
 
-        for (y=0;y!==corrCount;y++) {
+        for (y=0;y!=corrCount;y++) {
 
-            dx=lft+Math.trunc((wid-(corrWid*corrCount))*0.5);
+            dx=lft+((wid-(corrWid*corrCount))/2);
 
-            for (x=0;x!==corrCount;x++) {
+            for (x=0;x!=corrCount;x++) {
 
                 idx=((y&0x1)*2)+(x&0x1);
                 line=CORRUGATION_LINES[lineStyle][idx];
 
-                sx=dx+(line[0][0]*lineWid);
-                sy=dy+(line[0][1]*lineHigh);
-                ex=dx+(line[1][0]*lineWid);
-                ey=dy+(line[1][1]*lineHigh);
+                sx=dx+(int)(line[0][0]*lineWid);
+                sy=dy+(int)(line[0][1]*lineHigh);
+                ex=dx+(int)(line[1][0]*lineWid);
+                ey=dy+(int)(line[1][1]*lineHigh);
 
                 drawLineColor(sx,sy,ex,ey,metalCorrColor);
                 drawLineNormal(sx,sy,ex,ey,NORMAL_CLEAR);
@@ -89,67 +90,65 @@ public class BitmapMetal extends BitmapBase
 
             dy+=corrHigh;
         }
-        */
     }
 
     private void generateMetalScrews(int lft,int top,int rgt,int bot,RagColor screwColor,int screwSize)
     {
-        /*
-        let mx,my;
-        let edgeSize=Math.trunc(screwSize*0.5);
-        let outlineColor=adjustColor(screwColor,0.8);
+        int         mx,my,edgeSize;
+        RagColor    outlineColor;
+        
+        edgeSize=screwSize/2;
+        outlineColor=adjustColor(screwColor,0.8f);
         
             // corners
             
-        if (this.core.randomPercentage(0.33)) {
-            drawOval(lft,top,(lft+screwSize),(top+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
-            drawOval((rgt-screwSize),top,rgt,(top+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
-            drawOval((rgt-screwSize),(bot-screwSize),rgt,bot,0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
-            drawOval(lft,(bot-screwSize),(lft+screwSize),bot,0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
+        if (Math.random()<0.33) {
+            drawOval(lft,top,(lft+screwSize),(top+screwSize),0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,screwColor,outlineColor,0.5f,false,false,1.0f,0.0f);
+            drawOval((rgt-screwSize),top,rgt,(top+screwSize),0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,screwColor,outlineColor,0.5f,false,false,1.0f,0.0f);
+            drawOval((rgt-screwSize),(bot-screwSize),rgt,bot,0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,screwColor,outlineColor,0.5f,false,false,1.0f,0.0f);
+            drawOval(lft,(bot-screwSize),(lft+screwSize),bot,0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,screwColor,outlineColor,0.5f,false,false,1.0f,0.0f);
         }
         
             // middles
             
-        if (this.core.randomPercentage(0.33)) {
-            mx=Math.trunc((lft+rgt)*0.5)-Math.trunc(screwSize*0.5);
-            my=Math.trunc((top+bot)*0.5)-Math.trunc(screwSize*0.5);
-            drawOval(mx,top,(mx+screwSize),(top+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
-            drawOval((rgt-screwSize),my,rgt,(my+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
-            drawOval(mx,(bot-screwSize),(mx+screwSize),bot,0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
-            drawOval(lft,my,(lft+screwSize),(my+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
+        if (Math.random()<0.33) {
+            mx=((lft+rgt)/2)-(screwSize/2);
+            my=((top+bot)/2)-(screwSize/2);
+            drawOval(mx,top,(mx+screwSize),(top+screwSize),0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,screwColor,outlineColor,0.5f,false,false,1.0f,0.0f);
+            drawOval((rgt-screwSize),my,rgt,(my+screwSize),0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,screwColor,outlineColor,0.5f,false,false,1.0f,0.0f);
+            drawOval(mx,(bot-screwSize),(mx+screwSize),bot,0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,screwColor,outlineColor,0.5f,false,false,1.0f,0.0f);
+            drawOval(lft,my,(lft+screwSize),(my+screwSize),0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,screwColor,outlineColor,0.5f,false,false,1.0f,0.0f);
         }
-        */
     }
     
     private void generateMetalWave(int lft,int top,int rgt,int bot,RagColor color)
     {
-        /*
-        let frameColor;
-        let sz,waveCount;
+        int             sz,waveCount;
+        RagColor        frameColor;
         
         drawMetalShine(lft,top,rgt,bot,color);
         
-        frameColor=adjustColorRandom(color,0.75,0.85);
-        sz=Math.trunc(Math.max((rgt-lft),(bot-top))*0.045);
-        waveCount=this.core.randomInt(sz,sz);
-        if (this.core.randomPercentage(0.5)) {
+        frameColor=adjustColorRandom(color,0.75f,0.85f);
+        sz=(int)((float)Math.max((rgt-lft),(bot-top))*0.045f);
+        waveCount=sz+(int)(Math.random()*(double)sz);
+        
+        if (Math.random()<0.5) {
             drawNormalWaveHorizontal(lft,top,rgt,bot,color,frameColor,waveCount);
         }
         else {
             drawNormalWaveVertical(lft,top,rgt,bot,color,frameColor,waveCount);
         }
-        */
     }
 
     private void generateMetalPanel(int lft,int top,int rgt,int bot,RagColor metalColor,RagColor altMetalColor,int edgeSize,int screwSize,int variationMode)
     {
-        /*
-        let lft2,rgt2,top2,bot2,sz;
-        let color,frameColor,screwColor,panelType;
+        int         lft2,rgt2,top2,bot2,
+                    sz,panelType;
+        RagColor    color,screwColor,frameColor;
         
             // colors
             
-        if (this.core.randomPercentage(0.5)) {
+        if (Math.random()<0.5) {
             color=metalColor;
             screwColor=altMetalColor;
         }
@@ -158,32 +157,32 @@ public class BitmapMetal extends BitmapBase
             screwColor=metalColor;
         }
         
-        frameColor=adjustColorRandom(color,0.85,0.95);
+        frameColor=adjustColorRandom(color,0.85f,0.95f);
         
             // the plate
             
         createPerlinNoiseData(16,16);
         drawRect(lft,top,rgt,bot,color);
-        drawPerlinNoiseRect(lft,top,rgt,bot,0.8,1.0);
+        drawPerlinNoiseRect(lft,top,rgt,bot,0.8f,1.0f);
         
         drawMetalShine(lft,top,rgt,bot,color);
         draw3DFrameRect(lft,top,rgt,bot,edgeSize,frameColor,true);
         
             // variations
             
-        panelType=(variationMode==VARIATION_BOX)?0:this.core.randomIndex(4);
+        panelType=(variationMode==VARIATION_BOX)?0:(int)(Math.random()*4.0);
             
         switch (panelType) {
             
                 // internal box
                 
             case 0:
-                sz=this.core.randomInt(((edgeSize+screwSize)*2),(edgeSize*3));
+                sz=((edgeSize+screwSize)*2)+(int)(Math.random()*(double)(edgeSize*3));
                 lft2=lft+sz;
                 rgt2=rgt-sz;
                 top2=top+sz;
                 bot2=bot-sz;
-                frameColor=adjustColorRandom(color,0.75,0.85);
+                frameColor=adjustColorRandom(color,0.75f,0.85f);
                 draw3DFrameRect(lft2,top2,rgt2,bot2,edgeSize,frameColor,false);
                 drawMetalShine((lft2+edgeSize),(top2+edgeSize),(rgt2-edgeSize),(bot2-edgeSize),color);
                 
@@ -194,7 +193,7 @@ public class BitmapMetal extends BitmapBase
                 // corrugation
                 
             case 1:
-                sz=Math.trunc(edgeSize*2.5);
+                sz=(int)((float)edgeSize*2.5f);
                 generateMetalCorrugation((lft+sz),(top+sz),(rgt-sz),(bot-sz),color);
                 break;
                 
@@ -211,20 +210,18 @@ public class BitmapMetal extends BitmapBase
                 generateMetalScrews((lft+sz),(top+sz),(rgt-sz),(bot-sz),screwColor,screwSize);
                 break;
         }
-        */
     }
     
     private void generateMetalRegular(RagColor metalColor,RagColor altMetalColor,int edgeSize,int screwSize,int variationMode)
     {
-        /*
-        let mx,my,panelCount;
+        int     mx,my,panelCount;
         
             // either single, dual, or 4 panel
             
-        mx=Math.trunc(textureSize*0.5);
-        my=Math.trunc(textureSize*0.5);
+        mx=textureSize/2;
+        my=textureSize/2;
         
-        panelCount=this.core.randomIndex(3);
+        panelCount=(int)(Math.random()*3.0);
             
         switch (panelCount) {
             case 0:
@@ -241,7 +238,6 @@ public class BitmapMetal extends BitmapBase
                 generateMetalPanel(mx,my,textureSize,textureSize,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 break;
         }
-        */
     }
     
     private void generateMetalBox(RagColor metalColor,RagColor altMetalColor,int edgeSize,int screwSize,int variationMode)
@@ -261,39 +257,40 @@ public class BitmapMetal extends BitmapBase
     
     private void generateMetalHexagon(RagColor metalColor,RagColor altMetalColor,int edgeSize,int screwSize)
     {
-            /*
-        let x,y,lft,top,pointSize;
-        let color,edgeSize;
-        let xCount,yCount,xSize,ySize;
-        
-            // colors
-            
-        color=getRandomColor();
+        int         x,y,lft,top,pointSize,
+                    xCount,yCount,xSize,ySize;
+        RagColor    color;
         
             // sizing
         
-        edgeSize=this.core.randomInt(3,5);
-        xCount=2+(2*this.core.randomInt(0,2));
-        yCount=2+(2*this.core.randomInt(0,5));
+        xCount=2+(2*(int)(Math.random()*2.0));
+        yCount=2+(2*(int)(Math.random()*5.0));
         
-        xSize=Math.trunc(textureSize/xCount);
-        ySize=Math.trunc(textureSize/yCount);
+        xSize=textureSize/xCount;
+        ySize=textureSize/yCount;
         
-        pointSize=Math.trunc(xSize*0.1);
+        pointSize=(int)((float)xSize*0.1f);
         
         lft=0;
         
         for (x=0;x<=xCount;x++) {
-            top=((x&0x1)===0)?0:-Math.trunc(ySize*0.5);
+            top=((x&0x1)==0)?0:-(ySize/2);
         
             for (y=0;y<=yCount;y++) {
-                drawHexagon(lft,top,(Math.trunc(lft+xSize)-pointSize),Math.trunc(top+ySize),pointSize,edgeSize,color);
+                
+                    // sometimes an alt color, but never on wrapping rows
+                    
+                color=metalColor;
+                if ((x!=0) && (x!=xCount) && (y!=0) && (y!=yCount)) {
+                    color=adjustColorRandom(metalColor,0.9f,1.1f);
+                }
+                
+                drawHexagon(lft,top,((lft+xSize)-pointSize),(top+ySize),pointSize,edgeSize,color);
                 top+=ySize;
             }
             
             lft+=xSize;
         }
-*/
     }
  
         //
@@ -308,8 +305,8 @@ public class BitmapMetal extends BitmapBase
         
         metalColor=getRandomColor();
         altMetalColor=getRandomColor();
-        edgeSize=(int)((float)textureSize*0.005)+(int)(Math.random()*0.005);
-        screwSize=(int)((float)textureSize*0.008)+(int)(Math.random()*0.015);
+        edgeSize=(int)((float)textureSize*0.005)+(int)(Math.random()*((double)textureSize*0.005));
+        screwSize=(int)((float)textureSize*0.01)+(int)(Math.random()*((double)textureSize*0.02));
         
         switch (variationMode) {
             case VARIATION_PLATE:
