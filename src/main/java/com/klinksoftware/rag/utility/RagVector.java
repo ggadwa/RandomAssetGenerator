@@ -11,6 +11,13 @@ public class RagVector
         this.z=z;
     }
     
+    public void scale(float f)
+    {
+        x*=f;
+        y*=f;
+        z*=f;
+    }
+    
     public void normalize()
     {
         float       f;
@@ -32,5 +39,10 @@ public class RagVector
         
         x*=f;
         y*=f;
+    }
+    
+    public float dot(RagVector vct)
+    {
+        return((x*vct.x)+(y*vct.y)+(z*vct.z));
     }
 }

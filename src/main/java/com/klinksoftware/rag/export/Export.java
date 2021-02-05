@@ -11,66 +11,83 @@ public class Export
     public void export(MeshList meshList,String basePath,String name)
     {
         int                             n,meshCount;
+        byte[]                          binBytes;
+        ByteArrayOutputStream           bin;
         String                          path;
         Mesh                            mesh;
-        ArrayList<Object>               arrList,primitivesArr;
-        LinkedHashMap<String,Object>    obj,obj2,primitiveObj,attributeObj;
+        ArrayList<Object>               arrList,nodeArr,meshesArr,primitivesArr,
+                                        accessorsArr,bufferViewsArr,bufferArr;
+        LinkedHashMap<String,Object>    json,obj2,nodeObj,meshObj,primitiveObj,attributeObj,
+                                        bufferObj;
         ObjectMapper                    objMapper;
         
+            // the bin data
+            
+        bin=new ByteArrayOutputStream(32*1024);
+        
+            // the json
+            
         meshCount=meshList.count();
         
-        obj=new LinkedHashMap<>();
+        json=new LinkedHashMap<>();
         
-            // headers (assets, scene, scenes)
+            // asset header
             
         obj2=new LinkedHashMap<>();
         obj2.put("generator","WSJS Random Asset Generator");
         obj2.put("version","0.1");
-        obj.put("asset",obj2);
+        json.put("asset",obj2);
         
-        obj.put("scene",0);
+            // the single scene
+            // points to all the nodes
+            
+        json.put("scene",0);
         
         obj2=new LinkedHashMap<>();
         obj2.put("name","Scene");
         
-        arrList=new ArrayList<>();      // one node for every mesh
+        nodeArr=new ArrayList<>();      // one node for every mesh
         for (n=0;n!=meshCount;n++) {
-            arrList.add(n);
+            nodeArr.add(n);
         }
-        obj2.put("nodes",arrList);
+        obj2.put("nodes",nodeArr);
         
         arrList=new ArrayList<>();
         arrList.add(obj2);
-        obj.put("scenes",arrList);
+        json.put("scenes",arrList);
         
-            // the mesh nodes
+            // the nodes, pointed from scene
             // one for each mesh
             
-        arrList=new ArrayList<>();
+        nodeArr=new ArrayList<>();
         
         for (n=0;n!=meshCount;n++) {
             mesh=meshList.get(n);
 
-            obj2=new LinkedHashMap<>();
-            obj2.put("mesh",0);
-            obj2.put("name",mesh.name);
+            nodeObj=new LinkedHashMap<>();
+            nodeObj.put("mesh",n);
+            nodeObj.put("name",mesh.name);
             
-            arrList.add(obj2);
+            nodeArr.add(nodeObj);
         }
         
-        obj.put("nodes",arrList);
+        json.put("nodes",nodeArr);
         
-            // the meshes
-            // one for each mesh, parallel with
-            // the nodes
+            // the meshes, pointed from nodes
+            // one for each mesh, parallel with the nodes
             
-        arrList=new ArrayList<>();
+            // we build the accessor and bufferViews at the
+            // same time
+            
+        meshesArr=new ArrayList<>();
+        accessorsArr=new ArrayList<>();
+        bufferViewsArr=new ArrayList<>();
         
         for (n=0;n!=meshCount;n++) {
             mesh=meshList.get(n);
             
-            obj2=new LinkedHashMap<>();
-            obj2.put("name",mesh.name);
+            meshObj=new LinkedHashMap<>();
+            meshObj.put("name",mesh.name);
             
             primitiveObj=new LinkedHashMap<>();
             
@@ -81,55 +98,87 @@ public class Export
             attributeObj.put("TEXCOORD_0",3);
             primitiveObj.put("attributes",attributeObj);
             
+            byte[] temp=new byte[]{0x0,0x1,0x2};
+            try { bin.write(temp); } catch(Exception e) {}
+            
             primitiveObj.put("indices",3);
             primitiveObj.put("material",0);
             primitivesArr=new ArrayList<>();
+            primitivesArr.add(primitiveObj);
             
-            obj2.put("primitive",primitiveObj);
+            meshObj.put("primitives",primitivesArr);
             
-            arrList.add(obj2);
+            meshesArr.add(meshObj);
         }
         
-        obj.put("meshes",arrList);
+        json.put("meshes",meshesArr);
             
-            // the materials (materials, textures, images, samplers)
-            
-        arrList=new ArrayList<>();
-        obj.put("materials",arrList);
-
-        arrList=new ArrayList<>();
-        obj.put("textures",arrList);
-
-        arrList=new ArrayList<>();
-        obj.put("images",arrList);
-
-        arrList=new ArrayList<>();
-        obj.put("samplers",arrList);
-            
-            // bin (accessors, bufferViews, buffers)
+            // the materials, pointed to from mesh primitives
             
         arrList=new ArrayList<>();
-        obj.put("accessors",arrList);
-
-        arrList=new ArrayList<>();
-        obj.put("bufferViews",arrList);
-
-            
-        obj2=new LinkedHashMap<>();
-        obj2.put("byteLength",0);           // UPDATE THIS!
-        obj2.put("uri",(name+".bin"));
-        arrList=new ArrayList<>();
-        arrList.add(obj2);
-        obj.put("buffers",arrList);
+        json.put("materials",arrList);
         
-            // finish and save
+            // textures, pointed to from materials
+
+        arrList=new ArrayList<>();
+        json.put("textures",arrList);
+        
+            // images, pointed to from textures
+
+        arrList=new ArrayList<>();
+        json.put("images",arrList);
+
+            // samplers, pointed to from textures
+            // just one, with mag/min filter
+            
+        arrList=new ArrayList<>();
+        obj2=new LinkedHashMap<>();
+        obj2.put("magFilter",9729);
+        obj2.put("minFilter",9986);
+        arrList.add(obj2);
+        json.put("samplers",arrList);
+            
+            // accessors, pointed to from mesh primitives
+            // these are built when we build the meshes
+            
+        json.put("accessors",accessorsArr);
+
+            // buffer view, pointed to from accessors
+            // these are built when we build the meshes
+            
+        json.put("bufferViews",bufferViewsArr);
+
+            // the buffer, just one for all information
+            
+        binBytes=bin.toByteArray();
+            
+        bufferObj=new LinkedHashMap<>();
+        bufferObj.put("byteLength",binBytes.length);
+        bufferObj.put("uri",(name+".bin"));
+        bufferArr=new ArrayList<>();
+        bufferArr.add(bufferObj);
+        json.put("buffers",bufferArr);
+        
+            // save the json
                
         path=basePath+File.separator+name+".json";
         
         objMapper=new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
 
-            objMapper.writeValue(new File(path),obj);
+            objMapper.writeValue(new File(path),json);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        
+            // now write the bin
+            
+        path=basePath+File.separator+name+".bin";
+        
+        try(FileOutputStream binFile=new FileOutputStream(path)) {
+            binFile.write(binBytes);
         }
         catch (IOException e)
         {

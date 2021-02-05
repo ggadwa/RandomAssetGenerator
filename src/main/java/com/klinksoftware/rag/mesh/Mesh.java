@@ -4,18 +4,18 @@ import java.util.*;
 
 public class Mesh
 {
-    public String               name,bitmapName;
-    public ArrayList<Integer>   vertexArray,indexArray;
-    public ArrayList<Float>     normalArray,tangentArray,uvArray;
+    public String       name,bitmapName;
+    public int[]        vertexes,indexes;
+    public float[]      normals,tangents,uvs;
 
-    public Mesh(String name,String bitmapName,ArrayList<Integer> vertexArray,ArrayList<Float> normalArray,ArrayList<Float> tangentArray,ArrayList<Float> uvArray,ArrayList<Integer> indexArray)
+    public Mesh(String name,String bitmapName,int[] vertexes,float[] normals,float[] tangents,float[] uvs,int[] indexes)
     {
         this.name=name;
         this.bitmapName=bitmapName;
-        this.vertexArray=vertexArray;
-        this.normalArray=normalArray;
-        this.tangentArray=tangentArray;
-        this.uvArray=uvArray;
-        this.indexArray=indexArray;
+        this.vertexes=vertexes;
+        this.normals=normals;
+        this.tangents=tangents;
+        this.uvs=uvs;
+        this.indexes=indexes;
     }
 }

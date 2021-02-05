@@ -1,6 +1,7 @@
 package com.klinksoftware.rag.mesh;
 
-import com.klinksoftware.rag.utility.RagPoint;
+import com.klinksoftware.rag.utility.*;
+
 import java.util.*;
 
 public class MeshUtility
@@ -20,48 +21,48 @@ public class MeshUtility
         // build UVs for vertex lists
         //
             
-    public static ArrayList<Float> buildUVs(ArrayList<Integer> vertexArray,ArrayList<Float> normalArray,float uvScale)
+    public static float[] buildUVs(int[] vertexes,float[] normals,float uvScale)
     {
-        /*
-        let n,k,nVertex,offset;
-        let x,y,ang,mapUp;
-        let minIntX,minIntY;
-        let uvArray;
+        int                 n,k,nVertex,offset,minIntX,minIntY;
+        float               x,y,ang;
+        float[]             uvs;
+        RagPoint            v;
+        RagVector           normal,mapUp;
         
-        let v=new PointClass(0.0,0.0,0.0);
-        let normal=new PointClass(0.0,0.0,0.0);
+        v=new RagPoint(0,0,0);
+        normal=new RagVector(0.0f,0.0f,0.0f);
 
-        nVertex=Math.trunc(vertexArray.length/3);
+        nVertex=vertexes.length/3;
         
-        uvArray=new Float32Array(nVertex*2);
+        uvs=new float[nVertex*2];
 
             // determine floor/wall like by
             // the dot product of the normal
             // and an up vector
 
-        mapUp=new PointClass(0.0,1.0,0.0);
+        mapUp=new RagVector(0.0f,1.0f,0.0f);
 
             // run through the vertices
             // remember, both this and normals
             // are packed arrays
 
-        for (n=0;n!==nVertex;n++) {
+        for (n=0;n!=nVertex;n++) {
 
             offset=n*3;
-            v.x=vertexArray[offset];
-            v.y=vertexArray[offset+1];
-            v.z=vertexArray[offset+2];
+            v.x=vertexes[offset];
+            v.y=vertexes[offset+1];
+            v.z=vertexes[offset+2];
             
-            normal.x=normalArray[offset];
-            normal.y=normalArray[offset+1];
-            normal.z=normalArray[offset+2];
+            normal.x=normals[offset];
+            normal.y=normals[offset+1];
+            normal.z=normals[offset+2];
 
             ang=mapUp.dot(normal);
 
                 // wall like
                 // use longest of x/z coordinates + Y coordinates of vertex
 
-            if (Math.abs(ang)<=0.4) {
+            if (Math.abs(ang)<=0.4f) {
                 if (Math.abs(normal.x)<Math.abs(normal.z)) {
                     x=v.x;
                 }
@@ -80,52 +81,51 @@ public class MeshUtility
             }
             
             offset=n*2;
-            uvArray[offset]=x*uvScale;
-            uvArray[offset+1]=1.0-(y*uvScale);
+            uvs[offset]=x*uvScale;
+            uvs[offset+1]=1.0f-(y*uvScale);
         }
         
             // reduce all the UVs to
             // their minimum integers
          
-        minIntX=Math.trunc(uvArray[0]);
-        minIntY=Math.trunc(uvArray[1]);
+        minIntX=(int)(uvs[0]);
+        minIntY=(int)(uvs[1]);
         
-        for (n=1;n!==nVertex;n++) {
+        for (n=1;n!=nVertex;n++) {
             offset=n*2;
             
-            k=Math.trunc(uvArray[offset]);
+            k=(int)(uvs[offset]);
             if (k<minIntX) minIntX=k;
-            k=Math.trunc(uvArray[offset+1]);
+            k=(int)(uvs[offset+1]);
             if (k<minIntY) minIntY=k;
         }
         
-        for (n=0;n!==nVertex;n++) {
+        for (n=0;n!=nVertex;n++) {
             offset=n*2;
-            uvArray[offset]-=minIntX;
-            uvArray[offset+1]-=minIntY;
+            uvs[offset]-=(float)minIntX;
+            uvs[offset+1]-=(float)minIntY;
         }
         
-        return(uvArray);
-        */
-        return(null);
+        return(uvs);
     }
     
         //
         // build normals
         //
         
-    public static ArrayList<Float> buildNormals(ArrayList<Integer> vertexArray,ArrayList<Integer> indexArray,RagPoint meshCenter,boolean normalsIn)
+    public static float[] buildNormals(int[] vertexes,int[] indexes,RagPoint meshCenter,boolean normalsIn)
     {
-        /*
-        let n,flip,nTrig,trigIdx,offset;
-        let v0,v1,v2,normalArray;
-        let trigCenter,faceVct;
-        let p10,p20,normal;
 
-        normalArray=new Float32Array(vertexArray.length);
+        int             n,nTrig,trigIdx,offset;
+        float[]         normals;
+        boolean         flip;
+        RagPoint        trigCenter,v0,v1,v2;
+        RagVector       faceVct,p10,p20,normal;
 
-        trigCenter=new PointClass(0.0,0.0,0.0);
-        faceVct=new PointClass(0.0,0.0,0.0);
+        normals=new float[vertexes.length];
+
+        trigCenter=new RagPoint(0,0,0);
+        faceVct=new RagVector(0.0f,0.0f,0.0f);
 
             // generate normals by the trigs
             // sometimes we will end up overwriting
@@ -133,43 +133,51 @@ public class MeshUtility
             // constant shared vertices against
             // triangle normals
 
-        v0=new PointClass(0.0,0.0,0.0);
-        v1=new PointClass(0.0,0.0,0.0);
-        v2=new PointClass(0.0,0.0,0.0);
-        p10=new PointClass(0.0,0.0,0.0);
-        p20=new PointClass(0.0,0.0,0.0);
-        normal=new PointClass(0.0,0.0,0.0);
+        v0=new RagPoint(0,0,0);
+        v1=new RagPoint(0,0,0);
+        v2=new RagPoint(0,0,0);
+        p10=new RagVector(0.0f,0.0f,0.0f);
+        p20=new RagVector(0.0f,0.0f,0.0f);
+        normal=new RagVector(0.0f,0.0f,0.0f);
 
-        nTrig=Math.trunc(indexArray.length/3);
+        nTrig=indexes.length/3;
 
-        for (n=0;n!==nTrig;n++) {
+        for (n=0;n!=nTrig;n++) {
 
                 // get the vertex indexes and
                 // the vertexes for the trig
 
             trigIdx=n*3;
             
-            offset=indexArray[trigIdx]*3;
-            v0.x=vertexArray[offset];
-            v0.y=vertexArray[offset+1];
-            v0.z=vertexArray[offset+2];
+            offset=indexes[trigIdx]*3;
+            v0.x=vertexes[offset];
+            v0.y=vertexes[offset+1];
+            v0.z=vertexes[offset+2];
             
-            offset=indexArray[trigIdx+1]*3;
-            v1.x=vertexArray[offset];
-            v1.y=vertexArray[offset+1];
-            v1.z=vertexArray[offset+2];
+            offset=indexes[trigIdx+1]*3;
+            v1.x=vertexes[offset];
+            v1.y=vertexes[offset+1];
+            v1.z=vertexes[offset+2];
 
-            offset=indexArray[trigIdx+2]*3;
-            v2.x=vertexArray[offset];
-            v2.y=vertexArray[offset+1];
-            v2.z=vertexArray[offset+2];
+            offset=indexes[trigIdx+2]*3;
+            v2.x=vertexes[offset];
+            v2.y=vertexes[offset+1];
+            v2.z=vertexes[offset+2];
 
                 // create vectors and calculate the normal
                 // by the cross product
 
-            p10.setFromSubPoint(v1,v0);
-            p20.setFromSubPoint(v2,v0);
-            normal.setFromCross(p10,p20);
+            p10.x=(float)(v1.x-v0.x);
+            p10.y=(float)(v1.y-v0.y);
+            p10.z=(float)(v1.z-v0.z);
+            p20.x=(float)(v2.x-v0.x);
+            p20.y=(float)(v2.y-v0.y);
+            p20.z=(float)(v2.z-v0.z);
+            
+            normal.x=(p10.y*p20.z)-(p10.z*p20.y);
+            normal.y=(p10.z*p20.x)-(p10.x*p20.z);
+            normal.z=(p10.x*p20.y)-(p10.y*p20.x);
+
             normal.normalize();
 
                 // determine if we need to flip
@@ -178,48 +186,54 @@ public class MeshUtility
                 // more towards the center or more
                 // away from it
 
-            trigCenter.setFromValues(((v0.x+v1.x+v2.x)/3),((v0.y+v1.y+v2.y)/3),((v0.z+v1.z+v2.z)/3));
-            faceVct.setFromSubPoint(trigCenter,meshCenter);
+            trigCenter.x=((v0.x+v1.x+v2.x)/3);
+            trigCenter.y=((v0.y+v1.y+v2.y)/3);
+            trigCenter.z=((v0.z+v1.z+v2.z)/3);
+            
+            faceVct.x=(float)(trigCenter.x-meshCenter.x);
+            faceVct.y=(float)(trigCenter.y-meshCenter.y);
+            faceVct.z=(float)(trigCenter.z-meshCenter.z);
 
-            flip=(normal.dot(faceVct)>0.0);
+            flip=(normal.dot(faceVct)>0.0f);
             if (!normalsIn) flip=!flip;
 
-            if (flip) normal.scale(-1.0);
+            if (flip) normal.scale(-1.0f);
 
                 // and set the mesh normal
                 // to all vertexes in this trig
 
-            offset=indexArray[trigIdx]*3;
-            normalArray[offset]=normal.x;
-            normalArray[offset+1]=normal.y;
-            normalArray[offset+2]=normal.z;
+            offset=indexes[trigIdx]*3;
+            normals[offset]=normal.x;
+            normals[offset+1]=normal.y;
+            normals[offset+2]=normal.z;
 
-            offset=indexArray[trigIdx+1]*3;
-            normalArray[offset]=normal.x;
-            normalArray[offset+1]=normal.y;
-            normalArray[offset+2]=normal.z;
+            offset=indexes[trigIdx+1]*3;
+            normals[offset]=normal.x;
+            normals[offset+1]=normal.y;
+            normals[offset+2]=normal.z;
             
-            offset=indexArray[trigIdx+2]*3;
-            normalArray[offset]=normal.x;
-            normalArray[offset+1]=normal.y;
-            normalArray[offset+2]=normal.z;
+            offset=indexes[trigIdx+2]*3;
+            normals[offset]=normal.x;
+            normals[offset+1]=normal.y;
+            normals[offset+2]=normal.z;
         }
         
-        return(normalArray);
-        */
-        return(null);
+        return(normals);
     }
     
         //
         // build tangents
         //
 
-    public static ArrayList<Float> buildTangents(ArrayList<Integer> vertexArray,ArrayList<Float> uvArray,ArrayList<Integer> indexArray)
+    public static float[] buildTangents(int[] vertexes,float[] uvs,int[] indexes)
     {
-        /*
-        let n,nTrig,trigIdx,offset;
-        let u10,u20,v10,v20;
-        let tangentArray;
+        int             n,nTrig,trigIdx,offset;
+        float           denom,u10,u20,v10,v20;
+        float[]         tangents;
+        RagPoint        v0,v1,v2;
+        RagVector       uv0,uv1,uv2,p10,p20,
+                        vLeft,vRight,vNum,
+                        tangent;
 
             // generate tangents by the trigs
             // sometimes we will end up overwriting
@@ -231,62 +245,66 @@ public class MeshUtility
             // goes on to create the normal, because
             // we need that first to make the UVs
 
-        let v0=new PointClass(0.0,0.0,0.0);
-        let v1=new PointClass(0.0,0.0,0.0);
-        let v2=new PointClass(0.0,0.0,0.0);
-        let uv0=new PointClass(0.0,0.0,0.0);
-        let uv1=new PointClass(0.0,0.0,0.0);
-        let uv2=new PointClass(0.0,0.0,0.0);
-        let p10=new PointClass(0.0,0.0,0.0);
-        let p20=new PointClass(0.0,0.0,0.0);
-        let vLeft=new PointClass(0.0,0.0,0.0);
-        let vRight=new PointClass(0.0,0.0,0.0);
-        let vNum=new PointClass(0.0,0.0,0.0);
-        let denom;
-        let tangent=new PointClass(0.0,0.0,0.0);
+        v0=new RagPoint(0,0,0);
+        v1=new RagPoint(0,0,0);
+        v2=new RagPoint(0,0,0);
+        uv0=new RagVector(0.0f,0.0f,0.0f);
+        uv1=new RagVector(0.0f,0.0f,0.0f);
+        uv2=new RagVector(0.0f,0.0f,0.0f);
+        p10=new RagVector(0.0f,0.0f,0.0f);
+        p20=new RagVector(0.0f,0.0f,0.0f);
+        vLeft=new RagVector(0.0f,0.0f,0.0f);
+        vRight=new RagVector(0.0f,0.0f,0.0f);
+        vNum=new RagVector(0.0f,0.0f,0.0f);
 
-        nTrig=Math.trunc(indexArray.length/3);
+        tangent=new RagVector(0.0f,0.0f,0.0f);
+
+        nTrig=indexes.length/3;
         
-        tangentArray=new Float32Array(vertexArray.length);
+        tangents=new float[vertexes.length];
 
-        for (n=0;n!==nTrig;n++) {
+        for (n=0;n!=nTrig;n++) {
 
                 // get the vertex indexes and
                 // the vertexes for the trig
 
             trigIdx=n*3;
             
-            offset=indexArray[trigIdx]*3;
-            v0.x=vertexArray[offset];
-            v0.y=vertexArray[offset+1];
-            v0.z=vertexArray[offset+2];
+            offset=indexes[trigIdx]*3;
+            v0.x=vertexes[offset];
+            v0.y=vertexes[offset+1];
+            v0.z=vertexes[offset+2];
             
-            offset=indexArray[trigIdx]*2;
-            uv0.x=uvArray[offset];
-            uv0.y=uvArray[offset+1];
+            offset=indexes[trigIdx]*2;
+            uv0.x=uvs[offset];
+            uv0.y=uvs[offset+1];
             
-            offset=indexArray[trigIdx+1]*3;
-            v1.x=vertexArray[offset];
-            v1.y=vertexArray[offset+1];
-            v1.z=vertexArray[offset+2];
+            offset=indexes[trigIdx+1]*3;
+            v1.x=vertexes[offset];
+            v1.y=vertexes[offset+1];
+            v1.z=vertexes[offset+2];
             
-            offset=indexArray[trigIdx+1]*2;
-            uv1.x=uvArray[offset];
-            uv1.y=uvArray[offset+1];
+            offset=indexes[trigIdx+1]*2;
+            uv1.x=uvs[offset];
+            uv1.y=uvs[offset+1];
 
-            offset=indexArray[trigIdx+2]*3;
-            v2.x=vertexArray[offset];
-            v2.y=vertexArray[offset+1];
-            v2.z=vertexArray[offset+2];
+            offset=indexes[trigIdx+2]*3;
+            v2.x=vertexes[offset];
+            v2.y=vertexes[offset+1];
+            v2.z=vertexes[offset+2];
             
-            offset=indexArray[trigIdx+2]*2;
-            uv2.x=uvArray[offset];
-            uv2.y=uvArray[offset+1];
+            offset=indexes[trigIdx+2]*2;
+            uv2.x=uvs[offset];
+            uv2.y=uvs[offset+1];
 
                 // create vectors
 
-            p10.setFromSubPoint(v1,v0);
-            p20.setFromSubPoint(v2,v0);
+            p10.x=(float)(v1.x-v0.x);
+            p10.y=(float)(v1.y-v0.y);
+            p10.z=(float)(v1.z-v0.z);
+            p20.x=(float)(v2.x-v0.x);
+            p20.y=(float)(v2.y-v0.y);
+            p20.z=(float)(v2.z-v0.z);
 
                 // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
 
@@ -298,37 +316,47 @@ public class MeshUtility
                 // calculate the tangent
                 // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
 
-            vLeft.setFromScale(p10,v20);
-            vRight.setFromScale(p20,v10);
-            vNum.setFromSubPoint(vLeft,vRight);
+            vLeft.x=p10.x*v20;
+            vLeft.y=p10.y*v20;
+            vLeft.z=p10.z*v20;
+            
+            vRight.x=p20.x*v10;
+            vRight.y=p20.y*v10;
+            vRight.z=p20.z*v10;
+            
+            vNum.x=vLeft.x-vRight.x;
+            vNum.y=vLeft.y-vRight.y;
+            vNum.z=vLeft.z-vRight.z;
 
             denom=(u10*v20)-(v10*u20);
-            if (denom!==0.0) denom=1.0/denom;
-            tangent.setFromScale(vNum,denom);
+            if (denom!=0.0f) denom=1.0f/denom;
+            
+            tangent.x=vNum.x*denom;
+            tangent.y=vNum.y*denom;
+            tangent.z=vNum.z*denom;
+            
             tangent.normalize();
 
                 // and set the mesh normal
                 // to all vertexes in this trig
                 
-            offset=indexArray[trigIdx]*3;
-            tangentArray[offset]=tangent.x;
-            tangentArray[offset+1]=tangent.y;
-            tangentArray[offset+2]=tangent.z;
+            offset=indexes[trigIdx]*3;
+            tangents[offset]=tangent.x;
+            tangents[offset+1]=tangent.y;
+            tangents[offset+2]=tangent.z;
 
-            offset=indexArray[trigIdx+1]*3;
-            tangentArray[offset]=tangent.x;
-            tangentArray[offset+1]=tangent.y;
-            tangentArray[offset+2]=tangent.z;
+            offset=indexes[trigIdx+1]*3;
+            tangents[offset]=tangent.x;
+            tangents[offset+1]=tangent.y;
+            tangents[offset+2]=tangent.z;
             
-            offset=indexArray[trigIdx+2]*3;
-            tangentArray[offset]=tangent.x;
-            tangentArray[offset+1]=tangent.y;
-            tangentArray[offset+2]=tangent.z;
+            offset=indexes[trigIdx+2]*3;
+            tangents[offset]=tangent.x;
+            tangents[offset+1]=tangent.y;
+            tangents[offset+2]=tangent.z;
         }
         
-        return(tangentArray);
-        */
-        return(null);
+        return(tangents);
     }
 
         //
@@ -345,7 +373,8 @@ public class MeshUtility
     {
         int                     trigIdx;
         ArrayList<Integer>      vertexArray,indexArray;
-        ArrayList<Float>        normalArray,tangentArray,uvArray;
+        int[]                   vertexes,indexes;
+        float[]                 normals,tangents,uvs;
         RagPoint                centerPnt;
         
         trigIdx=0;
@@ -378,15 +407,20 @@ public class MeshUtility
             trigIdx=addQuadToIndexes(indexArray,trigIdx);
         }
         
+            // convert to simple arrays
+            
+        vertexes=vertexArray.stream().mapToInt(Integer::intValue).toArray();
+        indexes=indexArray.stream().mapToInt(Integer::intValue).toArray();
+        
             // calculate the normal, tangent, uv
             
         centerPnt=new RagPoint(((negX+posX)/2),((negY+posY)/2),((negZ+posZ)/2));
      
-        normalArray=MeshUtility.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=MeshUtility.buildUVs(vertexArray,normalArray,(1.0f/(float)segmentSize));
-        tangentArray=MeshUtility.buildTangents(vertexArray,uvArray,indexArray);
+        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/(float)segmentSize));
+        tangents=MeshUtility.buildTangents(vertexes,uvs,indexes);
 
-        return(meshList.add(new Mesh(name,bitmapName,vertexArray,normalArray,tangentArray,uvArray,indexArray)));
+        return(meshList.add(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes)));
     }
     
         //

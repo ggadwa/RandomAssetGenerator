@@ -37,12 +37,12 @@ public class GeneratorMain
             
         
         
-        //mapBuilder=new MapBuilder(random);
-        //mapBuilder.build(colorScheme,roomCount,basePath,modelName);
+        mapBuilder=new MapBuilder(random);
+        mapBuilder.build(colorScheme,roomCount,basePath,modelName);
         
         
         
-
+/*
         (new BitmapBrick(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapBrick.VARIATION_NONE,basePath,"brick");
         (new BitmapStone(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapStone.VARIATION_NONE,basePath,"stone");
         (new BitmapConcrete(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapConcrete.VARIATION_NONE,basePath,"concrete");
@@ -56,7 +56,7 @@ public class GeneratorMain
         (new BitmapMetal(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapMetal.VARIATION_HEXAGON,basePath,"metal_hexagon");
         (new BitmapComputer(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapComputer.VARIATION_COMPUTER_BANK,basePath,"computer_bank");
         (new BitmapComputer(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"computer_panel");
-
+*/
         
         System.out.println("done!");
     }
