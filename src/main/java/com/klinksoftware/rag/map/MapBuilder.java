@@ -1,28 +1,25 @@
-import PointClass from '../../utility/point.js';
-import ColorClass from '../../utility/color.js';
-import MapClass from '../../map/map.js';
-import MeshClass from '../../mesh/mesh.js';
-import LightClass from '../../light/light.js';
-import MapPathNodeClass from '../../map/map_path_node.js';
-import GeneratePieceClass from './generate_piece.js';
-import GenerateRoomClass from './generate_room.js';
-import GenerateMeshClass from './generate_mesh.js';
-import GenerateStoryClass from './generate_story.js';
-import GeneratePillarClass from './generate_pillar.js';
-import GenerateStorageClass from './generate_storage.js';
-import GenerateComputerClass from './generate_computer.js';
-import GeneratePipeClass from './generate_pipe.js';
-import GenerateAltarClass from './generate_altar.js';
-import GenerateLightClass from './generate_light.js';
-import GenerateBitmapBaseClass from '../bitmap/generate_bitmap_base.js';
-import GenerateBitmapRunClass from '../bitmap/generate_bitmap_run.js';
+package com.klinksoftware.rag.map;
 
-export default class GenerateMapClass
+import com.klinksoftware.rag.export.*;
+import com.klinksoftware.rag.mesh.*;
+
+import java.util.*;
+
+public class MapBuilder
 {
-    constructor(core)
+    public static final int         SEGMENT_SIZE=100;
+    
+    private MeshList                meshList;
+    private Random                  random;
+    
+    public MapBuilder(Random random)
     {
-        this.core=core;
+        this.random=random;
     }
+
+/*
+    
+    
     
         //
         // mesh building utilities
@@ -260,38 +257,39 @@ export default class GenerateMapClass
             path.nodes.push(pathNode);
         }
     }
-
+*/
         //
         // build a map
         //
         
-    build(autoGenerate)
+    public void build(int colorScheme,int roomCount,String basePath,String name)
     {
+        /*
         let n,k,seed;
         let genPiece,genMesh,genBitmap;
         let roomTopY;
         let xAdd,zAdd,origX,origZ,touchIdx,failCount,placeCount,moveCount;
         let room,centerPnt;
-        let roomCount,segmentSize;
+        let segmentSize;
         let rooms=[];
+        */
         
-            // see the random number generator
-            
-        seed=(autoGenerate.randomSeed===undefined)?Date.now():autoGenerate.randomSeed;
-        console.info('Random Seed: '+seed);
+        meshList=new MeshList();
         
-        this.core.setRandomSeed(seed);
+        MeshUtility.addBox(meshList,"temp","wall",-1000,1000,-1000,1000,-1000,1000,true,true,true,true,true,true,SEGMENT_SIZE);
+
+        
         
             // some generators
-            
+        /*    
         genPiece=new GeneratePieceClass(this.core);
         genMesh=new GenerateMeshClass(this.core);
-        genBitmap=new GenerateBitmapRunClass(this.core,0);      // 0 is the random color scheme, we can just generate a random integer later for this
-        
+        genBitmap=new GenerateBitmapRunClass(this.core,colorScheme);      // 0 is the random color scheme, we can just generate a random integer later for this
+
             // some global settings
             
-        roomCount=autoGenerate.roomCount;
-        segmentSize=autoGenerate.segmentSize;
+
+
         
             // first room in center of map
             
@@ -427,5 +425,13 @@ export default class GenerateMapClass
         this.generateRandomNodes(rooms,segmentSize);
 
         return(true);
+*/
+   
+        
+        //(new BitmapBrick(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapBrick.VARIATION_NONE,basePath,"brick");
+        
+            // write out the model
+        
+        (new Export()).export(meshList,basePath,name);
     }
 }

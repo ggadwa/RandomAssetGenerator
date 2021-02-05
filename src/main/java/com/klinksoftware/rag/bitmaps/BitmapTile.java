@@ -2,13 +2,15 @@ package com.klinksoftware.rag.bitmaps;
 
 import com.klinksoftware.rag.utility.*;
 
+import java.util.*;
+
 public class BitmapTile extends BitmapBase
 {
     public final static int VARIATION_NONE=0;
     
-    public BitmapTile(int colorScheme)
+    public BitmapTile(int colorScheme,Random random)
     {
-        super(colorScheme);
+        super(colorScheme,random);
         
         hasNormal=true;
         hasMetallicRoughness=true;
@@ -31,10 +33,10 @@ public class BitmapTile extends BitmapBase
 
             // tile style
 
-        tileStyle=(int)(Math.random()*3.0);
-        tileContent=(int)(Math.random()*4.0);
-        tileDirty=(Math.random()<0.2);
-        edgeSize=(int)((float)textureSize*0.005)+(int)(Math.random()*(double)(textureSize*0.01));
+        tileStyle=random.nextInt(3);
+        tileContent=random.nextInt(4);
+        tileDirty=(random.nextFloat()<0.2f);
+        edgeSize=(int)(((float)textureSize*0.005f)+(random.nextFloat()*((float)textureSize*0.01f)));
 
             // splits
 
@@ -58,8 +60,8 @@ public class BitmapTile extends BitmapBase
                     // sometimes a tile piece is a recursion to
                     // another tile set
 
-                if ((complex) && (Math.random()<0.25)) {
-                    tileStyle=(int)(Math.random()*3.0);
+                if ((complex) && (random.nextFloat()<0.25f)) {
+                    tileStyle=random.nextInt(3);
                     generateTilePiece(dLft,dTop,dRgt,dBot,tileColor,designColor,2,false);
                     continue;
                 }
@@ -94,7 +96,7 @@ public class BitmapTile extends BitmapBase
 
                 if (complex) {
                     col=adjustColorRandom(col,0.75f,0.85f);
-                    padding=(edgeSize*2)+(int)(Math.random()*10.0);
+                    padding=(edgeSize*2)+random.nextInt(10);
                     
                     switch (tileContent) {
                         case 0:
@@ -121,43 +123,43 @@ public class BitmapTile extends BitmapBase
                 
                     // possible crack
 
-                if ((Math.random()<0.2) && (!complex)) {
-                    switch ((int)(Math.random()*4.0)) {
+                if ((random.nextFloat()<0.2f) && (!complex)) {
+                    switch (random.nextInt(4)) {
                         case 0:
                             sy=dTop+edgeSize;
-                            ey=(dTop+edgeSize)+(int)(Math.random()*((double)(dBot-dTop)*0.5));
-                            sx=(dLft+edgeSize)+(int)(Math.random()*((double)(dRgt-dLft)*0.5));
+                            ey=(dTop+edgeSize)+random.nextInt((dBot-dTop)/2);
+                            sx=(dLft+edgeSize)+random.nextInt((dRgt-dLft)/2);
                             ex=dLft+edgeSize;
                             crackXVarient=5;
                             crackYVarient=5;
                             break;
                         case 1:
                             sy=dTop+edgeSize;
-                            ey=(dTop+edgeSize)+(int)(Math.random()*((double)(dBot-dTop)*0.5));
-                            sx=((dLft+dRgt)/2)+(int)(Math.random()*((double)(dRgt-dLft)*0.5));
+                            ey=(dTop+edgeSize)+random.nextInt((dBot-dTop)/2);
+                            sx=((dLft+dRgt)/2)+random.nextInt((dRgt-dLft)/2);
                             ex=dRgt-edgeSize;
                             crackXVarient=-5;
                             crackYVarient=5;
                             break;
                         case 2:
                             sy=dBot-edgeSize;
-                            ey=((dTop+dBot)/2)+(int)(Math.random()*((double)(dBot-dTop)*0.5));
-                            sx=(dLft+edgeSize)+(int)(Math.random()*((double)(dRgt-dLft)*0.5));
+                            ey=((dTop+dBot)/2)+random.nextInt((dBot-dTop)/2);
+                            sx=(dLft+edgeSize)+random.nextInt((dRgt-dLft)/2);
                             ex=dLft+edgeSize;
                             crackXVarient=-5;
                             crackYVarient=5;
                             break;
                         default:
                             sy=dBot-edgeSize;
-                            ey=((dTop+dBot)/2)+(int)(Math.random()*((double)(dBot-dTop)*0.5));
-                            sx=((dLft+dRgt)/2)+(int)(Math.random()*((double)(dRgt-dLft)*0.5));
+                            ey=((dTop+dBot)/2)+random.nextInt((dBot-dTop)/2);
+                            sx=((dLft+dRgt)/2)+random.nextInt((dRgt-dLft)/2);
                             ex=dRgt-edgeSize;
                             crackXVarient=-5;
                             crackYVarient=-5;
                             break;
                     }
 
-                    crackSegCount=2+(int)(Math.random()*2.0);
+                    crackSegCount=2+random.nextInt(2);
                     drawSimpleCrack(sx,sy,ex,ey,crackSegCount,crackXVarient,crackYVarient,frameCol);
                 }
             }
@@ -174,16 +176,16 @@ public class BitmapTile extends BitmapBase
         
             // get splits
             
-        complex=(Math.random()<0.5);
+        complex=(random.nextBoolean());
         
         small=false;
-        if (!complex) small=(Math.random()<0.5);
+        if (!complex) small=(random.nextBoolean());
 
         if (!small) {
-            splitCount=2+(int)(Math.random()*2.0);
+            splitCount=2+random.nextInt(2);
         }
         else {
-            splitCount=6+(int)(Math.random()*4.0);
+            splitCount=6+random.nextInt(4);
         }
         
             // colors

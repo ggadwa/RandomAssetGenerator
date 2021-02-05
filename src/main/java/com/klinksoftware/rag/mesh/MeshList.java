@@ -11,13 +11,19 @@ public class MeshList
         meshes=new ArrayList<>();
     }
     
-    public void addMesh(Mesh mesh)
+    public int add(Mesh mesh)
     {
         meshes.add(mesh);
+        return(meshes.size()-1);
     }
     
-    public Mesh getMesh(int index)
+    public Mesh get(int index)
     {
         return(meshes.get(index));
+    }
+    
+    public int count()
+    {
+        return(meshes.size());
     }
 }

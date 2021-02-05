@@ -2,14 +2,22 @@ package com.klinksoftware.rag.bitmaps;
 
 import com.klinksoftware.rag.utility.*;
 
+import java.util.*;
+
 public class BitmapComputer extends BitmapBase
 {
     public final static int VARIATION_COMPUTER_BANK=0;
     public final static int VARIATION_CONTROL_PANEL=1;
     
-    public BitmapComputer(int colorScheme)
+    public final static RagColor[] LED_COLORS={
+                                new RagColor(0.0f,1.0f,0.0f),
+                                new RagColor(1.0f,1.0f,0.0f),
+                                new RagColor(1.0f,0.0f,0.0f)
+                            };
+    
+    public BitmapComputer(int colorScheme,Random random)
     {
-        super(colorScheme);
+        super(colorScheme,random);
         
         textureSize=1024;
         hasNormal=true;
@@ -57,7 +65,7 @@ public class BitmapComputer extends BitmapBase
             if (lineVar<4) lineVar=4;
             
             for (n=0;n!=nLine;n++) {
-                y=top+(int)(Math.random()*(double)(bot-top));
+                y=top+random.nextInt(bot-top);
                 
                 lineColor=getRandomColor();
                 drawRandomLine(lft,y,rgt,y,lft,top,rgt,bot,lineVar,lineColor,true);
@@ -71,7 +79,7 @@ public class BitmapComputer extends BitmapBase
             if (lineVar<4) lineVar=4;
             
             for (n=0;n!=nLine;n++) {
-                x=lft+(int)(Math.random()*(double)(rgt-lft));
+                x=lft+random.nextInt(rgt-lft);
                 
                 lineColor=this.getRandomColor();
                 drawRandomLine(x,top,x,bot,lft,top,rgt,bot,lineVar,lineColor,true);
@@ -81,124 +89,119 @@ public class BitmapComputer extends BitmapBase
     
     private void generateComputerComponentShutter(int lft,int top,int rgt,int bot,int edgeSize)
     {
-        /*
-        let sz;
-        let shutterCount,shutterColor,shutterEdgeColor;
+        int         sz,shutterCount;
+        RagColor    shutterColor,shutterEdgeColor;
 
         lft+=edgeSize;
         rgt-=edgeSize;
         top+=edgeSize;
         bot-=edgeSize;
        
-        shutterColor=this.getRandomColor();
-        shutterEdgeColor=this.adjustColor(shutterColor,0.9);
+        shutterColor=getRandomColor();
+        shutterEdgeColor=adjustColor(shutterColor,0.9f);
         
-        sz=Math.trunc(Math.max((rgt-lft),(bot-top))*0.1);
-        shutterCount=this.core.randomInt(sz,sz);
+        sz=(int)((float)Math.max((rgt-lft),(bot-top))*0.1f);
+        shutterCount=sz+random.nextInt(sz);
         
         this.drawMetalShine(lft,top,rgt,bot,shutterColor);
         
         if ((rgt-lft)>(bot-top)) {
-            this.drawNormalWaveHorizontal(lft,top,rgt,bot,shutterColor,shutterEdgeColor,shutterCount);
+            drawNormalWaveHorizontal(lft,top,rgt,bot,shutterColor,shutterEdgeColor,shutterCount);
         }
         else {
-            this.drawNormalWaveVertical(lft,top,rgt,bot,shutterColor,shutterEdgeColor,shutterCount);
+            drawNormalWaveVertical(lft,top,rgt,bot,shutterColor,shutterEdgeColor,shutterCount);
         }
-        */
     }
     
     private void generateComputerComponentLights(int lft,int top,int rgt,int bot,int edgeSize)
     {
-        /*
-        let x,y,xCount,yCount,xMargin,yMargin,dx,dy,sz;
-        let color;
+        int         x,y,xCount,yCount,xMargin,yMargin,
+                    dx,dy,sz;
+        RagColor    color;
         
         lft+=edgeSize;
         rgt-=edgeSize;
         top+=edgeSize;
         bot-=edgeSize;
         
-        sz=this.core.randomInt(12,5);
+        sz=12+random.nextInt(5);
         
-        xCount=Math.trunc((rgt-lft)/sz);
-        yCount=Math.trunc((bot-top)/sz);
+        xCount=(rgt-lft)/sz;
+        yCount=(bot-top)/sz;
         
         if (xCount<=0) xCount=1;
         if (yCount<=0) yCount=1;
         
-        xMargin=Math.trunc(((rgt-lft)-(xCount*sz))*0.5)+1;
-        yMargin=Math.trunc(((bot-top)-(yCount*sz))*0.5)+1;
+        xMargin=(((rgt-lft)-(xCount*sz))/2)+1;
+        yMargin=(((bot-top)-(yCount*sz))/2)+1;
         
-        for (y=0;y!==yCount;y++) {
+        for (y=0;y!=yCount;y++) {
             dy=(top+yMargin)+(y*sz);
             
-            for (x=0;x!==xCount;x++) {
+            for (x=0;x!=xCount;x++) {
                 dx=(lft+xMargin)+(x*sz);
                 
                     // the light
                     
-                color=this.getRandomColor();
-                if (this.core.randomPercentage(0.5)) color=this.adjustColor(color,0.8);
-                this.drawOval((dx+1),(dy+1),(dx+(sz-1)),(dy+(sz-1)),0,1,0,0,sz,0.8,color,null,0.5,false,false,1,0);
+                color=getRandomColor();
+                if (random.nextBoolean()) color=adjustColor(color,0.8f);
+                drawOval((dx+1),(dy+1),(dx+(sz-1)),(dy+(sz-1)),0.0f,1.0f,0.0f,0.0f,sz,0.8f,color,null,0.5f,false,false,1.0f,0.0f);
                 
                     // the possible glow
                     
-                if (this.core.randomPercentage(0.5)) this.drawOvalGlow(dx,dy,(dx+sz),(dy+sz),this.adjustColor(color,0.7));
+                if (random.nextBoolean()) drawOvalGlow(dx,dy,(dx+sz),(dy+sz),adjustColor(color,0.7f));
             }
         }
-        */
     }
     
     private void generateComputerComponentButtons(int lft,int top,int rgt,int bot,int edgeSize)
     {
-        /*
-        let x,y,xCount,yCount,xMargin,yMargin,dx,dy,sz;
-        let color,outlineColor;
+        int         x,y,xCount,yCount,xMargin,yMargin,
+                    dx,dy,sz;
+        RagColor    color,outlineColor;
         
         lft+=edgeSize;
         rgt-=edgeSize;
         top+=edgeSize;
         bot-=edgeSize;
         
-        sz=this.core.randomInt(10,15);
+        sz=10+random.nextInt(15);
         
-        xCount=Math.trunc((rgt-lft)/sz);
-        yCount=Math.trunc((bot-top)/sz);
+        xCount=(rgt-lft)/sz;
+        yCount=(bot-top)/sz;
         
         if (xCount<=0) xCount=1;
         if (yCount<=0) yCount=1;
         
-        xMargin=Math.trunc(((rgt-lft)-(xCount*sz))*0.5);
-        yMargin=Math.trunc(((bot-top)-(yCount*sz))*0.5);
+        xMargin=(((rgt-lft)-(xCount*sz))/2);
+        yMargin=(((bot-top)-(yCount*sz))/2);
         
-        outlineColor=this.getRandomGray(0.1,0.3);
+        outlineColor=getRandomGray(0.1f,0.3f);
         
-        for (y=0;y!==yCount;y++) {
+        for (y=0;y!=yCount;y++) {
             dy=(top+yMargin)+(y*sz);
             
-            for (x=0;x!==xCount;x++) {
+            for (x=0;x!=xCount;x++) {
                 dx=(lft+xMargin)+(x*sz);
                 
                     // the button
                 
-                color=this.getRandomColor();
-                this.drawRect(dx,dy,(dx+sz),(dy+sz),color);
-                this.draw3DFrameRect(dx,dy,(dx+sz),(dy+sz),2,outlineColor,true);
+                color=getRandomColor();
+                drawRect(dx,dy,(dx+sz),(dy+sz),color);
+                draw3DFrameRect(dx,dy,(dx+sz),(dy+sz),2,outlineColor,true);
                 
                     // the possible glow
                     
-                if (this.core.randomPercentage(0.5)) this.drawRectGlow(dx,dy,(dx+sz),(dy+sz),color);
+                if (random.nextBoolean()) drawRectGlow(dx,dy,(dx+sz),(dy+sz),color);
             }
         }
-        */
     }
     
     private void generateComputerComponentDrives(int lft,int top,int rgt,int bot,int edgeSize)
     {
-        /*
-        let x,y,xCount,yCount,dx,dy,bx,by,wid,high,ledWid,ledHigh,xMargin,yMargin;
-        let color,outlineColor,ledColor;
-        let ledColors=[new ColorClass(0.0,1.0,0.0),new ColorClass(1.0,1.0,0.0),new ColorClass(1.0,0.0,0.0)];
+        int         x,y,xCount,yCount,dx,dy,bx,by,
+                    wid,high,ledWid,ledHigh,xMargin,yMargin;
+        RagColor    color,outlineColor,ledColor;
         
         lft+=edgeSize;
         rgt-=edgeSize;
@@ -207,75 +210,76 @@ public class BitmapComputer extends BitmapBase
         
             // the random color (always dark)
             
-        color=this.getRandomGray(0.1,0.3);
-        outlineColor=this.adjustColor(color,0.8);
+        color=getRandomGray(0.1f,0.3f);
+        outlineColor=adjustColor(color,0.8f);
         
             // the drive sizes
             // pick randomly, but make sure they fill entire size
         
-        high=this.core.randomInt(15,15);
+        high=15+random.nextInt(15);
         wid=high*2;
         
-        ledWid=Math.trunc(high*0.1);
+        ledWid=(int)((float)high*0.1f);
         if (ledWid<4) ledWid=4;
-        ledHigh=Math.trunc(ledWid*0.5);
+        ledHigh=(int)((float)ledWid*0.5f);
         
-        xCount=Math.trunc((rgt-lft)/wid);
-        yCount=Math.trunc((bot-top)/high);
+        xCount=(rgt-lft)/wid;
+        yCount=(bot-top)/high;
         
         if (xCount<=0) xCount=1;
         if (yCount<=0) yCount=1;
         
-        wid=Math.trunc((rgt-lft)/xCount);
-        high=Math.trunc((bot-top)/yCount);
+        wid=(rgt-lft)/xCount;
+        high=(bot-top)/yCount;
         
-        xMargin=Math.trunc(((rgt-lft)-(xCount*wid))*0.5);
-        yMargin=Math.trunc(((bot-top)-(yCount*high))*0.5);
+        xMargin=((rgt-lft)-(xCount*wid))/2;
+        yMargin=((bot-top)-(yCount*high))/2;
         
-        for (y=0;y!==yCount;y++) {
+        for (y=0;y!=yCount;y++) {
             dy=(top+yMargin)+(y*high);
             
-            for (x=0;x!==xCount;x++) {
+            for (x=0;x!=xCount;x++) {
                 dx=(lft+xMargin)+(x*wid);
                 
                     // the drive
                 
-                this.drawRect(dx,dy,(dx+wid),(dy+high),color);
-                this.draw3DFrameRect(dx,dy,(dx+wid),(dy+high),2,outlineColor,true);
+                drawRect(dx,dy,(dx+wid),(dy+high),color);
+                draw3DFrameRect(dx,dy,(dx+wid),(dy+high),2,outlineColor,true);
                 
                     // the glowing indicator
                 
-                ledColor=ledColors[this.core.randomIndex(3)];
+                ledColor=LED_COLORS[random.nextInt(3)];
                 
                 bx=(dx+wid)-(ledWid+5);
                 by=(dy+high)-(ledHigh+5);
-                this.drawRect(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
-                this.drawRectGlow(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
+                drawRect(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
+                drawRectGlow(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
             }
         }
-        */
     }
     
     private void generateComputerComponentScreen(int lft,int top,int rgt,int bot,int edgeSize)
     {
-    /*
-        let x,y,dx,dy,rowCount,colCount;
-        let screenColor=new ColorClass(0.2,0.25,0.2);
-        let charColor=new ColorClass(0.2,0.6,0.2);
+        int         x,y,dx,dy,rowCount,colCount;
+        RagColor    screenColor,charColor,glowCharColor;
         
         lft+=edgeSize;
         rgt-=edgeSize;
         top+=edgeSize;
         bot-=edgeSize;
+        
+        screenColor=new RagColor(0.2f,0.25f,0.2f);
+        charColor=new RagColor(0.2f,0.6f,0.2f);
+        glowCharColor=adjustColor(charColor,0.8f);
 
             // screen
             
-        this.drawRect(lft,top,rgt,bot,this.blackColor);
+        this.drawRect(lft,top,rgt,bot,COLOR_BLACK);
         
-        this.drawOval((lft+3),(top+3),(lft+13),(top+13),0,1,0,0,0,0,screenColor,null,0.5,false,false,1,0);
-        this.drawOval((rgt-13),(top+3),(rgt-3),(top+13),0,1,0,0,0,0,screenColor,null,0.5,false,false,1,0);
-        this.drawOval((lft+3),(bot-13),(lft+13),(bot-3),0,1,0,0,0,0,screenColor,null,0.5,false,false,1,0);
-        this.drawOval((rgt-13),(bot-13),(rgt-3),(bot-3),0,1,0,0,0,0,screenColor,null,0.5,false,false,1,0);
+        this.drawOval((lft+3),(top+3),(lft+13),(top+13),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
+        this.drawOval((rgt-13),(top+3),(rgt-3),(top+13),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
+        this.drawOval((lft+3),(bot-13),(lft+13),(bot-3),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
+        this.drawOval((rgt-13),(bot-13),(rgt-3),(bot-3),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
         
         this.drawRect((lft+8),(top+8),(rgt-8),(bot-8),screenColor);
         this.drawRect((lft+8),(top+3),(rgt-8),(top+8),screenColor);
@@ -286,27 +290,31 @@ public class BitmapComputer extends BitmapBase
             // chars
             
         dy=top+10;
-        rowCount=Math.trunc(((bot-top)-20)/10);
+        rowCount=((bot-top)-20)/10;
         
         for (y=0;y<rowCount;y++) {
-            colCount=this.core.randomInt(3,(Math.trunc(((rgt-lft)-20)/7)-3));
+            colCount=3+((((rgt-lft)-20)/7)-3);
             
             dx=lft+10;
             
             for (x=0;x<colCount;x++) {
                 
-                switch (this.core.randomIndex(5)) {
+                switch (random.nextInt(5)) {
                     case 0:
-                        this.drawRect(dx,dy,(dx+5),(dy+8),charColor);
+                        drawRect(dx,dy,(dx+5),(dy+8),charColor);
+                        drawRectGlow(dx,dy,(dx+5),(dy+8),glowCharColor);
                         break;
                     case 1:
-                        this.drawRect((dx+2),dy,(dx+5),(dy+6),charColor);
+                        drawRect((dx+2),dy,(dx+5),(dy+6),charColor);
+                        drawRectGlow((dx+2),dy,(dx+5),(dy+6),glowCharColor);
                         break;
                     case 2:
-                        this.drawRect(dx,(dy+5),(dx+5),(dy+8),charColor);
+                        drawRect(dx,(dy+5),(dx+5),(dy+8),charColor);
+                        drawRectGlow(dx,(dy+5),(dx+5),(dy+8),glowCharColor);
                         break;
                     case 3:
-                        this.drawRect(dx,dy,(dx+5),(dy+3),charColor);
+                        drawRect(dx,dy,(dx+5),(dy+3),charColor);
+                        drawRectGlow(dx,dy,(dx+5),(dy+3),glowCharColor);
                         break;
                 }
                 
@@ -315,10 +323,9 @@ public class BitmapComputer extends BitmapBase
             
             dy+=10;
         }
-*/
     }
 
-    private void generateComputerComponents(int lft,int top,int rgt,int bot,RagColor panelColor,int edgeSize)
+    private void generateComputerComponents(int lft,int top,int rgt,int bot,RagColor panelColor,int edgeSize,int variationMode)
     {
         int         mx,my,sz,lx,ty,rx,by,rndTry,
                     componentType,lightCount,buttonCount,
@@ -347,11 +354,11 @@ public class BitmapComputer extends BitmapBase
             
             lx=mx;
             ty=my;
-            sz=minPanelSize+(int)(Math.random()*(double)extraPanelSize);
+            sz=minPanelSize+random.nextInt(extraPanelSize);
             
                 // vertical stack
                 
-            if (Math.random()<0.5) {
+            if (random.nextBoolean()) {
                 rx=lx+sz;
                 if (rx>=(rgt-(skipPanelSize+edgeSize))) rx=rgt-edgeSize;
                 by=bot-edgeSize;
@@ -373,7 +380,7 @@ public class BitmapComputer extends BitmapBase
                 // be randonly in or out
                 
             drawRect(lx,ty,rx,by,panelColor);
-            draw3DFrameRect(lx,ty,rx,by,edgeSize,panelColor,(Math.random()<0.5));
+            draw3DFrameRect(lx,ty,rx,by,edgeSize,panelColor,(random.nextBoolean()));
             
                 // draw the components
                 // we only allow one blank, wires, or shutter
@@ -381,12 +388,13 @@ public class BitmapComputer extends BitmapBase
             rndTry=0;
             
             while (rndTry<25) {
-                componentType=(int)(Math.random()*7.0);
+                componentType=random.nextInt(7);
                 
                 rndSuccess=false;
 
                 switch (componentType) {
                     case 0:
+                        if (variationMode==VARIATION_CONTROL_PANEL) break;              // no wires on panels
                         if (hadWires) break;
                         if ((rx-lx)>(by-ty)) break;     // wires only vertical
                         hadWires=true;
@@ -394,6 +402,7 @@ public class BitmapComputer extends BitmapBase
                         rndSuccess=true;
                         break;
                     case 1:
+                        if (variationMode==VARIATION_CONTROL_PANEL) break;              // no shutters on panels
                         if (hadShutter) break;
                         hadShutter=true;
                         generateComputerComponentShutter(lx,ty,rx,by,edgeSize);
@@ -412,6 +421,7 @@ public class BitmapComputer extends BitmapBase
                         rndSuccess=true;
                         break;
                     case 4:
+                        if (variationMode==VARIATION_CONTROL_PANEL) break;              // no drives on panels
                         generateComputerComponentDrives(lx,ty,rx,by,edgeSize);
                         rndSuccess=true;
                         break;
@@ -451,10 +461,10 @@ public class BitmapComputer extends BitmapBase
         RagColor    panelColor,panelInsideColor;
         
         offset=textureSize/2;
-        panelEdgeSize=2+(int)(Math.random()*3.0);
-        panelInsideEdgeSize=2+(int)(Math.random()*2.0);
+        panelEdgeSize=2+random.nextInt(4);
+        panelInsideEdgeSize=2+random.nextInt(3);
         
-        panelColor=getRandomColor();
+        panelColor=getRandomGray(0.6f,0.8f);
         panelInsideColor=adjustColor(panelColor,1.1f);
        
             // this is a collection of plates that are
@@ -462,8 +472,8 @@ public class BitmapComputer extends BitmapBase
             
         drawRect(0,0,textureSize,textureSize,panelColor);
         
-        generateComputerComponents(0,0,offset,offset,panelInsideColor,panelInsideEdgeSize);             // left and right
-        generateComputerComponents(offset,0,textureSize,offset,panelInsideColor,panelInsideEdgeSize);   // front and back
+        generateComputerComponents(0,0,offset,offset,panelInsideColor,panelInsideEdgeSize,variationMode);             // left and right
+        generateComputerComponents(offset,0,textureSize,offset,panelInsideColor,panelInsideEdgeSize,variationMode);   // front and back
         draw3DFrameRect(0,offset,offset,textureSize,panelEdgeSize,panelColor,true);                     // top and bottom
         
             // set the emissive

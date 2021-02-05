@@ -1,31 +1,28 @@
-import PointClass from '../../utility/point.js';
-import BoundClass from '../../utility/bound.js';
-import MeshClass from '../../mesh/mesh.js';
+package com.klinksoftware.rag.mesh;
 
-export default class GenerateMeshClass
+import com.klinksoftware.rag.utility.RagPoint;
+import java.util.*;
+
+public class MeshUtility
 {
-    constructor(core)
-    {
-        this.STAIR_STEP_COUNT=10;
+    public static final int STAIR_STEP_COUNT=10;
 
-        this.STAIR_DIR_POS_Z=0;
-        this.STAIR_DIR_NEG_Z=1;
-        this.STAIR_DIR_POS_X=2;
-        this.STAIR_DIR_NEG_X=3;
+    public static final int STAIR_DIR_POS_Z=0;
+    public static final int STAIR_DIR_NEG_Z=1;
+    public static final int STAIR_DIR_POS_X=2;
+    public static final int STAIR_DIR_NEG_X=3;
 
-        this.UV_WHOLE=0;
-        this.UV_BOX=1;
-        this.UV_MAP=2;
-
-        this.core=core;
-    }
+    public static final int UV_WHOLE=0;
+    public static final int UV_BOX=1;
+    public static final int UV_MAP=2;
     
         //
         // build UVs for vertex lists
         //
             
-    buildUVs(vertexArray,normalArray,uvScale)
+    public static ArrayList<Float> buildUVs(ArrayList<Integer> vertexArray,ArrayList<Float> normalArray,float uvScale)
     {
+        /*
         let n,k,nVertex,offset;
         let x,y,ang,mapUp;
         let minIntX,minIntY;
@@ -109,14 +106,17 @@ export default class GenerateMeshClass
         }
         
         return(uvArray);
+        */
+        return(null);
     }
     
         //
         // build normals
         //
         
-    buildNormals(vertexArray,indexArray,meshCenter,normalsIn)
+    public static ArrayList<Float> buildNormals(ArrayList<Integer> vertexArray,ArrayList<Integer> indexArray,RagPoint meshCenter,boolean normalsIn)
     {
+        /*
         let n,flip,nTrig,trigIdx,offset;
         let v0,v1,v2,normalArray;
         let trigCenter,faceVct;
@@ -206,14 +206,17 @@ export default class GenerateMeshClass
         }
         
         return(normalArray);
+        */
+        return(null);
     }
     
         //
         // build tangents
         //
 
-    buildTangents(vertexArray,uvArray,indexArray)
+    public static ArrayList<Float> buildTangents(ArrayList<Integer> vertexArray,ArrayList<Float> uvArray,ArrayList<Integer> indexArray)
     {
+        /*
         let n,nTrig,trigIdx,offset;
         let u10,u20,v10,v20;
         let tangentArray;
@@ -324,62 +327,72 @@ export default class GenerateMeshClass
         }
         
         return(tangentArray);
+        */
+        return(null);
     }
-    
+
         //
         // mesh utilities
         //
         
-    addQuadToIndexes(indexArray,trigIdx)
+    private static int addQuadToIndexes(ArrayList<Integer> indexArray,int trigIdx)
     {
-        indexArray.push(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3));
+        indexArray.addAll(Arrays.asList(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3)));
         return(trigIdx+4);
     }
-    
-    addBox(name,bitmap,negX,posX,negY,posY,negZ,posZ,isNegX,isPosX,isNegY,isPosY,isNegZ,isPosZ,segmentSize)
+
+    public static int addBox(MeshList meshList,String name,String bitmapName,int negX,int posX,int negY,int posY,int negZ,int posZ,boolean isNegX,boolean isPosX,boolean isNegY,boolean isPosY,boolean isNegZ,boolean isPosZ,int segmentSize)
     {
-        let vertexArray=[];
-        let indexArray=[];
-        let normalArray,uvArray,tangentArray;
-        let trigIdx=0;
-        let centerPnt=new PointClass(Math.trunc((negX+posX)*0.5),Math.trunc((negY+posY)*0.5),Math.trunc((negZ+posZ)*0.5));
+        int                     trigIdx;
+        ArrayList<Integer>      vertexArray,indexArray;
+        ArrayList<Float>        normalArray,tangentArray,uvArray;
+        RagPoint                centerPnt;
+        
+        trigIdx=0;
+        
+        vertexArray=new ArrayList<>();
+        indexArray=new ArrayList<>();
         
         if (isNegX) {
-            vertexArray.push(negX,negY,negZ,negX,negY,posZ,negX,posY,posZ,negX,posY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            vertexArray.addAll(Arrays.asList(negX,negY,negZ,negX,negY,posZ,negX,posY,posZ,negX,posY,negZ));
+            trigIdx=addQuadToIndexes(indexArray,trigIdx);
         }
         if (isPosX) {
-            vertexArray.push(posX,negY,negZ,posX,negY,posZ,posX,posY,posZ,posX,posY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            vertexArray.addAll(Arrays.asList(posX,negY,negZ,posX,negY,posZ,posX,posY,posZ,posX,posY,negZ));
+            trigIdx=addQuadToIndexes(indexArray,trigIdx);
         }
         if (isNegY) {
-            vertexArray.push(negX,negY,negZ,negX,negY,posZ,posX,negY,posZ,posX,negY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            vertexArray.addAll(Arrays.asList(negX,negY,negZ,negX,negY,posZ,posX,negY,posZ,posX,negY,negZ));
+            trigIdx=addQuadToIndexes(indexArray,trigIdx);
         }
         if (isPosY) {
-            vertexArray.push(negX,posY,negZ,negX,posY,posZ,posX,posY,posZ,posX,posY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            vertexArray.addAll(Arrays.asList(negX,posY,negZ,negX,posY,posZ,posX,posY,posZ,posX,posY,negZ));
+            trigIdx=addQuadToIndexes(indexArray,trigIdx);
         }
         if (isNegZ) {
-            vertexArray.push(negX,negY,negZ,posX,negY,negZ,posX,posY,negZ,negX,posY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            vertexArray.addAll(Arrays.asList(negX,negY,negZ,posX,negY,negZ,posX,posY,negZ,negX,posY,negZ));
+            trigIdx=addQuadToIndexes(indexArray,trigIdx);
         }
         if (isPosZ) {
-            vertexArray.push(negX,negY,posZ,posX,negY,posZ,posX,posY,posZ,negX,posY,posZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            vertexArray.addAll(Arrays.asList(negX,negY,posZ,posX,negY,posZ,posX,posY,posZ,negX,posY,posZ));
+            trigIdx=addQuadToIndexes(indexArray,trigIdx);
         }
-            
-        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
         
-        return(this.core.game.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray))));
+            // calculate the normal, tangent, uv
+            
+        centerPnt=new RagPoint(((negX+posX)/2),((negY+posY)/2),((negZ+posZ)/2));
+     
+        normalArray=MeshUtility.buildNormals(vertexArray,indexArray,centerPnt,false);
+        uvArray=MeshUtility.buildUVs(vertexArray,normalArray,(1.0f/(float)segmentSize));
+        tangentArray=MeshUtility.buildTangents(vertexArray,uvArray,indexArray);
+
+        return(meshList.add(new Mesh(name,bitmapName,vertexArray,normalArray,tangentArray,uvArray,indexArray)));
     }
     
         //
         // room pieces
         //
-        
+   /*     
     buildRoomFloorCeiling(room,centerPnt,name,bitmap,y,segmentSize)
     {
         let vertexArray=[];
@@ -1030,3 +1043,6 @@ export default class GenerateMeshClass
  
 }
 
+
+    */
+}

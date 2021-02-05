@@ -2,13 +2,15 @@ package com.klinksoftware.rag.bitmaps;
 
 import com.klinksoftware.rag.utility.*;
 
+import java.util.*;
+
 public class BitmapConcrete extends BitmapBase
 {
     public final static int VARIATION_NONE=0;
     
-    public BitmapConcrete(int colorScheme)
+    public BitmapConcrete(int colorScheme,Random random)
     {
-        super(colorScheme);
+        super(colorScheme,random);
         
         hasNormal=true;
         hasMetallicRoughness=true;
@@ -42,17 +44,17 @@ public class BitmapConcrete extends BitmapBase
         
             // stains
             
-        stainCount=(int)(Math.random()*5.0);
+        stainCount=random.nextInt(5);
         stainSize=(int)((float)textureSize*0.1f);
         
         for (n=0;n!=stainCount;n++) {
-            lft=(int)(Math.random()*textureSize);
-            xSize=stainSize+(int)(Math.random()*(double)stainSize);
+            lft=random.nextInt(textureSize);
+            xSize=stainSize+random.nextInt(stainSize);
             
-            top=(int)(Math.random()*textureSize);
-            ySize=stainSize+(int)(Math.random()*(double)stainSize);
+            top=random.nextInt(textureSize);
+            ySize=stainSize+random.nextInt(stainSize);
             
-            markCount=2+(int)(Math.random()*4.0);
+            markCount=2+random.nextInt(4);
             
             for (k=0;k!=markCount;k++) {
                 rgt=lft+xSize;
@@ -62,8 +64,8 @@ public class BitmapConcrete extends BitmapBase
                 
                 drawOvalStain(lft,top,rgt,bot,0.01f,0.15f,0.85f);
                 
-                lft+=(Math.random()<0.5)?(-(xSize/3)):(xSize/3);
-                top+=(Math.random()<0.5)?(-(ySize/3)):(ySize/3);
+                lft+=(random.nextBoolean())?(-(xSize/3)):(xSize/3);
+                top+=(random.nextBoolean())?(-(ySize/3)):(ySize/3);
                 xSize=(int)((float)xSize*0.8f);
                 ySize=(int)((float)ySize*0.8f);
             }
@@ -73,7 +75,7 @@ public class BitmapConcrete extends BitmapBase
         
             // concrete expansion cuts
             
-        if (Math.random()<0.5) {
+        if (random.nextBoolean()) {
             drawLineColor(1,0,1,textureSize,jointColor);
             jointColor=adjustColor(jointColor,0.9f);
             drawLineColor(0,0,0,textureSize,jointColor);
@@ -83,7 +85,7 @@ public class BitmapConcrete extends BitmapBase
             drawLineNormal(2,0,2,textureSize,NORMAL_LEFT_45);
         }
         
-        if (Math.random()<0.5) {
+        if (random.nextBoolean()) {
             mx=textureSize/2;
             drawLineColor(mx,0,mx,textureSize,jointColor);
             jointColor=adjustColor(jointColor,0.9f);
@@ -94,7 +96,7 @@ public class BitmapConcrete extends BitmapBase
             drawLineNormal((mx+1),0,(mx+1),textureSize,NORMAL_LEFT_45);
         }
         
-        if (Math.random()<0.5) {
+        if (random.nextBoolean()) {
             drawLineColor(0,1,textureSize,1,jointColor);
             jointColor=adjustColor(jointColor,0.9f);
             drawLineColor(0,0,textureSize,0,jointColor);
@@ -104,7 +106,7 @@ public class BitmapConcrete extends BitmapBase
             drawLineNormal(0,2,textureSize,2,NORMAL_TOP_45);
         }
         
-        if (Math.random()<0.5) {
+        if (random.nextBoolean()) {
             my=textureSize/2;
             drawLineColor(0,my,textureSize,my,jointColor);
             jointColor=adjustColor(jointColor,0.9f);

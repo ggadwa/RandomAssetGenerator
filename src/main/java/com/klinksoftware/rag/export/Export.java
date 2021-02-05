@@ -1,16 +1,23 @@
 package com.klinksoftware.rag.export;
 
+import com.klinksoftware.rag.mesh.*;
+
 import java.util.*;
 import java.io.*;
 import com.fasterxml.jackson.databind.*;
 
 public class Export
 {
-    public void export(String name)
+    public void export(MeshList meshList,String basePath,String name)
     {
-        ArrayList<Object>       arrList;
-        LinkedHashMap<String,Object>  obj,obj2;
-        ObjectMapper            objMapper;
+        int                             n,meshCount;
+        String                          path;
+        Mesh                            mesh;
+        ArrayList<Object>               arrList,primitivesArr;
+        LinkedHashMap<String,Object>    obj,obj2,primitiveObj,attributeObj;
+        ObjectMapper                    objMapper;
+        
+        meshCount=meshList.count();
         
         obj=new LinkedHashMap<>();
         
@@ -25,21 +32,65 @@ public class Export
         
         obj2=new LinkedHashMap<>();
         obj2.put("name","Scene");
-        arrList=new ArrayList<>();
-        arrList.add(0);
+        
+        arrList=new ArrayList<>();      // one node for every mesh
+        for (n=0;n!=meshCount;n++) {
+            arrList.add(n);
+        }
         obj2.put("nodes",arrList);
+        
         arrList=new ArrayList<>();
         arrList.add(obj2);
         obj.put("scenes",arrList);
         
-            // the meshes (nodes, meshes)
+            // the mesh nodes
+            // one for each mesh
             
         arrList=new ArrayList<>();
+        
+        for (n=0;n!=meshCount;n++) {
+            mesh=meshList.get(n);
+
+            obj2=new LinkedHashMap<>();
+            obj2.put("mesh",0);
+            obj2.put("name",mesh.name);
+            
+            arrList.add(obj2);
+        }
+        
         obj.put("nodes",arrList);
+        
+            // the meshes
+            // one for each mesh, parallel with
+            // the nodes
             
         arrList=new ArrayList<>();
-        obj.put("meshes",arrList);
+        
+        for (n=0;n!=meshCount;n++) {
+            mesh=meshList.get(n);
             
+            obj2=new LinkedHashMap<>();
+            obj2.put("name",mesh.name);
+            
+            primitiveObj=new LinkedHashMap<>();
+            
+            attributeObj=new LinkedHashMap<>();
+            attributeObj.put("POSITION",0);
+            attributeObj.put("NORMAL",1);
+            attributeObj.put("TANGENT",2);
+            attributeObj.put("TEXCOORD_0",3);
+            primitiveObj.put("attributes",attributeObj);
+            
+            primitiveObj.put("indices",3);
+            primitiveObj.put("material",0);
+            primitivesArr=new ArrayList<>();
+            
+            obj2.put("primitive",primitiveObj);
+            
+            arrList.add(obj2);
+        }
+        
+        obj.put("meshes",arrList);
             
             // the materials (materials, textures, images, samplers)
             
@@ -72,11 +123,13 @@ public class Export
         obj.put("buffers",arrList);
         
             // finish and save
-                    
+               
+        path=basePath+File.separator+name+".json";
+        
         objMapper=new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
 
-            objMapper.writeValue(new File("output/"+name+".json"),obj);
+            objMapper.writeValue(new File(path),obj);
         }
         catch (IOException e)
         {

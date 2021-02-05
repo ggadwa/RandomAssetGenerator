@@ -23,7 +23,7 @@ public class MapBitmapCache
         computerBitmap=null;
         pipeBitmap=null;
     }
-    /*
+/*
     public BitmapBase generateWall()
     {
         let variationMode=0;
@@ -226,6 +226,5 @@ public class MapBitmapCache
         
         return(this.pipeBitmap);
     }
-*/
-    
+    */
 }

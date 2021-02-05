@@ -2,13 +2,15 @@ package com.klinksoftware.rag.bitmaps;
 
 import com.klinksoftware.rag.utility.*;
 
+import java.util.*;
+
 public class BitmapBrick extends BitmapBase
 {
     public final static int VARIATION_NONE=0;
     
-    public BitmapBrick(int colorScheme)
+    public BitmapBrick(int colorScheme,Random random)
     {
-        super(colorScheme);
+        super(colorScheme,random);
         
         hasNormal=true;
         hasMetallicRoughness=true;
@@ -30,7 +32,7 @@ public class BitmapBrick extends BitmapBase
 
         f=1.0f;
         if (!((lft<0) || (rgt>textureSize))) {        // don't darken bricks that fall off edges
-            f=0.6f+(float)(Math.random()*0.4);
+            f=0.6f+(random.nextFloat()*0.4f);
         }
 
         if (isLarge) {
@@ -62,24 +64,24 @@ public class BitmapBrick extends BitmapBase
 
                 // any cracks
 
-            if (Math.random()<0.1) {
+            if (random.nextFloat()<0.1f) {
                 if ((rgt-lft)>45) {
-                    sx=(lft+15)+(int)(Math.random()*(double)((rgt-15)-(lft+15)));
-                    ex=sx+((5+(int)(Math.random()*25.0))-15);
+                    sx=(lft+15)+random.nextInt((rgt-15)-(lft+15));
+                    ex=sx+((5+random.nextInt(25))-15);
 
                     lineColor=adjustColorRandom(drawBrickColor,0.65f,0.75f);
-                    drawVerticalCrack(sx,top,bot,lft,rgt,(int)Math.signum(Math.random()-0.5),10,lineColor,true);
+                    drawVerticalCrack(sx,top,bot,lft,rgt,(int)Math.signum(random.nextFloat()-0.5f),10,lineColor,true);
                 }
             }
 
                 // streaks
 
-            if (Math.random()<0.2) {
-                streakWid=(int)((float)(rgt-lft)*0.3f)+(int)(Math.random()*((double)(rgt-lft)*0.3));
+            if (random.nextFloat()<0.2f) {
+                streakWid=(int)(((float)(rgt-lft)*0.3f)+(random.nextFloat()*((float)(rgt-lft)*0.3f)));
                 if (streakWid<10) streakWid=10;
                 if (streakWid>(int)((float)textureSize*0.1f)) streakWid=(int)((float)textureSize*0.1f);
 
-                sx=lft+(int)(Math.random()*(double)((rgt-lft)-streakWid));
+                sx=lft+random.nextInt((rgt-lft)-streakWid);
                 ex=sx+streakWid;
 
                 streakColor=adjustColorRandom(drawBrickColor,0.65f,0.75f);
@@ -100,8 +102,8 @@ public class BitmapBrick extends BitmapBase
         altBrickColor=getRandomColor();
         groutColor=getRandomGray(0.4f,0.6f);
         
-        edgeSize=(int)((float)textureSize*0.005)+(int)(Math.random()*((float)textureSize*0.0125));
-        paddingSize=(int)((float)textureSize*0.005)+(int)(Math.random()*((float)textureSize*0.0125));
+        edgeSize=(int)(((float)textureSize*0.005f)+(random.nextFloat()*((float)textureSize*0.0125f)));
+        paddingSize=(int)(((float)textureSize*0.005f)+(random.nextFloat()*((float)textureSize*0.0125f)));
         
             // create noise data
         
@@ -116,11 +118,11 @@ public class BitmapBrick extends BitmapBase
         
             // draw the bricks
             
-        xCount=4+(int)(Math.random()*4.0);
+        xCount=4+random.nextInt(4);
         xAdd=textureSize/xCount;
         halfWid=xAdd/2;
 
-        yCount=4+(int)(Math.random()*5.0);
+        yCount=4+random.nextInt(5);
         yAdd=textureSize/yCount;
 
         top=0;
@@ -130,8 +132,8 @@ public class BitmapBrick extends BitmapBase
 
                 // special lines (full line or double bricks)
                 
-            if (Math.random()<0.2) {
-                if (Math.random()<0.5) {
+            if (random.nextFloat()<0.2f) {
+                if (random.nextBoolean()) {
                     generateSingleBrick(0,top,(textureSize-1),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,false,true);
                 }
                 else {

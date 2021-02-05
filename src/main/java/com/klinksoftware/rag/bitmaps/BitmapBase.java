@@ -1,8 +1,10 @@
 package com.klinksoftware.rag.bitmaps;
 
+import com.klinksoftware.rag.GeneratorMain;
 import com.klinksoftware.rag.utility.*;
 
 import java.io.*;
+import java.util.*;
 import java.awt.*;
 import java.awt.color.*;
 import java.awt.image.*;
@@ -65,10 +67,12 @@ public class BitmapBase
     protected RagVector     specularFactor,emissiveFactor;
     protected float[]       colorData,normalData,metallicRoughnessData,glowData,
                             perlinNoiseColorFactor,noiseNormals;
+    protected Random        random;
     
-    public BitmapBase(int colorScheme)
+    public BitmapBase(int colorScheme,Random random)
     {
         this.colorScheme=colorScheme;
+        this.random=random;
         
             // will be reset in children classes
            
@@ -111,18 +115,18 @@ public class BitmapBase
                 // random primary colors
                 
             case COLOR_SCHEME_RANDOM:
-                idx=(int)((float)COLOR_PRIMARY_LIST.length*Math.random());
+                idx=random.nextInt(COLOR_PRIMARY_LIST.length);
                 col=COLOR_PRIMARY_LIST[idx];
-                darken=0.1f-(float)(Math.random()*0.2);
+                darken=0.1f-(random.nextFloat()*0.2f);
                 return(new RagColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
                 
                 // doom browns and green
                 
             case COLOR_SCHEME_DOOM:
-                if (Math.random()<0.5) return(adjustColorRandom(new RagColor(0.6f,0.3f,0.0f),0.7f,1.0f));
+                if (random.nextBoolean()) return(adjustColorRandom(new RagColor(0.6f,0.3f,0.0f),0.7f,1.0f));
 
-                f=(float)(Math.random()*0.1);
-                return(new RagColor(f,(0.4f+(float)(Math.random()*0.2)),f));
+                f=random.nextFloat()*0.1f;
+                return(new RagColor(f,(0.4f+(random.nextFloat()*0.2f)),f));
             
                 // black and white
                 
@@ -132,7 +136,7 @@ public class BitmapBase
                 // pastel primary colors
                 
             case COLOR_SCHEME_PASTEL:
-                idx=(int)((float)COLOR_PRIMARY_LIST.length*Math.random());
+                idx=random.nextInt(COLOR_PRIMARY_LIST.length);
                 col=COLOR_PRIMARY_LIST[idx];
                 midPoint=(col[0]+col[1]+col[2])*0.33f;
                 return(new RagColor((col[0]+(midPoint-col[0])*0.8f),(col[1]+(midPoint-col[1])*0.8f),(col[2]+(midPoint-col[2])*0.8f)));
@@ -166,7 +170,7 @@ public class BitmapBase
     {
         float       col;
         
-        col=minFactor+((float)Math.random()*(maxFactor-minFactor));
+        col=minFactor+(random.nextFloat()*(maxFactor-minFactor));
         return(new RagColor(col,col,col));
     }
 
@@ -179,7 +183,7 @@ public class BitmapBase
     {
         float       f;
         
-        f=minFactor+((float)Math.random()*(maxFactor-minFactor));
+        f=minFactor+(random.nextFloat()*(maxFactor-minFactor));
         return(new RagColor((color.r*f),(color.g*f),(color.b*f)));
     }
     
@@ -342,7 +346,7 @@ public class BitmapBase
         for (y=0;y!=gridYSize;y++) {
             
             for (x=0;x!=gridXSize;x++) {
-                normal=new RagVector((float)((Math.random()*2.0)-1.0),(float)((Math.random()*2.0)-1.0),0);
+                normal=new RagVector(((random.nextFloat()*2.0f)-1.0f),((random.nextFloat()*2.0f)-1.0f),0.0f);
                 normal.normalize2D();
                 vectors[x][y]=normal;
             }
@@ -433,7 +437,7 @@ public class BitmapBase
                 
                     // the static random color factor
                     
-                colFactor=colorFactorMin+(colorFactorAdd*(float)Math.random());
+                colFactor=colorFactorMin+(random.nextFloat()*colorFactorAdd);
 
                 idx=((y*textureSize)+x)*4;
                 
@@ -541,9 +545,9 @@ public class BitmapBase
         
             // random settings
             
-        lineSize=2+(int)(Math.random()*3.0);
-        startArc=(int)(Math.random()*36.0);
-        endArc=startArc+(int)(Math.random()*36.0);
+        lineSize=2+random.nextInt(3);
+        startArc=random.nextInt(36);
+        endArc=startArc+random.nextInt(36);
         
         mx=(lft+rgt)/2;
         my=(top+bot)/2;
@@ -557,8 +561,8 @@ public class BitmapBase
         ry=new int[36];
         
         for (n=0;n!=36;n++) {
-            rx[n]=(int)(Math.random()*20.0)-10;
-            ry[n]=(int)(Math.random()*20.0)-10;
+            rx[n]=random.nextInt(20)-10;
+            ry[n]=random.nextInt(20)-10;
         }
 
             // build the polygon/oval
@@ -626,12 +630,12 @@ public class BitmapBase
         nCount=(int)(((float)textureSize*0.5f)*density);
         
         for (n=0;n!=nCount;n++) {
-            x=(int)(Math.random()*(textureSize-1));
-            y=(int)(Math.random()*(textureSize-1));
-            wid=20+(int)(Math.random()*40.f);
-            high=20+(int)(Math.random()*40.f);
+            x=random.nextInt(textureSize-1);
+            y=random.nextInt(textureSize-1);
+            wid=20+random.nextInt(40);
+            high=20+random.nextInt(40);
             
-            createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,(Math.random()<0.5f));
+            createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,random.nextBoolean());
         }
         
             // blur to fix any missing pixels and make the
@@ -679,21 +683,21 @@ public class BitmapBase
 
                 // find a gravity point on an edge
 
-            switch ((int)(Math.random()*4.0)) {
+            switch (random.nextInt(4)) {
                 case 0:
                     gx=lft+distortSize;
-                    gy=top+(int)(Math.random()*(double)(bot-top));
+                    gy=top+random.nextInt(bot-top);
                     break;
                 case 1:
                     gx=rgt-distortSize;
-                    gy=top+(int)(Math.random()*(double)(bot-top));
+                    gy=top+random.nextInt(bot-top);
                     break;
                 case 2:
-                    gx=lft+(int)(Math.random()*(double)(rgt-lft));
+                    gx=lft+random.nextInt(rgt-lft);
                     gy=top+distortSize;
                     break;
                 default:
-                    gx=lft+(int)(Math.random()*(double)(rgt-lft));
+                    gx=lft+random.nextInt(rgt-lft);
                     gy=bot-distortSize;
                     break;
             }
@@ -765,29 +769,28 @@ public class BitmapBase
             }
         }
     }
-    /*
-    drawRectGlow(lft,top,rgt,bot,color)
+
+    protected void drawRectGlow(int lft,int top,int rgt,int bot,RagColor color)
     {
-        let x,y,idx;
-        let glowData=this.glowImgData.data;
+        int         x,y,idx;
         
         if ((lft>=rgt) || (top>=bot)) return;
 
         for (y=top;y<=bot;y++) {
-            if ((y<0) || (y>=this.glowImgData.height)) continue;
+            if ((y<0) || (y>=textureSize)) continue;
             
             for (x=lft;x<=rgt;x++) {
-                if ((x<0) || (x>=this.glowImgData.width)) continue;
+                if ((x<0) || (x>=textureSize)) continue;
                 
-                idx=((y*this.glowImgData.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 
-                glowData[idx]=color.r*255.0;
-                glowData[idx+1]=color.g*255.0;
-                glowData[idx+2]=color.b*255.0;
+                glowData[idx]=color.r;
+                glowData[idx+1]=color.g;
+                glowData[idx+2]=color.b;
             }
         }
     }
-    */
+
     protected void draw3DFrameRect(int lft,int top,int rgt,int bot,int size,RagColor color,boolean faceOut)
     {
         int         n,x,y,idx;
@@ -1015,13 +1018,11 @@ public class BitmapBase
         }
 
     }
-    /*
-    drawOvalGlow(lft,top,rgt,bot,color)
+
+    protected void drawOvalGlow(int lft,int top,int rgt,int bot,RagColor color)
     {
-        let n,x,y,mx,my,halfWid,halfHigh;
-        let rad,fx,fy,idx;
-        let wid,high;
-        let glowData=this.glowImgData.data;
+        int         n,x,y,mx,my,wid,high,idx;
+        float       rad,fx,fy,halfWid,halfHigh;
         
         if ((lft>=rgt) || (top>=bot)) return;
         
@@ -1029,47 +1030,47 @@ public class BitmapBase
             
         wid=(rgt-lft)-1;
         high=(bot-top)-1;         // avoids clipping on bottom from being on wid,high
-        mx=lft+Math.trunc(wid*0.5);
-        my=top+Math.trunc(high*0.5);
+        mx=lft+(wid/2);
+        my=top+(high/2);
         
             // fill the oval
 
         while ((wid>0) && (high>0)) {
 
-            halfWid=wid*0.5;
-            halfHigh=high*0.5;
+            halfWid=(float)wid*0.5f;
+            halfHigh=(float)high*0.5f;
             
             for (n=0;n<1000;n++) {
-                rad=(Math.PI*2.0)*(n*0.001);
+                rad=(float)(Math.PI*2.0)*((float)n*0.001f);
 
-                fx=Math.sin(rad);
-                if (fx>1.0) fx=1.0;
-                if (fx<-1.0) fx=-1.0;
+                fx=(float)Math.sin(rad);
+                if (fx>1.0f) fx=1.0f;
+                if (fx<-1.0f) fx=-1.0f;
                 
-                x=mx+Math.trunc(halfWid*fx);
-                if ((x<0) || (x>=this.glowImgData.width)) continue;
+                x=mx+(int)(halfWid*fx);
+                if ((x<0) || (x>=textureSize)) continue;
 
-                fy=Math.cos(rad);
-                if (fy>1.0) fy=1.0;
-                if (fy<-1.0) fy=-1.0;
+                fy=(float)Math.cos(rad);
+                if (fy>1.0f) fy=1.0f;
+                if (fy<-1.0f) fy=-1.0f;
                 
-                y=my-Math.trunc(halfHigh*fy);
-                if ((y<0) || (y>=this.glowImgData.height)) continue;
+                y=my-(int)(halfHigh*fy);
+                if ((y<0) || (y>=textureSize)) continue;
 
                     // the color
                 
-                idx=((y*this.glowImgData.width)+x)*4;
+                idx=((y*textureSize)+x)*4;
                 
-                glowData[idx]=Math.trunc(color.r*255.0);
-                glowData[idx+1]=Math.trunc(color.g*255.0);
-                glowData[idx+2]=Math.trunc(color.b*255.0);
+                glowData[idx]=color.r;
+                glowData[idx+1]=color.g;
+                glowData[idx+2]=color.b;
             }
 
             wid--;
             high--;
         }
     }
-    */
+
     protected void drawDiamond(int lft,int top,int rgt,int bot,RagColor color)
     {
         int         x,y,lx,rx,mx,my,idx;
@@ -1320,7 +1321,7 @@ public class BitmapBase
     private void drawMetalShineLine(int x,int top,int bot,int shineWid,RagColor baseColor)
     {
         int         n,lx,rx,y,idx;
-        double      density,densityReduce;
+        float       density,densityReduce;
         
         if (top>=bot) return;
         if (shineWid<=0) return;
@@ -1335,8 +1336,8 @@ public class BitmapBase
             // start with 100 density and reduce
             // as we go across the width
             
-        density=1.0;
-        densityReduce=0.9/(double)shineWid;
+        density=1.0f;
+        densityReduce=0.9f/(float)shineWid;
         
             // write the shine lines
             
@@ -1347,7 +1348,7 @@ public class BitmapBase
             
             for (y=top;y!=bot;y++) {
                 
-                if (Math.random()<density) {
+                if (random.nextFloat()<density) {
                     if ((lx>=0) && (lx<textureSize)) {
                         idx=((y*textureSize)+lx)*4;
                         colorData[idx]=baseColor.r;
@@ -1356,7 +1357,7 @@ public class BitmapBase
                     }
                 }
                 
-                if (Math.random()<density) {
+                if (random.nextFloat()<density) {
                     if ((rx>=0) && (rx<textureSize)) {
                         idx=((y*textureSize)+rx)*4;
                         colorData[idx]=baseColor.r;
@@ -1380,17 +1381,17 @@ public class BitmapBase
         wid=rgt-lft;
         
         while (true) {
-            shineWid=(int)((float)wid*0.035f)+(int)(Math.random()*0.15);
+            shineWid=(int)(((float)wid*0.035f)+(random.nextFloat()*((float)wid*0.15)));
             if ((x+shineWid)>rgt) shineWid=rgt-x;
             
                 // small % are no lines
                 
-            if (Math.random()<0.9) {
+            if (random.nextFloat()<0.9f) {
                 shineColor=adjustColorRandom(metalColor,0.7f,1.3f);
                 this.drawMetalShineLine(x,top,bot,shineWid,shineColor);
             }
             
-            x+=(shineWid+((int)((float)wid*0.03f)+(int)(Math.random()*0.05)));
+            x+=(shineWid+(int)(((float)wid*0.03f)+(random.nextFloat()*((float)wid*0.05))));
             if (x>=rgt) break;
         }
         
@@ -1413,7 +1414,7 @@ public class BitmapBase
         
             // random shrink
             
-        xAdd=(float)(Math.random()*minXReduce);
+        xAdd=random.nextFloat()*minXReduce;
         
             // draw the dirt
             
@@ -1428,7 +1429,7 @@ public class BitmapBase
             if (lx>=rx) break;
             
             for (x=lx;x!=rx;x++) {
-                factor2=factor*(minMix+(float)(Math.random()*addMix));
+                factor2=factor*(minMix+(random.nextFloat()*addMix));
 
                 idx=((y*textureSize)+x)*4;
                 colorData[idx]=((1.0f-factor2)*colorData[idx])+(color.r*factor2);
@@ -1457,8 +1458,8 @@ public class BitmapBase
         minWid=(int)((float)(rgt-lft)*0.1f);
         
         for (n=0;n!=additionalStreakCount;n++) {
-            sx=lft+(int)(Math.random()*(double)((rgt-minWid)-lft));
-            ex=(sx+minWid)+(int)(Math.random()*(double)(rgt-(sx+minWid)));
+            sx=lft+random.nextInt((rgt-minWid)-lft);
+            ex=(sx+minWid)+random.nextInt(rgt-(sx+minWid));
             if (sx>=ex) continue;
             
             drawStreakDirtSingle(sx,top,ex,bot,minMix,addMix,color,0.1f);
@@ -1505,7 +1506,7 @@ public class BitmapBase
             halfHigh=(float)high*0.5f;
             
             for (n=0;n!=1000;n++) {
-                if (Math.random()>curPercentage) continue;
+                if (random.nextFloat()>curPercentage) continue;
                 
                 rad=(float)(Math.PI*2.0)*((float)n*0.001f);
 
@@ -1561,9 +1562,9 @@ public class BitmapBase
 
             count--;
             if (count<=0) {
-                count=2+(int)(Math.random()*4.0);
+                count=2+random.nextInt(4);
                 
-                f=1.0f+((1.0f-(float)(Math.random()*2.0))*factor);
+                f=1.0f+((1.0f-(random.nextFloat()*2.0f))*factor);
                 
                 r=baseColor.r*f;
                 g=baseColor.g*f;
@@ -1615,9 +1616,9 @@ public class BitmapBase
             
             count--;
             if (count<=0) {
-                count=2+(int)(Math.random()*4.0);
+                count=2+random.nextInt(4);
                 
-                f=1.0f+((1.0f-(float)(Math.random()*2.0))*factor);
+                f=1.0f+((1.0f-(random.nextFloat()*2.0f))*factor);
                 
                 r=baseColor.r*f;
                 g=baseColor.g*f;
@@ -1991,7 +1992,7 @@ public class BitmapBase
         boolean     horizontal;
         RagColor    aliasColor;
         
-        segCount=2+(int)(Math.random()*5.0);
+        segCount=2+random.nextInt(5);
         horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
         xAdd=(x2-x)/segCount;
@@ -2011,7 +2012,7 @@ public class BitmapBase
                 ey=sy+yAdd;
 
                 if ((n&0x1)==0) {      // straighten out line every other variation
-                    r=lineVariant-(int)(Math.random()*2.0);
+                    r=lineVariant-random.nextInt(lineVariant*2);
 
                     if (horizontal) {
                         ey+=r;
@@ -2059,8 +2060,8 @@ public class BitmapBase
     {
         int     n,sx,sy,ex,ey,segCount,xAdd;
         
-        segCount=2+(int)(Math.random()*5.0);
-        xAdd=(int)((x2-x)/segCount);
+        segCount=2+random.nextInt(5);
+        xAdd=(x2-x)/segCount;
         
         sx=ex=x;
         sy=ey=y;
@@ -2071,7 +2072,7 @@ public class BitmapBase
                 ex=x2;
             }
             else {
-                ey=sy+((int)(Math.random()*(double)lineVariant)*lineDir);
+                ey=sy+(random.nextInt(lineVariant)*lineDir);
                 ex=sx+xAdd;
             }
             
@@ -2087,7 +2088,7 @@ public class BitmapBase
             
             if ((ey==clipTop) || (ey==clipBot)) break;
             
-            if ((canSplit) && (Math.random()<0.5)) {
+            if ((canSplit) && (random.nextBoolean())) {
                 if (lineDir>0) {
                     this.drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
                 }
@@ -2107,8 +2108,8 @@ public class BitmapBase
     {
         int     n,sx,sy,ex,ey,segCount,yAdd;
         
-        segCount=2+(int)(Math.random()*5.0);
-        yAdd=(int)((y2-y)/segCount);
+        segCount=2+random.nextInt(5);
+        yAdd=(y2-y)/segCount;
         
         sx=ex=x;
         sy=ey=y;
@@ -2119,7 +2120,7 @@ public class BitmapBase
                 ey=y2;
             }
             else {
-                ex=sx+((int)(Math.random()*(double)lineVariant)*lineDir);
+                ex=sx+(random.nextInt(lineVariant)*lineDir);
                 ey=sy+yAdd;
             }
             
@@ -2135,7 +2136,7 @@ public class BitmapBase
             
             if ((ex==clipLft) || (ex==clipRgt)) break;
             
-            if ((canSplit) && (Math.random()<0.5)) {
+            if ((canSplit) && (random.nextBoolean())) {
                 if (lineDir>0) {
                     drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,false);
                 }
@@ -2165,8 +2166,8 @@ public class BitmapBase
                 dy2=ey;
             }
             else {
-                dx2=(int)(sx+((float)((ex-sx)*(n+1))/(float)segCount))+(int)(Math.random()*(double)lineXVarient);
-                dy2=(int)(sy+((float)((ey-sy)*(n+1))/(float)segCount))+(int)(Math.random()*(double)lineYVarient);
+                dx2=(int)(sx+((float)((ex-sx)*(n+1))/(float)segCount))+(random.nextInt(Math.abs(lineXVarient))*(int)Math.signum(lineXVarient));
+                dy2=(int)(sy+((float)((ey-sy)*(n+1))/(float)segCount))+(random.nextInt(Math.abs(lineYVarient))*(int)Math.signum(lineYVarient));
             }
             
             this.drawLineColor(dx,dy,dx2,dy2,color);
@@ -2340,9 +2341,10 @@ public class BitmapBase
         drawRect(mid,mid,textureSize,textureSize,new RagColor(0.0f,0.0f,1.0f));
     }
 
-    public void generate(int variationMode,String name)
+    public void generate(int variationMode,String basePath,String name)
     {
         int     imgSize;
+        String  path;
         
             // setup all the bitmaps for drawing
             
@@ -2363,11 +2365,13 @@ public class BitmapBase
         generateInternal(variationMode);
         
             // write out the bitmaps
-            
-        writeImageData(colorData,("output"+File.separator+name+"_color.png"));
-        if (hasNormal) writeImageData(normalData,("output"+File.separator+name+"_normal.png"));
-        if (hasMetallicRoughness) writeImageData(metallicRoughnessData,("output"+File.separator+name+"_metallic_roughness.png"));
-        if (hasGlow) writeImageData(glowData,("output"+File.separator+name+"_glow.png"));
+        
+        path=basePath+File.separator+"textures"+File.separator+name;
+        
+        writeImageData(colorData,(path+"_color.png"));
+        if (hasNormal) writeImageData(normalData,(path+"_normal.png"));
+        if (hasMetallicRoughness) writeImageData(metallicRoughnessData,(path+"_metallic_roughness.png"));
+        if (hasGlow) writeImageData(glowData,(path+"_glow.png"));
     }
 
 }
