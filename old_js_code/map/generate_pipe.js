@@ -150,8 +150,6 @@ export default class GeneratePipeClass
         
             // finally create the mesh
 
-        tangentArray=this.genMesh.buildTangents(vertexArray,uvArray,indexArray);
-        
         mesh=new MeshClass(this.core,this.name,this.pipeBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         this.core.game.map.meshList.add(mesh);
     }
@@ -295,8 +293,6 @@ export default class GeneratePipeClass
         
             // finally create the mesh
 
-        tangentArray=this.genMesh.buildTangents(vertexArray,uvArray,indexArray);
-        
         mesh=new MeshClass(this.core,this.name,this.pipeBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         this.core.game.map.meshList.add(mesh);
     }

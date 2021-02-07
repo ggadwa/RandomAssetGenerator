@@ -15,7 +15,7 @@ public class AppWindow implements WindowListener
     
     private JFrame          frame;
     private JToolBar        toolBar;
-    private JPanel          panel;
+    private JTextArea       textArea;
     
         //
         // window events
@@ -95,6 +95,7 @@ public class AppWindow implements WindowListener
     {
         URL                 iconURL;
         Image               image;
+        JScrollPane         textScroll;
         GridBagConstraints  gbc;
         
         try {
@@ -147,13 +148,19 @@ public class AppWindow implements WindowListener
         gbc.weighty=0.0;
         frame.add(toolBar,gbc);
         
-            // control panel
+            // json
             
-        panel=new JPanel();
-        panel.setBackground(Color.RED);
-        panel.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
-        panel.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        textArea=new JTextArea();
+        
+        textArea.setText(GeneratorMain.getSettingJson());
+        
+        textScroll=new JScrollPane(textArea); 
+        textScroll.setBorder(BorderFactory.createMatteBorder(1,0,0,0,Color.DARK_GRAY));
+        textScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        textScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        textScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
+        textScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
+        textScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
@@ -161,7 +168,7 @@ public class AppWindow implements WindowListener
         gbc.gridy=1;
         gbc.weightx=1.0;
         gbc.weighty=1.0;
-        frame.add(panel,gbc);
+        frame.add(textScroll,gbc);
 
             // all the event listeners
             

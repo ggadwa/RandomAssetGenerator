@@ -1,0 +1,8 @@
+{
+    "generate": "map",
+    "name": "test",
+    "map": {
+                "maxRoomCount": 25,
+                "colorScheme": "random"
+           }
+}

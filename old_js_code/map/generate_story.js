@@ -337,7 +337,6 @@ export default class GenerateStoryClass
         }
         
         uvArray=this.genMesh.buildUVs(vertexArray,normalArray,(1/this.segmentSize));
-        tangentArray=this.genMesh.buildTangents(vertexArray,uvArray,indexArray);
         
         this.core.game.map.meshList.add(new MeshClass(this.core,(this.name+'_story'),this.platformBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }

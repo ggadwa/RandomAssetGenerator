@@ -1,8 +1,10 @@
 package com.klinksoftware.rag.mesh;
 
+import com.klinksoftware.rag.map.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
+import java.nio.*;
 
 public class MeshUtility
 {
@@ -21,16 +23,15 @@ public class MeshUtility
         // build UVs for vertex lists
         //
             
-    public static float[] buildUVs(int[] vertexes,float[] normals,float uvScale)
+    public static float[] buildUVs(float[] vertexes,float[] normals,float uvScale)
     {
         int                 n,k,nVertex,offset,minIntX,minIntY;
         float               x,y,ang;
         float[]             uvs;
-        RagPoint            v;
-        RagVector           normal,mapUp;
+        RagPoint            v,normal,mapUp;
         
-        v=new RagPoint(0,0,0);
-        normal=new RagVector(0.0f,0.0f,0.0f);
+        v=new RagPoint(0.0f,0.0f,0.0f);
+        normal=new RagPoint(0.0f,0.0f,0.0f);
 
         nVertex=vertexes.length/3;
         
@@ -40,7 +41,7 @@ public class MeshUtility
             // the dot product of the normal
             // and an up vector
 
-        mapUp=new RagVector(0.0f,1.0f,0.0f);
+        mapUp=new RagPoint(0.0f,1.0f,0.0f);
 
             // run through the vertices
             // remember, both this and normals
@@ -113,19 +114,19 @@ public class MeshUtility
         // build normals
         //
         
-    public static float[] buildNormals(int[] vertexes,int[] indexes,RagPoint meshCenter,boolean normalsIn)
+    public static float[] buildNormals(float[] vertexes,int[] indexes,RagPoint meshCenter,boolean normalsIn)
     {
 
         int             n,nTrig,trigIdx,offset;
         float[]         normals;
         boolean         flip;
-        RagPoint        trigCenter,v0,v1,v2;
-        RagVector       faceVct,p10,p20,normal;
+        RagPoint        trigCenter,v0,v1,v2,
+                        faceVct,p10,p20,normal;
 
         normals=new float[vertexes.length];
 
-        trigCenter=new RagPoint(0,0,0);
-        faceVct=new RagVector(0.0f,0.0f,0.0f);
+        trigCenter=new RagPoint(0.0f,0.0f,0.0f);
+        faceVct=new RagPoint(0.0f,0.0f,0.0f);
 
             // generate normals by the trigs
             // sometimes we will end up overwriting
@@ -133,12 +134,12 @@ public class MeshUtility
             // constant shared vertices against
             // triangle normals
 
-        v0=new RagPoint(0,0,0);
-        v1=new RagPoint(0,0,0);
-        v2=new RagPoint(0,0,0);
-        p10=new RagVector(0.0f,0.0f,0.0f);
-        p20=new RagVector(0.0f,0.0f,0.0f);
-        normal=new RagVector(0.0f,0.0f,0.0f);
+        v0=new RagPoint(0.0f,0.0f,0.0f);
+        v1=new RagPoint(0.0f,0.0f,0.0f);
+        v2=new RagPoint(0.0f,0.0f,0.0f);
+        p10=new RagPoint(0.0f,0.0f,0.0f);
+        p20=new RagPoint(0.0f,0.0f,0.0f);
+        normal=new RagPoint(0.0f,0.0f,0.0f);
 
         nTrig=indexes.length/3;
 
@@ -167,12 +168,12 @@ public class MeshUtility
                 // create vectors and calculate the normal
                 // by the cross product
 
-            p10.x=(float)(v1.x-v0.x);
-            p10.y=(float)(v1.y-v0.y);
-            p10.z=(float)(v1.z-v0.z);
-            p20.x=(float)(v2.x-v0.x);
-            p20.y=(float)(v2.y-v0.y);
-            p20.z=(float)(v2.z-v0.z);
+            p10.x=v1.x-v0.x;
+            p10.y=v1.y-v0.y;
+            p10.z=v1.z-v0.z;
+            p20.x=v2.x-v0.x;
+            p20.y=v2.y-v0.y;
+            p20.z=v2.z-v0.z;
             
             normal.x=(p10.y*p20.z)-(p10.z*p20.y);
             normal.y=(p10.z*p20.x)-(p10.x*p20.z);
@@ -186,13 +187,13 @@ public class MeshUtility
                 // more towards the center or more
                 // away from it
 
-            trigCenter.x=((v0.x+v1.x+v2.x)/3);
-            trigCenter.y=((v0.y+v1.y+v2.y)/3);
-            trigCenter.z=((v0.z+v1.z+v2.z)/3);
+            trigCenter.x=((v0.x+v1.x+v2.x)*0.33f);
+            trigCenter.y=((v0.y+v1.y+v2.y)*0.33f);
+            trigCenter.z=((v0.z+v1.z+v2.z)*0.33f);
             
-            faceVct.x=(float)(trigCenter.x-meshCenter.x);
-            faceVct.y=(float)(trigCenter.y-meshCenter.y);
-            faceVct.z=(float)(trigCenter.z-meshCenter.z);
+            faceVct.x=trigCenter.x-meshCenter.x;
+            faceVct.y=trigCenter.y-meshCenter.y;
+            faceVct.z=trigCenter.z-meshCenter.z;
 
             flip=(normal.dot(faceVct)>0.0f);
             if (!normalsIn) flip=!flip;
@@ -222,212 +223,74 @@ public class MeshUtility
     }
     
         //
-        // build tangents
-        //
-
-    public static float[] buildTangents(int[] vertexes,float[] uvs,int[] indexes)
-    {
-        int             n,nTrig,trigIdx,offset;
-        float           denom,u10,u20,v10,v20;
-        float[]         tangents;
-        RagPoint        v0,v1,v2;
-        RagVector       uv0,uv1,uv2,p10,p20,
-                        vLeft,vRight,vNum,
-                        tangent;
-
-            // generate tangents by the trigs
-            // sometimes we will end up overwriting
-            // but it depends on the mesh to have
-            // constant shared vertices against
-            // triangle tangents
-
-            // note this recreates a bit of what
-            // goes on to create the normal, because
-            // we need that first to make the UVs
-
-        v0=new RagPoint(0,0,0);
-        v1=new RagPoint(0,0,0);
-        v2=new RagPoint(0,0,0);
-        uv0=new RagVector(0.0f,0.0f,0.0f);
-        uv1=new RagVector(0.0f,0.0f,0.0f);
-        uv2=new RagVector(0.0f,0.0f,0.0f);
-        p10=new RagVector(0.0f,0.0f,0.0f);
-        p20=new RagVector(0.0f,0.0f,0.0f);
-        vLeft=new RagVector(0.0f,0.0f,0.0f);
-        vRight=new RagVector(0.0f,0.0f,0.0f);
-        vNum=new RagVector(0.0f,0.0f,0.0f);
-
-        tangent=new RagVector(0.0f,0.0f,0.0f);
-
-        nTrig=indexes.length/3;
-        
-        tangents=new float[vertexes.length];
-
-        for (n=0;n!=nTrig;n++) {
-
-                // get the vertex indexes and
-                // the vertexes for the trig
-
-            trigIdx=n*3;
-            
-            offset=indexes[trigIdx]*3;
-            v0.x=vertexes[offset];
-            v0.y=vertexes[offset+1];
-            v0.z=vertexes[offset+2];
-            
-            offset=indexes[trigIdx]*2;
-            uv0.x=uvs[offset];
-            uv0.y=uvs[offset+1];
-            
-            offset=indexes[trigIdx+1]*3;
-            v1.x=vertexes[offset];
-            v1.y=vertexes[offset+1];
-            v1.z=vertexes[offset+2];
-            
-            offset=indexes[trigIdx+1]*2;
-            uv1.x=uvs[offset];
-            uv1.y=uvs[offset+1];
-
-            offset=indexes[trigIdx+2]*3;
-            v2.x=vertexes[offset];
-            v2.y=vertexes[offset+1];
-            v2.z=vertexes[offset+2];
-            
-            offset=indexes[trigIdx+2]*2;
-            uv2.x=uvs[offset];
-            uv2.y=uvs[offset+1];
-
-                // create vectors
-
-            p10.x=(float)(v1.x-v0.x);
-            p10.y=(float)(v1.y-v0.y);
-            p10.z=(float)(v1.z-v0.z);
-            p20.x=(float)(v2.x-v0.x);
-            p20.y=(float)(v2.y-v0.y);
-            p20.z=(float)(v2.z-v0.z);
-
-                // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
-
-            u10=uv1.x-uv0.x;        // x component
-            u20=uv2.x-uv0.x;
-            v10=uv1.y-uv0.y;        // y component
-            v20=uv2.y-uv0.y;
-
-                // calculate the tangent
-                // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
-
-            vLeft.x=p10.x*v20;
-            vLeft.y=p10.y*v20;
-            vLeft.z=p10.z*v20;
-            
-            vRight.x=p20.x*v10;
-            vRight.y=p20.y*v10;
-            vRight.z=p20.z*v10;
-            
-            vNum.x=vLeft.x-vRight.x;
-            vNum.y=vLeft.y-vRight.y;
-            vNum.z=vLeft.z-vRight.z;
-
-            denom=(u10*v20)-(v10*u20);
-            if (denom!=0.0f) denom=1.0f/denom;
-            
-            tangent.x=vNum.x*denom;
-            tangent.y=vNum.y*denom;
-            tangent.z=vNum.z*denom;
-            
-            tangent.normalize();
-
-                // and set the mesh normal
-                // to all vertexes in this trig
-                
-            offset=indexes[trigIdx]*3;
-            tangents[offset]=tangent.x;
-            tangents[offset+1]=tangent.y;
-            tangents[offset+2]=tangent.z;
-
-            offset=indexes[trigIdx+1]*3;
-            tangents[offset]=tangent.x;
-            tangents[offset+1]=tangent.y;
-            tangents[offset+2]=tangent.z;
-            
-            offset=indexes[trigIdx+2]*3;
-            tangents[offset]=tangent.x;
-            tangents[offset+1]=tangent.y;
-            tangents[offset+2]=tangent.z;
-        }
-        
-        return(tangents);
-    }
-
-        //
         // mesh utilities
         //
         
-    private static int addQuadToIndexes(ArrayList<Integer> indexArray,int trigIdx)
+    private static int addQuadToIndexes(IntBuffer indexBuf,int trigIdx)
     {
-        indexArray.addAll(Arrays.asList(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3)));
+        indexBuf.put(new int[]{trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3)});
         return(trigIdx+4);
     }
 
-    public static int addBox(MeshList meshList,String name,String bitmapName,int negX,int posX,int negY,int posY,int negZ,int posZ,boolean isNegX,boolean isPosX,boolean isNegY,boolean isPosY,boolean isNegZ,boolean isPosZ,int segmentSize)
+    public static int addBox(MeshList meshList,String name,String bitmapName,float negX,float posX,float negY,float posY,float negZ,float posZ,boolean isNegX,boolean isPosX,boolean isNegY,boolean isPosY,boolean isNegZ,boolean isPosZ)
     {
         int                     trigIdx;
-        ArrayList<Integer>      vertexArray,indexArray;
-        int[]                   vertexes,indexes;
-        float[]                 normals,tangents,uvs;
+        FloatBuffer             vertexBuf;
+        IntBuffer               indexBuf;
+        int[]                   indexes;
+        float[]                 vertexes,normals,uvs;
         RagPoint                centerPnt;
         
         trigIdx=0;
         
-        vertexArray=new ArrayList<>();
-        indexArray=new ArrayList<>();
+        vertexBuf=FloatBuffer.allocate((isNegX?12:0)+(isPosX?12:0)+(isNegY?12:0)+(isPosY?12:0)+(isNegZ?12:0)+(isPosZ?12:0));
+        indexBuf=IntBuffer.allocate((isNegX?6:0)+(isPosX?6:0)+(isNegY?6:0)+(isPosY?6:0)+(isNegZ?6:0)+(isPosZ?6:0));
         
         if (isNegX) {
-            vertexArray.addAll(Arrays.asList(negX,negY,negZ,negX,negY,posZ,negX,posY,posZ,negX,posY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
+            vertexBuf.put(new float[]{negX,negY,negZ,negX,negY,posZ,negX,posY,posZ,negX,posY,negZ});
+            trigIdx=addQuadToIndexes(indexBuf,trigIdx);
         }
         if (isPosX) {
-            vertexArray.addAll(Arrays.asList(posX,negY,negZ,posX,negY,posZ,posX,posY,posZ,posX,posY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
+            vertexBuf.put(new float[]{posX,negY,negZ,posX,negY,posZ,posX,posY,posZ,posX,posY,negZ});
+            trigIdx=addQuadToIndexes(indexBuf,trigIdx);
         }
         if (isNegY) {
-            vertexArray.addAll(Arrays.asList(negX,negY,negZ,negX,negY,posZ,posX,negY,posZ,posX,negY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
+            vertexBuf.put(new float[]{negX,negY,negZ,negX,negY,posZ,posX,negY,posZ,posX,negY,negZ});
+            trigIdx=addQuadToIndexes(indexBuf,trigIdx);
         }
         if (isPosY) {
-            vertexArray.addAll(Arrays.asList(negX,posY,negZ,negX,posY,posZ,posX,posY,posZ,posX,posY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
+            vertexBuf.put(new float[]{negX,posY,negZ,negX,posY,posZ,posX,posY,posZ,posX,posY,negZ});
+            trigIdx=addQuadToIndexes(indexBuf,trigIdx);
         }
         if (isNegZ) {
-            vertexArray.addAll(Arrays.asList(negX,negY,negZ,posX,negY,negZ,posX,posY,negZ,negX,posY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
+            vertexBuf.put(new float[]{negX,negY,negZ,posX,negY,negZ,posX,posY,negZ,negX,posY,negZ});
+            trigIdx=addQuadToIndexes(indexBuf,trigIdx);
         }
         if (isPosZ) {
-            vertexArray.addAll(Arrays.asList(negX,negY,posZ,posX,negY,posZ,posX,posY,posZ,negX,posY,posZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
+            vertexBuf.put(new float[]{negX,negY,posZ,posX,negY,posZ,posX,posY,posZ,negX,posY,posZ});
+            trigIdx=addQuadToIndexes(indexBuf,trigIdx);
         }
         
             // convert to simple arrays
             
-        vertexes=vertexArray.stream().mapToInt(Integer::intValue).toArray();
-        indexes=indexArray.stream().mapToInt(Integer::intValue).toArray();
+        vertexes=vertexBuf.array();
+        indexes=indexBuf.array();
         
             // calculate the normal, tangent, uv
             
-        centerPnt=new RagPoint(((negX+posX)/2),((negY+posY)/2),((negZ+posZ)/2));
+        centerPnt=new RagPoint(((negX+posX)*0.5f),((negY+posY)*0.5f),((negZ+posZ)*0.5f));
      
         normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/(float)segmentSize));
-        tangents=MeshUtility.buildTangents(vertexes,uvs,indexes);
+        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.segmentSize));
 
-        return(meshList.add(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes)));
+        return(meshList.add(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes,false)));
     }
     
         //
         // room pieces
         //
    /*     
-    buildRoomFloorCeiling(room,centerPnt,name,bitmap,y,segmentSize)
+    public static void buildRoomFloorCeiling(room,centerPnt,name,bitmap,y)
     {
         let vertexArray=[];
         let normalArray;
@@ -443,62 +306,64 @@ public class MeshUtility
         this.addQuadToIndexes(indexArray,0);
         
         normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
+        uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/MapBuilder.segmentSize));
         
         this.core.game.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
-    
-    buildRoomWalls(room,centerPnt,name,bitmap,segmentSize)
+*/    
+    public static void buildRoomWalls(MeshList meshList,MapRoom room,RagPoint centerPnt,String name)
     {
-        let n,k,k2,y;
-        let nVertex,trigIdx;
-        let vertexArray,indexArray,uvArray,normalArray,tangentArray;
-        let piece=room.piece;
+        int             n,k,k2,vertexCount,trigIdx;
+        float           y;
+        FloatBuffer     vertexBuf;
+        IntBuffer       indexBuf;
+        int[]           indexes;
+        float[]         vertexes,normals,uvs;
+        MapPiece        piece;
         
-        nVertex=piece.vertexes.length;
+        piece=room.piece;
+        vertexCount=piece.vertexes.length;
         
-        vertexArray=[];
-        indexArray=[];
+        vertexBuf=FloatBuffer.allocate(room.storyCount*(vertexCount*12));
+        indexBuf=IntBuffer.allocate(room.storyCount*(vertexCount*6));
 
         trigIdx=0;
         y=room.offset.y;
         
-        for (n=0;n!==room.storyCount;n++) {
+        for (n=0;n!=room.storyCount;n++) {
             
-            for (k=0;k!=nVertex;k++) {
+            for (k=0;k!=vertexCount;k++) {
                 k2=k+1;
-                if (k2===nVertex) k2=0;
+                if (k2==vertexCount) k2=0;
                 
                 if (room.isWallHidden(n,k)) continue;
                 
-                vertexArray.push((Math.trunc(piece.vertexes[k][0]*segmentSize)+room.offset.x),(y+segmentSize),(Math.trunc(piece.vertexes[k][1]*segmentSize)+room.offset.z));
-                vertexArray.push((Math.trunc(piece.vertexes[k2][0]*segmentSize)+room.offset.x),(y+segmentSize),(Math.trunc(piece.vertexes[k2][1]*segmentSize)+room.offset.z));
-                vertexArray.push((Math.trunc(piece.vertexes[k2][0]*segmentSize)+room.offset.x),y,(Math.trunc(piece.vertexes[k2][1]*segmentSize)+room.offset.z));
-                vertexArray.push((Math.trunc(piece.vertexes[k][0]*segmentSize)+room.offset.x),y,(Math.trunc(piece.vertexes[k][1]*segmentSize)+room.offset.z));
+                vertexBuf.put(new float[]{((piece.vertexes[k][0]*MapBuilder.segmentSize)+room.offset.x),(y+MapBuilder.segmentSize),((piece.vertexes[k][1]*MapBuilder.segmentSize)+room.offset.z)});
+                vertexBuf.put(new float[]{((piece.vertexes[k2][0]*MapBuilder.segmentSize)+room.offset.x),(y+MapBuilder.segmentSize),((piece.vertexes[k2][1]*MapBuilder.segmentSize)+room.offset.z)});
+                vertexBuf.put(new float[]{((piece.vertexes[k2][0]*MapBuilder.segmentSize)+room.offset.x),y,((piece.vertexes[k2][1]*MapBuilder.segmentSize)+room.offset.z)});
+                vertexBuf.put(new float[]{((piece.vertexes[k][0]*MapBuilder.segmentSize)+room.offset.x),y,((piece.vertexes[k][1]*MapBuilder.segmentSize)+room.offset.z)});
 
-                trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+                trigIdx=addQuadToIndexes(indexBuf,trigIdx);
             }
 
-            y+=segmentSize;
+            y+=MapBuilder.segmentSize;
         }
         
-        if (vertexArray.length===0) return;
+        if (trigIdx==0) return;
 
-        vertexArray=new Float32Array(vertexArray);
-        indexArray=new Uint16Array(indexArray);
-        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
+        vertexes=vertexBuf.array();
+        indexes=indexBuf.array();
+        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.segmentSize));
         
-        this.core.game.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,vertexArray,normalArray,tangentArray,uvArray,null,null,indexArray));
+        meshList.add(new Mesh(name,"wall",vertexBuf.array(),normals,uvs,indexBuf.array(),false));
     }
     
         //
         // staircases
         //
-        
-    buildStairs(room,name,stepBitmap,segmentSize,x,y,z,dir,stepWidth,sides)
+/*        
+    buildStairs(room,name,stepBitmap,x,y,z,dir,stepWidth,sides)
     {
         let n,trigIdx;
         let sx,sx2,sy,sz,sz2;
@@ -508,8 +373,8 @@ public class MeshUtility
         let uvArray;
         let tangentArray;
         let indexArray=[];
-        let stepSize=Math.trunc((segmentSize*10)*0.02);
-        let stepHigh=Math.trunc(segmentSize/this.STAIR_STEP_COUNT);
+        let stepSize=Math.trunc((MapBuilder.segmentSize*10)*0.02);
+        let stepHigh=Math.trunc(MapBuilder.segmentSize/this.STAIR_STEP_COUNT);
 
             // initial locations
 
@@ -517,14 +382,14 @@ public class MeshUtility
             case this.STAIR_DIR_POS_Z:
             case this.STAIR_DIR_NEG_Z:
                 sx=x;
-                sx2=sx+(segmentSize*stepWidth);
-                centerPnt=new PointClass(Math.trunc(x+(segmentSize*0.5)),room.offset.y,Math.trunc(z+segmentSize));
+                sx2=sx+(MapBuilder.segmentSize*stepWidth);
+                centerPnt=new PointClass(Math.trunc(x+(MapBuilder.segmentSize*0.5)),room.offset.y,Math.trunc(z+MapBuilder.segmentSize));
                 break;
             case this.STAIR_DIR_POS_X:
             case this.STAIR_DIR_NEG_X:
                 sz=z;
-                sz2=sz+(segmentSize*stepWidth);
-                centerPnt=new PointClass(Math.trunc(x+segmentSize),room.offset.y,Math.trunc(z+(segmentSize*0.5)));
+                sz2=sz+(MapBuilder.segmentSize*stepWidth);
+                centerPnt=new PointClass(Math.trunc(x+MapBuilder.segmentSize),room.offset.y,Math.trunc(z+(MapBuilder.segmentSize*0.5)));
                 break;
         }
         
@@ -543,7 +408,7 @@ public class MeshUtility
                     sz2=sz+stepSize;
                     break;
                 case this.STAIR_DIR_NEG_Z:
-                    sz=(z+(segmentSize*2))-(n*stepSize);
+                    sz=(z+(MapBuilder.segmentSize*2))-(n*stepSize);
                     sz2=sz-stepSize;
                     break;
                 case this.STAIR_DIR_POS_X:
@@ -551,7 +416,7 @@ public class MeshUtility
                     sx2=sx+stepSize;
                     break;
                 case this.STAIR_DIR_NEG_X:
-                    sx=(x+(segmentSize*2))-(n*stepSize);
+                    sx=(x+(MapBuilder.segmentSize*2))-(n*stepSize);
                     sx2=sx-stepSize;
                     break;
             }
@@ -622,34 +487,34 @@ public class MeshUtility
             // step back
         
         if (sides) {
-            sy=y+segmentSize;
+            sy=y+MapBuilder.segmentSize;
             
             switch (dir) {
                 case this.STAIR_DIR_POS_Z:
-                    sx=x+(segmentSize*stepWidth);
-                    sz=z+(segmentSize*2);
+                    sx=x+(MapBuilder.segmentSize*stepWidth);
+                    sz=z+(MapBuilder.segmentSize*2);
                     vertexArray.push(x,y,sz);
                     vertexArray.push(sx,y,sz);
                     vertexArray.push(sx,sy,sz);
                     vertexArray.push(x,sy,sz);
                     break;
                 case this.STAIR_DIR_NEG_Z:
-                    sx=x+(segmentSize*stepWidth);
+                    sx=x+(MapBuilder.segmentSize*stepWidth);
                     vertexArray.push(x,y,z);
                     vertexArray.push(sx,y,z);
                     vertexArray.push(sx,sy,z);
                     vertexArray.push(x,sy,z);
                     break;
                 case this.STAIR_DIR_POS_X:
-                    sx=x+(segmentSize*2);
-                    sz=z+(segmentSize*stepWidth);
+                    sx=x+(MapBuilder.segmentSize*2);
+                    sz=z+(MapBuilder.segmentSize*stepWidth);
                     vertexArray.push(sx,y,z);
                     vertexArray.push(sx,y,sz);
                     vertexArray.push(sx,sy,sz);
                     vertexArray.push(sx,sy,z);
                     break;
                 case this.STAIR_DIR_NEG_X:
-                    sz=z+(segmentSize*stepWidth);
+                    sz=z+(MapBuilder.segmentSize*stepWidth);
                     vertexArray.push(x,y,z);
                     vertexArray.push(x,y,sz);
                     vertexArray.push(x,sy,sz);
@@ -663,13 +528,12 @@ public class MeshUtility
             // create the mesh
             
         normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
+        uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/MapBuilder.segmentSize));
         
         this.core.game.map.meshList.add(new MeshClass(this.core,name,stepBitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
     
-    buildRoomStairs(room,name,stepBitmap,segmentSize)
+    buildRoomStairs(room,name,stepBitmap)
     {
         let dir,stepWidth;
         
@@ -684,14 +548,14 @@ public class MeshUtility
             stepWidth=room.piece.size.z;
         }
         
-        this.buildStairs(room,name,stepBitmap,segmentSize,room.offset.x,room.offset.y,room.offset.z,dir,stepWidth,false);
+        this.buildStairs(room,name,stepBitmap,room.offset.x,room.offset.y,room.offset.z,dir,stepWidth,false);
     }
     
         //
         // cubes
         //
 
-    createCubeRotated(room,name,bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize)
+    createCubeRotated(room,name,bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,uvMode)
     {
         let idx,centerPnt,rotPnt;
         let n,mesh;
@@ -847,16 +711,15 @@ public class MeshUtility
             // create the mesh
 
         normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,normalsIn);
-        if (uvMode===this.UV_MAP) uvArray=this.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
+        if (uvMode===this.UV_MAP) uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/MapBuilder.segmentSize));
         
         mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         this.core.game.map.meshList.add(mesh);
     }
     
-    createCube(room,name,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize)
+    createCube(room,name,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,uvMode)
     {
-        return(this.createCubeRotated(room,name,bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize));
+        return(this.createCubeRotated(room,name,bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,uvMode));
     }
     
         //
@@ -1062,8 +925,6 @@ public class MeshUtility
         
             // create the mesh
 
-        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
-        
         mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         this.core.game.map.meshList.add(mesh);
     }

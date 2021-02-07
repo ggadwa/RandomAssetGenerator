@@ -1,20 +1,26 @@
 package com.klinksoftware.rag.map;
 
+import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.export.*;
 import com.klinksoftware.rag.mesh.*;
+import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
 
 public class MapBuilder
 {
-    public static final int         SEGMENT_SIZE=100;
+    public static final int         ROOM_RANDOM_LOCATION_DISTANCE=100;
     
+    public static float             segmentSize=10.0f;
+    
+    private String                  basePath;
     private MeshList                meshList;
-    private Random                  random;
+    private MapBitmapList           mapBitmapList;
+    private MapPieceList            mapPieceList;
     
-    public MapBuilder(Random random)
+    public MapBuilder(String basePath)
     {
-        this.random=random;
+        this.basePath=basePath;
     }
 
 /*
@@ -127,7 +133,7 @@ public class MapBuilder
     }
     
         //
-        // add additional room
+        // room steps
         //
         
     buildSteps(core,room,name,toRoom,genMesh,stepBitmap,segmentSize)
@@ -186,12 +192,12 @@ public class MapBuilder
         }
         
     }
-    
+    */
         //
         // add additional room
         //
     
-    addAdditionalRoom(rooms,room,touchRoom,segmentSize)
+    private void addAdditionalRoom(ArrayList<MapRoom> rooms,MapRoom room,MapRoom touchRoom)
     {
             // start at same height
             
@@ -199,135 +205,78 @@ public class MapBuilder
         
             // can we change height?
             
-        if ((room.offset.y===0) && (touchRoom.piece.decorate) && (touchRoom.storyCount>1)) {
-            if (this.core.randomPercentage(0.25)) {
+        if ((room.offset.y==0) && (touchRoom.piece.decorate) && (touchRoom.storyCount>1)) {
+            if (GeneratorMain.random.nextFloat()<0.25) {
                 room.offset.y+=segmentSize;
-                touchRoom.requiredStairs.push(room);
+                touchRoom.requiredStairs.add(room);
             }
         }
                             
             // add the room
                             
-        rooms.push(room);
-    }
-    
-        //
-        // random nodes
-        //
-        
-    generateRandomNodes(rooms,segmentSize)
-    {
-        let x,z,nodeCount;
-        let room,failCount,pathNode,offset;
-        let roomCount=rooms.length;
-        let path=this.core.game.map.path;
-        
-        failCount=0;
-        nodeCount=roomCount*3;
-        
-        offset=Math.trunc(segmentSize*0.5);
-        
-        while (path.nodes.length<nodeCount) {
-            
-                // only put stuff in decorated rooms
-                
-            room=rooms[this.core.randomIndex(roomCount)];
-            if (!room.piece.decorate) {
-                failCount++;
-                if (failCount>100) break;
-            }
-            
-                // skip if it's filled
-                
-            x=this.core.randomInBetween(1,(room.piece.size.x-1));
-            z=this.core.randomInBetween(1,(room.piece.size.z-1));
-            
-            if (room.getGrid(0,x,z)!==0) {
-                failCount++;
-                if (failCount>100) break;
-            }
-            
-                // add this and block it off
-                
-            room.setGrid(0,x,z,1);
-                
-            x=room.offset.x+((x*segmentSize)+offset);
-            z=room.offset.z+((z*segmentSize)+offset);
-            pathNode=new MapPathNodeClass(path.nodes.length,new PointClass(x,room.offset.y,z),[],null,false,null,null);
-            path.nodes.push(pathNode);
-        }
-    }
-*/
+        rooms.add(room);
+    }  
+
         //
         // build a map
         //
         
-    public void build(int colorScheme,int roomCount,String basePath,String name)
+    public void build(String mapName,int roomCount)
     {
-        /*
-        let n,k,seed;
-        let genPiece,genMesh,genBitmap;
-        let roomTopY;
-        let xAdd,zAdd,origX,origZ,touchIdx,failCount,placeCount,moveCount;
-        let room,centerPnt;
-        let segmentSize;
-        let rooms=[];
-        */
+        int                 n,failCount,placeCount,moveCount,
+                            touchIdx;
+        float               roomTopY,origX,origZ,xAdd,zAdd;
+        RagPoint            centerPnt;
+        MapRoom             room;
+        ArrayList<MapRoom>  rooms;
         
+            // some generator classes
+        
+        mapBitmapList=new MapBitmapList(basePath);
+        mapPieceList=new MapPieceList();
+        
+            // no rooms or meshes
+            
+        rooms=new ArrayList<>();
         meshList=new MeshList();
         
-        MeshUtility.addBox(meshList,"temp","wall",-1000,1000,-1000,1000,-1000,1000,true,true,true,true,true,true,SEGMENT_SIZE);
-
-        
-        
-            // some generators
-        /*    
-        genPiece=new GeneratePieceClass(this.core);
-        genMesh=new GenerateMeshClass(this.core);
-        genBitmap=new GenerateBitmapRunClass(this.core,colorScheme);      // 0 is the random color scheme, we can just generate a random integer later for this
-
-            // some global settings
+             // first room in center of map
             
-
-
-        
-            // first room in center of map
-            
-        room=new GenerateRoomClass(this.core,genPiece.getDefaultPiece(),segmentSize);
-        room.offset.setFromValues(0,0,0);
-        rooms.push(room);
+        room=new MapRoom(mapPieceList.getDefaultPiece());
+        room.offset.setFromValues(0.0f,0.0f,0.0f);
+        rooms.add(room);
         
             // other rooms start outside of center
             // room and gravity brings them in until they connect
-        
+       
         failCount=25;
         
-        while ((rooms.length<roomCount) && (failCount>0)) {
+        while ((rooms.size()<roomCount) && (failCount>0)) {
                 
-            room=new GenerateRoomClass(this.core,genPiece.getRandomPiece(),segmentSize);
+            room=new MapRoom(mapPieceList.getRandomPiece());
             
             placeCount=10;
             
             while (placeCount>0) {
-                room.offset.x=this.core.randomInBetween(-100,100)*segmentSize;
+                room.offset.x=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*segmentSize;
                 room.offset.y=0;
-                room.offset.z=this.core.randomInBetween(-100,100)*segmentSize;
+                room.offset.z=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*segmentSize;
                 if (!room.collides(rooms)) break;
                 
                 placeCount--;
             }
             
-            if (placeCount===0) {      // could not place this anywhere, so fail this room
+            if (placeCount==0) {        // could not place this anywhere, so fail this room
                 failCount--;
                 continue;
             }
             
                 // migrate it in to center of map
-                
-            xAdd=-(Math.sign(room.offset.x)*segmentSize);
-            zAdd=-(Math.sign(room.offset.z)*segmentSize);
+  
+            xAdd=-(Math.signum(room.offset.x)*segmentSize);
+            zAdd=-(Math.signum(room.offset.z)*segmentSize);
             
-            moveCount=100;
+            moveCount=ROOM_RANDOM_LOCATION_DISTANCE;
             
             while (moveCount>0) {
                 
@@ -345,10 +294,10 @@ public class MapBuilder
                     room.offset.x-=xAdd;
                 }
                 else {
-                    touchIdx=room.touches(rooms,n);
-                    if (touchIdx!==-1) {
-                        if (room.hasSharedWalls(rooms[touchIdx],segmentSize)) {
-                            this.addAdditionalRoom(rooms,room,rooms[touchIdx],segmentSize);
+                    touchIdx=room.touches(rooms);
+                    if (touchIdx!=-1) {
+                        if (room.hasSharedWalls(rooms.get(touchIdx))) {
+                            addAdditionalRoom(rooms,room,rooms.get(touchIdx));
                             break;
                         }
                     }
@@ -359,10 +308,10 @@ public class MapBuilder
                     room.offset.z-=zAdd;
                 }
                 else {
-                    touchIdx=room.touches(rooms,n);
-                    if (touchIdx!==-1) {
-                        if (room.hasSharedWalls(rooms[touchIdx],segmentSize)) {
-                            this.addAdditionalRoom(rooms,room,rooms[touchIdx],segmentSize);
+                    touchIdx=room.touches(rooms);
+                    if (touchIdx!=-1) {
+                        if (room.hasSharedWalls(rooms.get(touchIdx))) {
+                            addAdditionalRoom(rooms,room,rooms.get(touchIdx));
                             break;
                         }
                     }
@@ -370,7 +319,7 @@ public class MapBuilder
                 
                     // if we couldn't move at all, fail this room
                     
-                if ((room.offset.x===origX) && (room.offset.z===origZ)) {
+                if ((room.offset.x==origX) && (room.offset.z==origZ)) {
                     failCount--;
                     break;
                 }
@@ -378,60 +327,66 @@ public class MapBuilder
                 moveCount--;
             }
         }
-        
-        console.info('room count='+rooms.length);
 
             // eliminate all combined walls
-            
+/*            
         this.removeSharedWalls(rooms,segmentSize);
+*/      
+
+            // maps always need walls, floors, ceilings
+            // and steps
+            
+        mapBitmapList.generateWall();
+        mapBitmapList.generateFloor();
+        mapBitmapList.generateCeiling();
+        mapBitmapList.generateStep();
         
             // now create the meshes
             
-        roomCount=rooms.length;
+        roomCount=rooms.size();
         
         for (n=0;n!=roomCount;n++) {
-            room=rooms[n];
+            room=rooms.get(n);
             
             roomTopY=room.offset.y+(room.storyCount*segmentSize);
-            centerPnt=new PointClass((room.offset.x+Math.trunc(room.size.x*0.5)),(room.offset.y+Math.trunc((segmentSize*room.storyCount)*0.5)),(room.offset.z+Math.trunc(room.size.z*0.5)));
+            centerPnt=new RagPoint((room.offset.x+(room.size.x*0.5f)),(room.offset.y+((segmentSize*room.storyCount)*0.5f)),(room.offset.z+(room.size.z*0.5f)));
                 
                 // meshes
 
-            genMesh.buildRoomWalls(room,centerPnt,('wall_'+n),genBitmap.generateWall(),segmentSize);
-            genMesh.buildRoomFloorCeiling(room,centerPnt,('floor_'+n),genBitmap.generateFloor(),room.offset.y,segmentSize);
-            genMesh.buildRoomFloorCeiling(room,centerPnt,('ceiling_'+n),genBitmap.generateCeiling(),roomTopY,segmentSize);
+            MeshUtility.buildRoomWalls(meshList,room,centerPnt,("wall_"+Integer.toString(n)));
+            //genMesh.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),genBitmap.generateFloor(),room.offset.y,segmentSize);
+            //genMesh.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),genBitmap.generateCeiling(),roomTopY,segmentSize);
             
                 // decorations
 
-            if (room.piece.decorate) this.buildDecoration(room,n,genMesh,genBitmap,segmentSize);
+        //    if (room.piece.decorate) this.buildDecoration(room,n,genMesh,genBitmap,segmentSize);
             
                 // room lights
 
-            (new GenerateLightClass(this.core,room,('light_'+n),genMesh,genBitmap.generateStep(),segmentSize)).build();
+        //    (new GenerateLightClass(this.core,room,('light_'+n),genMesh,genBitmap.generateStep(),segmentSize)).build();
         }
         
             // any steps
-            
+ /*           
         for (n=0;n!=roomCount;n++) {
-            room=rooms[n];
+            room=rooms.get(n);
             
             for (k=0;k!==room.requiredStairs.length;k++) {
                 this.buildSteps(this.core,room,('room_'+n+'_step_'+k),room.requiredStairs[k],genMesh,genBitmap.generateStep(),segmentSize);
             }
         }
-        
-            // generate nodes
-            
-        this.generateRandomNodes(rooms,segmentSize);
+*/        
 
-        return(true);
-*/
-   
-        
-        //(new BitmapBrick(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapBrick.VARIATION_NONE,basePath,"brick");
+
         
             // write out the model
         
-        (new Export()).export(meshList,basePath,name);
+        try {
+            (new Export()).export(meshList,basePath,mapName);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

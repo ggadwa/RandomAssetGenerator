@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.bitmaps;
 
+import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
@@ -9,9 +10,9 @@ public class BitmapWood extends BitmapBase
     public final static int VARIATION_BOARDS=0;
     public final static int VARIATION_BOX=1;
     
-    public BitmapWood(int colorScheme,Random random)
+    public BitmapWood()
     {
-        super(colorScheme,random);
+        super();
         
         hasNormal=true;
         hasMetallicRoughness=true;
@@ -62,9 +63,9 @@ public class BitmapWood extends BitmapBase
         
             // some random values
 
-        boardCount=4+random.nextInt(12);
+        boardCount=4+GeneratorMain.random.nextInt(12);
         boardSize=textureSize/boardCount;
-        edgeSize=(int)(((float)textureSize*0.005f)+(random.nextFloat()*((float)textureSize*0.005f)));
+        edgeSize=(int)(((float)textureSize*0.005f)+(GeneratorMain.random.nextFloat()*((float)textureSize*0.005f)));
         woodColor=getRandomColor();
         
             // perlin noise
@@ -83,7 +84,7 @@ public class BitmapWood extends BitmapBase
             rgt=lft+boardSize;
             if (n==(boardCount-1)) rgt=textureSize;
             
-            boardType=(variationMode==VARIATION_BOX)?0:random.nextInt(5);
+            boardType=(variationMode==VARIATION_BOX)?0:GeneratorMain.random.nextInt(5);
             
             switch (boardType) {
                 case 0:

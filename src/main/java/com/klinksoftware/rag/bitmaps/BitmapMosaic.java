@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.bitmaps;
 
+import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
@@ -8,9 +9,9 @@ public class BitmapMosaic extends BitmapBase
 {
     public final static int VARIATION_NONE=0;
     
-    public BitmapMosaic(int colorScheme,Random random)
+    public BitmapMosaic()
     {
-        super(colorScheme,random);
+        super();
         
         hasNormal=true;
         hasMetallicRoughness=true;
@@ -31,7 +32,7 @@ public class BitmapMosaic extends BitmapBase
         
             // some random values
 
-        splitCount=15+random.nextInt(10);
+        splitCount=15+GeneratorMain.random.nextInt(10);
         
         groutColor=getRandomGray(0.4f,0.6f);
         mosaicColor=getRandomColor();
@@ -67,10 +68,10 @@ public class BitmapMosaic extends BitmapBase
                 
                     // slightly random position
                     
-                lft=(x*tileWid)+random.nextInt(3);
-                rgt=((x*tileWid)+tileWid)-random.nextInt(3);
-                top=(y*tileHigh)+random.nextInt(3);
-                bot=((y*tileHigh)+tileHigh)-random.nextInt(3);
+                lft=(x*tileWid)+GeneratorMain.random.nextInt(3);
+                rgt=((x*tileWid)+tileWid)-GeneratorMain.random.nextInt(3);
+                top=(y*tileHigh)+GeneratorMain.random.nextInt(3);
+                bot=((y*tileHigh)+tileHigh)-GeneratorMain.random.nextInt(3);
                 
                     // the color
 

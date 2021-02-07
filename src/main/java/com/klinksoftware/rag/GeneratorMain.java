@@ -4,15 +4,33 @@ import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.map.*;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
+import com.fasterxml.jackson.core.type.*;
+import com.fasterxml.jackson.databind.*;
 
 public class GeneratorMain
 {
     private static final String modelName="test";
-    private static final int colorScheme=BitmapBase.COLOR_SCHEME_RANDOM;
     private static final int roomCount=20;
     
+    public static int               colorScheme=BitmapBase.COLOR_SCHEME_RANDOM;
     public static Random            random;
+    
+    public static String getSettingJson()
+    {
+        File        jsonFile;
+        
+        try {
+            jsonFile=new File(GeneratorMain.class.getClassLoader().getResource("data/settings.json").getFile());
+            return(new String(Files.readAllBytes(jsonFile.toPath())));
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return("");
+        }
+    }
     
     public static void run()
     {
@@ -37,8 +55,8 @@ public class GeneratorMain
             
         
         
-        mapBuilder=new MapBuilder(random);
-        mapBuilder.build(colorScheme,roomCount,basePath,modelName);
+        mapBuilder=new MapBuilder(basePath);
+        mapBuilder.build(modelName,roomCount);
         
         
         

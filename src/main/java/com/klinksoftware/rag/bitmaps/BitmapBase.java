@@ -1,6 +1,6 @@
 package com.klinksoftware.rag.bitmaps;
 
-import com.klinksoftware.rag.GeneratorMain;
+import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.io.*;
@@ -19,22 +19,22 @@ public class BitmapBase
     
     public static final int COLOR_SCHEME_COUNT=4;
 
-    public static final RagVector NORMAL_CLEAR=new RagVector(0.0f,0.0f,1.0f);
+    public static final RagPoint NORMAL_CLEAR=new RagPoint(0.0f,0.0f,1.0f);
 
-    public static final RagVector NORMAL_LEFT_45=new RagVector(-0.65f,0.02f,0.75f);
-    public static final RagVector NORMAL_RIGHT_45=new RagVector(0.65f,-0.02f,0.75f);
-    public static final RagVector NORMAL_TOP_45=new RagVector(-0.02f,0.65f,0.75f);
-    public static final RagVector NORMAL_BOTTOM_45=new RagVector(0.02f,-0.65f,0.75f);
+    public static final RagPoint NORMAL_LEFT_45=new RagPoint(-0.65f,0.02f,0.75f);
+    public static final RagPoint NORMAL_RIGHT_45=new RagPoint(0.65f,-0.02f,0.75f);
+    public static final RagPoint NORMAL_TOP_45=new RagPoint(-0.02f,0.65f,0.75f);
+    public static final RagPoint NORMAL_BOTTOM_45=new RagPoint(0.02f,-0.65f,0.75f);
 
-    public static final RagVector NORMAL_LEFT_10=new RagVector(-0.1f,0.0f,0.90f);
-    public static final RagVector NORMAL_RIGHT_10=new RagVector(0.1f,0.0f,0.90f);
-    public static final RagVector NORMAL_TOP_10=new RagVector(0.0f,0.1f,0.90f);
-    public static final RagVector NORMAL_BOTTOM_10=new RagVector(0.0f,-0.1f,0.90f);
+    public static final RagPoint NORMAL_LEFT_10=new RagPoint(-0.1f,0.0f,0.90f);
+    public static final RagPoint NORMAL_RIGHT_10=new RagPoint(0.1f,0.0f,0.90f);
+    public static final RagPoint NORMAL_TOP_10=new RagPoint(0.0f,0.1f,0.90f);
+    public static final RagPoint NORMAL_BOTTOM_10=new RagPoint(0.0f,-0.1f,0.90f);
         
-    public static final RagVector NORMAL_TOP_LEFT_45=new RagVector(-0.48f,0.48f,0.72f);
-    public static final RagVector NORMAL_TOP_RIGHT_45=new RagVector(0.48f,0.48f,0.72f);
-    public static final RagVector NORMAL_BOTTOM_LEFT_45=new RagVector(-0.48f,-0.48f,0.72f);
-    public static final RagVector NORMAL_BOTTOM_RIGHT_45=new RagVector(0.48f,-0.48f,0.72f);
+    public static final RagPoint NORMAL_TOP_LEFT_45=new RagPoint(-0.48f,0.48f,0.72f);
+    public static final RagPoint NORMAL_TOP_RIGHT_45=new RagPoint(0.48f,0.48f,0.72f);
+    public static final RagPoint NORMAL_BOTTOM_LEFT_45=new RagPoint(-0.48f,-0.48f,0.72f);
+    public static final RagPoint NORMAL_BOTTOM_RIGHT_45=new RagPoint(0.48f,-0.48f,0.72f);
     
     public static final RagColor COLOR_BLACK=new RagColor(0.0f,0.0f,0.0f);
     public static final RagColor COLOR_WHITE=new RagColor(1.0f,1.0f,1.0f);
@@ -62,18 +62,14 @@ public class BitmapBase
                                         {0.8f,0.5f,0.5f}    // dull red
                                     };
     
-    protected int           colorScheme,textureSize;
+    protected int           textureSize;
     protected boolean       hasNormal,hasMetallicRoughness,hasGlow,hasAlpha;
-    protected RagVector     specularFactor,emissiveFactor;
+    protected RagPoint      specularFactor,emissiveFactor;
     protected float[]       colorData,normalData,metallicRoughnessData,glowData,
                             perlinNoiseColorFactor,noiseNormals;
-    protected Random        random;
     
-    public BitmapBase(int colorScheme,Random random)
+    public BitmapBase()
     {
-        this.colorScheme=colorScheme;
-        this.random=random;
-        
             // will be reset in children classes
            
         textureSize=512;
@@ -82,8 +78,8 @@ public class BitmapBase
         hasGlow=false;
         hasAlpha=false;
         
-        specularFactor=new RagVector(5,5,5);
-        emissiveFactor=new RagVector(1,1,1);
+        specularFactor=new RagPoint(5.0f,5.0f,5.0f);
+        emissiveFactor=new RagPoint(1.0f,1.0f,1.0f);
 
             // the color, normal, metallic-roughness, and glow
             // define them later as child classes
@@ -110,23 +106,23 @@ public class BitmapBase
         float           f,midPoint,darken;
         float[]         col;
         
-        switch (colorScheme) {
+        switch (GeneratorMain.colorScheme) {
             
                 // random primary colors
                 
             case COLOR_SCHEME_RANDOM:
-                idx=random.nextInt(COLOR_PRIMARY_LIST.length);
+                idx=GeneratorMain.random.nextInt(COLOR_PRIMARY_LIST.length);
                 col=COLOR_PRIMARY_LIST[idx];
-                darken=0.1f-(random.nextFloat()*0.2f);
+                darken=0.1f-(GeneratorMain.random.nextFloat()*0.2f);
                 return(new RagColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
                 
                 // doom browns and green
                 
             case COLOR_SCHEME_DOOM:
-                if (random.nextBoolean()) return(adjustColorRandom(new RagColor(0.6f,0.3f,0.0f),0.7f,1.0f));
+                if (GeneratorMain.random.nextBoolean()) return(adjustColorRandom(new RagColor(0.6f,0.3f,0.0f),0.7f,1.0f));
 
-                f=random.nextFloat()*0.1f;
-                return(new RagColor(f,(0.4f+(random.nextFloat()*0.2f)),f));
+                f=GeneratorMain.random.nextFloat()*0.1f;
+                return(new RagColor(f,(0.4f+(GeneratorMain.random.nextFloat()*0.2f)),f));
             
                 // black and white
                 
@@ -136,7 +132,7 @@ public class BitmapBase
                 // pastel primary colors
                 
             case COLOR_SCHEME_PASTEL:
-                idx=random.nextInt(COLOR_PRIMARY_LIST.length);
+                idx=GeneratorMain.random.nextInt(COLOR_PRIMARY_LIST.length);
                 col=COLOR_PRIMARY_LIST[idx];
                 midPoint=(col[0]+col[1]+col[2])*0.33f;
                 return(new RagColor((col[0]+(midPoint-col[0])*0.8f),(col[1]+(midPoint-col[1])*0.8f),(col[2]+(midPoint-col[2])*0.8f)));
@@ -170,7 +166,7 @@ public class BitmapBase
     {
         float       col;
         
-        col=minFactor+(random.nextFloat()*(maxFactor-minFactor));
+        col=minFactor+(GeneratorMain.random.nextFloat()*(maxFactor-minFactor));
         return(new RagColor(col,col,col));
     }
 
@@ -183,7 +179,7 @@ public class BitmapBase
     {
         float       f;
         
-        f=minFactor+(random.nextFloat()*(maxFactor-minFactor));
+        f=minFactor+(GeneratorMain.random.nextFloat()*(maxFactor-minFactor));
         return(new RagColor((color.r*f),(color.g*f),(color.b*f)));
     }
     
@@ -301,7 +297,7 @@ public class BitmapBase
         // noise
         //
     
-    private float getDotGridVector(RagVector[][] vectors,int gridX,int gridY,int gridWid,int gridHigh,int x,int y)
+    private float getDotGridVector(RagPoint[][] vectors,int gridX,int gridY,int gridWid,int gridHigh,int x,int y)
     {
         float       dx,dy;
         
@@ -324,8 +320,8 @@ public class BitmapBase
         int             x,y,gridWid,gridHigh,
                         gridX0,gridX1,gridY0,gridY1;
         float           sx,sy,ix0,ix1,n0,n1;
-        RagVector       normal;
-        RagVector[][]   vectors;
+        RagPoint        normal;
+        RagPoint[][]    vectors;
         
             // the grid
             // it must be evenly divisible
@@ -341,12 +337,12 @@ public class BitmapBase
             // generate the random grid vectors
             // these need to wrap around so textures can tile
             
-        vectors=new RagVector[gridXSize+1][gridYSize+1];
+        vectors=new RagPoint[gridXSize+1][gridYSize+1];
         
         for (y=0;y!=gridYSize;y++) {
             
             for (x=0;x!=gridXSize;x++) {
-                normal=new RagVector(((random.nextFloat()*2.0f)-1.0f),((random.nextFloat()*2.0f)-1.0f),0.0f);
+                normal=new RagPoint(((GeneratorMain.random.nextFloat()*2.0f)-1.0f),((GeneratorMain.random.nextFloat()*2.0f)-1.0f),0.0f);
                 normal.normalize2D();
                 vectors[x][y]=normal;
             }
@@ -363,7 +359,7 @@ public class BitmapBase
             // create the noise arrays
             
         gridY0=0;
-        normal=new RagVector(0.0f,0.0f,0.0f);
+        normal=new RagPoint(0.0f,0.0f,0.0f);
         
         for (y=0;y!=textureSize;y++) {
             
@@ -437,7 +433,7 @@ public class BitmapBase
                 
                     // the static random color factor
                     
-                colFactor=colorFactorMin+(random.nextFloat()*colorFactorAdd);
+                colFactor=colorFactorMin+(GeneratorMain.random.nextFloat()*colorFactorAdd);
 
                 idx=((y*textureSize)+x)*4;
                 
@@ -448,7 +444,7 @@ public class BitmapBase
         }
     }
 
-    private void createNormalNoiseDataSinglePolygonLine(int x,int y,int x2,int y2,RagVector normal)
+    private void createNormalNoiseDataSinglePolygonLine(int x,int y,int x2,int y2,RagPoint normal)
     {
         int         xLen,yLen,sp,ep,dx,dy,wx,wy,idx;
         float       slope,f,r,g,b;
@@ -539,15 +535,15 @@ public class BitmapBase
                     mx,my,halfWid,halfHigh;
         int[]       rx,ry;
         float       rad,fx,fy,nFactor;
-        RagVector   normal;
+        RagPoint    normal;
         
         if ((rgt<=lft) || (bot<=top)) return;
         
             // random settings
             
-        lineSize=2+random.nextInt(3);
-        startArc=random.nextInt(36);
-        endArc=startArc+random.nextInt(36);
+        lineSize=2+GeneratorMain.random.nextInt(3);
+        startArc=GeneratorMain.random.nextInt(36);
+        endArc=startArc+GeneratorMain.random.nextInt(36);
         
         mx=(lft+rgt)/2;
         my=(top+bot)/2;
@@ -561,14 +557,14 @@ public class BitmapBase
         ry=new int[36];
         
         for (n=0;n!=36;n++) {
-            rx[n]=random.nextInt(20)-10;
-            ry[n]=random.nextInt(20)-10;
+            rx[n]=GeneratorMain.random.nextInt(20)-10;
+            ry[n]=GeneratorMain.random.nextInt(20)-10;
         }
 
             // build the polygon/oval
             
         lx=ly=0;
-        normal=new RagVector(0.0f,0.0f,0.0f);
+        normal=new RagPoint(0.0f,0.0f,0.0f);
         
         for (n=0;n!=lineSize;n++) {
             
@@ -630,12 +626,12 @@ public class BitmapBase
         nCount=(int)(((float)textureSize*0.5f)*density);
         
         for (n=0;n!=nCount;n++) {
-            x=random.nextInt(textureSize-1);
-            y=random.nextInt(textureSize-1);
-            wid=20+random.nextInt(40);
-            high=20+random.nextInt(40);
+            x=GeneratorMain.random.nextInt(textureSize-1);
+            y=GeneratorMain.random.nextInt(textureSize-1);
+            wid=20+GeneratorMain.random.nextInt(40);
+            high=20+GeneratorMain.random.nextInt(40);
             
-            createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,random.nextBoolean());
+            createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,GeneratorMain.random.nextBoolean());
         }
         
             // blur to fix any missing pixels and make the
@@ -683,21 +679,21 @@ public class BitmapBase
 
                 // find a gravity point on an edge
 
-            switch (random.nextInt(4)) {
+            switch (GeneratorMain.random.nextInt(4)) {
                 case 0:
                     gx=lft+distortSize;
-                    gy=top+random.nextInt(bot-top);
+                    gy=top+GeneratorMain.random.nextInt(bot-top);
                     break;
                 case 1:
                     gx=rgt-distortSize;
-                    gy=top+random.nextInt(bot-top);
+                    gy=top+GeneratorMain.random.nextInt(bot-top);
                     break;
                 case 2:
-                    gx=lft+random.nextInt(rgt-lft);
+                    gx=lft+GeneratorMain.random.nextInt(rgt-lft);
                     gy=top+distortSize;
                     break;
                 default:
-                    gx=lft+random.nextInt(rgt-lft);
+                    gx=lft+GeneratorMain.random.nextInt(rgt-lft);
                     gy=bot-distortSize;
                     break;
             }
@@ -868,7 +864,7 @@ public class BitmapBase
         float       fx,fy,halfWid,halfHigh,rad,
                     colorFactorAdd,colorFactor,nFactor;
         RagColor    col;
-        RagVector   normal;
+        RagPoint    normal;
         
         if ((lft>=rgt) || (top>=bot)) return;
         
@@ -886,7 +882,7 @@ public class BitmapBase
         my=top+(high/2);
         
         col=new RagColor(0.0f,0.0f,0.0f);
-        normal=new RagVector(0.0f,0.0f,0.0f);
+        normal=new RagPoint(0.0f,0.0f,0.0f);
         colorFactorAdd=colorFactorMax-colorFactorMin;
 
         edgeCount=edgeSize;
@@ -1348,7 +1344,7 @@ public class BitmapBase
             
             for (y=top;y!=bot;y++) {
                 
-                if (random.nextFloat()<density) {
+                if (GeneratorMain.random.nextFloat()<density) {
                     if ((lx>=0) && (lx<textureSize)) {
                         idx=((y*textureSize)+lx)*4;
                         colorData[idx]=baseColor.r;
@@ -1357,7 +1353,7 @@ public class BitmapBase
                     }
                 }
                 
-                if (random.nextFloat()<density) {
+                if (GeneratorMain.random.nextFloat()<density) {
                     if ((rx>=0) && (rx<textureSize)) {
                         idx=((y*textureSize)+rx)*4;
                         colorData[idx]=baseColor.r;
@@ -1381,17 +1377,17 @@ public class BitmapBase
         wid=rgt-lft;
         
         while (true) {
-            shineWid=(int)(((float)wid*0.035f)+(random.nextFloat()*((float)wid*0.15)));
+            shineWid=(int)(((float)wid*0.035f)+(GeneratorMain.random.nextFloat()*((float)wid*0.15)));
             if ((x+shineWid)>rgt) shineWid=rgt-x;
             
                 // small % are no lines
                 
-            if (random.nextFloat()<0.9f) {
+            if (GeneratorMain.random.nextFloat()<0.9f) {
                 shineColor=adjustColorRandom(metalColor,0.7f,1.3f);
                 this.drawMetalShineLine(x,top,bot,shineWid,shineColor);
             }
             
-            x+=(shineWid+(int)(((float)wid*0.03f)+(random.nextFloat()*((float)wid*0.05))));
+            x+=(shineWid+(int)(((float)wid*0.03f)+(GeneratorMain.random.nextFloat()*((float)wid*0.05))));
             if (x>=rgt) break;
         }
         
@@ -1414,7 +1410,7 @@ public class BitmapBase
         
             // random shrink
             
-        xAdd=random.nextFloat()*minXReduce;
+        xAdd=GeneratorMain.random.nextFloat()*minXReduce;
         
             // draw the dirt
             
@@ -1429,7 +1425,7 @@ public class BitmapBase
             if (lx>=rx) break;
             
             for (x=lx;x!=rx;x++) {
-                factor2=factor*(minMix+(random.nextFloat()*addMix));
+                factor2=factor*(minMix+(GeneratorMain.random.nextFloat()*addMix));
 
                 idx=((y*textureSize)+x)*4;
                 colorData[idx]=((1.0f-factor2)*colorData[idx])+(color.r*factor2);
@@ -1458,8 +1454,8 @@ public class BitmapBase
         minWid=(int)((float)(rgt-lft)*0.1f);
         
         for (n=0;n!=additionalStreakCount;n++) {
-            sx=lft+random.nextInt((rgt-minWid)-lft);
-            ex=(sx+minWid)+random.nextInt(rgt-(sx+minWid));
+            sx=lft+GeneratorMain.random.nextInt((rgt-minWid)-lft);
+            ex=(sx+minWid)+GeneratorMain.random.nextInt(rgt-(sx+minWid));
             if (sx>=ex) continue;
             
             drawStreakDirtSingle(sx,top,ex,bot,minMix,addMix,color,0.1f);
@@ -1506,7 +1502,7 @@ public class BitmapBase
             halfHigh=(float)high*0.5f;
             
             for (n=0;n!=1000;n++) {
-                if (random.nextFloat()>curPercentage) continue;
+                if (GeneratorMain.random.nextFloat()>curPercentage) continue;
                 
                 rad=(float)(Math.PI*2.0)*((float)n*0.001f);
 
@@ -1540,13 +1536,13 @@ public class BitmapBase
     {
         int                 x,y,count,idx;
         float               f,r,g,b,nx,ny,nz;
-        RagVector           normal;
+        RagPoint            normal;
 
         if ((rgt<=lft) || (bot<=top)) return;
         
             // the rotating normal
             
-        normal=new RagVector(0.0f,0.1f,1.0f);
+        normal=new RagPoint(0.0f,0.1f,1.0f);
         normal.normalize();
         
         nx=(normal.x+1.0f)*0.5f;
@@ -1562,9 +1558,9 @@ public class BitmapBase
 
             count--;
             if (count<=0) {
-                count=2+random.nextInt(4);
+                count=2+GeneratorMain.random.nextInt(4);
                 
-                f=1.0f+((1.0f-(random.nextFloat()*2.0f))*factor);
+                f=1.0f+((1.0f-(GeneratorMain.random.nextFloat()*2.0f))*factor);
                 
                 r=baseColor.r*f;
                 g=baseColor.g*f;
@@ -1594,13 +1590,13 @@ public class BitmapBase
     {
         int                 x,y,count,idx;
         float               f,r,g,b,nx,ny,nz;
-        RagVector           normal;
+        RagPoint            normal;
 
         if ((rgt<=lft) || (bot<=top)) return;
         
             // the rotating normal
             
-        normal=new RagVector(0.1f,0.0f,1.0f);
+        normal=new RagPoint(0.1f,0.0f,1.0f);
         normal.normalize();
         
         nx=(normal.x+1.0f)*0.5f;
@@ -1616,9 +1612,9 @@ public class BitmapBase
             
             count--;
             if (count<=0) {
-                count=2+random.nextInt(4);
+                count=2+GeneratorMain.random.nextInt(4);
                 
-                f=1.0f+((1.0f-(random.nextFloat()*2.0f))*factor);
+                f=1.0f+((1.0f-(GeneratorMain.random.nextFloat()*2.0f))*factor);
                 
                 r=baseColor.r*f;
                 g=baseColor.g*f;
@@ -1880,7 +1876,7 @@ public class BitmapBase
         }
     }
     
-    protected void drawLineNormal(int x,int y,int x2,int y2,RagVector normal)
+    protected void drawLineNormal(int x,int y,int x2,int y2,RagPoint normal)
     {
         int         xLen,yLen,sp,ep,dx,dy,idx,
                     prevX,prevY;
@@ -1992,7 +1988,7 @@ public class BitmapBase
         boolean     horizontal;
         RagColor    aliasColor;
         
-        segCount=2+random.nextInt(5);
+        segCount=2+GeneratorMain.random.nextInt(5);
         horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
         xAdd=(x2-x)/segCount;
@@ -2012,7 +2008,7 @@ public class BitmapBase
                 ey=sy+yAdd;
 
                 if ((n&0x1)==0) {      // straighten out line every other variation
-                    r=lineVariant-random.nextInt(lineVariant*2);
+                    r=lineVariant-GeneratorMain.random.nextInt(lineVariant*2);
 
                     if (horizontal) {
                         ey+=r;
@@ -2060,7 +2056,7 @@ public class BitmapBase
     {
         int     n,sx,sy,ex,ey,segCount,xAdd;
         
-        segCount=2+random.nextInt(5);
+        segCount=2+GeneratorMain.random.nextInt(5);
         xAdd=(x2-x)/segCount;
         
         sx=ex=x;
@@ -2072,7 +2068,7 @@ public class BitmapBase
                 ex=x2;
             }
             else {
-                ey=sy+(random.nextInt(lineVariant)*lineDir);
+                ey=sy+(GeneratorMain.random.nextInt(lineVariant)*lineDir);
                 ex=sx+xAdd;
             }
             
@@ -2088,7 +2084,7 @@ public class BitmapBase
             
             if ((ey==clipTop) || (ey==clipBot)) break;
             
-            if ((canSplit) && (random.nextBoolean())) {
+            if ((canSplit) && (GeneratorMain.random.nextBoolean())) {
                 if (lineDir>0) {
                     this.drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
                 }
@@ -2108,7 +2104,7 @@ public class BitmapBase
     {
         int     n,sx,sy,ex,ey,segCount,yAdd;
         
-        segCount=2+random.nextInt(5);
+        segCount=2+GeneratorMain.random.nextInt(5);
         yAdd=(y2-y)/segCount;
         
         sx=ex=x;
@@ -2120,7 +2116,7 @@ public class BitmapBase
                 ey=y2;
             }
             else {
-                ex=sx+(random.nextInt(lineVariant)*lineDir);
+                ex=sx+(GeneratorMain.random.nextInt(lineVariant)*lineDir);
                 ey=sy+yAdd;
             }
             
@@ -2136,7 +2132,7 @@ public class BitmapBase
             
             if ((ex==clipLft) || (ex==clipRgt)) break;
             
-            if ((canSplit) && (random.nextBoolean())) {
+            if ((canSplit) && (GeneratorMain.random.nextBoolean())) {
                 if (lineDir>0) {
                     drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,false);
                 }
@@ -2166,8 +2162,8 @@ public class BitmapBase
                 dy2=ey;
             }
             else {
-                dx2=(int)(sx+((float)((ex-sx)*(n+1))/(float)segCount))+(random.nextInt(Math.abs(lineXVarient))*(int)Math.signum(lineXVarient));
-                dy2=(int)(sy+((float)((ey-sy)*(n+1))/(float)segCount))+(random.nextInt(Math.abs(lineYVarient))*(int)Math.signum(lineYVarient));
+                dx2=(int)(sx+((float)((ex-sx)*(n+1))/(float)segCount))+(GeneratorMain.random.nextInt(Math.abs(lineXVarient))*(int)Math.signum(lineXVarient));
+                dy2=(int)(sy+((float)((ey-sy)*(n+1))/(float)segCount))+(GeneratorMain.random.nextInt(Math.abs(lineYVarient))*(int)Math.signum(lineYVarient));
             }
             
             this.drawLineColor(dx,dy,dx2,dy2,color);
@@ -2371,7 +2367,7 @@ public class BitmapBase
         writeImageData(colorData,(path+"_color.png"));
         if (hasNormal) writeImageData(normalData,(path+"_normal.png"));
         if (hasMetallicRoughness) writeImageData(metallicRoughnessData,(path+"_metallic_roughness.png"));
-        if (hasGlow) writeImageData(glowData,(path+"_glow.png"));
+        if (hasGlow) writeImageData(glowData,(path+"_emissive.png"));
     }
 
 }

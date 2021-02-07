@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.bitmaps;
 
+import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
@@ -8,9 +9,9 @@ public class BitmapStone extends BitmapBase
 {
     public final static int VARIATION_NONE=0;
     
-    public BitmapStone(int colorScheme,Random random)
+    public BitmapStone()
     {
-        super(colorScheme,random);
+        super();
         
         hasNormal=true;
         hasMetallicRoughness=true;
@@ -61,7 +62,7 @@ public class BitmapStone extends BitmapBase
         
             // draw the stones
             
-        yCount=4+random.nextInt(4);
+        yCount=4+GeneratorMain.random.nextInt(4);
         yAdd=textureSize/yCount;
         
         top=0;
@@ -73,7 +74,7 @@ public class BitmapStone extends BitmapBase
             lft=0;
             
             while (true) {
-                rgt=lft+(yAdd+(int)(random.nextFloat()*((float)yAdd*0.8f)));
+                rgt=lft+(yAdd+(int)(GeneratorMain.random.nextFloat()*((float)yAdd*0.8f)));
                 if (rgt>=textureSize) rgt=textureSize-1;
 
                     // special check if next stone would be too small,
@@ -83,15 +84,15 @@ public class BitmapStone extends BitmapBase
                 
                     // the stone itself
                     
-                drawStoneColor=adjustColorRandom(((random.nextFloat()<0.7f)?stoneColor:altStoneColor),0.7f,1.2f);
+                drawStoneColor=adjustColorRandom(((GeneratorMain.random.nextFloat()<0.7f)?stoneColor:altStoneColor),0.7f,1.2f);
 
-                xOff=(int)(random.nextFloat()*((float)textureSize*0.01f));
-                yOff=(int)(random.nextFloat()*((float)textureSize*0.01f));
+                xOff=(int)(GeneratorMain.random.nextFloat()*((float)textureSize*0.01f));
+                yOff=(int)(GeneratorMain.random.nextFloat()*((float)textureSize*0.01f));
 
-                edgeSize=(int)((random.nextFloat()*((float)textureSize*0.1f))+(random.nextFloat()*((float)textureSize*0.2f)));     // new edge size as stones aren't the same
-                xRoundFactor=0.02f+(random.nextFloat()*0.05f);
-                yRoundFactor=0.02f+(random.nextFloat()*0.05f);
-                normalZFactor=(random.nextFloat()*0.2f);           // different z depths
+                edgeSize=(int)((GeneratorMain.random.nextFloat()*((float)textureSize*0.1f))+(GeneratorMain.random.nextFloat()*((float)textureSize*0.2f)));     // new edge size as stones aren't the same
+                xRoundFactor=0.02f+(GeneratorMain.random.nextFloat()*0.05f);
+                yRoundFactor=0.02f+(GeneratorMain.random.nextFloat()*0.05f);
+                normalZFactor=(GeneratorMain.random.nextFloat()*0.2f);           // different z depths
                 
                     // draw on the background
                     
