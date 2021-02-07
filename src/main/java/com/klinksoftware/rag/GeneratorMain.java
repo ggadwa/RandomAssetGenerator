@@ -14,15 +14,16 @@ public class GeneratorMain
     private static final String modelName="test";
     private static final int roomCount=20;
     
-    public static int               colorScheme=BitmapBase.COLOR_SCHEME_RANDOM;
-    public static Random            random;
+    public static int                   colorScheme=BitmapBase.COLOR_SCHEME_RANDOM;
+    public static Map<String,Object>    settings;
+    public static Random                random;
     
-    public static String getSettingJson()
+    public static String getSettingJson(String name)
     {
         File        jsonFile;
         
         try {
-            jsonFile=new File(GeneratorMain.class.getClassLoader().getResource("data/settings.json").getFile());
+            jsonFile=new File(GeneratorMain.class.getClassLoader().getResource("data/"+name+"_settings.json").getFile());
             return(new String(Files.readAllBytes(jsonFile.toPath())));
         }
         catch(Exception e)
@@ -32,31 +33,41 @@ public class GeneratorMain
         }
     }
     
-    public static void run()
+    public static void runMap(String jsonSettingsStr)
     {
-        String          basePath;
-        File            file;
-        MapBuilder      mapBuilder;
+        String              basePath,name;
+        File                file;
+        MapBuilder          mapBuilder;
         
-        System.out.println("start!");
+        System.out.println("starting map build");
+        
+            // get the json settings
+            
+        try {
+            settings=(new ObjectMapper()).readValue(jsonSettingsStr,new TypeReference<Map<String,Object>>(){});
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return;
+        }
         
             // seed the random
             
-        random=new Random(Calendar.getInstance().getTimeInMillis());
+        random=new Random((int)settings.get("seed"));
         
             // create the model directory
         
-        basePath="output"+File.separator+modelName;
+        name=(String)settings.get("name");
+        basePath="output"+File.separator+name;
         
         file=new File(basePath+File.separator+"textures");
         if (!file.exists()) file.mkdirs();
         
             // run the map creation
             
-        
-        
         mapBuilder=new MapBuilder(basePath);
-        mapBuilder.build(modelName,roomCount);
+        mapBuilder.build();
         
         
         
@@ -76,6 +87,6 @@ public class GeneratorMain
         (new BitmapComputer(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"computer_panel");
 */
         
-        System.out.println("done!");
+        System.out.println("finished map build");
     }
 }

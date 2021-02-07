@@ -11,8 +11,6 @@ public class MapBuilder
 {
     public static final int         ROOM_RANDOM_LOCATION_DISTANCE=100;
     
-    public static float             segmentSize=10.0f;
-    
     private String                  basePath;
     private MeshList                meshList;
     private MapBitmapList           mapBitmapList;
@@ -23,16 +21,13 @@ public class MapBuilder
         this.basePath=basePath;
     }
 
-/*
-    
-    
-    
         //
         // mesh building utilities
         //
         
-    removeSharedWalls(rooms,segmentSize)
+    private void removeSharedWalls(ArrayList<MapRoom> rooms,float segmentSize)
     {
+        /*
         let n,k,t,y,room,room2;
         let vIdx,vIdx2,nextIdx,nextIdx2,nVertex,nVertex2;
         let ax,az,ax2,az2,bx,bz,bx2,bz2;
@@ -100,12 +95,13 @@ public class MapBuilder
                 }
             }
         }
+        */
     }
     
         //
         // room decorations
         //
-        
+/*        
     buildDecoration(room,roomIdx,genMesh,genBitmap,segmentSize)
     {
             // build the decoration
@@ -197,7 +193,7 @@ public class MapBuilder
         // add additional room
         //
     
-    private void addAdditionalRoom(ArrayList<MapRoom> rooms,MapRoom room,MapRoom touchRoom)
+    private void addAdditionalRoom(ArrayList<MapRoom> rooms,MapRoom room,MapRoom touchRoom,float segmentSize)
     {
             // start at same height
             
@@ -221,11 +217,12 @@ public class MapBuilder
         // build a map
         //
         
-    public void build(String mapName,int roomCount)
+    public void build()
     {
-        int                 n,failCount,placeCount,moveCount,
-                            touchIdx;
-        float               roomTopY,origX,origZ,xAdd,zAdd;
+        int                 n,roomCount,maxRoomCount,touchIdx,
+                            failCount,placeCount,moveCount;
+        float               segmentSize,roomTopY,origX,origZ,xAdd,zAdd;
+        String              mapName;
         RagPoint            centerPnt;
         MapRoom             room;
         ArrayList<MapRoom>  rooms;
@@ -235,6 +232,12 @@ public class MapBuilder
         mapBitmapList=new MapBitmapList(basePath);
         mapPieceList=new MapPieceList();
         
+            // some settings
+         
+        mapName=(String)GeneratorMain.settings.get("name");
+        maxRoomCount=(int)GeneratorMain.settings.get("maxRoomCount");
+        segmentSize=((Double)GeneratorMain.settings.get("segmentSize")).floatValue();
+        
             // no rooms or meshes
             
         rooms=new ArrayList<>();
@@ -242,7 +245,7 @@ public class MapBuilder
         
              // first room in center of map
             
-        room=new MapRoom(mapPieceList.getDefaultPiece());
+        room=new MapRoom(mapPieceList.getDefaultPiece(),segmentSize);
         room.offset.setFromValues(0.0f,0.0f,0.0f);
         rooms.add(room);
         
@@ -251,9 +254,9 @@ public class MapBuilder
        
         failCount=25;
         
-        while ((rooms.size()<roomCount) && (failCount>0)) {
+        while ((rooms.size()<maxRoomCount) && (failCount>0)) {
                 
-            room=new MapRoom(mapPieceList.getRandomPiece());
+            room=new MapRoom(mapPieceList.getRandomPiece(),segmentSize);
             
             placeCount=10;
             
@@ -297,7 +300,7 @@ public class MapBuilder
                     touchIdx=room.touches(rooms);
                     if (touchIdx!=-1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            addAdditionalRoom(rooms,room,rooms.get(touchIdx));
+                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),segmentSize);
                             break;
                         }
                     }
@@ -311,7 +314,7 @@ public class MapBuilder
                     touchIdx=room.touches(rooms);
                     if (touchIdx!=-1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            addAdditionalRoom(rooms,room,rooms.get(touchIdx));
+                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),segmentSize);
                             break;
                         }
                     }
@@ -329,9 +332,8 @@ public class MapBuilder
         }
 
             // eliminate all combined walls
-/*            
-        this.removeSharedWalls(rooms,segmentSize);
-*/      
+           
+        removeSharedWalls(rooms,segmentSize);
 
             // maps always need walls, floors, ceilings
             // and steps
@@ -353,7 +355,7 @@ public class MapBuilder
                 
                 // meshes
 
-            MeshUtility.buildRoomWalls(meshList,room,centerPnt,("wall_"+Integer.toString(n)));
+            MeshUtility.buildRoomWalls(meshList,room,centerPnt,("wall_"+Integer.toString(n)),segmentSize);
             //genMesh.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),genBitmap.generateFloor(),room.offset.y,segmentSize);
             //genMesh.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),genBitmap.generateCeiling(),roomTopY,segmentSize);
             

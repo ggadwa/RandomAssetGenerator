@@ -232,7 +232,7 @@ public class MeshUtility
         return(trigIdx+4);
     }
 
-    public static int addBox(MeshList meshList,String name,String bitmapName,float negX,float posX,float negY,float posY,float negZ,float posZ,boolean isNegX,boolean isPosX,boolean isNegY,boolean isPosY,boolean isNegZ,boolean isPosZ)
+    public static int addBox(MeshList meshList,String name,String bitmapName,float negX,float posX,float negY,float posY,float negZ,float posZ,boolean isNegX,boolean isPosX,boolean isNegY,boolean isPosY,boolean isNegZ,boolean isPosZ,float segmentSize)
     {
         int                     trigIdx;
         FloatBuffer             vertexBuf;
@@ -281,7 +281,7 @@ public class MeshUtility
         centerPnt=new RagPoint(((negX+posX)*0.5f),((negY+posY)*0.5f),((negZ+posZ)*0.5f));
      
         normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.segmentSize));
+        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
 
         return(meshList.add(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes,false)));
     }
@@ -306,12 +306,12 @@ public class MeshUtility
         this.addQuadToIndexes(indexArray,0);
         
         normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/MapBuilder.segmentSize));
+        uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/segmentSize));
         
         this.core.game.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
 */    
-    public static void buildRoomWalls(MeshList meshList,MapRoom room,RagPoint centerPnt,String name)
+    public static void buildRoomWalls(MeshList meshList,MapRoom room,RagPoint centerPnt,String name,float segmentSize)
     {
         int             n,k,k2,vertexCount,trigIdx;
         float           y;
@@ -338,15 +338,15 @@ public class MeshUtility
                 
                 if (room.isWallHidden(n,k)) continue;
                 
-                vertexBuf.put(new float[]{((piece.vertexes[k][0]*MapBuilder.segmentSize)+room.offset.x),(y+MapBuilder.segmentSize),((piece.vertexes[k][1]*MapBuilder.segmentSize)+room.offset.z)});
-                vertexBuf.put(new float[]{((piece.vertexes[k2][0]*MapBuilder.segmentSize)+room.offset.x),(y+MapBuilder.segmentSize),((piece.vertexes[k2][1]*MapBuilder.segmentSize)+room.offset.z)});
-                vertexBuf.put(new float[]{((piece.vertexes[k2][0]*MapBuilder.segmentSize)+room.offset.x),y,((piece.vertexes[k2][1]*MapBuilder.segmentSize)+room.offset.z)});
-                vertexBuf.put(new float[]{((piece.vertexes[k][0]*MapBuilder.segmentSize)+room.offset.x),y,((piece.vertexes[k][1]*MapBuilder.segmentSize)+room.offset.z)});
+                vertexBuf.put(new float[]{((piece.vertexes[k][0]*segmentSize)+room.offset.x),(y+segmentSize),((piece.vertexes[k][1]*segmentSize)+room.offset.z)});
+                vertexBuf.put(new float[]{((piece.vertexes[k2][0]*segmentSize)+room.offset.x),(y+segmentSize),((piece.vertexes[k2][1]*segmentSize)+room.offset.z)});
+                vertexBuf.put(new float[]{((piece.vertexes[k2][0]*segmentSize)+room.offset.x),y,((piece.vertexes[k2][1]*segmentSize)+room.offset.z)});
+                vertexBuf.put(new float[]{((piece.vertexes[k][0]*segmentSize)+room.offset.x),y,((piece.vertexes[k][1]*segmentSize)+room.offset.z)});
 
                 trigIdx=addQuadToIndexes(indexBuf,trigIdx);
             }
 
-            y+=MapBuilder.segmentSize;
+            y+=segmentSize;
         }
         
         if (trigIdx==0) return;
@@ -354,7 +354,7 @@ public class MeshUtility
         vertexes=vertexBuf.array();
         indexes=indexBuf.array();
         normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.segmentSize));
+        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         
         meshList.add(new Mesh(name,"wall",vertexBuf.array(),normals,uvs,indexBuf.array(),false));
     }
@@ -373,8 +373,8 @@ public class MeshUtility
         let uvArray;
         let tangentArray;
         let indexArray=[];
-        let stepSize=Math.trunc((MapBuilder.segmentSize*10)*0.02);
-        let stepHigh=Math.trunc(MapBuilder.segmentSize/this.STAIR_STEP_COUNT);
+        let stepSize=Math.trunc((segmentSize*10)*0.02);
+        let stepHigh=Math.trunc(segmentSize/this.STAIR_STEP_COUNT);
 
             // initial locations
 
@@ -382,14 +382,14 @@ public class MeshUtility
             case this.STAIR_DIR_POS_Z:
             case this.STAIR_DIR_NEG_Z:
                 sx=x;
-                sx2=sx+(MapBuilder.segmentSize*stepWidth);
-                centerPnt=new PointClass(Math.trunc(x+(MapBuilder.segmentSize*0.5)),room.offset.y,Math.trunc(z+MapBuilder.segmentSize));
+                sx2=sx+(segmentSize*stepWidth);
+                centerPnt=new PointClass(Math.trunc(x+(segmentSize*0.5)),room.offset.y,Math.trunc(z+segmentSize));
                 break;
             case this.STAIR_DIR_POS_X:
             case this.STAIR_DIR_NEG_X:
                 sz=z;
-                sz2=sz+(MapBuilder.segmentSize*stepWidth);
-                centerPnt=new PointClass(Math.trunc(x+MapBuilder.segmentSize),room.offset.y,Math.trunc(z+(MapBuilder.segmentSize*0.5)));
+                sz2=sz+(segmentSize*stepWidth);
+                centerPnt=new PointClass(Math.trunc(x+segmentSize),room.offset.y,Math.trunc(z+(segmentSize*0.5)));
                 break;
         }
         
@@ -408,7 +408,7 @@ public class MeshUtility
                     sz2=sz+stepSize;
                     break;
                 case this.STAIR_DIR_NEG_Z:
-                    sz=(z+(MapBuilder.segmentSize*2))-(n*stepSize);
+                    sz=(z+(segmentSize*2))-(n*stepSize);
                     sz2=sz-stepSize;
                     break;
                 case this.STAIR_DIR_POS_X:
@@ -416,7 +416,7 @@ public class MeshUtility
                     sx2=sx+stepSize;
                     break;
                 case this.STAIR_DIR_NEG_X:
-                    sx=(x+(MapBuilder.segmentSize*2))-(n*stepSize);
+                    sx=(x+(segmentSize*2))-(n*stepSize);
                     sx2=sx-stepSize;
                     break;
             }
@@ -487,34 +487,34 @@ public class MeshUtility
             // step back
         
         if (sides) {
-            sy=y+MapBuilder.segmentSize;
+            sy=y+segmentSize;
             
             switch (dir) {
                 case this.STAIR_DIR_POS_Z:
-                    sx=x+(MapBuilder.segmentSize*stepWidth);
-                    sz=z+(MapBuilder.segmentSize*2);
+                    sx=x+(segmentSize*stepWidth);
+                    sz=z+(segmentSize*2);
                     vertexArray.push(x,y,sz);
                     vertexArray.push(sx,y,sz);
                     vertexArray.push(sx,sy,sz);
                     vertexArray.push(x,sy,sz);
                     break;
                 case this.STAIR_DIR_NEG_Z:
-                    sx=x+(MapBuilder.segmentSize*stepWidth);
+                    sx=x+(segmentSize*stepWidth);
                     vertexArray.push(x,y,z);
                     vertexArray.push(sx,y,z);
                     vertexArray.push(sx,sy,z);
                     vertexArray.push(x,sy,z);
                     break;
                 case this.STAIR_DIR_POS_X:
-                    sx=x+(MapBuilder.segmentSize*2);
-                    sz=z+(MapBuilder.segmentSize*stepWidth);
+                    sx=x+(segmentSize*2);
+                    sz=z+(segmentSize*stepWidth);
                     vertexArray.push(sx,y,z);
                     vertexArray.push(sx,y,sz);
                     vertexArray.push(sx,sy,sz);
                     vertexArray.push(sx,sy,z);
                     break;
                 case this.STAIR_DIR_NEG_X:
-                    sz=z+(MapBuilder.segmentSize*stepWidth);
+                    sz=z+(segmentSize*stepWidth);
                     vertexArray.push(x,y,z);
                     vertexArray.push(x,y,sz);
                     vertexArray.push(x,sy,sz);
@@ -528,7 +528,7 @@ public class MeshUtility
             // create the mesh
             
         normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/MapBuilder.segmentSize));
+        uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/segmentSize));
         
         this.core.game.map.meshList.add(new MeshClass(this.core,name,stepBitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
@@ -711,7 +711,7 @@ public class MeshUtility
             // create the mesh
 
         normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,normalsIn);
-        if (uvMode===this.UV_MAP) uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/MapBuilder.segmentSize));
+        if (uvMode===this.UV_MAP) uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/segmentSize));
         
         mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
         this.core.game.map.meshList.add(mesh);

@@ -15,7 +15,9 @@ public class AppWindow implements WindowListener
     
     private JFrame          frame;
     private JToolBar        toolBar;
-    private JTextArea       textArea;
+    private JTabbedPane     tab;
+    private JScrollPane     mapTextScroll,modelTextScroll;
+    private JTextArea       mapTextArea,modelTextArea;
     
         //
         // window events
@@ -65,7 +67,12 @@ public class AppWindow implements WindowListener
     {
         switch (buttonId) {
             case TOOL_BUTTON_RUN:
-                GeneratorMain.run();
+                if (tab.getSelectedIndex()==0) {
+                    GeneratorMain.runMap(mapTextArea.getText());
+                }
+                else {
+                    // todo -- nothing yet
+                }
                 break;
         }
     }
@@ -95,7 +102,6 @@ public class AppWindow implements WindowListener
     {
         URL                 iconURL;
         Image               image;
-        JScrollPane         textScroll;
         GridBagConstraints  gbc;
         
         try {
@@ -138,6 +144,7 @@ public class AppWindow implements WindowListener
         toolBar.setMinimumSize(new Dimension(Integer.MAX_VALUE,TOOLBAR_HEIGHT));
         toolBar.setMaximumSize(new Dimension(Integer.MAX_VALUE,TOOLBAR_HEIGHT));
         
+        toolBar.add(Box.createHorizontalGlue());
         addToolButton("tool_run",TOOL_BUTTON_RUN,"Run");
         
         gbc=new GridBagConstraints();
@@ -148,27 +155,53 @@ public class AppWindow implements WindowListener
         gbc.weighty=0.0;
         frame.add(toolBar,gbc);
         
-            // json
+            // tabs
             
-        textArea=new JTextArea();
+        tab=new JTabbedPane();
+        tab.setFont(new Font("Arial",Font.PLAIN,18));
+        tab.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
+        tab.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
+        tab.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         
-        textArea.setText(GeneratorMain.getSettingJson());
+            // map json
+            
+        mapTextArea=new JTextArea();
+        mapTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
+        mapTextArea.setText(GeneratorMain.getSettingJson("map"));
         
-        textScroll=new JScrollPane(textArea); 
-        textScroll.setBorder(BorderFactory.createMatteBorder(1,0,0,0,Color.DARK_GRAY));
-        textScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        textScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        textScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
-        textScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
-        textScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        mapTextScroll=new JScrollPane(mapTextArea); 
+        mapTextScroll.setBorder(BorderFactory.createEmptyBorder());
+        mapTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        mapTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        mapTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
+        mapTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
+        mapTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         
+        tab.addTab("Map",null,mapTextScroll,"Map Creation Settings");
+        
+            // model json
+            
+        modelTextArea=new JTextArea();
+        modelTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
+        modelTextArea.setText(GeneratorMain.getSettingJson("model"));
+        
+        modelTextScroll=new JScrollPane(modelTextArea); 
+        modelTextScroll.setBorder(BorderFactory.createEmptyBorder());
+        modelTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        modelTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        modelTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
+        modelTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
+        modelTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        
+        tab.addTab("Model",null,modelTextScroll,"Model Creation Settings");
+                
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
         gbc.gridx=0;
         gbc.gridy=1;
         gbc.weightx=1.0;
         gbc.weighty=1.0;
-        frame.add(textScroll,gbc);
+        frame.add(tab,gbc);
 
             // all the event listeners
             

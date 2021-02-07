@@ -8,6 +8,8 @@ public class MapRoom
 {
     public static final int     MAX_STORIES=5;
     
+    private float               segmentSize;
+    
     public int                  storyCount;
     public byte[]               vertexHideArray;
     public int[]                grid;
@@ -15,14 +17,15 @@ public class MapRoom
     public RagPoint             offset,size;
     public ArrayList<MapRoom>   requiredStairs;
     
-    public MapRoom(MapPiece piece)
+    public MapRoom(MapPiece piece,float segmentSize)
     {
         this.piece=piece;
+        this.segmentSize=segmentSize;
 
         this.storyCount=this.piece.storyMinimum+GeneratorMain.random.nextInt(MAX_STORIES-this.piece.storyMinimum);
         
         this.offset=new RagPoint(0.0f,0.0f,0.0f);
-        this.size=new RagPoint((MapBuilder.segmentSize*piece.size.x),(MapBuilder.segmentSize*this.storyCount),(MapBuilder.segmentSize*piece.size.z));
+        this.size=new RagPoint((segmentSize*piece.size.x),(segmentSize*this.storyCount),(segmentSize*piece.size.z));
 
             // flags for staircases
             
@@ -105,11 +108,11 @@ public class MapRoom
             nextIdx=vIdx+1;
             if (nextIdx==vertexCount) nextIdx=0;
 
-            ax=(piece.vertexes[vIdx][0]*MapBuilder.segmentSize)+offset.x;
-            az=(piece.vertexes[vIdx][1]*MapBuilder.segmentSize)+offset.z;
+            ax=(piece.vertexes[vIdx][0]*segmentSize)+offset.x;
+            az=(piece.vertexes[vIdx][1]*segmentSize)+offset.z;
 
-            ax2=(piece.vertexes[nextIdx][0]*MapBuilder.segmentSize)+offset.x;
-            az2=(piece.vertexes[nextIdx][1]*MapBuilder.segmentSize)+offset.z;
+            ax2=(piece.vertexes[nextIdx][0]*segmentSize)+offset.x;
+            az2=(piece.vertexes[nextIdx][1]*segmentSize)+offset.z;
 
             vIdx2=0;
 
@@ -117,11 +120,11 @@ public class MapRoom
                 nextIdx2=vIdx2+1;
                 if (nextIdx2==vertexCount2) nextIdx2=0;
 
-                bx=(checkRoom.piece.vertexes[vIdx2][0]*MapBuilder.segmentSize)+checkRoom.offset.x;
-                bz=(checkRoom.piece.vertexes[vIdx2][1]*MapBuilder.segmentSize)+checkRoom.offset.z;
+                bx=(checkRoom.piece.vertexes[vIdx2][0]*segmentSize)+checkRoom.offset.x;
+                bz=(checkRoom.piece.vertexes[vIdx2][1]*segmentSize)+checkRoom.offset.z;
 
-                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*MapBuilder.segmentSize)+checkRoom.offset.x;
-                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*MapBuilder.segmentSize)+checkRoom.offset.z;
+                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*segmentSize)+checkRoom.offset.x;
+                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*segmentSize)+checkRoom.offset.z;
 
                 if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) return(true);
 
@@ -155,11 +158,11 @@ public class MapRoom
             nextIdx=vIdx+1;
             if (nextIdx==vertexCount) nextIdx=0;
 
-            ax=(piece.vertexes[vIdx][0]*MapBuilder.segmentSize)+offset.x;
-            az=(piece.vertexes[vIdx][1]*MapBuilder.segmentSize)+offset.z;
+            ax=(piece.vertexes[vIdx][0]*segmentSize)+offset.x;
+            az=(piece.vertexes[vIdx][1]*segmentSize)+offset.z;
 
-            ax2=(piece.vertexes[nextIdx][0]*MapBuilder.segmentSize)+offset.x;
-            az2=(piece.vertexes[nextIdx][1]*MapBuilder.segmentSize)+offset.z;
+            ax2=(piece.vertexes[nextIdx][0]*segmentSize)+offset.x;
+            az2=(piece.vertexes[nextIdx][1]*segmentSize)+offset.z;
 
             vIdx2=0;
 
@@ -167,11 +170,11 @@ public class MapRoom
                 nextIdx2=vIdx2+1;
                 if (nextIdx2==vertexCount2) nextIdx2=0;
 
-                bx=(checkRoom.piece.vertexes[vIdx2][0]*MapBuilder.segmentSize)+checkRoom.offset.x;
-                bz=(checkRoom.piece.vertexes[vIdx2][1]*MapBuilder.segmentSize)+checkRoom.offset.z;
+                bx=(checkRoom.piece.vertexes[vIdx2][0]*segmentSize)+checkRoom.offset.x;
+                bz=(checkRoom.piece.vertexes[vIdx2][1]*segmentSize)+checkRoom.offset.z;
 
-                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*MapBuilder.segmentSize)+checkRoom.offset.x;
-                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*MapBuilder.segmentSize)+checkRoom.offset.z;
+                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*segmentSize)+checkRoom.offset.x;
+                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*segmentSize)+checkRoom.offset.z;
 
                 if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) {
                     if (xRun) {

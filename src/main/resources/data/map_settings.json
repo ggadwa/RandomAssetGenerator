@@ -1,0 +1,7 @@
+{
+    "name": "test2",
+    "seed": 123456789,
+    "colorScheme": "random",
+    "maxRoomCount": 25,
+    "segmentSize": 10.0
+}
