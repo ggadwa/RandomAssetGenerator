@@ -11,6 +11,7 @@ public class MapPiece
     
     public MapPiece clone()
     {
+        int             n;
         MapPiece        piece;
         
         piece=new MapPiece();
@@ -18,8 +19,13 @@ public class MapPiece
         piece.storyMinimum=storyMinimum;
         piece.size=size.clone();
         piece.margins=margins.clone();
-        piece.vertexes=vertexes.clone();
         piece.decorate=decorate;
+        
+        piece.vertexes=vertexes.clone();        // need to make sure we are really duplicating this array
+        for (n=0;n!=vertexes.length;n++) {
+            piece.vertexes[n]=vertexes[n].clone();
+            
+        }
         
         return(piece);
     }

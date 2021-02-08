@@ -11,9 +11,6 @@ import com.fasterxml.jackson.databind.*;
 
 public class GeneratorMain
 {
-    private static final String modelName="test";
-    private static final int roomCount=20;
-    
     public static int                   colorScheme=BitmapBase.COLOR_SCHEME_RANDOM;
     public static Map<String,Object>    settings;
     public static Random                random;
@@ -35,6 +32,7 @@ public class GeneratorMain
     
     public static void runMap(String jsonSettingsStr)
     {
+        long                seed;
         String              basePath,name;
         File                file;
         MapBuilder          mapBuilder;
@@ -53,8 +51,16 @@ public class GeneratorMain
         }
         
             // seed the random
+            // if seed == 0, then seed is set randomly
             
-        random=new Random((int)settings.get("seed"));
+        seed=(int)settings.get("seed");
+        if (seed==0) seed=Calendar.getInstance().getTimeInMillis();
+        
+        random=new Random(seed);
+        
+            // the color scheme
+            
+        colorScheme=BitmapBase.getColorScheme((String)settings.get("colorScheme"));
         
             // create the model directory
         
@@ -65,10 +71,15 @@ public class GeneratorMain
         if (!file.exists()) file.mkdirs();
         
             // run the map creation
-            
-        mapBuilder=new MapBuilder(basePath);
-        mapBuilder.build();
-        
+       
+        try {
+            mapBuilder=new MapBuilder(basePath);
+            mapBuilder.build();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         
         
 /*
@@ -89,4 +100,5 @@ public class GeneratorMain
         
         System.out.println("finished map build");
     }
+
 }

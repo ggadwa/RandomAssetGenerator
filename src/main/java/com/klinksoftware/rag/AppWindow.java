@@ -15,6 +15,7 @@ public class AppWindow implements WindowListener
     
     private JFrame          frame;
     private JToolBar        toolBar;
+    private JButton         runButton;
     private JTabbedPane     tab;
     private JScrollPane     mapTextScroll,modelTextScroll;
     private JTextArea       mapTextArea,modelTextArea;
@@ -67,17 +68,12 @@ public class AppWindow implements WindowListener
     {
         switch (buttonId) {
             case TOOL_BUTTON_RUN:
-                if (tab.getSelectedIndex()==0) {
-                    GeneratorMain.runMap(mapTextArea.getText());
-                }
-                else {
-                    // todo -- nothing yet
-                }
+                (new GeneratorRun(runButton,tab,mapTextArea,modelTextArea)).execute();
                 break;
         }
     }
     
-    private void addToolButton(String iconName,int buttonId,String toolTipText)
+    private JButton addToolButton(String iconName,int buttonId,String toolTipText)
     {
         URL                 iconURL;
         JButton             button;
@@ -92,6 +88,8 @@ public class AppWindow implements WindowListener
         button.addActionListener(e->toolBarClick(buttonId));
         
         toolBar.add(button);
+        
+        return(button);
     }
 
         //
@@ -145,7 +143,7 @@ public class AppWindow implements WindowListener
         toolBar.setMaximumSize(new Dimension(Integer.MAX_VALUE,TOOLBAR_HEIGHT));
         
         toolBar.add(Box.createHorizontalGlue());
-        addToolButton("tool_run",TOOL_BUTTON_RUN,"Run");
+        runButton=addToolButton("tool_run",TOOL_BUTTON_RUN,"Run");
         
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;

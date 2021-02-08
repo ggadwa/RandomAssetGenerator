@@ -137,7 +137,7 @@ public class MapRoom
         return(false);
     }
     
-    public float[] getTouchWallRange(MapRoom checkRoom,boolean xRun)
+    public RagBound getTouchWallRange(MapRoom checkRoom,boolean xRun)
     {
         int                 n,vIdx,vIdx2,nextIdx,nextIdx2,
                             vertexCount,vertexCount2;
@@ -203,7 +203,7 @@ public class MapRoom
             if (f>touchMax) touchMax=f;
         }
         
-        return(new float[]{touchMin,touchMax});
+        return(new RagBound(touchMin,touchMax));
     }
     
         //

@@ -17,6 +17,8 @@ public class BitmapBase
     public static final int COLOR_SCHEME_GRAY=2;
     public static final int COLOR_SCHEME_PASTEL=3;
     
+    public static final String[] COLOR_SCHEME_LIST={"random","doom","gray","pastel"};
+    
     public static final int COLOR_SCHEME_COUNT=4;
 
     public static final RagPoint NORMAL_CLEAR=new RagPoint(0.0f,0.0f,1.0f);
@@ -94,6 +96,20 @@ public class BitmapBase
             
         perlinNoiseColorFactor=null;
         noiseNormals=null;
+    }
+    
+        //
+        // static color scheme lookup
+        //
+    
+    public static int getColorScheme(String colorSchemeName)
+    {
+        int     idx;
+        
+        idx=Arrays.asList(COLOR_SCHEME_LIST).indexOf(colorSchemeName);
+        if (idx==-1) idx=COLOR_SCHEME_RANDOM;
+        
+        return(idx);
     }
     
         //

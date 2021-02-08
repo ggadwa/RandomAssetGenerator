@@ -289,31 +289,35 @@ public class MeshUtility
         //
         // room pieces
         //
-   /*     
-    public static void buildRoomFloorCeiling(room,centerPnt,name,bitmap,y)
+   
+    public static void buildRoomFloorCeiling(MeshList meshList,MapRoom room,RagPoint centerPnt,String name,String bitmapName,float y,float segmentSize)
     {
-        let vertexArray=[];
-        let normalArray;
-        let uvArray;
-        let tangentArray;
-        let indexArray=[];
+        FloatBuffer     vertexBuf;
+        IntBuffer       indexBuf;
+        int[]           indexes;
+        float[]         vertexes,normals,uvs;
         
-        vertexArray.push(room.offset.x,y,room.offset.z);
-        vertexArray.push((room.offset.x+room.size.x),y,room.offset.z);
-        vertexArray.push((room.offset.x+room.size.x),y,(room.offset.z+room.size.z));
-        vertexArray.push(room.offset.x,y,(room.offset.z+room.size.z));
+        vertexBuf=FloatBuffer.allocate(12);
+        indexBuf=IntBuffer.allocate(6);
+        
+        vertexBuf.put(new float[]{room.offset.x,y,room.offset.z});
+        vertexBuf.put(new float[]{(room.offset.x+room.size.x),y,room.offset.z});
+        vertexBuf.put(new float[]{(room.offset.x+room.size.x),y,(room.offset.z+room.size.z)});
+        vertexBuf.put(new float[]{room.offset.x,y,(room.offset.z+room.size.z)});
 
-        this.addQuadToIndexes(indexArray,0);
+        addQuadToIndexes(indexBuf,0);
         
-        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/segmentSize));
+        vertexes=vertexBuf.array();
+        indexes=indexBuf.array();
+        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         
-        this.core.game.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
+        meshList.add(new Mesh(name,bitmapName,vertexBuf.array(),normals,uvs,indexBuf.array(),false));
     }
-*/    
+   
     public static void buildRoomWalls(MeshList meshList,MapRoom room,RagPoint centerPnt,String name,float segmentSize)
     {
-        int             n,k,k2,vertexCount,trigIdx;
+        int             n,k,k2,wallCount,vertexCount,trigIdx;
         float           y;
         FloatBuffer     vertexBuf;
         IntBuffer       indexBuf;
@@ -324,8 +328,22 @@ public class MeshUtility
         piece=room.piece;
         vertexCount=piece.vertexes.length;
         
-        vertexBuf=FloatBuffer.allocate(room.storyCount*(vertexCount*12));
-        indexBuf=IntBuffer.allocate(room.storyCount*(vertexCount*6));
+            // need to determine how many walls are knocked out
+            
+        wallCount=0;
+        
+        for (n=0;n!=room.storyCount;n++) {
+            for (k=0;k!=vertexCount;k++) {
+                if (!room.isWallHidden(n,k)) wallCount++;
+            }
+        }
+        
+        if (wallCount==0) return;
+        
+            // now build the walls
+        
+        vertexBuf=FloatBuffer.allocate(wallCount*12);
+        indexBuf=IntBuffer.allocate(wallCount*6);
 
         trigIdx=0;
         y=room.offset.y;
@@ -333,10 +351,10 @@ public class MeshUtility
         for (n=0;n!=room.storyCount;n++) {
             
             for (k=0;k!=vertexCount;k++) {
+                if (room.isWallHidden(n,k)) continue;
+                
                 k2=k+1;
                 if (k2==vertexCount) k2=0;
-                
-                if (room.isWallHidden(n,k)) continue;
                 
                 vertexBuf.put(new float[]{((piece.vertexes[k][0]*segmentSize)+room.offset.x),(y+segmentSize),((piece.vertexes[k][1]*segmentSize)+room.offset.z)});
                 vertexBuf.put(new float[]{((piece.vertexes[k2][0]*segmentSize)+room.offset.x),(y+segmentSize),((piece.vertexes[k2][1]*segmentSize)+room.offset.z)});
@@ -362,123 +380,112 @@ public class MeshUtility
         //
         // staircases
         //
-/*        
-    buildStairs(room,name,stepBitmap,x,y,z,dir,stepWidth,sides)
+     
+    public static void buildStairs(MeshList meshList,MapRoom room,String name,float x,float y,float z,int dir,float stepWidth,boolean sides,float segmentSize)
     {
-        let n,trigIdx;
-        let sx,sx2,sy,sz,sz2;
-        let centerPnt;
-        let vertexArray=[];
-        let normalArray;
-        let uvArray;
-        let tangentArray;
-        let indexArray=[];
-        let stepSize=Math.trunc((segmentSize*10)*0.02);
-        let stepHigh=Math.trunc(segmentSize/this.STAIR_STEP_COUNT);
+        int             n,trigIdx;
+        float           sx,sx2,sy,sz,sz2,
+                        stepSize,stepHigh;
+        FloatBuffer     vertexBuf;
+        IntBuffer       indexBuf;
+        int[]           indexes;
+        float[]         vertexes,normals,uvs;
+        RagPoint        centerPnt;
+        
+            // step sizes
+            
+        stepSize=(segmentSize*10.0f)*0.02f;
+        stepHigh=segmentSize/(float)STAIR_STEP_COUNT;
+        
+        centerPnt=null;
+
+            // allocate proper buffers
+            
+        vertexBuf=FloatBuffer.allocate((STAIR_STEP_COUNT*24)+(sides?((STAIR_STEP_COUNT*24)+12):0));
+        indexBuf=IntBuffer.allocate((STAIR_STEP_COUNT*12)+(sides?((STAIR_STEP_COUNT*12)+6):0));
 
             // initial locations
 
         switch (dir) {
-            case this.STAIR_DIR_POS_Z:
-            case this.STAIR_DIR_NEG_Z:
+            case STAIR_DIR_POS_Z:
+            case STAIR_DIR_NEG_Z:
                 sx=x;
                 sx2=sx+(segmentSize*stepWidth);
-                centerPnt=new PointClass(Math.trunc(x+(segmentSize*0.5)),room.offset.y,Math.trunc(z+segmentSize));
+                centerPnt=new RagPoint((x+(segmentSize*0.5f)),room.offset.y,(z+segmentSize));
                 break;
-            case this.STAIR_DIR_POS_X:
-            case this.STAIR_DIR_NEG_X:
+            case STAIR_DIR_POS_X:
+            case STAIR_DIR_NEG_X:
                 sz=z;
                 sz2=sz+(segmentSize*stepWidth);
-                centerPnt=new PointClass(Math.trunc(x+segmentSize),room.offset.y,Math.trunc(z+(segmentSize*0.5)));
+                centerPnt=new RagPoint((x+segmentSize),room.offset.y,(z+(segmentSize*0.5f)));
                 break;
         }
         
             // the steps
         
         trigIdx=0;
+        
+        sx=sz=0.0f;
+        sx2=sz2=0.0f;
         sy=y+stepHigh;
         
-        for (n=0;n!==this.STAIR_STEP_COUNT;n++) { 
+        for (n=0;n!=STAIR_STEP_COUNT;n++) { 
             
                 // step top
                 
             switch (dir) {
-                case this.STAIR_DIR_POS_Z:
+                case STAIR_DIR_POS_Z:
                     sz=z+(n*stepSize);
                     sz2=sz+stepSize;
                     break;
-                case this.STAIR_DIR_NEG_Z:
-                    sz=(z+(segmentSize*2))-(n*stepSize);
+                case STAIR_DIR_NEG_Z:
+                    sz=(z+(segmentSize*2.0f))-(n*stepSize);
                     sz2=sz-stepSize;
                     break;
-                case this.STAIR_DIR_POS_X:
+                case STAIR_DIR_POS_X:
                     sx=x+(n*stepSize);
                     sx2=sx+stepSize;
                     break;
-                case this.STAIR_DIR_NEG_X:
-                    sx=(x+(segmentSize*2))-(n*stepSize);
+                case STAIR_DIR_NEG_X:
+                    sx=(x+(segmentSize*2.0f))-(n*stepSize);
                     sx2=sx-stepSize;
                     break;
             }
            
-            vertexArray.push(sx,sy,sz);
-            vertexArray.push(sx2,sy,sz);
-            vertexArray.push(sx2,sy,sz2);
-            vertexArray.push(sx,sy,sz2);
-            
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            vertexBuf.put(new float[]{sx,sy,sz,sx2,sy,sz,sx2,sy,sz2,sx,sy,sz2});
+            trigIdx=addQuadToIndexes(indexBuf,trigIdx);
             
                 // step front
                 
             switch (dir) {
-                case this.STAIR_DIR_POS_Z:
-                case this.STAIR_DIR_NEG_Z:
-                    vertexArray.push(sx,sy,sz);
-                    vertexArray.push(sx2,sy,sz);
-                    vertexArray.push(sx2,(sy-stepHigh),sz);
-                    vertexArray.push(sx,(sy-stepHigh),sz);
+                case STAIR_DIR_POS_Z:
+                case STAIR_DIR_NEG_Z:
+                    vertexBuf.put(new float[]{sx,sy,sz,sx2,sy,sz,sx2,(sy-stepHigh),sz,sx,(sy-stepHigh),sz});
                     break;
-                case this.STAIR_DIR_POS_X:
-                case this.STAIR_DIR_NEG_X:
-                    vertexArray.push(sx,sy,sz);
-                    vertexArray.push(sx,sy,sz2);
-                    vertexArray.push(sx,(sy-stepHigh),sz2);
-                    vertexArray.push(sx,(sy-stepHigh),sz);
+                case STAIR_DIR_POS_X:
+                case STAIR_DIR_NEG_X:
+                    vertexBuf.put(new float[]{sx,sy,sz,sx,sy,sz2,sx,(sy-stepHigh),sz2,sx,(sy-stepHigh),sz});
                     break;
             }
             
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            trigIdx=addQuadToIndexes(indexBuf,trigIdx);
             
                 // step sides
                 
             if (sides) {
                 switch (dir) {
-                    case this.STAIR_DIR_POS_Z:
-                    case this.STAIR_DIR_NEG_Z:
-                        vertexArray.push(sx,sy,sz);
-                        vertexArray.push(sx,sy,sz2);
-                        vertexArray.push(sx,y,sz2);
-                        vertexArray.push(sx,y,sz);
-                        vertexArray.push(sx2,sy,sz);
-                        vertexArray.push(sx2,sy,sz2);
-                        vertexArray.push(sx2,y,sz2);
-                        vertexArray.push(sx2,y,sz);
+                    case STAIR_DIR_POS_Z:
+                    case STAIR_DIR_NEG_Z:
+                        vertexBuf.put(new float[]{sx,sy,sz,sx,sy,sz2,sx,y,sz2,sx,y,sz,sx2,sy,sz,sx2,sy,sz2,sx2,y,sz2,sx2,y,sz});
                         break;
-                    case this.STAIR_DIR_POS_X:
-                    case this.STAIR_DIR_NEG_X:
-                        vertexArray.push(sx,sy,sz);
-                        vertexArray.push(sx2,sy,sz);
-                        vertexArray.push(sx2,y,sz);
-                        vertexArray.push(sx,y,sz);
-                        vertexArray.push(sx,sy,sz2);
-                        vertexArray.push(sx2,sy,sz2);
-                        vertexArray.push(sx2,y,sz2);
-                        vertexArray.push(sx,y,sz2);
+                    case STAIR_DIR_POS_X:
+                    case STAIR_DIR_NEG_X:
+                        vertexBuf.put(new float[]{sx,sy,sz,sx2,sy,sz,sx2,y,sz,sx,y,sz,sx,sy,sz2,sx2,sy,sz2,sx2,y,sz2,sx,y,sz2});
                         break;
                 }
 
-                trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
-                trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+                trigIdx=addQuadToIndexes(indexBuf,trigIdx);
+                trigIdx=addQuadToIndexes(indexBuf,trigIdx);
             }
             
             sy+=stepHigh;
@@ -490,49 +497,39 @@ public class MeshUtility
             sy=y+segmentSize;
             
             switch (dir) {
-                case this.STAIR_DIR_POS_Z:
+                case STAIR_DIR_POS_Z:
                     sx=x+(segmentSize*stepWidth);
                     sz=z+(segmentSize*2);
-                    vertexArray.push(x,y,sz);
-                    vertexArray.push(sx,y,sz);
-                    vertexArray.push(sx,sy,sz);
-                    vertexArray.push(x,sy,sz);
+                    vertexBuf.put(new float[]{x,y,sz,sx,y,sz,sx,sy,sz,x,sy,sz});
                     break;
-                case this.STAIR_DIR_NEG_Z:
+                case STAIR_DIR_NEG_Z:
                     sx=x+(segmentSize*stepWidth);
-                    vertexArray.push(x,y,z);
-                    vertexArray.push(sx,y,z);
-                    vertexArray.push(sx,sy,z);
-                    vertexArray.push(x,sy,z);
+                    vertexBuf.put(new float[]{x,y,z,sx,y,z,sx,sy,z,x,sy,z});
                     break;
-                case this.STAIR_DIR_POS_X:
+                case STAIR_DIR_POS_X:
                     sx=x+(segmentSize*2);
                     sz=z+(segmentSize*stepWidth);
-                    vertexArray.push(sx,y,z);
-                    vertexArray.push(sx,y,sz);
-                    vertexArray.push(sx,sy,sz);
-                    vertexArray.push(sx,sy,z);
+                    vertexBuf.put(new float[]{sx,y,z,sx,y,sz,sx,sy,sz,sx,sy,z});
                     break;
-                case this.STAIR_DIR_NEG_X:
+                case STAIR_DIR_NEG_X:
                     sz=z+(segmentSize*stepWidth);
-                    vertexArray.push(x,y,z);
-                    vertexArray.push(x,y,sz);
-                    vertexArray.push(x,sy,sz);
-                    vertexArray.push(x,sy,z);
+                    vertexBuf.put(new float[]{x,y,z,x,y,sz,x,sy,sz,x,sy,z});
                     break;
             }
 
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            trigIdx=addQuadToIndexes(indexBuf,trigIdx);
         }
         
             // create the mesh
             
-        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/segmentSize));
+        vertexes=vertexBuf.array();
+        indexes=indexBuf.array();
+        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         
-        this.core.game.map.meshList.add(new MeshClass(this.core,name,stepBitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
+        meshList.add(new Mesh(name,"step",vertexBuf.array(),normals,uvs,indexBuf.array(),false));
     }
-    
+    /*
     buildRoomStairs(room,name,stepBitmap)
     {
         let dir,stepWidth;

@@ -1,6 +1,7 @@
 {
-    "name": "test2",
+    "name": "test",
     "seed": 123456789,
+    "style": "indoor",
     "colorScheme": "random",
     "maxRoomCount": 25,
     "segmentSize": 10.0

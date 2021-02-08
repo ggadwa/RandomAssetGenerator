@@ -1,39 +1,37 @@
-import PointClass from '../../utility/point.js';
-import MeshClass from '../../mesh/mesh.js';
-import MeshMoveClass from '../../mesh/mesh_move.js';
-import MeshMovementClass from '../../mesh/mesh_movement.js';
-import GenerateMeshClass from './generate_mesh.js';
+package com.klinksoftware.rag.map;
 
-export default class GenerateStoryClass
+import com.klinksoftware.rag.mesh.*;
+
+public class MapStory
 {
-    constructor(core,room,name,genMesh,stepBitmap,platformBitmap,segmentSize)
-    {
-        this.PLATFORM_DIR_POS_Z=0;
-        this.PLATFORM_DIR_NEG_Z=1;
-        this.PLATFORM_DIR_POS_X=2;
-        this.PLATFORM_DIR_NEG_X=3;
+    public static final int PLATFORM_DIR_POS_Z=0;
+    public static final int PLATFORM_DIR_NEG_Z=1;
+    public static final int PLATFORM_DIR_POS_X=2;
+    public static final int PLATFORM_DIR_NEG_X=3;
         
-        this.FLAG_NONE=0;
-        this.FLAG_STEPS=1;
-        this.FLAG_LIFT=2;
-        this.FLAG_PLATFORM=3;
-        this.FLAG_WALL=4;
+    public static final int FLAG_NONE=0;
+    public static final int FLAG_STEPS=1;
+    public static final int FLAG_LIFT=2;
+    public static final int FLAG_PLATFORM=3;
+    public static final int FLAG_WALL=4;
+    
+    private float               segmentSize;
+    private String              name;
+    private MeshList            meshList;
+    private MapRoom             room;
 
-        this.core=core;
+    public MapStory(MeshList meshList,MapRoom room,String name,float segmentSize)
+    {
+        this.meshList=meshList;
         this.room=room;
         this.name=name;
-        this.genMesh=genMesh;
-        this.stepBitmap=stepBitmap;
-        this.platformBitmap=platformBitmap;
         this.segmentSize=segmentSize;
-        
-        Object.seal(this);
     }
     
         //
         // lifts and stairs
         //
-  
+  /*
     addLift(x,z)
     {
         let n,sx,sz,y,meshIdx;
@@ -77,39 +75,42 @@ export default class GenerateStoryClass
 
         mesh.movement.addMove(new MeshMoveClass(moveMilliSec,new PointClass(0,0,0),new PointClass(0,0,0),movement.MOVEMENT_PAUSE_NONE,null,null,null));
     }
+    */
     
-    addStairs(x,z,dir,storyIdx)
+    public void addStairs(int x,int z,int dir,int storyIdx)
     {
-        let floorHigh=Math.trunc(this.segmentSize*0.1);
-        let y=this.room.offset.y+(storyIdx*this.segmentSize)+(floorHigh*storyIdx);
+        float           y,floorHigh;
+        
+        floorHigh=segmentSize*0.1f;
+        y=room.offset.y+(storyIdx*segmentSize)+(floorHigh*storyIdx);
         
         switch (dir)
         {
-            case this.genMesh.STAIR_DIR_POS_Z:
-                this.room.setGridAllStories(x,z,this.FLAG_STEPS);
-                this.room.setGridAllStories(x,(z+1),this.FLAG_STEPS);
+            case MeshUtility.STAIR_DIR_POS_Z:
+                room.setGridAllStories(x,z,FLAG_STEPS);
+                room.setGridAllStories(x,(z+1),FLAG_STEPS);
                 break;
-            case this.genMesh.STAIR_DIR_NEG_Z:
-                this.room.setGridAllStories(x,z,this.FLAG_STEPS);
-                this.room.setGridAllStories(x,(z-1),this.FLAG_STEPS);
+            case MeshUtility.STAIR_DIR_NEG_Z:
+                room.setGridAllStories(x,z,FLAG_STEPS);
+                room.setGridAllStories(x,(z-1),FLAG_STEPS);
                 break;
-            case this.genMesh.STAIR_DIR_POS_X:
-                this.room.setGridAllStories(x,z,this.FLAG_STEPS);
-                this.room.setGridAllStories((x+1),z,this.FLAG_STEPS);
+            case MeshUtility.STAIR_DIR_POS_X:
+                room.setGridAllStories(x,z,FLAG_STEPS);
+                room.setGridAllStories((x+1),z,FLAG_STEPS);
                 break;
-            case this.genMesh.STAIR_DIR_NEG_X:
-                this.room.setGridAllStories(x,z,this.FLAG_STEPS);
-                this.room.setGridAllStories((x-1),z,this.FLAG_STEPS);
+            case MeshUtility.STAIR_DIR_NEG_X:
+                room.setGridAllStories(x,z,FLAG_STEPS);
+                room.setGridAllStories((x-1),z,FLAG_STEPS);
                 break;
         }
         
-        this.genMesh.buildStairs(this.room,this.name,this.stepBitmap,this.segmentSize,(this.room.offset.x+(x*this.segmentSize)),y,(this.room.offset.z+(z*this.segmentSize)),dir,1,true);
+        MeshUtility.buildStairs(meshList,room,name,(room.offset.x+((float)x*segmentSize)),y,(room.offset.z+((float)z*segmentSize)),dir,1.0f,true,segmentSize);
     }
     
         //
         // second story segments
         //
-        
+/*        
     hasNegXWall(storyIdx,x,z)
     {
         let flag,flag2;
@@ -340,7 +341,7 @@ export default class GenerateStoryClass
         
         this.core.game.map.meshList.add(new MeshClass(this.core,(this.name+'_story'),this.platformBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
-    
+
         //
         // second story mainline
         //
@@ -366,5 +367,5 @@ export default class GenerateStoryClass
         }
     }
     
+*/
 }
-
