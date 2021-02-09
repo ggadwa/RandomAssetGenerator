@@ -1,8 +1,12 @@
 {
     "name": "test",
     "seed": 123456789,
-    "style": "indoor",
     "colorScheme": "random",
     "maxRoomCount": 25,
-    "segmentSize": 10.0
+    "maxExtensionRoomCount": 10,
+    "segmentSize": 10.0,
+    "storyChangePercentage": 0.25,
+    "bigRoomsOnly": false,
+    "ceilings": false,
+    "decorations": true
 }

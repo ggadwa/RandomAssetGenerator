@@ -92,9 +92,23 @@ public class MapPieceList
         return(this.pieces.get(0));
     }
 
-    public MapPiece getRandomPiece()
+    public MapPiece getRandomPiece(boolean bigRoomsOnly)
     {
-        return(this.dupTransformPiece(this.pieces.get(GeneratorMain.random.nextInt(this.pieces.size())),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean()));
+        int                 idx;
+        MapPiece            piece;
+        
+        idx=GeneratorMain.random.nextInt(this.pieces.size());
+        
+        if (bigRoomsOnly) {
+            while (true) {
+                piece=this.pieces.get(idx);
+                if ((piece.size.x==10) && (piece.size.z==10)) break;
+                idx++;
+                if (idx>=this.pieces.size()) idx=0;
+            }
+        }
+        
+        return(this.dupTransformPiece(this.pieces.get(idx),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean()));
     }
 
 }

@@ -102,33 +102,36 @@ public class MapBuilder
         //
         // room decorations
         //
-/*        
-    buildDecoration(room,roomIdx,genMesh,genBitmap,segmentSize)
+   
+    private void buildDecoration(MapRoom room,int roomIdx,float segmentSize)
     {
             // build the decoration
             
-        switch (this.core.randomIndex(6)) {
+        switch (GeneratorMain.random.nextInt(6)) {
             case 0:
-                (new GenerateStoryClass(this.core,room,('story_'+roomIdx),genMesh,genBitmap.generateStep(),genBitmap.generatePlatform(),segmentSize)).build();
+                mapBitmapList.generatePlatform();
+                (new MapStory(meshList,room,("story_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
             case 1:
-                (new GeneratePillarClass(this.core,room,('pillar_'+roomIdx),genMesh,genBitmap.generatePillar(),segmentSize)).build();
+                mapBitmapList.generatePillar();
+                (new MapPillar(meshList,room,("pillar_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
             case 2:
-                (new GenerateStorageClass(this.core,room,('storage'+roomIdx),genMesh,genBitmap.generateBox(),segmentSize)).build();
+                mapBitmapList.generateBox();
+                (new MapStorage(meshList,room,("storage_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
             case 3:
-                (new GenerateComputerClass(this.core,room,('computer_'+roomIdx),genMesh,genBitmap.generatePlatform(),genBitmap.generateComputer(),segmentSize)).build();
+            //    (new GenerateComputerClass(this.core,room,('computer_'+roomIdx),genMesh,genBitmap.generatePlatform(),genBitmap.generateComputer(),segmentSize)).build();
                 break;
             case 4:
-                (new GeneratePipeClass(this.core,room,('pipe_'+roomIdx),genMesh,genBitmap.generatePipe(),segmentSize)).build();
+            //    (new GeneratePipeClass(this.core,room,('pipe_'+roomIdx),genMesh,genBitmap.generatePipe(),segmentSize)).build();
                 break;
             case 5:
-                (new GenerateAltarClass(this.core,room,('alter_'+roomIdx),genMesh,genBitmap.generatePlatform(),segmentSize)).build();
+            //    (new GenerateAltarClass(this.core,room,('alter_'+roomIdx),genMesh,genBitmap.generatePlatform(),segmentSize)).build();
                 break;
         }
     }
-    */
+
         //
         // room steps
         //
@@ -214,7 +217,7 @@ public class MapBuilder
         // add additional room
         //
     
-    private void addAdditionalRoom(ArrayList<MapRoom> rooms,MapRoom room,MapRoom touchRoom,float segmentSize)
+    private void addAdditionalRoom(ArrayList<MapRoom> rooms,MapRoom room,MapRoom touchRoom,float storyChangePercentage,float segmentSize)
     {
             // start at same height
             
@@ -223,7 +226,7 @@ public class MapBuilder
             // can we change height?
             
         if ((room.offset.y==0) && (touchRoom.piece.decorate) && (touchRoom.storyCount>1)) {
-            if (GeneratorMain.random.nextFloat()<0.25) {
+            if (GeneratorMain.random.nextFloat()<storyChangePercentage) {
                 room.offset.y+=segmentSize;
                 touchRoom.requiredStairs.add(room);
             }
@@ -240,12 +243,14 @@ public class MapBuilder
         
     public void build()
     {
-        int                 n,k,roomCount,maxRoomCount,touchIdx,
-                            failCount,placeCount,moveCount;
-        float               segmentSize,roomTopY,origX,origZ,xAdd,zAdd;
+        int                 n,k,roomCount,maxRoomCount,maxExtensionRoomCount,
+                            touchIdx,failCount,placeCount,moveCount;
+        float               segmentSize,storyChangePercentage,
+                            roomTopY,origX,origZ,xAdd,zAdd;
+        boolean             ceilings,decorations,bigRoomsOnly;
         String              mapName;
         RagPoint            centerPnt;
-        MapRoom             room;
+        MapRoom             room,connectRoom;
         ArrayList<MapRoom>  rooms;
         
             // some generator classes
@@ -257,6 +262,11 @@ public class MapBuilder
          
         mapName=(String)GeneratorMain.settings.get("name");
         maxRoomCount=(int)GeneratorMain.settings.get("maxRoomCount");
+        maxExtensionRoomCount=(int)GeneratorMain.settings.get("maxExtensionRoomCount");
+        storyChangePercentage=(float)((double)GeneratorMain.settings.get("storyChangePercentage"));
+        ceilings=(boolean)GeneratorMain.settings.get("ceilings");
+        decorations=(boolean)GeneratorMain.settings.get("decorations");
+        bigRoomsOnly=(boolean)GeneratorMain.settings.get("bigRoomsOnly");
         segmentSize=((Double)GeneratorMain.settings.get("segmentSize")).floatValue();
         
             // no rooms or meshes
@@ -277,7 +287,7 @@ public class MapBuilder
         
         while ((rooms.size()<maxRoomCount) && (failCount>0)) {
                 
-            room=new MapRoom(mapPieceList.getRandomPiece(),segmentSize);
+            room=new MapRoom(mapPieceList.getRandomPiece(bigRoomsOnly),segmentSize);
             
             placeCount=10;
             
@@ -320,7 +330,7 @@ public class MapBuilder
                     touchIdx=room.touches(rooms);
                     if (touchIdx!=-1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),segmentSize);
+                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),storyChangePercentage,segmentSize);
                             break;
                         }
                     }
@@ -334,7 +344,7 @@ public class MapBuilder
                     touchIdx=room.touches(rooms);
                     if (touchIdx!=-1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),segmentSize);
+                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),storyChangePercentage,segmentSize);
                             break;
                         }
                     }
@@ -348,6 +358,47 @@ public class MapBuilder
                 }
                 
                 moveCount--;
+            }
+        }
+        
+            // extension rooms
+            // these rooms try to attach to existing rooms
+            
+        roomCount=rooms.size();
+        
+        for (n=0;n!=maxExtensionRoomCount;n++) {
+            room=new MapRoom(mapPieceList.getRandomPiece(bigRoomsOnly),segmentSize);
+            
+            failCount=25;
+            
+            while (failCount>0) {
+                connectRoom=rooms.get(GeneratorMain.random.nextInt(roomCount));
+                
+                room.offset.setFromValues((connectRoom.offset.x-room.size.x),connectRoom.offset.y,connectRoom.offset.z);     // on left
+                if (!room.collides(rooms)) {
+                    addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                    break;
+                }
+
+                room.offset.setFromValues((connectRoom.offset.x+connectRoom.size.x),connectRoom.offset.y,connectRoom.offset.z);     // on right
+                if (!room.collides(rooms)) {
+                    addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                    break;
+                }
+            
+                room.offset.setFromValues(connectRoom.offset.x,connectRoom.offset.y,(connectRoom.offset.z-room.size.z));     // on top
+                if (!room.collides(rooms)) {
+                    addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                    break;
+                }
+            
+                room.offset.setFromValues(connectRoom.offset.x,connectRoom.offset.y,(connectRoom.offset.z+connectRoom.size.z));     // on bottom
+                if (!room.collides(rooms)) {
+                    addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                    break;
+                }
+            
+                failCount--;
             }
         }
 
@@ -375,11 +426,11 @@ public class MapBuilder
 
             MeshUtility.buildRoomWalls(meshList,room,centerPnt,("wall_"+Integer.toString(n)),segmentSize);
             MeshUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y,segmentSize);
-            //MeshUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY,segmentSize);
+            if (ceilings) MeshUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY,segmentSize);
             
                 // decorations
 
-            //if (room.piece.decorate) this.buildDecoration(room,n,genMesh,genBitmap,segmentSize);
+            if ((room.piece.decorate) && (decorations)) this.buildDecoration(room,n,segmentSize);
         }
         
             // any steps
