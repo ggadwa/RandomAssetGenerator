@@ -15,7 +15,7 @@ public class BitmapBrick extends BitmapBase
         
         hasNormal=true;
         hasMetallicRoughness=true;
-        hasGlow=false;
+        hasEmissive=false;
         hasAlpha=false;
     }
    
@@ -113,9 +113,9 @@ public class BitmapBrick extends BitmapBase
         
             // grout is a static noise color
             
-        this.drawRect(0,0,textureSize,textureSize,groutColor);
-        this.drawStaticNoiseRect(0,0,textureSize,textureSize,1.0f,1.4f);
-        this.blur(colorData,0,0,textureSize,textureSize,1,false);
+        drawRect(0,0,textureSize,textureSize,groutColor);
+        drawStaticNoiseRect(0,0,textureSize,textureSize,1.0f,1.4f);
+        blur(colorData,0,0,textureSize,textureSize,1,false);
         
             // draw the bricks
             

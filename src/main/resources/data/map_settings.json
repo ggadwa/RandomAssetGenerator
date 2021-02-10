@@ -1,6 +1,6 @@
 {
     "name": "test",
-    "seed": 123456789,
+    "seed": 555,
     "colorScheme": "random",
     "maxRoomCount": 25,
     "maxExtensionRoomCount": 10,

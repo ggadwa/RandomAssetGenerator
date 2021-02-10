@@ -52,4 +52,63 @@ public class RagPoint
     {
         return((x*vct.x)+(y*vct.y)+(z*vct.z));
     }
+    
+    public void rotateAroundPoint(RagPoint centerPnt,RagPoint ang)
+    {
+        float       rd,sn,cs,rx,ry,rz;
+        
+        if (centerPnt!=null) {
+            x-=centerPnt.x;
+            y-=centerPnt.y;
+            z-=centerPnt.z;
+        }
+        
+            // rotate X
+        
+        if (ang.x!=0.0f) {
+            rd=ang.x*((float)Math.PI/180.0f);
+            sn=(float)Math.sin(rd);
+            cs=(float)Math.cos(rd);
+
+            ry=(y*cs)-(z*sn);
+            rz=(y*sn)+(z*cs);
+
+            this.y=ry;
+            this.z=rz;
+        }
+        
+            // rotate Y
+        
+        if (ang.y!=0.0f) {
+            rd=ang.y*((float)Math.PI/180.0f);
+            sn=(float)Math.sin(rd);
+            cs=(float)Math.cos(rd);
+
+            rx=(z*sn)+(x*cs);
+            rz=(z*cs)-(x*sn);
+
+            x=rx;
+            z=rz;
+        }
+        
+            // rotate Z
+        
+        if (ang.z!=0.0f) {
+            rd=ang.z*((float)Math.PI/180.0f);
+            sn=(float)Math.sin(rd);
+            cs=(float)Math.cos(rd);
+
+            rx=(x*cs)-(y*sn);
+            ry=(x*sn)+(y*cs);
+
+            x=rx;
+            y=ry;
+        }
+        
+        if (centerPnt!=null) {
+            x+=centerPnt.x;
+            y+=centerPnt.y;
+            z+=centerPnt.z;
+        }
+    }
 }

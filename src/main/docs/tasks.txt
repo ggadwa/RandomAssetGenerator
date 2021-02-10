@@ -1,3 +1,9 @@
+- js -> java updates
+   - computer
+   - lab decoration
+   - pipes
+   - storage
+
 - rooms
    - do we need a fat + room (like the one with broken edges but a plus at the top
 
@@ -9,7 +15,6 @@
    - don't repeat decorations for connected rooms
    - pool decorations
    - better uv for pillars
-   - control panel decorations
    - connectors for pipes
 
 

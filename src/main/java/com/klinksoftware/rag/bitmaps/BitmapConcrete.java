@@ -3,8 +3,6 @@ package com.klinksoftware.rag.bitmaps;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
-import java.util.*;
-
 public class BitmapConcrete extends BitmapBase
 {
     public final static int VARIATION_NONE=0;
@@ -15,7 +13,7 @@ public class BitmapConcrete extends BitmapBase
         
         hasNormal=true;
         hasMetallicRoughness=true;
-        hasGlow=false;
+        hasEmissive=false;
         hasAlpha=false;
     }
     
@@ -72,7 +70,7 @@ public class BitmapConcrete extends BitmapBase
             }
         }
         
-        this.blur(colorData,0,0,textureSize,textureSize,1,false);
+        blur(colorData,0,0,textureSize,textureSize,1,false);
         
             // concrete expansion cuts
             

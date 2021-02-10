@@ -81,22 +81,30 @@ public class GeneratorMain
             e.printStackTrace();
         }
         
-        
-/*
-        (new BitmapBrick(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapBrick.VARIATION_NONE,basePath,"brick");
-        (new BitmapStone(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapStone.VARIATION_NONE,basePath,"stone");
-        (new BitmapConcrete(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapConcrete.VARIATION_NONE,basePath,"concrete");
-        (new BitmapTile(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapTile.VARIATION_NONE,basePath,"tile");
-        (new BitmapMosaic(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapTile.VARIATION_NONE,basePath,"mosaic");
-        (new BitmapWood(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapWood.VARIATION_BOARDS,basePath,"wood");
-        (new BitmapWood(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapWood.VARIATION_BOX,basePath,"box");
-        (new BitmapMetal(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapMetal.VARIATION_PLATE,basePath,"metal_plate");
-        (new BitmapMetal(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapMetal.VARIATION_BOX,basePath,"metal_box");
-        (new BitmapMetal(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapMetal.VARIATION_PIPE,basePath,"metal_pipe");
-        (new BitmapMetal(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapMetal.VARIATION_HEXAGON,basePath,"metal_hexagon");
-        (new BitmapComputer(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapComputer.VARIATION_COMPUTER_BANK,basePath,"computer_bank");
-        (new BitmapComputer(BitmapBase.COLOR_SCHEME_RANDOM,random)).generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"computer_panel");
-*/
+        /*
+        try {
+            (new BitmapBrick()).generate(BitmapBrick.VARIATION_NONE,basePath,"brick");
+            (new BitmapStone()).generate(BitmapStone.VARIATION_NONE,basePath,"stone");
+            (new BitmapConcrete()).generate(BitmapConcrete.VARIATION_NONE,basePath,"concrete");
+            (new BitmapTile()).generate(BitmapTile.VARIATION_NONE,basePath,"tile");
+            (new BitmapMosaic()).generate(BitmapTile.VARIATION_NONE,basePath,"mosaic");
+            (new BitmapWood()).generate(BitmapWood.VARIATION_BOARDS,basePath,"wood");
+            (new BitmapWood()).generate(BitmapWood.VARIATION_BOX,basePath,"box");
+            (new BitmapMetal()).generate(BitmapMetal.VARIATION_PLATE,basePath,"metal_plate");
+            (new BitmapMetal()).generate(BitmapMetal.VARIATION_BOX,basePath,"metal_box");
+            (new BitmapMetal()).generate(BitmapMetal.VARIATION_PIPE,basePath,"metal_pipe");
+            (new BitmapMetal()).generate(BitmapMetal.VARIATION_HEXAGON,basePath,"metal_hexagon");
+            (new BitmapComputer()).generate(BitmapComputer.VARIATION_COMPUTER_BANK,basePath,"computer_bank");
+            (new BitmapComputer()).generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"computer_panel");
+            (new BitmapGlass()).generate(BitmapGlass.VARIATION_NONE,basePath,"glass");
+            (new BitmapGround()).generate(BitmapGround.VARIATION_NONE,basePath,"ground");
+            (new BitmapLiquid()).generate(BitmapLiquid.VARIATION_NONE,basePath,"liquid");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        */
         
         System.out.println("finished map build");
     }

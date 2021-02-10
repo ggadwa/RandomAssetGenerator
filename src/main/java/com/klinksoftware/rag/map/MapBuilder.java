@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.map;
 
+import com.klinksoftware.rag.bitmaps.BitmapGenerator;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.export.*;
 import com.klinksoftware.rag.mesh.*;
@@ -13,7 +14,7 @@ public class MapBuilder
     
     private String                  basePath;
     private MeshList                meshList;
-    private MapBitmapList           mapBitmapList;
+    private BitmapGenerator           mapBitmapList;
     private MapPieceList            mapPieceList;
     
     public MapBuilder(String basePath)
@@ -105,9 +106,33 @@ public class MapBuilder
    
     private void buildDecoration(MapRoom room,int roomIdx,float segmentSize)
     {
+        int         decorationType;
+        
+            // some decorations can't work in some rooms
+            
+        while (true) {
+            decorationType=GeneratorMain.random.nextInt(7);
+            
+                // stories only in rooms with more than one story
+                
+            if (decorationType==0) {
+                if (room.storyCount>1) break;
+                continue;
+            }
+            
+                // computers and labs only in big rooms
+                
+            if ((decorationType==3) || (decorationType==4)) {
+                if ((room.piece.size.x==10) || (room.piece.size.z==10)) break;
+                continue;
+            }
+            
+            break;
+        }
+        
             // build the decoration
             
-        switch (GeneratorMain.random.nextInt(6)) {
+        switch (decorationType) {
             case 0:
                 mapBitmapList.generatePlatform();
                 (new MapStory(meshList,room,("story_"+Integer.toString(roomIdx)),segmentSize)).build();
@@ -121,13 +146,21 @@ public class MapBuilder
                 (new MapStorage(meshList,room,("storage_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
             case 3:
-            //    (new GenerateComputerClass(this.core,room,('computer_'+roomIdx),genMesh,genBitmap.generatePlatform(),genBitmap.generateComputer(),segmentSize)).build();
+                mapBitmapList.generateComputer();
+                mapBitmapList.generatePanel();
+                mapBitmapList.generatePlatform();
+                (new MapComputer(meshList,room,("computer_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
             case 4:
-            //    (new GeneratePipeClass(this.core,room,('pipe_'+roomIdx),genMesh,genBitmap.generatePipe(),segmentSize)).build();
+                (new MapLab(meshList,room,("lab_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
             case 5:
-            //    (new GenerateAltarClass(this.core,room,('alter_'+roomIdx),genMesh,genBitmap.generatePlatform(),segmentSize)).build();
+                mapBitmapList.generatePipe();
+                (new MapPipe(meshList,room,("pipe_"+Integer.toString(roomIdx)),segmentSize)).build();
+                break;
+            case 6:
+                mapBitmapList.generatePlatform();
+                (new MapAltar(meshList,room,("alter_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
         }
     }
@@ -250,12 +283,13 @@ public class MapBuilder
         boolean             ceilings,decorations,bigRoomsOnly;
         String              mapName;
         RagPoint            centerPnt;
+        Mesh                mesh;
         MapRoom             room,connectRoom;
         ArrayList<MapRoom>  rooms;
         
             // some generator classes
         
-        mapBitmapList=new MapBitmapList(basePath);
+        mapBitmapList=new BitmapGenerator(basePath);
         mapPieceList=new MapPieceList();
         
             // some settings
@@ -376,26 +410,34 @@ public class MapBuilder
                 
                 room.offset.setFromValues((connectRoom.offset.x-room.size.x),connectRoom.offset.y,connectRoom.offset.z);     // on left
                 if (!room.collides(rooms)) {
-                    addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
-                    break;
+                    if (room.hasSharedWalls(connectRoom)) {
+                        addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                        break;
+                    }
                 }
 
                 room.offset.setFromValues((connectRoom.offset.x+connectRoom.size.x),connectRoom.offset.y,connectRoom.offset.z);     // on right
                 if (!room.collides(rooms)) {
-                    addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
-                    break;
+                    if (room.hasSharedWalls(connectRoom)) {
+                        addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                        break;
+                    }
                 }
             
                 room.offset.setFromValues(connectRoom.offset.x,connectRoom.offset.y,(connectRoom.offset.z-room.size.z));     // on top
                 if (!room.collides(rooms)) {
-                    addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
-                    break;
+                    if (room.hasSharedWalls(connectRoom)) {
+                        addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                        break;
+                    }
                 }
             
                 room.offset.setFromValues(connectRoom.offset.x,connectRoom.offset.y,(connectRoom.offset.z+connectRoom.size.z));     // on bottom
                 if (!room.collides(rooms)) {
-                    addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
-                    break;
+                    if (room.hasSharedWalls(connectRoom)) {
+                        addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                        break;
+                    }
                 }
             
                 failCount--;
@@ -424,9 +466,11 @@ public class MapBuilder
                 
                 // meshes
 
-            MeshUtility.buildRoomWalls(meshList,room,centerPnt,("wall_"+Integer.toString(n)),segmentSize);
-            MeshUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y,segmentSize);
-            if (ceilings) MeshUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY,segmentSize);
+            mesh=MeshUtility.buildRoomWalls(room,centerPnt,("wall_"+Integer.toString(n)),segmentSize);
+            mesh.combine(MeshUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y,segmentSize));
+            if (ceilings) mesh.combine(MeshUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY,segmentSize));
+            
+            meshList.add(mesh);
             
                 // decorations
 

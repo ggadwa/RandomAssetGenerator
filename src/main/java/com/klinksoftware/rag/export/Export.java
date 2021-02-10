@@ -2,6 +2,7 @@ package com.klinksoftware.rag.export;
 
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
+import com.klinksoftware.rag.bitmaps.*;
 
 import java.util.*;
 import java.io.*;
@@ -39,7 +40,7 @@ public class Export
         return(texturesArr.size()-1);
     }
     
-    private int addMaterial(String name,boolean hasEmissive,ArrayList<Object> materialsArr,ArrayList<Object> texturesArr,ArrayList<Object> imagesArr)
+    private int addMaterial(String name,ArrayList<Object> materialsArr,ArrayList<Object> texturesArr,ArrayList<Object> imagesArr)
     {
         int                             n,materialIdx,textureIdx;
         String                          checkName;
@@ -90,7 +91,7 @@ public class Export
 
             // any emissives
 
-        if (hasEmissive) {
+        if (BitmapGenerator.hasEmissive(name)) {
             textureIdx=addTextureAndImage((name+"_emissive"),texturesArr,imagesArr);
             
             emissiveObj=new LinkedHashMap<>();
@@ -312,7 +313,7 @@ public class Export
         for (n=0;n!=meshCount;n++) {
             mesh=meshList.get(n);
             
-            materialIdx=addMaterial(mesh.bitmapName,mesh.hasEmissive,materialsArr,texturesArr,imagesArr);
+            materialIdx=addMaterial(mesh.bitmapName,materialsArr,texturesArr,imagesArr);
             addMesh(mesh,materialIdx,meshesArr,accessorsArr,bufferViewsArr,bin);
         }
         
@@ -391,199 +392,3 @@ public class Export
         }
     }
 }
-
-
-/*
-
-
-{
-    "asset" : {
-        "generator" : "Khronos glTF Blender I/O v1.4.40",
-        "version" : "2.0"
-    },
-    "scene" : 0,
-    "scenes" : [
-        {
-            "name" : "Scene",
-            "nodes" : [
-                0,
-                1,
-                2
-            ]
-        }
-    ],
-    "nodes" : [
-        {
-            "mesh" : 0,
-            "name" : "Cube"
-        },
-        {
-            "name" : "Light",
-            "rotation" : [
-                0.16907575726509094,
-                0.7558803558349609,
-                -0.27217137813568115,
-                0.570947527885437
-            ],
-            "translation" : [
-                4.076245307922363,
-                5.903861999511719,
-                -1.0054539442062378
-            ]
-        },
-        {
-            "name" : "Camera",
-            "rotation" : [
-                0.483536034822464,
-                0.33687159419059753,
-                -0.20870360732078552,
-                0.7804827094078064
-            ],
-            "translation" : [
-                7.358891487121582,
-                4.958309173583984,
-                6.925790786743164
-            ]
-        }
-    ],
-    "materials" : [
-        {
-            "doubleSided" : true,
-            "name" : "Material",
-            "normalTexture" : {
-                "index" : 0,
-                "texCoord" : 0
-            },
-            "pbrMetallicRoughness" : {
-                "baseColorTexture" : {
-                    "index" : 1,
-                    "texCoord" : 0
-                },
-                "metallicRoughnessTexture" : {
-                    "index" : 2,
-                    "texCoord" : 0
-                }
-            }
-        }
-    ],
-    "meshes" : [
-        {
-            "name" : "Cube",
-            "primitives" : [
-                {
-                    "attributes" : {
-                        "POSITION" : 0,
-                        "NORMAL" : 1,
-                        "TEXCOORD_0" : 2
-                    },
-                    "indices" : 3,
-                    "material" : 0
-                }
-            ]
-        }
-    ],
-    "textures" : [
-        {
-            "sampler" : 0,
-            "source" : 0
-        },
-        {
-            "sampler" : 0,
-            "source" : 1
-        },
-        {
-            "sampler" : 0,
-            "source" : 2
-        }
-    ],
-    "images" : [
-        {
-            "mimeType" : "image/png",
-            "name" : "stone_normal",
-            "uri" : "textures/stone_normal.png"
-        },
-        {
-            "mimeType" : "image/png",
-            "name" : "stone_color",
-            "uri" : "textures/stone_color.png"
-        },
-        {
-            "mimeType" : "image/png",
-            "name" : "stone_metallic_roughness",
-            "uri" : "textures/stone_metallic_roughness.png"
-        }
-    ],
-    "accessors" : [
-        {
-            "bufferView" : 0,                   <-- position
-            "componentType" : 5126,
-            "count" : 24,
-            "max" : [
-                1,
-                1,
-                1
-            ],
-            "min" : [
-                -1,
-                -1,
-                -1
-            ],
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 1,               <-- normal
-            "componentType" : 5126,
-            "count" : 24,
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 2,               <-- text coords
-            "componentType" : 5126,
-            "count" : 24,
-            "type" : "VEC2"
-        },
-        {
-            "bufferView" : 3,           <-- indexes
-            "componentType" : 5123,
-            "count" : 36,
-            "type" : "SCALAR"
-        }
-    ],
-    "bufferViews" : [
-        {
-            "buffer" : 0,
-            "byteLength" : 288,
-            "byteOffset" : 0
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 288,
-            "byteOffset" : 288
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 192,
-            "byteOffset" : 576
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 72,
-            "byteOffset" : 768
-        }
-    ],
-    "samplers" : [
-        {
-            "magFilter" : 9729,
-            "minFilter" : 9986
-        }
-    ],
-    "buffers" : [
-        {
-            "byteLength" : 840,
-            "uri" : "zTest.bin"
-        }
-    ]
-}
-
-
-*/

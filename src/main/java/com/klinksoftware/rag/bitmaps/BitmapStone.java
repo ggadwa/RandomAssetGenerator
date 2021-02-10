@@ -15,7 +15,7 @@ public class BitmapStone extends BitmapBase
         
         hasNormal=true;
         hasMetallicRoughness=true;
-        hasGlow=false;
+        hasEmissive=false;
         hasAlpha=false;
     }
     
@@ -50,8 +50,8 @@ public class BitmapStone extends BitmapBase
 
             // noise for stones
             
-        this.createPerlinNoiseData(32,32);
-        this.createNormalNoiseData(5.0f,0.3f);
+        createPerlinNoiseData(32,32);
+        createNormalNoiseData(5.0f,0.3f);
         
             // we draw the stones all alone on the noise
             // background so we can distort the stones and

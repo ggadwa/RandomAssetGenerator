@@ -265,7 +265,7 @@ public class MeshUtility
         indexArray.addAll(Arrays.asList(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3)));
         return(trigIdx+4);
     }
-
+/*
     public static int addBox(MeshList meshList,String name,String bitmapName,float negX,float posX,float negY,float posY,float negZ,float posZ,boolean isNegX,boolean isPosX,boolean isNegY,boolean isPosY,boolean isNegZ,boolean isPosZ,float segmentSize)
     {
         int                 trigIdx;
@@ -314,14 +314,14 @@ public class MeshUtility
         normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
         uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
 
-        return(meshList.add(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes,false)));
+        return(meshList.add(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes)));
     }
-    
+   */ 
         //
         // room pieces
         //
    
-    public static void buildRoomFloorCeiling(MeshList meshList,MapRoom room,RagPoint centerPnt,String name,String bitmapName,float y,float segmentSize)
+    public static Mesh buildRoomFloorCeiling(MapRoom room,RagPoint centerPnt,String name,String bitmapName,float y,float segmentSize)
     {
         ArrayList<Float>    vertexArray;
         ArrayList<Integer>  indexArray;
@@ -343,10 +343,10 @@ public class MeshUtility
         normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
         uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         
-        meshList.add(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes,false));
+        return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
     }
        
-    public static void buildRoomWalls(MeshList meshList,MapRoom room,RagPoint centerPnt,String name,float segmentSize)
+    public static Mesh buildRoomWalls(MapRoom room,RagPoint centerPnt,String name,float segmentSize)
     {
         int                 n,k,k2,vertexCount,trigIdx;
         float               y;
@@ -385,15 +385,13 @@ public class MeshUtility
 
             y+=segmentSize;
         }
-        
-        if (trigIdx==0) return;
 
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
         normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
         uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         
-        meshList.add(new Mesh(name,"wall",vertexes,normals,uvs,indexes,false));
+        return(new Mesh(name,"wall",vertexes,normals,uvs,indexes));
     }
   
         //
@@ -553,180 +551,195 @@ public class MeshUtility
         normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
         uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         
-        meshList.add(new Mesh(name,"step",vertexes,normals,uvs,indexes,false));
+        meshList.add(new Mesh(name,"step",vertexes,normals,uvs,indexes));
     }
     
         //
         // cubes
         //
 
-    public static void createCubeRotated(MeshList meshList,MapRoom room,String name,String bitmapName,float xMin,float xMax,float yMin,float yMax,float zMin,float zMax,RagPoint rotAngle,boolean left,boolean right,boolean front,boolean back,boolean top,boolean bottom,boolean normalsIn,int uvMode,float segmentSize)
+    public static Mesh createCubeRotated(MapRoom room,String name,String bitmapName,float xMin,float xMax,float yMin,float yMax,float zMin,float zMax,RagPoint rotAngle,boolean left,boolean right,boolean front,boolean back,boolean top,boolean bottom,boolean normalsIn,int uvMode,float segmentSize)
     {
-        /*
-        let idx,centerPnt,rotPnt;
-        let n,mesh;
-        let vertexArray=[];
-        let uvArray=[];
-        let normalArray,tangentArray;
-        let indexArray=[];
+        int                 n,idx;
+        ArrayList<Float>    vertexArray,uvArray;
+        ArrayList<Integer>  indexArray;
+        int[]               indexes;
+        float[]             vertexes,normals,uvs;
+        RagPoint            centerPnt,rotPnt;
         
+            // allocate proper buffers
+            
+        vertexArray=new ArrayList<>();
+        uvArray=new ArrayList<>();
+        indexArray=new ArrayList<>();
+
+            // box parts
+            
         idx=0;
         
             // left
 
         if (left) {
-            vertexArray.push(xBound.min,yBound.max,zBound.min);
-            vertexArray.push(xBound.min,yBound.min,zBound.min);
-            vertexArray.push(xBound.min,yBound.min,zBound.max);        
-            vertexArray.push(xBound.min,yBound.max,zBound.max);     
+            vertexArray.addAll(Arrays.asList(xMin,yMax,zMin));
+            vertexArray.addAll(Arrays.asList(xMin,yMin,zMin));
+            vertexArray.addAll(Arrays.asList(xMin,yMin,zMax));        
+            vertexArray.addAll(Arrays.asList(xMin,yMax,zMax));     
             
             switch (uvMode) {
                 case MeshUtility.UV_WHOLE:
-                    uvArray.push(0,0,0,1,1,1,1,0);
+                    uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,0.0f));
                     break;
                 case MeshUtility.UV_BOX:
-                    uvArray.push(0,0,0,0.499,0.499,0.499,0.499,0);
+                    uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,0.499f,0.499f,0.499f,0.499f,0.0f));
                     break;
             }
             
-            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            indexArray.addAll(Arrays.asList(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3)));
             idx+=4;
         }
 
              // right
 
         if (right) {
-            vertexArray.push(xBound.max,yBound.max,zBound.min);
-            vertexArray.push(xBound.max,yBound.min,zBound.min);
-            vertexArray.push(xBound.max,yBound.min,zBound.max);
-            vertexArray.push(xBound.max,yBound.max,zBound.max);
+            vertexArray.addAll(Arrays.asList(xMax,yMax,zMin));
+            vertexArray.addAll(Arrays.asList(xMax,yMin,zMin));
+            vertexArray.addAll(Arrays.asList(xMax,yMin,zMax));
+            vertexArray.addAll(Arrays.asList(xMax,yMax,zMax));
             
             switch (uvMode) {
                 case MeshUtility.UV_WHOLE:
-                    uvArray.push(0,1,0,0,1,0,1,1);
+                    uvArray.addAll(Arrays.asList(0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f));
                     break;
                 case MeshUtility.UV_BOX:
-                    uvArray.push(0,0.499,0,0,0.499,0,0.499,0.499);
+                    uvArray.addAll(Arrays.asList(0.0f,0.499f,0.0f,0.0f,0.499f,0.0f,0.499f,0.499f));
                     break;
             }
             
-            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            indexArray.addAll(Arrays.asList(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3)));
             idx+=4;
         }
 
             // front
 
         if (front) {
-            vertexArray.push(xBound.min,yBound.max,zBound.min);
-            vertexArray.push(xBound.min,yBound.min,zBound.min);
-            vertexArray.push(xBound.max,yBound.min,zBound.min);
-            vertexArray.push(xBound.max,yBound.max,zBound.min);
+            vertexArray.addAll(Arrays.asList(xMin,yMax,zMin));
+            vertexArray.addAll(Arrays.asList(xMin,yMin,zMin));
+            vertexArray.addAll(Arrays.asList(xMax,yMin,zMin));
+            vertexArray.addAll(Arrays.asList(xMax,yMax,zMin));
             
             switch (uvMode) {
                 case MeshUtility.UV_WHOLE:
-                    uvArray.push(1,0,1,1,0,1,0,0);
+                    uvArray.addAll(Arrays.asList(1.0f,0.0f,1.0f,1.0f,0.0f,1.0f,0.0f,0.0f));
                     break;
                 case MeshUtility.UV_BOX:
-                    uvArray.push(1,0,1,0.499,0.5,0.499,0.5,0);
+                    uvArray.addAll(Arrays.asList(1.0f,0.0f,1.0f,0.499f,0.5f,0.499f,0.5f,0.0f));
                     break;
             }
             
-            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            indexArray.addAll(Arrays.asList(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3)));
             idx+=4;
         }
 
             // back
 
         if (back) {
-            vertexArray.push(xBound.min,yBound.max,zBound.max);
-            vertexArray.push(xBound.min,yBound.min,zBound.max);
-            vertexArray.push(xBound.max,yBound.min,zBound.max);
-            vertexArray.push(xBound.max,yBound.max,zBound.max);
+            vertexArray.addAll(Arrays.asList(xMin,yMax,zMax));
+            vertexArray.addAll(Arrays.asList(xMin,yMin,zMax));
+            vertexArray.addAll(Arrays.asList(xMax,yMin,zMax));
+            vertexArray.addAll(Arrays.asList(xMax,yMax,zMax));
             
             switch (uvMode) {
                 case MeshUtility.UV_WHOLE:
-                    uvArray.push(0,0,0,1,1,1,1,0);
+                    uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,0.0f));
                     break;
                 case MeshUtility.UV_BOX:
-                    uvArray.push(0.5,0,0.5,0.499,1,0.499,1,0);
+                    uvArray.addAll(Arrays.asList(0.5f,0.0f,0.5f,0.499f,1.0f,0.499f,1.0f,0.0f));
                     break;
             }
             
-            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            indexArray.addAll(Arrays.asList(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3)));
             idx+=4;
         }
 
             // top
 
         if (top) {
-            vertexArray.push(xBound.min,yBound.max,zBound.max);
-            vertexArray.push(xBound.min,yBound.max,zBound.min);
-            vertexArray.push(xBound.max,yBound.max,zBound.min);
-            vertexArray.push(xBound.max,yBound.max,zBound.max);
+            vertexArray.addAll(Arrays.asList(xMin,yMax,zMax));
+            vertexArray.addAll(Arrays.asList(xMin,yMax,zMin));
+            vertexArray.addAll(Arrays.asList(xMax,yMax,zMin));
+            vertexArray.addAll(Arrays.asList(xMax,yMax,zMax));
             
             switch (uvMode) {
                 case MeshUtility.UV_WHOLE:
-                    uvArray.push(0,0,0,1,1,1,1,0);
+                    uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,0.0f));
                     break;
                 case MeshUtility.UV_BOX:
-                    uvArray.push(0,0.499,0,1,0.499,1,0.499,0.499);
+                    uvArray.addAll(Arrays.asList(0.0f,0.499f,0.0f,1.0f,0.499f,1.0f,0.499f,0.499f));
                     break;
             }
             
-            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            indexArray.addAll(Arrays.asList(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3)));
             idx+=4;
         }
 
             // bottom
 
         if (bottom) {
-            vertexArray.push(xBound.min,yBound.min,zBound.max);
-            vertexArray.push(xBound.min,yBound.min,zBound.min);
-            vertexArray.push(xBound.max,yBound.min,zBound.min);
-            vertexArray.push(xBound.max,yBound.min,zBound.max);
+            vertexArray.addAll(Arrays.asList(xMin,yMin,zMax));
+            vertexArray.addAll(Arrays.asList(xMin,yMin,zMin));
+            vertexArray.addAll(Arrays.asList(xMax,yMin,zMin));
+            vertexArray.addAll(Arrays.asList(xMax,yMin,zMax));
             
             switch (uvMode) {
                 case MeshUtility.UV_WHOLE:
-                    uvArray.push(0,0,0,1,1,1,1,0);
+                    uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,0.0f));
                     break;
                 case MeshUtility.UV_BOX:
-                    uvArray.push(0,0.499,0,1,0.499,1,0.499,0.499);
+                    uvArray.addAll(Arrays.asList(0.0f,0.499f,0.0f,1.0f,0.499f,1.0f,0.499f,0.499f));
                     break;
             }
             
-            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            indexArray.addAll(Arrays.asList(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3)));
             idx+=4;
         }
+        
+            // vertexes and indexes to arrays
+            
+        vertexes=floatArrayListToFloat(vertexArray);
+        indexes=intArrayListToInt(indexArray);
 
             // rotate
         
-        centerPnt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        centerPnt=new RagPoint(((xMin+xMax)*0.5f),((yMin+yMax)*0.5f),((zMin+zMax)*0.5f));
 
-        if (rotAngle!==null) {
-            rotPnt=new PointClass(0,0,0);
+        if (rotAngle!=null) {
+            rotPnt=new RagPoint(0.0f,0.0f,0.0f);
             
-            for (n=0;n<vertexArray.length;n+=3) {
-                rotPnt.setFromValues(vertexArray[n],vertexArray[n+1],vertexArray[n+2]);
+            for (n=0;n<vertexes.length;n+=3) {
+                rotPnt.setFromValues(vertexes[n],vertexes[n+1],vertexes[n+2]);
                 rotPnt.rotateAroundPoint(centerPnt,rotAngle);
-                vertexArray[n]=rotPnt.x;
-                vertexArray[n+1]=rotPnt.y;
-                vertexArray[n+2]=rotPnt.z;
+                vertexes[n]=rotPnt.x;
+                vertexes[n+1]=rotPnt.y;
+                vertexes[n+2]=rotPnt.z;
             }
         }
 
             // create the mesh
-
-        normalArray=this.buildNormals(vertexArray,indexArray,centerPnt,normalsIn);
-        if (uvMode===this.UV_MAP) uvArray=this.buildUVs(vertexArray,normalArray,(1.0f/segmentSize));
+            
+        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        if (uvMode==MeshUtility.UV_MAP) {
+            uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+        }
+        else {
+            uvs=floatArrayListToFloat(uvArray);
+        }
         
-        mesh=new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
-        this.core.game.map.meshList.add(mesh);
-*/
+        return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
     }
     
-    public static void createCube(MeshList meshList,MapRoom room,String name,String bitmapName,float xMin,float xMax,float yMin,float yMax,float zMin,float zMax,boolean left,boolean right,boolean front,boolean back,boolean top,boolean bottom,boolean normalsIn,int uvMode,float segmentSize)
+    public static Mesh createCube(MapRoom room,String name,String bitmapName,float xMin,float xMax,float yMin,float yMax,float zMin,float zMax,boolean left,boolean right,boolean front,boolean back,boolean top,boolean bottom,boolean normalsIn,int uvMode,float segmentSize)
     {
-        createCubeRotated(meshList,room,name,bitmapName,xMin,xMax,yMin,yMax,zMin,zMax,null,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize);
+        return(createCubeRotated(room,name,bitmapName,xMin,xMax,yMin,yMax,zMin,zMax,null,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize));
     }
    
         //
@@ -757,7 +770,7 @@ public class MeshUtility
         return(segments);
     }
     
-    public static void createCylinder(MeshList meshList,MapRoom room,String name,RagPoint centerPnt,float ty,float by,float[] segments,float radius,boolean addTop,boolean addBot)
+    public static Mesh createCylinder(MapRoom room,String name,RagPoint centerPnt,float ty,float by,float[] segments,float radius,boolean addTop,boolean addBot)
     {
         int                 n,k,t,iIdx,vStartIdx,segCount;
         float               ang,ang2,angAdd,y,segTy,segBy,yAdd,
@@ -947,11 +960,11 @@ public class MeshUtility
         uvs=floatArrayListToFloat(uvArray);
         indexes=intArrayListToInt(indexArray);
         
-        meshList.add(new Mesh(name,"pillar",vertexes,normals,uvs,indexes,false));
+        return(new Mesh(name,"pillar",vertexes,normals,uvs,indexes));
     }
     
-    public static void createMeshCylinderSimple(MeshList meshList,MapRoom room,String name,RagPoint centerPnt,float ty,float by,float radius,boolean addTop,boolean addBot)
+    public static Mesh createMeshCylinderSimple(MapRoom room,String name,RagPoint centerPnt,float ty,float by,float radius,boolean addTop,boolean addBot)
     {
-        createCylinder(meshList,room,name,centerPnt,ty,by,new float[]{1.0f,1.0f},radius,addTop,addBot);
+        return(createCylinder(room,name,centerPnt,ty,by,new float[]{1.0f,1.0f},radius,addTop,addBot));
     }
 }

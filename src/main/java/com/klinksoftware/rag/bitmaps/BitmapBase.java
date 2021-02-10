@@ -65,9 +65,9 @@ public class BitmapBase
                                     };
     
     protected int           textureSize;
-    protected boolean       hasNormal,hasMetallicRoughness,hasGlow,hasAlpha;
+    protected boolean       hasNormal,hasMetallicRoughness,hasEmissive,hasAlpha;
     protected RagPoint      specularFactor,emissiveFactor;
-    protected float[]       colorData,normalData,metallicRoughnessData,glowData,
+    protected float[]       colorData,normalData,metallicRoughnessData,emissiveData,
                             perlinNoiseColorFactor,noiseNormals;
     
     public BitmapBase()
@@ -77,20 +77,20 @@ public class BitmapBase
         textureSize=512;
         hasNormal=true;
         hasMetallicRoughness=true;
-        hasGlow=false;
+        hasEmissive=false;
         hasAlpha=false;
         
         specularFactor=new RagPoint(5.0f,5.0f,5.0f);
         emissiveFactor=new RagPoint(1.0f,1.0f,1.0f);
 
-            // the color, normal, metallic-roughness, and glow
+            // the color, normal, metallic-roughness, and emissive
             // define them later as child classes
             // can change texture size
  
         colorData=null;
         normalData=null;
         metallicRoughnessData=null;
-        glowData=null;
+        emissiveData=null;
         
             // noise
             
@@ -176,6 +176,19 @@ public class BitmapBase
         color.b=color.b+(midPoint-color.b)*dullFactor;
 
         return(color);
+    }
+    
+    protected RagColor dullColor(RagColor color,float dullFactor)
+    {
+        float           midPoint;
+        
+            // find the midpoint
+            
+        midPoint=(color.r+color.g+color.b)*0.33f;
+        
+            // move towards it
+            
+        return(new RagColor((color.r+(midPoint-color.r)*dullFactor),(color.g+(midPoint-color.g)*dullFactor),(color.b+(midPoint-color.b)*dullFactor)));
     }
 
     protected RagColor getRandomGray(float minFactor,float maxFactor)
@@ -348,7 +361,7 @@ public class BitmapBase
             // noise data arrays
             // this is a single float
             
-        this.perlinNoiseColorFactor=new float[textureSize*textureSize];
+        perlinNoiseColorFactor=new float[textureSize*textureSize];
         
             // generate the random grid vectors
             // these need to wrap around so textures can tile
@@ -392,12 +405,12 @@ public class BitmapBase
                 sx=(float)(x-(gridX0*gridWid))/gridWid;
                 sy=(float)(y-(gridY0*gridHigh))/gridHigh;
                 
-                n0=this.getDotGridVector(vectors,gridX0,gridY0,gridWid,gridHigh,x,y);
-                n1=this.getDotGridVector(vectors,gridX1,gridY0,gridWid,gridHigh,x,y);
+                n0=getDotGridVector(vectors,gridX0,gridY0,gridWid,gridHigh,x,y);
+                n1=getDotGridVector(vectors,gridX1,gridY0,gridWid,gridHigh,x,y);
                 ix0=lerp(n0,n1,sx);
                 
-                n0=this.getDotGridVector(vectors,gridX0,gridY1,gridWid,gridHigh,x,y);
-                n1=this.getDotGridVector(vectors,gridX1,gridY1,gridWid,gridHigh,x,y);
+                n0=getDotGridVector(vectors,gridX0,gridY1,gridWid,gridHigh,x,y);
+                n1=getDotGridVector(vectors,gridX1,gridY1,gridWid,gridHigh,x,y);
                 ix1=lerp(n0,n1,sx);
                 
                     // turn this into a color factor for the base color
@@ -409,7 +422,7 @@ public class BitmapBase
 
     protected float getPerlineColorFactorForPosition(int x,int y)
     {
-        return(this.perlinNoiseColorFactor[(y*textureSize)+x]);
+        return(perlinNoiseColorFactor[(y*textureSize)+x]);
     }
     
     protected void drawPerlinNoiseRect(int lft,int top,int rgt,int bot,float colorFactorMin,float colorFactorMax)
@@ -433,6 +446,29 @@ public class BitmapBase
                 colorData[idx]=colorData[idx]*colFactor;
                 colorData[idx+1]=colorData[idx+1]*colFactor;
                 colorData[idx+2]=colorData[idx+2]*colFactor;
+            }
+        }
+    }
+    
+    protected void drawPerlinNoiseColorRect(int lft,int top,int rgt,int bot,RagColor color,float mixColorFactor)
+    {
+        int         x,y,idx;
+        float       colFactor;
+        
+        for (y=top;y!=bot;y++) {
+            for (x=lft;x!=rgt;x++) {
+                
+                    // the perlin color factor (a single float)
+
+                colFactor=mixColorFactor*perlinNoiseColorFactor[(y*textureSize)+x];
+                
+                    // now merge with bitmap color
+                    
+                idx=((y*textureSize)+x)*4;
+                
+                colorData[idx]=(colorData[idx]*(1.0f-colFactor))+(color.r*colFactor);
+                colorData[idx+1]=(colorData[idx+1]*(1.0f-colFactor))+(color.g*colFactor);
+                colorData[idx+2]=(colorData[idx+2]*(1.0f-colFactor))+(color.b*colFactor);
             }
         }
     }
@@ -606,7 +642,7 @@ public class BitmapBase
                 normal.normalize();
 
                 if (k!=startArc) {
-                    this.createNormalNoiseDataSinglePolygonLine(lx,ly,x,y,normal);
+                    createNormalNoiseDataSinglePolygonLine(lx,ly,x,y,normal);
                 }
 
                 lx=x;
@@ -782,7 +818,7 @@ public class BitmapBase
         }
     }
 
-    protected void drawRectGlow(int lft,int top,int rgt,int bot,RagColor color)
+    protected void drawRectEmissive(int lft,int top,int rgt,int bot,RagColor color)
     {
         int         x,y,idx;
         
@@ -796,9 +832,9 @@ public class BitmapBase
                 
                 idx=((y*textureSize)+x)*4;
                 
-                glowData[idx]=color.r;
-                glowData[idx+1]=color.g;
-                glowData[idx+2]=color.b;
+                emissiveData[idx]=color.r;
+                emissiveData[idx+1]=color.g;
+                emissiveData[idx+2]=color.b;
             }
         }
     }
@@ -1031,7 +1067,7 @@ public class BitmapBase
 
     }
 
-    protected void drawOvalGlow(int lft,int top,int rgt,int bot,RagColor color)
+    protected void drawOvalEmissive(int lft,int top,int rgt,int bot,RagColor color)
     {
         int         n,x,y,mx,my,wid,high,idx;
         float       rad,fx,fy,halfWid,halfHigh;
@@ -1073,9 +1109,9 @@ public class BitmapBase
                 
                 idx=((y*textureSize)+x)*4;
                 
-                glowData[idx]=color.r;
-                glowData[idx+1]=color.g;
-                glowData[idx+2]=color.b;
+                emissiveData[idx]=color.r;
+                emissiveData[idx+1]=color.g;
+                emissiveData[idx+2]=color.b;
             }
 
             wid--;
@@ -1288,9 +1324,9 @@ public class BitmapBase
             // fill the hexagon
             
         if (color!=null) {
-            this.drawRect(lx,top,rx,bot,color);
-            this.drawTriangle(lx,top,lft,my,lx,bot,color);
-            this.drawTriangle(rx,top,rgt,my,rx,bot,color);
+            drawRect(lx,top,rx,bot,color);
+            drawTriangle(lx,top,lft,my,lx,bot,color);
+            drawTriangle(rx,top,rgt,my,rx,bot,color);
         }    
         
             // draw the edges
@@ -1304,25 +1340,25 @@ public class BitmapBase
             
                 // top-left to top to top-right
 
-            this.drawLineColor((lft+n),my,(lx+n),(top+n),darkColor);
-            this.drawLineNormal((lft+n),my,(lx+n),(top+n),NORMAL_TOP_LEFT_45);
+            drawLineColor((lft+n),my,(lx+n),(top+n),darkColor);
+            drawLineNormal((lft+n),my,(lx+n),(top+n),NORMAL_TOP_LEFT_45);
 
-            this.drawLineColor((lx+n),(top+n),(rx-n),(top+n),darkColor);
-            this.drawLineNormal((lx+n),(top+n),(rx-n),(top+n),NORMAL_TOP_45);
+            drawLineColor((lx+n),(top+n),(rx-n),(top+n),darkColor);
+            drawLineNormal((lx+n),(top+n),(rx-n),(top+n),NORMAL_TOP_45);
 
-            this.drawLineColor((rx-n),(top+n),(rgt-n),my,darkColor);
-            this.drawLineNormal((rx-n),(top+n),(rgt-n),my,NORMAL_TOP_RIGHT_45);
+            drawLineColor((rx-n),(top+n),(rgt-n),my,darkColor);
+            drawLineNormal((rx-n),(top+n),(rgt-n),my,NORMAL_TOP_RIGHT_45);
 
                 // bottom-right to bottom to bottom-left
 
-            this.drawLineColor((lft+n),my,(lx+n),(bot-n),darkColor);
-            this.drawLineNormal((lft+n),my,(lx+n),(bot-n),NORMAL_BOTTOM_LEFT_45);
+            drawLineColor((lft+n),my,(lx+n),(bot-n),darkColor);
+            drawLineNormal((lft+n),my,(lx+n),(bot-n),NORMAL_BOTTOM_LEFT_45);
                 
-            this.drawLineColor((lx+n),(bot-n),(rx-n),(bot-n),darkColor);
-            this.drawLineNormal((lx+n),(bot-n),(rx-n),(bot-n),NORMAL_BOTTOM_45);
+            drawLineColor((lx+n),(bot-n),(rx-n),(bot-n),darkColor);
+            drawLineNormal((lx+n),(bot-n),(rx-n),(bot-n),NORMAL_BOTTOM_45);
 
-            this.drawLineColor((rx-n),(bot-n),(rgt-n),my,darkColor);
-            this.drawLineNormal((rx-n),(bot-n),(rgt-n),my,NORMAL_BOTTOM_RIGHT_45);
+            drawLineColor((rx-n),(bot-n),(rgt-n),my,darkColor);
+            drawLineNormal((rx-n),(bot-n),(rgt-n),my,NORMAL_BOTTOM_RIGHT_45);
         }
     }
 
@@ -1400,14 +1436,14 @@ public class BitmapBase
                 
             if (GeneratorMain.random.nextFloat()<0.9f) {
                 shineColor=adjustColorRandom(metalColor,0.7f,1.3f);
-                this.drawMetalShineLine(x,top,bot,shineWid,shineColor);
+                drawMetalShineLine(x,top,bot,shineWid,shineColor);
             }
             
             x+=(shineWid+(int)(((float)wid*0.03f)+(GeneratorMain.random.nextFloat()*((float)wid*0.05))));
             if (x>=rgt) break;
         }
         
-        this.blur(colorData,lft,top,rgt,bot,3,true);
+        blur(colorData,lft,top,rgt,bot,3,true);
     }
 
         //
@@ -2093,19 +2129,19 @@ public class BitmapBase
             
             if (sx==ex) return;
             
-            this.drawLineColor(sx,sy,ex,ey,color);
-            this.drawLineNormal(sx,sy,ex,ey,NORMAL_CLEAR);
-            this.drawLineNormal(sx,(sy-1),ex,(ey-1),NORMAL_BOTTOM_45);
-            this.drawLineNormal(sx,(sy+1),ex,(ey+1),NORMAL_TOP_45);
+            drawLineColor(sx,sy,ex,ey,color);
+            drawLineNormal(sx,sy,ex,ey,NORMAL_CLEAR);
+            drawLineNormal(sx,(sy-1),ex,(ey-1),NORMAL_BOTTOM_45);
+            drawLineNormal(sx,(sy+1),ex,(ey+1),NORMAL_TOP_45);
             
             if ((ey==clipTop) || (ey==clipBot)) break;
             
             if ((canSplit) && (GeneratorMain.random.nextBoolean())) {
                 if (lineDir>0) {
-                    this.drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
+                    drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
                 }
                 else {
-                    this.drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
+                    drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
                 }
                 
                 canSplit=false;
@@ -2182,10 +2218,10 @@ public class BitmapBase
                 dy2=(int)(sy+((float)((ey-sy)*(n+1))/(float)segCount))+(GeneratorMain.random.nextInt(Math.abs(lineYVarient))*(int)Math.signum(lineYVarient));
             }
             
-            this.drawLineColor(dx,dy,dx2,dy2,color);
-            this.drawLineNormal(dx,dy,dx2,dy2,NORMAL_CLEAR);
-            this.drawLineNormal((dx-1),dy,(dx2-1),dy2,NORMAL_RIGHT_45);
-            this.drawLineNormal((dx+1),dy,(dx2+1),dy2,NORMAL_LEFT_45);
+            drawLineColor(dx,dy,dx2,dy2,color);
+            drawLineNormal(dx,dy,dx2,dy2,NORMAL_CLEAR);
+            drawLineNormal((dx-1),dy,(dx2-1),dy2,NORMAL_RIGHT_45);
+            drawLineNormal((dx+1),dy,(dx2+1),dy2,NORMAL_LEFT_45);
              
             dx=dx2;
             dy=dy2;
@@ -2254,6 +2290,19 @@ public class BitmapBase
             metallicRoughnessData[idx+2]=f;
             idx+=4;
         } 
+    }
+    
+        //
+        // alpha utilities
+        //
+    
+    protected void setImageAlpha(float a)
+    {
+        int     n;
+        
+        for (n=0;n!=colorData.length;n+=4) {
+            colorData[n+3]=a;
+        }
     }
 
         //
@@ -2365,12 +2414,12 @@ public class BitmapBase
         colorData=new float[imgSize];
         normalData=new float[imgSize];
         metallicRoughnessData=new float[imgSize];
-        glowData=new float[imgSize];
+        emissiveData=new float[imgSize];
 
         clearImageData(colorData,1.0f,1.0f,1.0f,1.0f);
         clearImageData(normalData,0.5f,0.5f,1.0f,1.0f);
         clearImageData(metallicRoughnessData,0.0f,0.0f,0.0f,1.0f);
-        clearImageData(glowData,0.0f,0.0f,0.0f,1.0f);
+        clearImageData(emissiveData,0.0f,0.0f,0.0f,1.0f);
 
             // run the internal generator
 
@@ -2383,7 +2432,7 @@ public class BitmapBase
         writeImageData(colorData,(path+"_color.png"));
         if (hasNormal) writeImageData(normalData,(path+"_normal.png"));
         if (hasMetallicRoughness) writeImageData(metallicRoughnessData,(path+"_metallic_roughness.png"));
-        if (hasGlow) writeImageData(glowData,(path+"_emissive.png"));
+        if (hasEmissive) writeImageData(emissiveData,(path+"_emissive.png"));
     }
 
 }

@@ -1,18 +1,18 @@
-package com.klinksoftware.rag.map;
+package com.klinksoftware.rag.bitmaps;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.*;
 
 import java.util.*;
 
-public class MapBitmapList
+public class BitmapGenerator
 {
     private boolean     hasWallBitmap,hasFloorBitmap,hasCeilingBitmap,hasStepBitmap,
                         hasPlatformBitmap,hasPillarBitmap,hasBoxBitmap,hasComputerBitmap,
-                        hasPanelBitmap,hasPipeBitmap;
+                        hasPanelBitmap,hasPipeBitmap,hasLiquidBitmap,hasGlassBitmap;
     private String      basePath;
     
-    public MapBitmapList(String basePath)
+    public BitmapGenerator(String basePath)
     {
         this.basePath=basePath;
         
@@ -25,6 +25,8 @@ public class MapBitmapList
         hasBoxBitmap=false;
         hasComputerBitmap=false;
         hasPipeBitmap=false;
+        hasLiquidBitmap=false;
+        hasGlassBitmap=false;
     }
 
     public void generateWall()
@@ -65,7 +67,7 @@ public class MapBitmapList
         
         if (hasFloorBitmap) return;
         
-        switch(GeneratorMain.random.nextInt(6)) {
+        switch(GeneratorMain.random.nextInt(7)) {
             case 0:
                 bitmapBase=new BitmapWood();
                 variationMode=BitmapWood.VARIATION_BOARDS;
@@ -83,6 +85,10 @@ public class MapBitmapList
                 variationMode=BitmapMosaic.VARIATION_NONE;
                 break;
             case 4:
+                bitmapBase=new BitmapGround();
+                variationMode=BitmapGround.VARIATION_NONE;
+                break;
+            case 5:
                 bitmapBase=new BitmapMetal();
                 variationMode=BitmapMetal.VARIATION_HEXAGON;
                 break;
@@ -242,41 +248,57 @@ public class MapBitmapList
     
     public void generateComputer()
     {
-        int         variationMode;
-        BitmapBase  bitmapBase;
-        
         if (hasComputerBitmap) return;
         
-        bitmapBase=new BitmapComputer();
-        bitmapBase.generate(BitmapComputer.VARIATION_COMPUTER_BANK,basePath,"computer");
+        (new BitmapComputer()).generate(BitmapComputer.VARIATION_COMPUTER_BANK,basePath,"computer");
         
         hasComputerBitmap=true;
     }
     
     public void generatePanel()
     {
-        int         variationMode;
-        BitmapBase  bitmapBase;
-        
         if (hasPanelBitmap) return;
         
-        bitmapBase=new BitmapComputer();
-        bitmapBase.generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"panel");
+        (new BitmapComputer()).generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"panel");
         
         hasPanelBitmap=true;
     }
     
     public void generatePipe()
     {
-        int         variationMode;
-        BitmapBase  bitmapBase;
-        
         if (hasPipeBitmap) return;
         
-        bitmapBase=new BitmapMetal();
-        bitmapBase.generate(BitmapMetal.VARIATION_PIPE,basePath,"pipe");
+        (new BitmapMetal()).generate(BitmapMetal.VARIATION_PIPE,basePath,"pipe");
         
         hasPipeBitmap=true;
+    }
+    
+    public void generateLiquid()
+    {
+        if (hasLiquidBitmap) return;
+        
+        (new BitmapLiquid()).generate(BitmapLiquid.VARIATION_NONE,basePath,"liquid");
+        
+        hasLiquidBitmap=true;
+    }
+    
+    public void generateGlass()
+    {
+        if (hasGlassBitmap) return;
+        
+        (new BitmapGlass()).generate(BitmapGround.VARIATION_NONE,basePath,"glass");
+        
+        hasGlassBitmap=true;
+    }
+    
+        // this is a little hacky but it's a way to tell what
+        // generated bitmaps have emissives
+    
+    public static boolean hasEmissive(String name)
+    {
+        ArrayList<String>       emissiveList=new ArrayList<>(Arrays.asList("computer","panel"));
+        
+        return(emissiveList.contains(name));
     }
 
 }

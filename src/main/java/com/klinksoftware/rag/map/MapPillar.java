@@ -34,6 +34,7 @@ public class MapPillar
         byte[][]    pattern;
         String      nameSuffix;
         RagPoint    centerPnt;
+        Mesh        mesh;
         
             // bounds with margins
             
@@ -93,7 +94,7 @@ public class MapPillar
             
         offset=segmentSize*0.5f;
         radius=segmentSize*(0.1f+(GeneratorMain.random.nextFloat()*0.2f));
-        baseRadius=radius*(1.2f+(GeneratorMain.random.nextFloat()*0.2f));
+        baseRadius=radius*(1.3f+(GeneratorMain.random.nextFloat()*0.2f));
         
         cylinderSegments=MeshUtility.createCylinderSegmentList(5,3,0.2f);
         centerPnt=new RagPoint(0.0f,0.0f,0.0f);
@@ -108,22 +109,19 @@ public class MapPillar
                 centerPnt.z=room.offset.z+(((float)gz*segmentSize)+offset);
 
                 nameSuffix=Integer.toString(gx)+"_"+Integer.toString(gz);
+                
+                mesh=MeshUtility.createCylinder(room,(this.name+"_"+nameSuffix),centerPnt,pillarTy,pillarBy,cylinderSegments,radius,false,false);
 
                 if (squareBase) {
-                    MeshUtility.addBox(meshList,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),pillarBy,by,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,true,false,true,true,segmentSize);
+                    mesh.combine(MeshUtility.createCube(room,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),pillarBy,by,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,true,true,false,true,false,MeshUtility.UV_MAP,segmentSize));
+                    mesh.combine(MeshUtility.createCube(room,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),ty,pillarTy,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize));
                 }
                 else {
-                    MeshUtility.createMeshCylinderSimple(meshList,room,(name+"_base_bot_"+nameSuffix),centerPnt,pillarBy,by,baseRadius,true,false);
+                    mesh.combine(MeshUtility.createMeshCylinderSimple(room,(name+"_base_bot_"+nameSuffix),centerPnt,pillarBy,by,baseRadius,true,false));
+                    mesh.combine(MeshUtility.createMeshCylinderSimple(room,(this.name+"_base_top_"+nameSuffix),centerPnt,ty,pillarTy,baseRadius,false,true));
                 }
-
-                MeshUtility.createCylinder(meshList,room,(this.name+"_"+nameSuffix),centerPnt,pillarTy,pillarBy,cylinderSegments,radius,false,false);
-
-                if (squareBase) {
-                    MeshUtility.addBox(meshList,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),ty,pillarTy,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,false,true,true,true,segmentSize);
-                }
-                else {
-                    MeshUtility.createMeshCylinderSimple(meshList,room,(this.name+"_base_top_"+nameSuffix),centerPnt,ty,pillarTy,baseRadius,false,true);
-                }
+                
+                meshList.add(mesh);
 
                 room.setGrid(0,gx,gz,1);
             }

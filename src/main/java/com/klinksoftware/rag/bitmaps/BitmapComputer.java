@@ -23,7 +23,7 @@ public class BitmapComputer extends BitmapBase
         textureSize=1024;
         hasNormal=true;
         hasMetallicRoughness=true;
-        hasGlow=true;
+        hasEmissive=true;
         hasAlpha=false;
     }
     
@@ -82,7 +82,7 @@ public class BitmapComputer extends BitmapBase
             for (n=0;n!=nLine;n++) {
                 x=lft+GeneratorMain.random.nextInt(rgt-lft);
                 
-                lineColor=this.getRandomColor();
+                lineColor=getRandomColor();
                 drawRandomLine(x,top,x,bot,lft,top,rgt,bot,lineVar,lineColor,true);
             }
         }
@@ -104,7 +104,7 @@ public class BitmapComputer extends BitmapBase
         sz=(int)((float)Math.max((rgt-lft),(bot-top))*0.1f);
         shutterCount=sz+GeneratorMain.random.nextInt(sz);
         
-        this.drawMetalShine(lft,top,rgt,bot,shutterColor);
+        drawMetalShine(lft,top,rgt,bot,shutterColor);
         
         if ((rgt-lft)>(bot-top)) {
             drawNormalWaveHorizontal(lft,top,rgt,bot,shutterColor,shutterEdgeColor,shutterCount);
@@ -148,9 +148,9 @@ public class BitmapComputer extends BitmapBase
                 if (GeneratorMain.random.nextBoolean()) color=adjustColor(color,0.8f);
                 drawOval((dx+1),(dy+1),(dx+(sz-1)),(dy+(sz-1)),0.0f,1.0f,0.0f,0.0f,sz,0.8f,color,null,0.5f,false,false,1.0f,0.0f);
                 
-                    // the possible glow
+                    // the possible emissive
                     
-                if (GeneratorMain.random.nextBoolean()) drawOvalGlow(dx,dy,(dx+sz),(dy+sz),adjustColor(color,0.7f));
+                if (GeneratorMain.random.nextBoolean()) drawOvalEmissive(dx,dy,(dx+sz),(dy+sz),adjustColor(color,0.7f));
             }
         }
     }
@@ -191,9 +191,9 @@ public class BitmapComputer extends BitmapBase
                 drawRect(dx,dy,(dx+sz),(dy+sz),color);
                 draw3DFrameRect(dx,dy,(dx+sz),(dy+sz),2,outlineColor,true);
                 
-                    // the possible glow
+                    // the possible emissive
                     
-                if (GeneratorMain.random.nextBoolean()) drawRectGlow(dx,dy,(dx+sz),(dy+sz),color);
+                if (GeneratorMain.random.nextBoolean()) drawRectEmissive(dx,dy,(dx+sz),(dy+sz),color);
             }
         }
     }
@@ -247,14 +247,14 @@ public class BitmapComputer extends BitmapBase
                 drawRect(dx,dy,(dx+wid),(dy+high),color);
                 draw3DFrameRect(dx,dy,(dx+wid),(dy+high),2,outlineColor,true);
                 
-                    // the glowing indicator
+                    // the emissive indicator
                 
                 ledColor=LED_COLORS[GeneratorMain.random.nextInt(3)];
                 
                 bx=(dx+wid)-(ledWid+5);
                 by=(dy+high)-(ledHigh+5);
                 drawRect(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
-                drawRectGlow(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
+                drawRectEmissive(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
             }
         }
     }
@@ -262,7 +262,7 @@ public class BitmapComputer extends BitmapBase
     private void generateComputerComponentScreen(int lft,int top,int rgt,int bot,int edgeSize)
     {
         int         x,y,dx,dy,rowCount,colCount;
-        RagColor    screenColor,charColor,glowCharColor;
+        RagColor    screenColor,charColor,emissiveCharColor;
         
         lft+=edgeSize;
         rgt-=edgeSize;
@@ -271,22 +271,22 @@ public class BitmapComputer extends BitmapBase
         
         screenColor=new RagColor(0.2f,0.25f,0.2f);
         charColor=new RagColor(0.2f,0.6f,0.2f);
-        glowCharColor=adjustColor(charColor,0.8f);
+        emissiveCharColor=adjustColor(charColor,0.8f);
 
             // screen
             
-        this.drawRect(lft,top,rgt,bot,COLOR_BLACK);
+        drawRect(lft,top,rgt,bot,COLOR_BLACK);
         
-        this.drawOval((lft+3),(top+3),(lft+13),(top+13),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
-        this.drawOval((rgt-13),(top+3),(rgt-3),(top+13),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
-        this.drawOval((lft+3),(bot-13),(lft+13),(bot-3),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
-        this.drawOval((rgt-13),(bot-13),(rgt-3),(bot-3),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
+        drawOval((lft+3),(top+3),(lft+13),(top+13),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
+        drawOval((rgt-13),(top+3),(rgt-3),(top+13),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
+        drawOval((lft+3),(bot-13),(lft+13),(bot-3),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
+        drawOval((rgt-13),(bot-13),(rgt-3),(bot-3),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
         
-        this.drawRect((lft+8),(top+8),(rgt-8),(bot-8),screenColor);
-        this.drawRect((lft+8),(top+3),(rgt-8),(top+8),screenColor);
-        this.drawRect((lft+8),(bot-8),(rgt-8),(bot-3),screenColor);
-        this.drawRect((lft+3),(top+8),(lft+8),(bot-8),screenColor);
-        this.drawRect((rgt-8),(top+8),(rgt-3),(bot-8),screenColor);
+        drawRect((lft+8),(top+8),(rgt-8),(bot-8),screenColor);
+        drawRect((lft+8),(top+3),(rgt-8),(top+8),screenColor);
+        drawRect((lft+8),(bot-8),(rgt-8),(bot-3),screenColor);
+        drawRect((lft+3),(top+8),(lft+8),(bot-8),screenColor);
+        drawRect((rgt-8),(top+8),(rgt-3),(bot-8),screenColor);
         
             // chars
             
@@ -303,19 +303,19 @@ public class BitmapComputer extends BitmapBase
                 switch (GeneratorMain.random.nextInt(5)) {
                     case 0:
                         drawRect(dx,dy,(dx+5),(dy+8),charColor);
-                        drawRectGlow(dx,dy,(dx+5),(dy+8),glowCharColor);
+                        drawRectEmissive(dx,dy,(dx+5),(dy+8),emissiveCharColor);
                         break;
                     case 1:
                         drawRect((dx+2),dy,(dx+5),(dy+6),charColor);
-                        drawRectGlow((dx+2),dy,(dx+5),(dy+6),glowCharColor);
+                        drawRectEmissive((dx+2),dy,(dx+5),(dy+6),emissiveCharColor);
                         break;
                     case 2:
                         drawRect(dx,(dy+5),(dx+5),(dy+8),charColor);
-                        drawRectGlow(dx,(dy+5),(dx+5),(dy+8),glowCharColor);
+                        drawRectEmissive(dx,(dy+5),(dx+5),(dy+8),emissiveCharColor);
                         break;
                     case 3:
                         drawRect(dx,dy,(dx+5),(dy+3),charColor);
-                        drawRectGlow(dx,dy,(dx+5),(dy+3),glowCharColor);
+                        drawRectEmissive(dx,dy,(dx+5),(dy+3),emissiveCharColor);
                         break;
                 }
                 

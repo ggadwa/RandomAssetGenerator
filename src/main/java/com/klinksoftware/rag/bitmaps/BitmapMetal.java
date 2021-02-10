@@ -25,7 +25,7 @@ public class BitmapMetal extends BitmapBase
         
         hasNormal=true;
         hasMetallicRoughness=true;
-        hasGlow=false;
+        hasEmissive=false;
         hasAlpha=false;
     }
     

@@ -15,7 +15,7 @@ public class BitmapMosaic extends BitmapBase
         
         hasNormal=true;
         hasMetallicRoughness=true;
-        hasGlow=false;
+        hasEmissive=false;
         hasAlpha=false;
     }
     
@@ -47,19 +47,19 @@ public class BitmapMosaic extends BitmapBase
 
             // clear canvases to grout
 
-        this.drawRect(0,0,textureSize,textureSize,groutColor);
-        this.createPerlinNoiseData(16,16);
-        this.drawPerlinNoiseRect(0,0,textureSize,textureSize,0.6f,1.0f);
-        this.drawStaticNoiseRect(0,0,textureSize,textureSize,0.7f,1.0f);
-        this.blur(colorData,0,0,textureSize,textureSize,1,false);
+        drawRect(0,0,textureSize,textureSize,groutColor);
+        createPerlinNoiseData(16,16);
+        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.6f,1.0f);
+        drawStaticNoiseRect(0,0,textureSize,textureSize,0.7f,1.0f);
+        blur(colorData,0,0,textureSize,textureSize,1,false);
         
-        this.createNormalNoiseData(2.5f,0.5f);
-        this.drawNormalNoiseRect(0,0,textureSize,textureSize);
-        this.blur(normalData,0,0,textureSize,textureSize,1,false);
+        createNormalNoiseData(2.5f,0.5f);
+        drawNormalNoiseRect(0,0,textureSize,textureSize);
+        blur(normalData,0,0,textureSize,textureSize,1,false);
 
             // use a perlin noise rect for the colors
         
-        this.createPerlinNoiseData(32,32);
+        createPerlinNoiseData(32,32);
         
             // draw the tiles
         
@@ -75,7 +75,7 @@ public class BitmapMosaic extends BitmapBase
                 
                     // the color
 
-                col.setFromColorFactor(mosaicColor,mosaic2Color,this.getPerlineColorFactorForPosition(lft,top));
+                col.setFromColorFactor(mosaicColor,mosaic2Color,getPerlineColorFactorForPosition(lft,top));
 
                     // draw
                     

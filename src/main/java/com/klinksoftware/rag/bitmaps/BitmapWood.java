@@ -16,7 +16,7 @@ public class BitmapWood extends BitmapBase
         
         hasNormal=true;
         hasMetallicRoughness=true;
-        hasGlow=false;
+        hasEmissive=false;
         hasAlpha=false;
     }
     
@@ -50,8 +50,8 @@ public class BitmapWood extends BitmapBase
         
             // blur both the color and the normal
             
-        this.blur(colorData,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),2,true);
-        this.blur(normalData,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),5,true);
+        blur(colorData,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),2,true);
+        blur(normalData,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),5,true);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class BitmapWood extends BitmapBase
         
             // perlin noise
             
-        this.createPerlinNoiseData(32,32);
+        createPerlinNoiseData(32,32);
 
             // regular wood planking
 

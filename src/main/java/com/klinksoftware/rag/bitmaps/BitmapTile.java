@@ -15,7 +15,7 @@ public class BitmapTile extends BitmapBase
         
         hasNormal=true;
         hasMetallicRoughness=true;
-        hasGlow=false;
+        hasEmissive=false;
         hasAlpha=false;
     }
     
@@ -89,8 +89,8 @@ public class BitmapTile extends BitmapBase
                 
                 frameCol=adjustColorRandom(col,0.85f,0.95f);
                 
-                this.drawRect(dLft,dTop,dRgt,dBot,col);
-                this.draw3DFrameRect(dLft,dTop,dRgt,dBot,edgeSize,frameCol,true);
+                drawRect(dLft,dTop,dRgt,dBot,col);
+                draw3DFrameRect(dLft,dTop,dRgt,dBot,edgeSize,frameCol,true);
 
                     // possible design
                     // 0 = nothing

@@ -309,7 +309,7 @@ public class MapStory
         indexes=MeshUtility.intArrayListToInt(indexArray);
         uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
 
-        meshList.add(new Mesh(name,"platform",vertexes,normals,uvs,indexes,false));
+        meshList.add(new Mesh(name,"platform",vertexes,normals,uvs,indexes));
     }
 
         //
@@ -351,12 +351,9 @@ public class MapStory
         }
         
         room.setGrid(1,x,z,FLAG_WALL);
-
-            // starting position
-            
-        
         
             // build the story segments
+            // note: for now a single story
             
         //for (n=1;n<room.storyCount;n++) {
             setupRandomPlatforms(x,z,1);
