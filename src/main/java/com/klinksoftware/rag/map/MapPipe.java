@@ -38,10 +38,10 @@ public class MapPipe
         
             // get turn pieces
         
-        vertexList=MeshUtilityClass.createMapVertexList(constants.PIPE_SIDE_COUNT*6);
-        indexes=new Uint16Array(constants.PIPE_SIDE_COUNT*6);
+        vertexList=MeshUtilityClass.createMapVertexList(PIPE_SIDE_COUNT*6);
+        indexes=new Uint16Array(PIPE_SIDE_COUNT*6);
 
-        iCount=constants.PIPE_SIDE_COUNT*6;
+        iCount=PIPE_SIDE_COUNT*6;
         
         vIdx=0;
         
@@ -60,19 +60,19 @@ public class MapPipe
             // cyliner faces
 
         ang=0.0;
-        angAdd=360.0/constants.PIPE_SIDE_COUNT;
+        angAdd=360.0/PIPE_SIDE_COUNT;
 
-        for (n=0;n!==constants.PIPE_SIDE_COUNT;n++) {
+        for (n=0;n!==PIPE_SIDE_COUNT;n++) {
             ang2=ang+angAdd;
 
                 // the two Us
 
-            u1=(ang*constants.PIPE_SIDE_COUNT)/360.0;
-            u2=(ang2*constants.PIPE_SIDE_COUNT)/360.0;
+            u1=(ang*PIPE_SIDE_COUNT)/360.0;
+            u2=(ang2*PIPE_SIDE_COUNT)/360.0;
 
                 // force last segment to wrap
 
-            if (n===(constants.PIPE_SIDE_COUNT-1)) ang2=0.0;
+            if (n==(PIPE_SIDE_COUNT-1)) ang2=0.0;
 
             rd=ang*constants.DEGREE_TO_RAD;
             tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
@@ -166,10 +166,10 @@ public class MapPipe
         
             // get turn pieces
         
-        vertexList=MeshUtilityClass.createMapVertexList(constants.PIPE_CURVE_SEGMENT_COUNT*(constants.PIPE_SIDE_COUNT*6));
-        indexes=new Uint16Array(constants.PIPE_CURVE_SEGMENT_COUNT*(constants.PIPE_SIDE_COUNT*6));
+        vertexList=MeshUtilityClass.createMapVertexList(constants.PIPE_CURVE_SEGMENT_COUNT*(PIPE_SIDE_COUNT*6));
+        indexes=new Uint16Array(constants.PIPE_CURVE_SEGMENT_COUNT*(PIPE_SIDE_COUNT*6));
 
-        iCount=constants.PIPE_SIDE_COUNT*6;
+        iCount=PIPE_SIDE_COUNT*6;
         
         vIdx=0;
         iIdx=0;
@@ -211,7 +211,7 @@ public class MapPipe
 
                     // force last segment to wrap
                     
-                if (n===(constants.PIPE_SIDE_COUNT-1)) ang2=0.0;
+                if (n==(constants.PIPE_SIDE_COUNT-1)) ang2=0.0;
 
                 rd=ang*constants.DEGREE_TO_RAD;
                 tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
@@ -311,7 +311,7 @@ public class MapPipe
         pipeAng=new RagPoint(0,0,180.0);     // force len to point up
         
         len=genRandom.randomInt(1,(room.storyCount-1));
-        len=(len*(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH))-((radius*2)+constants.ROOM_FLOOR_DEPTH);
+        len=(len*(constants.ROOM_FLOOR_HEIGHT+floorDepth))-((radius*2)+floorDepth);
         
         this.addPipeStraightChunk(pnt,len,radius,pipeAng);
         
@@ -364,7 +364,7 @@ public class MapPipe
         
             // final up section of pipe
         
-        len=(pnt.y-yBound.min)+constants.ROOM_FLOOR_DEPTH;
+        len=(pnt.y-yBound.min)+floorDepth;
         
         if (len>0) {
             pipeAng=new RagPoint(0,0,180.0);     // force len to point up
@@ -384,11 +384,11 @@ public class MapPipe
     {
         let pipeAng=new RagPoint(0,0,0);
         
-        if (x===0) {
+        if (x==0) {
             
                 // to left
                 
-            if (z===0) {
+            if (z==0) {
                 this.addPipeCornerChunk(pnt,radius,0.0,0.0,0.0,-90.0,false);
                 
                 pipeAng.setFromValues(0.0,0.0,90.0);
@@ -414,7 +414,7 @@ public class MapPipe
             
                 // to top
                 
-            if (z===0) {
+            if (z==0) {
                 this.addPipeCornerChunk(pnt,radius,0.0,0.0,90.0,0.0,false);
                 
                 pipeAng.setFromValues(-90.0,0.0,0.0);
@@ -469,8 +469,8 @@ public class MapPipe
         platformBoundX=new BoundClass(x,(x+segmentSize));
         platformBoundZ=new BoundClass(z,(z+segmentSize));
         
-        platformBoundY=new BoundClass((yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        platformBoundY=new BoundClass((yBound.max-floorDepth),room.yBound.max);
+        this.map.meshList.add(MeshUtility.createCube(room,"","platform",platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize));
         
             // determine direction
         
@@ -489,7 +489,7 @@ public class MapPipe
         for (pz=0;pz!==2;pz++) {
             for (px=0;px!==2;px++) {
                 pnt.x=sx+(px*gridSize);
-                pnt.y=yBound.max-constants.ROOM_FLOOR_DEPTH;
+                pnt.y=yBound.max-floorDepth;
                 pnt.z=sz+(pz*gridSize);
                 
                 switch (genRandom.randomIndex(4)) {
@@ -506,31 +506,60 @@ public class MapPipe
             }
         }
     }
-    
-        //
-        // pipe decorations mainline
-        //
-
-    create(room,rect)
-    {
-        let x,z;
-        
-        for (z=rect.top;z!==rect.bot;z++) {
-            for (x=rect.lft;x!==rect.rgt;x++) {
-                
-                switch (genRandom.randomIndex(2)) {
-                    case 0:
-                        this.addPipeSet(room,x,z);
-                        break;
-                }
-                
-            }
-        }
-    }
 */
     
     public void build()
     {
+        int     x,z,lx,rx,tz,bz,skipX,skipZ,
+                pieceCount;
         
+            // bounds with margins
+            
+        lx=room.piece.margins[0];
+        rx=room.piece.size.x-(room.piece.margins[2]);
+        if (!room.requiredStairs.isEmpty()) {
+            if (lx<3) lx=3;
+            if (rx>(room.piece.size.x-3)) rx=room.piece.size.x-3;
+        }
+        if (rx<=lx) return;
+        
+        tz=this.room.piece.margins[1];
+        bz=this.room.piece.size.z-(room.piece.margins[3]);
+        if (!room.requiredStairs.isEmpty()) {
+            if (tz<3) tz=3;
+            if (bz>(room.piece.size.z-3)) bz=room.piece.size.z-3;
+        }
+        if (bz<=tz) return;
+        
+            // sizes
+            
+        
+            // if enough room, make a path
+            // through the equipment
+        
+        skipX=-1;
+        if ((rx-lx)>2) skipX=(lx+1)+GeneratorMain.random.nextInt((rx-lx)-2);
+        skipZ=-1;
+        if ((bz-tz)>2) skipZ=(tz+1)+GeneratorMain.random.nextInt((bz-tz)-2);
+        
+            // the pieces
+          
+        pieceCount=0;
+        
+        for (z=tz;z<bz;z++) {
+            if (z==skipZ) continue;
+            
+            for (x=lx;x<rx;x++) {
+                if (x==skipX) continue;
+                
+                if (GeneratorMain.random.nextBoolean()) {
+                    //addPipeSet(room,x,z);
+                }
+                
+                pieceCount++;
+                
+                this.room.setGrid(0,x,z,1);
+            }
+        }
     }
 }

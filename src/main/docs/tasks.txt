@@ -2,7 +2,6 @@
    - computer
    - lab decoration
    - pipes
-   - storage
 
 - rooms
    - do we need a fat + room (like the one with broken edges but a plus at the top

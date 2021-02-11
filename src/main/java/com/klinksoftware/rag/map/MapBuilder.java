@@ -143,12 +143,14 @@ public class MapBuilder
                 break;
             case 2:
                 mapBitmapList.generateBox();
+                mapBitmapList.generateAccessory();
                 (new MapStorage(meshList,room,("storage_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
             case 3:
                 mapBitmapList.generateComputer();
                 mapBitmapList.generatePanel();
                 mapBitmapList.generatePlatform();
+                mapBitmapList.generatePipe();
                 (new MapComputer(meshList,room,("computer_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
             case 4:
@@ -283,7 +285,6 @@ public class MapBuilder
         boolean             ceilings,decorations,bigRoomsOnly;
         String              mapName;
         RagPoint            centerPnt;
-        Mesh                mesh;
         MapRoom             room,connectRoom;
         ArrayList<MapRoom>  rooms;
         
@@ -466,11 +467,9 @@ public class MapBuilder
                 
                 // meshes
 
-            mesh=MeshUtility.buildRoomWalls(room,centerPnt,("wall_"+Integer.toString(n)),segmentSize);
-            mesh.combine(MeshUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y,segmentSize));
-            if (ceilings) mesh.combine(MeshUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY,segmentSize));
-            
-            meshList.add(mesh);
+            meshList.add(MeshUtility.buildRoomWalls(room,centerPnt,("wall_"+Integer.toString(n)),segmentSize));
+            meshList.add(MeshUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y,segmentSize));
+            if (ceilings) meshList.add(MeshUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY,segmentSize));
             
                 // decorations
 

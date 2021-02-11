@@ -11,6 +11,7 @@ public class BitmapMetal extends BitmapBase
     public final static int VARIATION_BOX=1;
     public final static int VARIATION_PIPE=2;
     public final static int VARIATION_HEXAGON=3;
+    public final static int VARIATION_SHEET=4;
 
     public final static float[][][][] CORRUGATION_LINES=
                                         {
@@ -359,7 +360,15 @@ public class BitmapMetal extends BitmapBase
             lft+=xSize;
         }
     }
- 
+    
+    private void generateMetalSheet(RagColor metalColor)
+    {
+        createPerlinNoiseData(16,16);
+        drawRect(0,0,textureSize,textureSize,metalColor);
+        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.8f,1.0f);
+        drawMetalShine(0,0,textureSize,textureSize,metalColor);
+    }
+    
         //
         // metal bitmaps
         //
@@ -387,6 +396,9 @@ public class BitmapMetal extends BitmapBase
                 break;
             case VARIATION_HEXAGON:
                 generateMetalHexagon(metalColor,altMetalColor,edgeSize,screwSize);
+                break;
+            case VARIATION_SHEET:
+                generateMetalSheet(metalColor);
                 break;
         }
 

@@ -19,147 +19,48 @@ public class MapComputer
         this.segmentSize=segmentSize;
     }
     
-    /*
-        constructor(view,map,platformBitmap)
-    {
-        let genBitmap;
-        
-        super(view,map,platformBitmap);
-        
-            // bitmaps
-            
-        genBitmap=new GenBitmapMetalClass(this.view);
-        this.metalBitmap=genBitmap.generate(false);
-
-        genBitmap=new GenBitmapPanelClass(this.view);
-        this.panelBitmap=genBitmap.generate(false);
-
-        genBitmap=new GenBitmapComputerClass(this.view);
-        this.computerBitmap=genBitmap.generate(false);
-
-        genBitmap=new GenBitmapPipeClass(this.view);
-        this.pipeBitmap=genBitmap.generate(false);
-
-        Object.seal(this);
-    }
-    
         //
         // platform
         //
         
-    addPlatform(room,rect)
+    private void addPlatform(MapRoom room,int lx,int tz,int rx,int bz,float floorDepth)
     {
-        let xBound,yBound,zBound;
+        float       xMin,xMax,yMin,yMax,zMin,zMax;
         
-        xBound=new BoundClass((room.xBound.min+(rect.lft*segmentSize)),(room.xBound.min+(rect.rgt*segmentSize)));
-        zBound=new BoundClass((room.zBound.min+(rect.top*segmentSize)),(room.zBound.min+(rect.bot*segmentSize)));
-        yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        xMin=room.offset.x+((float)lx*segmentSize);
+        xMax=room.offset.x+((float)rx*segmentSize);
+        yMin=room.offset.y;
+        yMax=room.offset.y+floorDepth;
+        zMin=room.offset.z+((float)tz*segmentSize);
+        zMax=room.offset.z+((float)bz*segmentSize);
+            
+        meshList.add(MeshUtility.createCube(room,(name+"_pedestal"),"platform",xMin,xMax,yMin,yMax,zMin,zMax,true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize));
     }
         
         //
         // computer banks
         //
         
-    addBank(room,x,z,margin,dir)
+    private void addBank(MapRoom room,int gx,int gz,float wid,float high,float floorDepth,int pieceCount)
     {
-        let wid,mesh;
-        let xBound,yBound,zBound,xBound2,zBound2;
-       
-            // computer
+        float       x,y,z,widOffset;
+        
+        widOffset=(segmentSize-wid)*0.5f;
+        
+        x=(room.offset.x+((float)gx*segmentSize))+widOffset;
+        y=room.offset.y+floorDepth;
+        z=(room.offset.z+((float)gz*segmentSize))+widOffset;
 
-        wid=segmentSize-(margin*2);
-        
-        x=room.xBound.min+(x*segmentSize);
-        z=room.zBound.min+(z*segmentSize);
-        
-        xBound=new BoundClass((x+margin),(x+wid));
-        zBound=new BoundClass((z+margin),(z+wid));
-        yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_HEIGHT),(room.yBound.max-constants.ROOM_FLOOR_DEPTH));
-        
-            // create meshes that point right way
-            
-        switch (dir) {
-            
-            case constants.ROOM_SIDE_LEFT:
-                xBound2=new BoundClass((xBound.min+constants.ROOM_FLOOR_DEPTH),xBound.max);
-                xBound.max=xBound2.min;
-                
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound2,yBound,zBound,false,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.meshList.add(mesh);
-                
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.computerBitmap,xBound,yBound,zBound,true,false,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.1,0.9,0.1,0.9);        // front facing poly
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.1,0.9);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.1,0.9);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.1,0.9,0.0,0.1);
-                this.map.meshList.add(mesh);
-                break;
-                
-            case constants.ROOM_SIDE_TOP:
-                zBound2=new BoundClass((zBound.min+constants.ROOM_FLOOR_DEPTH),zBound.max);
-                zBound.max=zBound2.min;
-                
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound,yBound,zBound2,true,true,false,true,true,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.meshList.add(mesh);
-                
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.computerBitmap,xBound,yBound,zBound,true,true,true,false,true,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.1,0.9);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.1,0.9);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.1,0.9,0.1,0.9);        // front facing poly
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.1,0.9,0.0,0.1);
-                this.map.meshList.add(mesh);
-                
-                break;
-                
-            case constants.ROOM_SIDE_RIGHT:
-                xBound2=new BoundClass(xBound.min,(xBound.max-constants.ROOM_FLOOR_DEPTH));
-                xBound.min=xBound2.max;
-                
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound2,yBound,zBound,true,false,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.meshList.add(mesh);
-                
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.computerBitmap,xBound,yBound,zBound,false,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.1,0.9,0.1,0.9);        // front facing poly
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.1,0.9);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.1,0.9);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.1,0.9,0.0,0.1);
-                this.map.meshList.add(mesh);
-                break;
-                
-            case constants.ROOM_SIDE_BOTTOM:
-                zBound2=new BoundClass(zBound.min,(zBound.max-constants.ROOM_FLOOR_DEPTH));
-                zBound.min=zBound2.max;
-                
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound,yBound,zBound2,true,true,true,false,true,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.meshList.add(mesh);
-                
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.computerBitmap,xBound,yBound,zBound,true,true,false,true,true,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.1,0.9);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.1,0.9);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.1,0.9,0.1,0.9);        // front facing poly
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.1,0.9,0.0,0.1);
-                this.map.meshList.add(mesh);
-                break;
-
-        }
+        meshList.add(MeshUtility.createCube(room,(name+"_computer_"+pieceCount),"computer",x,(x+wid),y,(y+high),z,(z+wid),true,true,true,true,true,false,false,MeshUtility.UV_BOX,segmentSize));
     }
-    
+   
         //
         // terminals
         //
         
-    addTerminal(room,pnt,dir)
+    public void addTerminal(MapRoom room,int gx,int gz,float wid,float high,float floorDepth,int pieceCount)
     {
+        /*
         let panelMargin,mesh,mesh2;
         let xBound,yBound,zBound;
         
@@ -171,16 +72,16 @@ public class MapComputer
         zBound=new BoundClass((pnt.z+panelMargin),((pnt.z+segmentSize)-panelMargin));
         yBound=new BoundClass(pnt.y,(pnt.y-Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.3)));
         
-        mesh=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshUtility.createCube(room,"","accessory",xBound,yBound,zBound,true,true,true,true,false,false,false,MeshUtility.UV_MAP,segmentSize);
         MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
         
             // the panel wedge
 
         yBound.max=yBound.min;
-        yBound.min=yBound.max-constants.ROOM_FLOOR_DEPTH;
+        yBound.min=yBound.max-floorDepth;
         
         mesh2=MeshPrimitivesClass.createMeshDirectionWedge(this.view,this.metalBitmap,xBound,yBound,zBound,dir,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
-        mesh.combineMesh(mesh2);
+        mesh.combine(mesh2);
         this.map.meshList.add(mesh);
         
             // the panel top
@@ -189,14 +90,16 @@ public class MapComputer
         MeshPrimitivesClass.meshWedgeSetWholeUV(mesh,0,false,false,false);
         MeshPrimitivesClass.meshWedgeScaleUV(mesh,0,false,false,false,0.1,0.9,0.1,0.9);
         this.map.meshList.add(mesh);
+        */
     }
     
         //
         // junctions
         //
-        
-    addJunction(room,pnt,dir)
+       
+    public void addJunction(MapRoom room,int gx,int gz,float wid,float high,float floorDepth,int pieceCount)
     {
+        /*
         let juncMargin,juncWid,pipeRadius,pipeHigh,mesh;
         let xBound,yBound,zBound,pipeYBound,centerPnt;
         let upperPipe,lowerPipe;
@@ -218,7 +121,7 @@ public class MapComputer
             case constants.ROOM_SIDE_LEFT:
                 xBound=new BoundClass(pnt.x,(pnt.x+juncWid));
                 zBound=new BoundClass((pnt.z+juncMargin),((pnt.z+segmentSize)-juncMargin));
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
+                mesh=MeshUtility.createCube(room,"","accessory",xBound,yBound,zBound,true,true,true,true,true,true,false,MeshUtility.UV_MAP,segmentSize);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 this.map.meshList.add(mesh);
                 break;
@@ -226,7 +129,7 @@ public class MapComputer
             case constants.ROOM_SIDE_TOP:
                 xBound=new BoundClass((pnt.x+juncMargin),((pnt.x+segmentSize)-juncMargin));
                 zBound=new BoundClass(pnt.z,(pnt.z+juncWid));
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
+                mesh=MeshUtility.createCube(room,"","accessory",xBound,yBound,zBound,true,true,true,true,true,true,false,MeshUtility.UV_MAP,segmentSize);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 this.map.meshList.add(mesh);
                 break;
@@ -234,7 +137,7 @@ public class MapComputer
             case constants.ROOM_SIDE_RIGHT:
                 xBound=new BoundClass(((pnt.x+segmentSize)-juncWid),(pnt.x+segmentSize));
                 zBound=new BoundClass((pnt.z+juncMargin),((pnt.z+segmentSize)-juncMargin));
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
+                mesh=MeshUtility.createCube(room,"","accessory",xBound,yBound,zBound,true,true,true,true,true,true,false,MeshUtility.UV_MAP,segmentSize);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 this.map.meshList.add(mesh);
                 break;
@@ -242,7 +145,7 @@ public class MapComputer
             case constants.ROOM_SIDE_BOTTOM:
                 xBound=new BoundClass((pnt.x+juncMargin),((pnt.x+segmentSize)-juncMargin));
                 zBound=new BoundClass(((pnt.z+segmentSize)-juncWid),(pnt.z+segmentSize));
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
+                mesh=MeshUtility.createCube(room,"","accessory",xBound,yBound,zBound,true,true,true,true,true,true,false,MeshUtility.UV_MAP,segmentSize);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 this.map.meshList.add(mesh);
                 break;
@@ -263,85 +166,14 @@ public class MapComputer
             pipeYBound=new BoundClass(yBound.max,pnt.y);
             this.map.meshList.add(MeshPrimitivesClass.createMeshCylinderSimple(this.view,this.pipeBitmap,centerPnt,pipeYBound,pipeRadius,false,false,constants.MESH_FLAG_DECORATION));
         }
+*/
     }
-    
-        //
-        // single spot piece
-        //
-        
-    addPiece(room,x,z,margin,dir)
-    {
-        let pnt;
-        
-            // computer item
-            
-        pnt=new RagPoint((room.xBound.min+(x*segmentSize)),room.yBound.max,(room.zBound.min+(z*segmentSize)));
-        
-        switch (genRandom.randomIndex(4)) {
-            case 0:
-            case 1:
-                this.addBank(room,x,z,margin,dir);         // appears twice as much as the others
-                break;
-            case 2:
-                this.addTerminal(room,pnt,dir);
-                break;
-            case 3:
-                this.addJunction(room,pnt,dir);
-                break;
-        }
-    }
-    
-        //
-        // computer decorations mainline
-        //
-
-    create(room,rect)
-    {
-        let x,z,margin;
-        
-            // the platform
-            
-        this.addPlatform(room,rect);
-        
-            // a margin for the items that use
-            // the same margins
-            
-        margin=genRandom.randomInt(0,Math.trunc(segmentSize/8));
-        
-            // computer pieces
-            
-        for (x=rect.lft;x!==rect.rgt;x++) {
-            for (z=rect.top;z!==rect.bot;z++) {
-                
-                if (x===rect.lft) {
-                    this.addPiece(room,x,z,margin,constants.ROOM_SIDE_LEFT);
-                }
-                else {
-                    if (x===(rect.rgt-1)) {
-                        this.addPiece(room,x,z,margin,constants.ROOM_SIDE_RIGHT);
-                    }
-                    else {
-                        if (z===(rect.top)) {
-                            this.addPiece(room,x,z,margin,constants.ROOM_SIDE_TOP);
-                        }
-                        else {
-                            if (z===(rect.bot-1)) {
-                                this.addPiece(room,x,z,margin,constants.ROOM_SIDE_BOTTOM);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    */
-    
+   
     public void build()
     {
         int     x,z,lx,rx,tz,bz,skipX,skipZ,
-                computerCount;
-        float   ty,by,wid,widOffset,
-                xMin,xMax,yMin,yMax,zMin,zMax;
+                pieceCount;
+        float   bankWid,bankHigh,floorDepth;
         Mesh    mesh;
         
             // bounds with margins
@@ -362,56 +194,48 @@ public class MapComputer
         }
         if (bz<=tz) return;
         
-            // size
+            // sizes
             
-        wid=segmentSize*0.7f;
-        widOffset=segmentSize*0.15f;
-        ty=segmentSize;
-        by=segmentSize*0.1f;
+        bankWid=(segmentSize*0.5f)+(GeneratorMain.random.nextFloat()*(segmentSize*0.3f));
+        bankHigh=bankWid*(1.0f+(GeneratorMain.random.nextFloat()*(segmentSize*0.15f)));
+        floorDepth=segmentSize*0.1f;
         
-            // the equipment floor
+            // the equipment platform
             
-        xMin=room.offset.x+((float)lx*segmentSize);
-        xMax=room.offset.x+((float)rx*segmentSize);
-        yMin=room.offset.y;
-        yMax=room.offset.y+by;
-        zMin=room.offset.z+((float)tz*segmentSize);
-        zMax=room.offset.z+((float)bz*segmentSize);
-            
-        mesh=MeshUtility.createCube(room,(name+"_pedestal"),"platform",xMin,xMax,yMin,yMax,zMin,zMax,true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize);
-        meshList.add(mesh);
+        addPlatform(room,lx,tz,rx,bz,floorDepth);
         
             // if enough room, make a path
-            // through the computers
+            // through the equipment
         
         skipX=-1;
         if ((rx-lx)>2) skipX=(lx+1)+GeneratorMain.random.nextInt((rx-lx)-2);
         skipZ=-1;
         if ((bz-tz)>2) skipZ=(tz+1)+GeneratorMain.random.nextInt((bz-tz)-2);
         
-            // the computers
+            // the pieces
           
-        computerCount=0;
-        
-        yMin=room.offset.y+by;
-        yMax=room.offset.y+ty;
+        pieceCount=0;
         
         for (z=tz;z<bz;z++) {
             if (z==skipZ) continue;
             
-            zMin=(room.offset.z+((float)z*segmentSize))+widOffset;
-            zMax=zMin+wid;
-            
             for (x=lx;x<rx;x++) {
                 if (x==skipX) continue;
                 
-                xMin=(room.offset.x+((float)x*segmentSize))+widOffset;
-                xMax=xMin+wid;
+                switch (GeneratorMain.random.nextInt(4)) {
+                    case 0:
+                    case 1:
+                        addBank(room,x,z,bankWid,bankHigh,floorDepth,pieceCount);         // appears twice as much as the others
+                        break;
+                    case 2:
+                    //    this.addTerminal(room,pnt,dir,floorDepth);
+                        break;
+                    case 3:
+                    //    this.addJunction(room,pnt,dir);
+                        break;
+                }
                 
-                mesh=MeshUtility.createCube(room,(name+"_computer_"+computerCount),"computer",xMin,xMax,yMin,yMax,zMin,zMax,true,true,true,true,true,false,false,MeshUtility.UV_BOX,segmentSize);
-                computerCount++;
-                
-                meshList.add(mesh);
+                pieceCount++;
                 
                 this.room.setGrid(0,x,z,1);
             }

@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.map;
 
+import com.klinksoftware.rag.GeneratorMain;
 import com.klinksoftware.rag.mesh.*;
 
 public class MapLab
@@ -25,9 +26,9 @@ public class MapLab
         super(view,map,platformBitmap);
         
         this.tubeHigh=constants.ROOM_FLOOR_HEIGHT;
-        this.tubeCapHigh=genRandom.randomInt(constants.ROOM_FLOOR_DEPTH,Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.25));
+        this.tubeCapHigh=genRandom.randomInt(floorDepth,Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.25));
         
-        this.smallTubeHigh=genRandom.randomInt(constants.ROOM_FLOOR_DEPTH,constants.ROOM_FLOOR_DEPTH);
+        this.smallTubeHigh=genRandom.randomInt(floorDepth,floorDepth);
         this.smallTubeCapHigh=Math.trunc(this.smallTubeHigh*genRandom.randomFloat(0.1,0.2));
 
             // bitmaps
@@ -49,12 +50,12 @@ public class MapLab
         
         Object.seal(this);
     }
-    
+    */
         //
         // lab tubes
         //
-        
-    addTubeInternal(centerPnt,radius,topCapHigh,botCapHigh,tubeHigh)
+        /*
+    addTubeInternal(centerPnt,radius,topCapHigh,botCapHigh,tubeHigh,float floorDepth)
     {
         let yBound,mesh,meshIdx;
         let yCapTop,yCapBottom,yBaseTop,yBaseBottom,yLiqHigh;
@@ -93,7 +94,7 @@ public class MapLab
         
             // the liquid in the tube
         
-        yLiqHigh=genRandom.randomInt(constants.ROOM_FLOOR_DEPTH,(yBound.getSize()-constants.ROOM_FLOOR_DEPTH));    
+        yLiqHigh=genRandom.randomInt(floorDepth,(yBound.getSize()-floorDepth));    
         yBound=new BoundClass((yBaseTop-yLiqHigh),yBaseTop);
         
         radius=Math.trunc(radius*0.98);
@@ -113,9 +114,11 @@ public class MapLab
         
         this.map.movementList.add(movement);
     }
+    */
     
-    addTube(room,x,z)
+    public void addTube(MapRoom room,int gx,int gz,int pieceCount)
     {
+        /*
         let centerPnt,radius;
         
         x=(room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH))+Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5);
@@ -125,19 +128,20 @@ public class MapLab
         radius=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.35);
         
         this.addTubeInternal(centerPnt,radius,this.tubeCapHigh,this.tubeCapHigh,this.tubeHigh);
+*/
     }
     
         //
         // lab machinery
         //
-
-    addMachineryItemPanel(xBound,zBound,y)
+/*
+    addMachineryItemPanel(xBound,zBound,y,floorDepth)
     {
         let mesh,yBound;
         
-        yBound=new BoundClass((y-Math.trunc(constants.ROOM_FLOOR_DEPTH*0.5)),y);
+        yBound=new BoundClass((y-Math.trunc(floorDepth*0.5)),y);
         
-        mesh=MeshPrimitivesClass.createMeshCube(this.view,this.panelBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshUtility.createCube(room,"","panel",xBound,yBound,zBound,true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize);
         MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
         MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.1,0.9,0.0,0.1);
         MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.1,0.9,0.0,0.1);
@@ -159,7 +163,7 @@ public class MapLab
                 centerPnt=new RagPoint(xBound.getMidPoint(),y,zBound.getMidPoint());
                 radius=Math.trunc(xBound.getSize()*0.3);
 
-                high=genRandom.randomInt(constants.ROOM_FLOOR_DEPTH,constants.ROOM_FLOOR_DEPTH);
+                high=genRandom.randomInt(floorDepth,floorDepth);
                 capHigh=Math.trunc(high*genRandom.randomFloat(0.1,0.2));
 
                 this.addTubeInternal(centerPnt,radius,this.smallTubeCapHigh,0,this.smallTubeHigh);
@@ -172,9 +176,11 @@ public class MapLab
                 break;
         }
     }
+    */
     
-    addMachinery(room,x,z)
+    public void addMachinery(MapRoom room,int gx,int gz,int pieceCount)
     {
+        /*
         let xBound,yBound,zBound;
         let sz,xBoundItem,zBoundItem;
         let reduceSize;
@@ -187,8 +193,8 @@ public class MapLab
         xBound=new BoundClass(x,(x+constants.ROOM_BLOCK_WIDTH));
         zBound=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
 
-        yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        yBound=new BoundClass((room.yBound.max-floorDepth),room.yBound.max);
+        this.map.meshList.add(MeshUtility.createCube(room,"","platform",xBound,yBound,zBound,true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize));
         
             // the box
         
@@ -198,8 +204,8 @@ public class MapLab
         zBound.min+=reduceSize;
         zBound.max-=reduceSize;
 
-        yBound=new BoundClass((room.yBound.max-Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.3)),(room.yBound.max-constants.ROOM_FLOOR_DEPTH));
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+        yBound=new BoundClass((room.yBound.max-Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.3)),(room.yBound.max-floorDepth));
+        this.map.meshList.add(MeshUtility.createCube(room,"","accessory",xBound,yBound,zBound,true,true,true,true,true,true,false,MeshUtility.UV_MAP,segmentSize));
         
             // box items
         
@@ -218,38 +224,69 @@ public class MapLab
         
         xBoundItem=new BoundClass((xBound.max-sz),xBound.max);
         this.addMachineryItem(xBoundItem,zBoundItem,yBound.min);
+*/
     }
         
-        //
-        // lab
-        //
-    
-    create(room,rect)
-    {
-        let x,z;
-        
-        for (z=rect.top;z!==rect.bot;z++) {
-            for (x=rect.lft;x!==rect.rgt;x++) {
-                switch (genRandom.randomIndex(3)) {
-                    case 0:
-                        this.addTube(room,x,z);
-                        break;
-                    case 1:
-                        this.addMachinery(room,x,z);
-                        break;
-                }
-            }
-        }
-    }
-    */
-    
         //
         // lab
         //
     
     public void build()
     {
+        int         x,z,lx,rx,tz,bz,skipX,skipZ,
+                    pieceCount;
         
+            // bounds with margins
+            
+        lx=room.piece.margins[0];
+        rx=room.piece.size.x-(room.piece.margins[2]);
+        if (!room.requiredStairs.isEmpty()) {
+            if (lx<3) lx=3;
+            if (rx>(room.piece.size.x-3)) rx=room.piece.size.x-3;
+        }
+        if (rx<=lx) return;
+        
+        tz=this.room.piece.margins[1];
+        bz=this.room.piece.size.z-(room.piece.margins[3]);
+        if (!room.requiredStairs.isEmpty()) {
+            if (tz<3) tz=3;
+            if (bz>(room.piece.size.z-3)) bz=room.piece.size.z-3;
+        }
+        if (bz<=tz) return;
+        
+            // if enough room, make a path
+            // through the lab
+        
+        skipX=-1;
+        if ((rx-lx)>2) skipX=(lx+1)+GeneratorMain.random.nextInt((rx-lx)-2);
+        skipZ=-1;
+        if ((bz-tz)>2) skipZ=(tz+1)+GeneratorMain.random.nextInt((bz-tz)-2);
+        
+            // the pieces
+          
+        pieceCount=0;
+        
+        for (z=tz;z<bz;z++) {
+            if (z==skipZ) continue;
+            
+            for (x=lx;x<rx;x++) {
+                if (x==skipX) continue;
+        
+                switch (GeneratorMain.random.nextInt(3)) {
+                    case 0:
+                        addTube(room,x,z,pieceCount);
+                        pieceCount++;
+                        room.setGrid(0,x,z,1);
+                        break;
+                    case 1:
+                        addMachinery(room,x,z,pieceCount);
+                        pieceCount++;
+                        room.setGrid(0,x,z,1);
+                        break;
+                }
+            }
+        }
+
     }
     
 }
