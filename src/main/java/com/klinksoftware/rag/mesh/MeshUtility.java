@@ -770,7 +770,7 @@ public class MeshUtility
         return(segments);
     }
     
-    public static Mesh createCylinder(MapRoom room,String name,RagPoint centerPnt,float ty,float by,float[] segments,float radius,boolean addTop,boolean addBot)
+    public static Mesh createCylinder(MapRoom room,String name,String bitmapName,RagPoint centerPnt,float ty,float by,float[] segments,float radius,boolean addTop,boolean addBot)
     {
         int                 n,k,t,iIdx,vStartIdx,segCount;
         float               ang,ang2,angAdd,y,segTy,segBy,yAdd,
@@ -960,11 +960,11 @@ public class MeshUtility
         uvs=floatArrayListToFloat(uvArray);
         indexes=intArrayListToInt(indexArray);
         
-        return(new Mesh(name,"pillar",vertexes,normals,uvs,indexes));
+        return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
     }
     
-    public static Mesh createMeshCylinderSimple(MapRoom room,String name,RagPoint centerPnt,float ty,float by,float radius,boolean addTop,boolean addBot)
+    public static Mesh createMeshCylinderSimple(MapRoom room,String name,String bitmapName,RagPoint centerPnt,float ty,float by,float radius,boolean addTop,boolean addBot)
     {
-        return(createCylinder(room,name,centerPnt,ty,by,new float[]{1.0f,1.0f},radius,addTop,addBot));
+        return(createCylinder(room,name,bitmapName,centerPnt,ty,by,new float[]{1.0f,1.0f},radius,addTop,addBot));
     }
 }

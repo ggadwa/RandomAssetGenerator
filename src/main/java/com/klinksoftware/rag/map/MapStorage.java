@@ -159,7 +159,7 @@ public class MapStorage
             
                 // go up one level
 
-            y+=shelfHigh;
+            y+=(shelfHigh+floorDepth);
             if (y>(room.offset.y+(segmentSize*room.storyCount))) break;
         }
             

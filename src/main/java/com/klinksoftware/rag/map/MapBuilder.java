@@ -111,7 +111,7 @@ public class MapBuilder
             // some decorations can't work in some rooms
             
         while (true) {
-            decorationType=GeneratorMain.random.nextInt(7);
+            decorationType=GeneratorMain.random.nextInt(6);
             
                 // stories only in rooms with more than one story
                 
@@ -120,9 +120,9 @@ public class MapBuilder
                 continue;
             }
             
-                // computers and labs only in big rooms
+                // equipment only in big rooms
                 
-            if ((decorationType==3) || (decorationType==4)) {
+            if (decorationType==3) {
                 if ((room.piece.size.x==10) || (room.piece.size.z==10)) break;
                 continue;
             }
@@ -149,18 +149,18 @@ public class MapBuilder
             case 3:
                 mapBitmapList.generateComputer();
                 mapBitmapList.generatePanel();
+                mapBitmapList.generateMonitor();
                 mapBitmapList.generatePlatform();
                 mapBitmapList.generatePipe();
-                (new MapComputer(meshList,room,("computer_"+Integer.toString(roomIdx)),segmentSize)).build();
+                mapBitmapList.generateLiquid();
+                mapBitmapList.generateGlass();
+                (new MapEquipment(meshList,room,("computer_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
             case 4:
-                (new MapLab(meshList,room,("lab_"+Integer.toString(roomIdx)),segmentSize)).build();
-                break;
-            case 5:
                 mapBitmapList.generatePipe();
                 (new MapPipe(meshList,room,("pipe_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;
-            case 6:
+            case 5:
                 mapBitmapList.generatePlatform();
                 (new MapAltar(meshList,room,("alter_"+Integer.toString(roomIdx)),segmentSize)).build();
                 break;

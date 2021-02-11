@@ -9,6 +9,7 @@ public class BitmapComputer extends BitmapBase
 {
     public final static int VARIATION_COMPUTER_BANK=0;
     public final static int VARIATION_CONTROL_PANEL=1;
+    public final static int VARIATION_MONITOR=2;
     
     public final static RagColor[] LED_COLORS={
                                 new RagColor(0.0f,1.0f,0.0f),
@@ -261,7 +262,7 @@ public class BitmapComputer extends BitmapBase
     
     private void generateComputerComponentScreen(int lft,int top,int rgt,int bot,int edgeSize)
     {
-        int         x,y,dx,dy,rowCount,colCount;
+        int         x,y,dx,dy,rowCount,colCount,colCount2;
         RagColor    screenColor,charColor,emissiveCharColor;
         
         lft+=edgeSize;
@@ -298,7 +299,9 @@ public class BitmapComputer extends BitmapBase
             
             dx=lft+10;
             
-            for (x=0;x<colCount;x++) {
+            colCount2=(colCount/2)+GeneratorMain.random.nextInt(colCount/2);
+            
+            for (x=0;x<colCount2;x++) {
                 
                 switch (GeneratorMain.random.nextInt(5)) {
                     case 0:
@@ -427,6 +430,7 @@ public class BitmapComputer extends BitmapBase
                         rndSuccess=true;
                         break;
                     case 5:
+                        if (variationMode==VARIATION_CONTROL_PANEL) break;              // no monitors on panels
                         if (hadScreen) break;
                         if ((rx-lx)<(by-ty)) break;     // screens only horizontal
                         hadScreen=true;
@@ -473,9 +477,16 @@ public class BitmapComputer extends BitmapBase
             
         drawRect(0,0,textureSize,textureSize,panelColor);
         
-        generateComputerComponents(0,0,offset,offset,panelInsideColor,panelInsideEdgeSize,variationMode);             // left and right
-        generateComputerComponents(offset,0,textureSize,offset,panelInsideColor,panelInsideEdgeSize,variationMode);   // front and back
-        draw3DFrameRect(0,offset,offset,textureSize,panelEdgeSize,panelColor,true);                     // top and bottom
+        if ((variationMode==VARIATION_COMPUTER_BANK) || (variationMode==VARIATION_CONTROL_PANEL)) {
+            generateComputerComponents(0,0,offset,offset,panelInsideColor,panelInsideEdgeSize,variationMode);             // left and right
+            generateComputerComponents(offset,0,textureSize,offset,panelInsideColor,panelInsideEdgeSize,variationMode);   // front and back
+            draw3DFrameRect(0,offset,offset,textureSize,panelEdgeSize,panelColor,true);                     // top and bottom
+        }
+        else {
+            draw3DFrameRect(0,0,offset,offset,panelEdgeSize,panelColor,true);                       // left and right
+            generateComputerComponentScreen(offset,0,textureSize,offset,panelInsideEdgeSize);       // front and back
+            draw3DFrameRect(offset,0,textureSize,offset,panelEdgeSize,panelColor,true);             // top and bottom
+        }
         
             // set the emissive
             

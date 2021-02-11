@@ -9,8 +9,8 @@ public class BitmapGenerator
 {
     private boolean     hasWallBitmap,hasFloorBitmap,hasCeilingBitmap,hasStepBitmap,
                         hasPlatformBitmap,hasPillarBitmap,hasBoxBitmap,hasComputerBitmap,
-                        hasPanelBitmap,hasPipeBitmap,hasLiquidBitmap,hasGlassBitmap,
-                        hasAccessoryBitmap;
+                        hasPanelBitmap,hasMonitorBitmap,hasPipeBitmap,hasLiquidBitmap,
+                        hasGlassBitmap,hasAccessoryBitmap;
     private String      basePath;
     
     public BitmapGenerator(String basePath)
@@ -25,6 +25,8 @@ public class BitmapGenerator
         hasPillarBitmap=false;
         hasBoxBitmap=false;
         hasComputerBitmap=false;
+        hasPanelBitmap=false;
+        hasMonitorBitmap=false;
         hasPipeBitmap=false;
         hasLiquidBitmap=false;
         hasGlassBitmap=false;
@@ -264,6 +266,15 @@ public class BitmapGenerator
         (new BitmapComputer()).generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"panel");
         
         hasPanelBitmap=true;
+    }
+    
+    public void generateMonitor()
+    {
+        if (hasMonitorBitmap) return;
+        
+        (new BitmapComputer()).generate(BitmapComputer.VARIATION_MONITOR,basePath,"monitor");
+        
+        hasMonitorBitmap=true;
     }
     
     public void generatePipe()

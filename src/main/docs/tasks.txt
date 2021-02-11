@@ -1,6 +1,4 @@
 - js -> java updates
-   - computer
-   - lab decoration
    - pipes
 
 - rooms
@@ -8,7 +6,6 @@
 
 - bitmaps
    - metal - screws get random rotated cross or straight line
-   - grass/dirt?
 
 - decorations
    - don't repeat decorations for connected rooms
@@ -17,3 +14,4 @@
    - connectors for pipes
 
 
+c:/Java/jdk-15.0.2/bin/jpackage --name RandomAssetGenerator --input c:\Code\RandomAssetGenerator\target --main-jar RandomAssetGenerator-1.0.jar --main-class com.klinksoftware.rag.RandomAssetGenerator --type EXE
