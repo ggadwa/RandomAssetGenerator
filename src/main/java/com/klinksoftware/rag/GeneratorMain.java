@@ -2,6 +2,7 @@ package com.klinksoftware.rag;
 
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.map.*;
+import com.klinksoftware.rag.model.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -35,7 +36,7 @@ public class GeneratorMain
         long                seed;
         String              basePath,name;
         File                file;
-        MapBuilder          mapBuilder;
+        MapIndoorBuilder    mapIndoorBuilder;
         
         System.out.println("starting map build");
         
@@ -73,8 +74,8 @@ public class GeneratorMain
             // run the map creation
        
         try {
-            mapBuilder=new MapBuilder(basePath);
-            mapBuilder.build();
+            mapIndoorBuilder=new MapIndoorBuilder(basePath);
+            mapIndoorBuilder.build();
         }
         catch (Exception e)
         {
@@ -108,5 +109,66 @@ public class GeneratorMain
         
         System.out.println("finished map build");
     }
-
+    
+    public static void runModel(String jsonSettingsStr)
+    {
+        long                    seed;
+        String                  basePath,name;
+        File                    file;
+        ModelHumanoidBuilder    modelHumanoidBuilder;
+        
+        System.out.println("starting model build");
+        
+            // get the json settings
+            
+        try {
+            settings=(new ObjectMapper()).readValue(jsonSettingsStr,new TypeReference<Map<String,Object>>(){});
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return;
+        }
+        
+            // seed the random
+            // if seed == 0, then seed is set randomly
+            
+        seed=(int)settings.get("seed");
+        if (seed==0) seed=Calendar.getInstance().getTimeInMillis();
+        
+        random=new Random(seed);
+        
+            // the color scheme
+            
+        colorScheme=BitmapBase.getColorScheme((String)settings.get("colorScheme"));
+        
+            // create the model directory
+        
+        name=(String)settings.get("name");
+        basePath="output"+File.separator+name;
+        
+        file=new File(basePath+File.separator+"textures");
+        if (!file.exists()) file.mkdirs();
+        
+            // run the model creation
+       
+        try {
+            modelHumanoidBuilder=new ModelHumanoidBuilder(basePath);
+            modelHumanoidBuilder.build();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
+        try {
+            (new BitmapBody()).generate(BitmapBrick.VARIATION_NONE,basePath,"body");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        
+        System.out.println("finished model build");
+    }
 }

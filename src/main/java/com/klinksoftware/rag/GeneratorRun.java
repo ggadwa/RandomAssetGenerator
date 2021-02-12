@@ -21,11 +21,13 @@ public class GeneratorRun extends SwingWorker<String,Void>
     {
         runButton.setEnabled(false);
         
-        if (tab.getSelectedIndex()==0) {
-            GeneratorMain.runMap(mapTextArea.getText());
-        }
-        else {
-            // todo -- nothing yet
+        switch (tab.getSelectedIndex()) {
+            case 0:
+                GeneratorMain.runMap(mapTextArea.getText());
+                break;
+            case 1:
+                GeneratorMain.runModel(modelTextArea.getText());
+                break;
         }
 
         return("");

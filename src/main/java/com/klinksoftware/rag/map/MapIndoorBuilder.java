@@ -1,6 +1,6 @@
 package com.klinksoftware.rag.map;
 
-import com.klinksoftware.rag.bitmaps.BitmapGenerator;
+import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.export.*;
 import com.klinksoftware.rag.mesh.*;
@@ -8,16 +8,16 @@ import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
 
-public class MapBuilder
+public class MapIndoorBuilder
 {
     public static final int         ROOM_RANDOM_LOCATION_DISTANCE=100;
     
     private String                  basePath;
     private MeshList                meshList;
-    private BitmapGenerator           mapBitmapList;
+    private BitmapGenerator         mapBitmapList;
     private MapPieceList            mapPieceList;
     
-    public MapBuilder(String basePath)
+    public MapIndoorBuilder(String basePath)
     {
         this.basePath=basePath;
     }

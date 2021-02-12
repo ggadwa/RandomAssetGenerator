@@ -165,7 +165,7 @@ public class AppWindow implements WindowListener
             
         mapTextArea=new JTextArea();
         mapTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
-        mapTextArea.setText(GeneratorMain.getSettingJson("map"));
+        mapTextArea.setText(GeneratorMain.getSettingJson("map_indoor"));
         
         mapTextScroll=new JScrollPane(mapTextArea); 
         mapTextScroll.setBorder(BorderFactory.createEmptyBorder());
@@ -175,13 +175,13 @@ public class AppWindow implements WindowListener
         mapTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
         mapTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         
-        tab.addTab("Map",null,mapTextScroll,"Map Creation Settings");
+        tab.addTab("Map Indoor",null,mapTextScroll,"Map Indoor Creation Settings");
         
             // model json
             
         modelTextArea=new JTextArea();
         modelTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
-        modelTextArea.setText(GeneratorMain.getSettingJson("model"));
+        modelTextArea.setText(GeneratorMain.getSettingJson("model_humanoid"));
         
         modelTextScroll=new JScrollPane(modelTextArea); 
         modelTextScroll.setBorder(BorderFactory.createEmptyBorder());
@@ -191,7 +191,7 @@ public class AppWindow implements WindowListener
         modelTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
         modelTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         
-        tab.addTab("Model",null,modelTextScroll,"Model Creation Settings");
+        tab.addTab("Model Humanoid",null,modelTextScroll,"Model Humanoid Creation Settings");
                 
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;

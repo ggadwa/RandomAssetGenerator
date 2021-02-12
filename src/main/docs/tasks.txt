@@ -1,6 +1,3 @@
-- js -> java updates
-   - pipes
-
 - rooms
    - do we need a fat + room (like the one with broken edges but a plus at the top
 
@@ -8,10 +5,12 @@
    - metal - screws get random rotated cross or straight line
 
 - decorations
+   - pipes and others become secondary decorations
    - don't repeat decorations for connected rooms
    - pool decorations
    - better uv for pillars
    - connectors for pipes
 
 
-c:/Java/jdk-15.0.2/bin/jpackage --name RandomAssetGenerator --input c:\Code\RandomAssetGenerator\target --main-jar RandomAssetGenerator-1.0.jar --main-class com.klinksoftware.rag.RandomAssetGenerator --type EXE
+jpackage (doesn't seem to work)
+c:/Java/jdk-15.0.2/bin/jpackage --name RandomAssetGenerator --input c:\Code\RandomAssetGenerator\target --main-jar RandomAssetGenerator-1.0.jar --main-class com.klinksoftware.rag.RandomAssetGenerator --win-dir-chooser --type EXE

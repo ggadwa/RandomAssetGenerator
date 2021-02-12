@@ -1,12 +1,12 @@
 {
-    "name": "test",
-    "seed": 555,
+    "name": "test_map",
+    "seed": 0,
     "colorScheme": "random",
     "maxRoomCount": 25,
     "maxExtensionRoomCount": 10,
     "segmentSize": 10.0,
     "storyChangePercentage": 0.25,
     "bigRoomsOnly": false,
-    "ceilings": false,
+    "ceilings": true,
     "decorations": true
 }

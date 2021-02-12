@@ -1,25 +1,29 @@
-import genRandom from '../../generate/utility/random.js';
-import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
-import BitmapClass from '../../code/bitmap/bitmap.js';
+package com.klinksoftware.rag.bitmaps;
 
-//
-// generate skin bitmap class
-//
+import com.klinksoftware.rag.*;
+import com.klinksoftware.rag.utility.*;
 
-export default class GenBitmapMonsterClass extends GenBitmapBaseClass
+public class BitmapBody extends BitmapBase
 {
-    constructor(view)
-    {    
-        super(view,true,true,true);
-        Object.seal(this);
-    }
+    public final static int VARIATION_NONE=0;
+    
+    public BitmapBody()
+    {
+        super();
         
+        hasNormal=true;
+        hasMetallicRoughness=true;
+        hasEmissive=false;
+        hasAlpha=false;
+    }
+    
         //
         // fur
         //
         
-    generateFurChunk(lft,top,rgt,bot)
+    private void generateFurChunk(int lft,int top,int rgt,int bot)
     {
+        /*
         let n,x,y;
         let darken,boost,lineColor;
         let wid=rgt-lft;
@@ -54,14 +58,16 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
             y=high-(halfHigh+genRandom.randomInt(top,halfHigh));
             this.drawRandomLine(x,(y-5),x,(bot+5),lft,top,rgt,bot,10,lineColor,false);
         }
+*/
     }
     
         //
         // cloth
         //
         
-    generateClothChunk(lft,top,rgt,bot)
+    private void generateClothChunk(int lft,int top,int rgt,int bot)
     {
+        /*
         let n,x,x2,y,y2,lineCount;
         let darken,lineColor;
         let wid=rgt-lft;
@@ -102,14 +108,16 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
             // blur it
             
         this.blur(lft,top,rgt,bot,25,false);
+*/
     }
     
         //
         // scales
         //
         
-    generateScaleChunk(lft,top,rgt,bot)
+    private void generateScaleChunk(int lft,int top,int rgt,int bot)
     {
+        /*
         let x,y,dx,dy,sx,sy,sx2,sy2;
         let xCount,col;
 
@@ -179,26 +187,30 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         }
         
         this.endClip();
+*/
     }
     
         //
         // metal
         //
         
-    generateMetalChunk(lft,top,rgt,bot)
+    private void generateMetalChunk(int lft,int top,int rgt,int bot)
     {
+        /*
         let metalColor=this.getRandomMetalColor();
         
         this.draw3DRect(lft,top,rgt,bot,0,metalColor,genRandom.randomPercentage(0.5));
         this.generateMetalStreakShine(lft,top,rgt,bot,metalColor);
+*/
     }
     
         //
         // spots
         //
         
-    generateSpots(lft,top,rgt,bot)
+    private void generateSpots(int lft,int top,int rgt,int bot)
     {
+        /*
         let innerWid=rgt-lft;
         let innerHigh=bot-top;
         let spotMin=Math.trunc(innerWid/5);
@@ -222,60 +234,89 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         }
         
         this.bitmapCTX.globalAlpha=1.0;
+*/
     }
     
+        //
+        // face chunks
+        //
+        
+    private void generateFaceChunkEye(int x,int top,int bot,RagColor eyeColor)
+    {
+        /*
+        this.draw3DOval(this.normalCTX,x,(top+80),(x+30),(top+90),0.0,1.0,1,0,this.whiteColor,this.blackColor);
+        this.drawOval((x+10),(top+81),(x+20),(top+89),eyeColor,null);
+        
+*/
+    }
+    
+    private void generateFaceChunk(int lft,int top,int rgt,int bot)
+    {
+        /*
+        let eyeColor=this.getRandomColor();
+        
+        this.generateFaceChunkEye(480,top,bot,eyeColor);
+        this.generateFaceChunkEye(430,top,bot,eyeColor);
+*/
+    }
+
         //
         // random chunk
         //
     
-    generateRandomChunk(lft,top,rgt,bot,isFace)
+    private void generateRandomChunk(int lft,int top,int rgt,int bot,boolean isFace)
     {
-        switch (genRandom.randomIndex(5)) {
+        switch (GeneratorMain.random.nextInt(5)) {
             
             case 0:
-                this.generateFurChunk(lft,top,rgt,bot);
+                generateFurChunk(lft,top,rgt,bot);
                 break;
             
             case 1:
-                this.generateClothChunk(lft,top,rgt,bot);
+                generateClothChunk(lft,top,rgt,bot);
                 break;
                 
             case 2:
-                this.generateScaleChunk(lft,top,rgt,bot);
+                generateScaleChunk(lft,top,rgt,bot);
                 break;
                 
             case 3:
-                this.generateMetalChunk(lft,top,rgt,bot);
+                generateMetalChunk(lft,top,rgt,bot);
                 break;
                 
             case 4:
-                this.generateSpots(lft,top,rgt,bot);
+                generateSpots(lft,top,rgt,bot);
                 break;
         }
         
-        if (isFace) this.generateFaceChunk(lft,top,rgt,bot);
+        if (isFace) generateFaceChunk(lft,top,rgt,bot);
     }
-
+    
         //
-        // generate mainline
+        // body bitmaps
         //
 
-    generateInternal()
+    @Override
+    public void generateInternal(int variationMode)
     {
-        let mx,my;
-
-        mx=Math.trunc(this.bitmapCanvas.width*0.5);
-        my=Math.trunc(this.bitmapCanvas.height*0.5);
-
-            // chunks
+        int         mx,my;
+        RagColor    color;
+        
+            // default to black
             
-        this.generateRandomChunk(0,0,mx,my,false);
-        this.generateRandomChunk(mx,0,this.bitmapCanvas.width,my,true);
-        this.generateRandomChunk(0,my,mx,this.bitmapCanvas.height,false);
+        drawRect(0,0,textureSize,textureSize,COLOR_BLACK);
+        
+            // the chunks
 
-            // finish with the specular
+        mx=textureSize/2;
+        my=textureSize/2;
+            
+        generateRandomChunk(0,0,mx,my,false);
+        generateRandomChunk(mx,0,textureSize,my,true);
+        generateRandomChunk(0,my,mx,textureSize,false);
+       
+            // finish with the metallic-roughness
 
-        this.createSpecularMap(0.4);
+        createMetallicRoughnessMap(0.5f,0.5f);
     }
-
 }

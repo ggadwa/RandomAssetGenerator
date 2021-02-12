@@ -10,7 +10,7 @@ public class BitmapGenerator
     private boolean     hasWallBitmap,hasFloorBitmap,hasCeilingBitmap,hasStepBitmap,
                         hasPlatformBitmap,hasPillarBitmap,hasBoxBitmap,hasComputerBitmap,
                         hasPanelBitmap,hasMonitorBitmap,hasPipeBitmap,hasLiquidBitmap,
-                        hasGlassBitmap,hasAccessoryBitmap;
+                        hasGlassBitmap,hasAccessoryBitmap,hasBodyBitmap;
     private String      basePath;
     
     public BitmapGenerator(String basePath)
@@ -31,6 +31,7 @@ public class BitmapGenerator
         hasLiquidBitmap=false;
         hasGlassBitmap=false;
         hasAccessoryBitmap=false;
+        hasBodyBitmap=false;
     }
 
     public void generateWall()
@@ -311,6 +312,15 @@ public class BitmapGenerator
         (new BitmapMetal()).generate(BitmapMetal.VARIATION_SHEET,basePath,"accessory");
         
         hasAccessoryBitmap=true;
+    }
+    
+    public void generateBody()
+    {
+        if (hasBodyBitmap) return;
+        
+        (new BitmapBody()).generate(BitmapBody.VARIATION_NONE,basePath,"body");
+        
+        hasBodyBitmap=true;
     }
     
         // this is a little hacky but it's a way to tell what
