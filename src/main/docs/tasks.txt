@@ -1,3 +1,9 @@
+- map outdoor
+   1 make a big square with a lot of segments
+   2 give each vertex a random (x/z, then normalize) vector out from center
+   3 average vectors with ones on both sides (always from original vector list)
+   4 and then push them out to make outer wall
+
 - rooms
    - do we need a fat + room (like the one with broken edges but a plus at the top
 
@@ -12,5 +18,5 @@
    - connectors for pipes
 
 
-jpackage (doesn't seem to work)
+jpackage (doesn't seem to work, need more testing)
 c:/Java/jdk-15.0.2/bin/jpackage --name RandomAssetGenerator --input c:\Code\RandomAssetGenerator\target --main-jar RandomAssetGenerator-1.0.jar --main-class com.klinksoftware.rag.RandomAssetGenerator --win-dir-chooser --type EXE

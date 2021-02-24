@@ -1,5 +1,5 @@
 {
-    "name": "test_map",
+    "name": "test_indoor_map",
     "seed": 0,
     "colorScheme": "random",
     "maxRoomCount": 25,
