@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.mesh;
 
+import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
@@ -27,6 +28,32 @@ public class MeshList
     public int count()
     {
         return(meshes.size());
+    }
+    
+    public Skeleton rebuildMapMeshesWithSkeleton()
+    {
+        int             n;
+        Mesh            mesh;
+        Skeleton        skeleton;
+        RagPoint        center;
+        
+            // this is used to turn boneless maps
+            // into a simple skeleton with a single
+            // root node
+        
+        skeleton=new Skeleton();        // node 0 will be root
+        
+        center=new RagPoint(0.0f,0.0f,0.0f);
+        
+        for (n=0;n!=meshes.size();n++) {
+            mesh=meshes.get(n);
+            
+            mesh.getCenterPoint(center);
+            skeleton.addChildBone(0,mesh.name,n,center);
+            mesh.makeVertexesRelativeToPoint(center);
+        }
+        
+        return(skeleton);
     }
     
 }

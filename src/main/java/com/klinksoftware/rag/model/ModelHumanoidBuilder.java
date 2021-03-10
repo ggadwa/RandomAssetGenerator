@@ -31,20 +31,19 @@ public class ModelHumanoidBuilder
             // always use a single body bitmap
         
         mapBitmapList=new BitmapGenerator(basePath);
-         mapBitmapList.generateBody();
+        mapBitmapList.generateBody();
         
             // some settings
          
         modelName=(String)GeneratorMain.settings.get("name");
         height=(float)((double)GeneratorMain.settings.get("height"));       
         
-            // no meshes or bones
+            // model components
             
         meshList=new MeshList();
         
+            // build the skeleton
         /*
-                    // mesh and skeleton
-            
         genSkeleton=new GenSkeletonMonsterClass(this.view,model,sizeFactor);
         genSkeleton.build();
         

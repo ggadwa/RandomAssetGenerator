@@ -1,3 +1,10 @@
+
+- build skeletons, use on regular map building
+- need a bitmap generator
+
+
+
+
 - map outdoor
    1 make a big square with a lot of segments
    2 give each vertex a random (x/z, then normalize) vector out from center

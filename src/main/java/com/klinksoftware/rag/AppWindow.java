@@ -13,12 +13,20 @@ public class AppWindow implements WindowListener
     
     private static final int        TOOL_BUTTON_RUN=0;
     
+    public static final int         UI_TAB_MAP_INDOOR=0;
+    public static final int         UI_TAB_MAP_OUTDOOR=1;
+    public static final int         UI_TAB_MAP_TRACK=2;
+    public static final int         UI_TAB_MODEL_HUMANOID=3;
+    public static final int         UI_TAB_BITMAPS=4;
+    
     private JFrame          frame;
     private JToolBar        toolBar;
     private JButton         runButton;
     private JTabbedPane     tab;
-    private JScrollPane     mapTextScroll,modelTextScroll;
-    private JTextArea       mapTextArea,modelTextArea;
+    private JScrollPane     mapIndoorTextScroll,mapOutdoorTextScroll,mapTrackTextScroll,
+                            modelHumanoidTextScroll,bitmapTextScroll;
+    private JTextArea       mapIndoorTextArea,mapOutdoorTextArea,mapTrackTextArea,
+                            modelHumanoidTextArea,bitmapTextArea;
     
         //
         // window events
@@ -61,6 +69,45 @@ public class AppWindow implements WindowListener
     }
     
         //
+        // getters
+        //
+    
+    public void enableRunButton(boolean enabled)
+    {
+        runButton.setEnabled(enabled);
+    }
+    
+    public int getSelectedTab()
+    {
+        return(tab.getSelectedIndex());
+    }
+    
+    public String getMapIndoorText()
+    {
+        return(mapIndoorTextArea.getText());
+    }
+    
+    public String getMapOutdoorText()
+    {
+        return(mapOutdoorTextArea.getText());
+    }
+    
+    public String getMapTrackText()
+    {
+        return(mapTrackTextArea.getText());
+    }
+    
+    public String getHumanoidModelText()
+    {
+        return(modelHumanoidTextArea.getText());
+    }
+    
+    public String getBitmapText()
+    {
+        return(bitmapTextArea.getText());
+    }
+    
+        //
         // toolbar
         //
 
@@ -68,7 +115,7 @@ public class AppWindow implements WindowListener
     {
         switch (buttonId) {
             case TOOL_BUTTON_RUN:
-                (new GeneratorRun(runButton,tab,mapTextArea,modelTextArea)).execute();
+                (new GeneratorRun(this)).execute();
                 break;
         }
     }
@@ -161,37 +208,85 @@ public class AppWindow implements WindowListener
         tab.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
         tab.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         
-            // map json
+            // map indoor json
             
-        mapTextArea=new JTextArea();
-        mapTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
-        mapTextArea.setText(GeneratorMain.getSettingJson("map_indoor"));
+        mapIndoorTextArea=new JTextArea();
+        mapIndoorTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
+        mapIndoorTextArea.setText(GeneratorMain.getSettingJson("map_indoor"));
         
-        mapTextScroll=new JScrollPane(mapTextArea); 
-        mapTextScroll.setBorder(BorderFactory.createEmptyBorder());
-        mapTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        mapTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        mapTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
-        mapTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
-        mapTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        mapIndoorTextScroll=new JScrollPane(mapIndoorTextArea); 
+        mapIndoorTextScroll.setBorder(BorderFactory.createEmptyBorder());
+        mapIndoorTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        mapIndoorTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        mapIndoorTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
+        mapIndoorTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
+        mapIndoorTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         
-        tab.addTab("Map Indoor",null,mapTextScroll,"Map Indoor Creation Settings");
+        tab.addTab("Map Indoor",null,mapIndoorTextScroll,"Map Indoor Creation Settings");
         
-            // model json
+            // map outdoor json
             
-        modelTextArea=new JTextArea();
-        modelTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
-        modelTextArea.setText(GeneratorMain.getSettingJson("model_humanoid"));
+        mapOutdoorTextArea=new JTextArea();
+        mapOutdoorTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
+        mapOutdoorTextArea.setText(GeneratorMain.getSettingJson("map_outdoor"));
         
-        modelTextScroll=new JScrollPane(modelTextArea); 
-        modelTextScroll.setBorder(BorderFactory.createEmptyBorder());
-        modelTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        modelTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        modelTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
-        modelTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
-        modelTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        mapOutdoorTextScroll=new JScrollPane(mapOutdoorTextArea); 
+        mapOutdoorTextScroll.setBorder(BorderFactory.createEmptyBorder());
+        mapOutdoorTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        mapOutdoorTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        mapOutdoorTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
+        mapOutdoorTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
+        mapOutdoorTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         
-        tab.addTab("Model Humanoid",null,modelTextScroll,"Model Humanoid Creation Settings");
+        tab.addTab("Map Outdoor",null,mapOutdoorTextScroll,"Map Outdoor Creation Settings");
+        
+            // map track json
+            
+        mapTrackTextArea=new JTextArea();
+        mapTrackTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
+        mapTrackTextArea.setText(GeneratorMain.getSettingJson("map_track"));
+        
+        mapTrackTextScroll=new JScrollPane(mapTrackTextArea); 
+        mapTrackTextScroll.setBorder(BorderFactory.createEmptyBorder());
+        mapTrackTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        mapTrackTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        mapTrackTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
+        mapTrackTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
+        mapTrackTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        
+        tab.addTab("Map Track",null,mapTrackTextScroll,"Map Track Creation Settings");
+        
+            // model humanoid json
+            
+        modelHumanoidTextArea=new JTextArea();
+        modelHumanoidTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
+        modelHumanoidTextArea.setText(GeneratorMain.getSettingJson("model_humanoid"));
+        
+        modelHumanoidTextScroll=new JScrollPane(modelHumanoidTextArea); 
+        modelHumanoidTextScroll.setBorder(BorderFactory.createEmptyBorder());
+        modelHumanoidTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        modelHumanoidTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        modelHumanoidTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
+        modelHumanoidTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
+        modelHumanoidTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        
+        tab.addTab("Model Humanoid",null,modelHumanoidTextScroll,"Model Humanoid Creation Settings");
+        
+            // generic bitmap generator
+            
+        bitmapTextArea=new JTextArea();
+        bitmapTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
+        bitmapTextArea.setText(GeneratorMain.getSettingJson("bitmaps"));
+        
+        bitmapTextScroll=new JScrollPane(bitmapTextArea); 
+        bitmapTextScroll.setBorder(BorderFactory.createEmptyBorder());
+        bitmapTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        bitmapTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        bitmapTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
+        bitmapTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
+        bitmapTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+            
+        tab.addTab("Bitmaps",null,bitmapTextScroll,"Generate All Bitmaps");
                 
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;

@@ -1,9 +1,10 @@
-package com.klinksoftware.rag.map;
+package com.klinksoftware.rag.map.indoor;
 
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.export.*;
 import com.klinksoftware.rag.mesh.*;
+import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
@@ -14,6 +15,7 @@ public class MapIndoorBuilder
     
     private String                  basePath;
     private MeshList                meshList;
+    private Skeleton                skeleton;
     private BitmapGenerator         mapBitmapList;
     private MapPieceList            mapPieceList;
     
@@ -304,7 +306,7 @@ public class MapIndoorBuilder
         bigRoomsOnly=(boolean)GeneratorMain.settings.get("bigRoomsOnly");
         segmentSize=((Double)GeneratorMain.settings.get("segmentSize")).floatValue();
         
-            // no rooms or meshes
+            // map components
             
         rooms=new ArrayList<>();
         meshList=new MeshList();
@@ -485,11 +487,15 @@ public class MapIndoorBuilder
                 buildSteps(room,("room_"+Integer.toString(n)+"_step_"+Integer.toString(k)),room.requiredStairs.get(k),segmentSize);
             }
         }
+        
+            // now build the fake skeleton
+            
+        skeleton=meshList.rebuildMapMeshesWithSkeleton();
 
             // write out the model
         
         try {
-            (new Export()).export(meshList,basePath,mapName);
+            (new Export()).export(skeleton,meshList,basePath,mapName);
         }
         catch (Exception e)
         {

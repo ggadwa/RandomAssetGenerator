@@ -1,7 +1,8 @@
 package com.klinksoftware.rag.mesh;
 
+import com.klinksoftware.rag.map.indoor.MapPiece;
+import com.klinksoftware.rag.map.indoor.MapRoom;
 import com.klinksoftware.rag.*;
-import com.klinksoftware.rag.map.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;

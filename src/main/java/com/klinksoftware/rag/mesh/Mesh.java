@@ -39,6 +39,39 @@ public class Mesh
         }
     }
     
+    public void getCenterPoint(RagPoint center)
+    {
+        int         n;
+        float       f;
+        
+        center.x=0;
+        center.y=0;
+        center.z=0;
+        
+        for (n=0;n<vertexes.length;n+=3) {
+            center.x+=vertexes[n];
+            center.y+=vertexes[n+1];
+            center.z+=vertexes[n+2];
+        }
+        
+        f=((float)vertexes.length)/3.0f;
+        
+        center.x=center.x/f;
+        center.y=center.y/f;
+        center.z=center.z/f;
+    }
+    
+    public void makeVertexesRelativeToPoint(RagPoint pnt)
+    {
+        int         n;
+        
+        for (n=0;n<vertexes.length;n+=3) {
+            vertexes[n]-=pnt.x;
+            vertexes[n+1]-=pnt.y;
+            vertexes[n+2]-=pnt.z;
+        }
+    }
+    
     public void combine(Mesh mesh)
     {
         int         n,idx,indexOffset;

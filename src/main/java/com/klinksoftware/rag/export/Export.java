@@ -3,6 +3,7 @@ package com.klinksoftware.rag.export;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.bitmaps.*;
+import com.klinksoftware.rag.skeleton.*;
 
 import java.util.*;
 import java.io.*;
@@ -231,13 +232,15 @@ public class Export
         // main export
         //
     
-    public void export(MeshList meshList,String basePath,String name) throws Exception
+    public void export(Skeleton skeleton,MeshList meshList,String basePath,String name) throws Exception
     {
         int                             n,meshCount,materialIdx;
         byte[]                          binBytes;
+        float[]                         translation,rotation,scale;
         ByteArrayOutputStream           bin;
         String                          path;
         Mesh                            mesh;
+        Bone                            bone;
         ArrayList<Object>               arrList,nodesArr,meshesArr,
                                         accessorsArr,bufferViewsArr,bufferArr,
                                         samplerArr,materialsArr,texturesArr,imagesArr;
@@ -262,7 +265,7 @@ public class Export
         json.put("asset",obj2);
         
             // the single scene
-            // points to all the nodes
+            // points to the root node
             
         json.put("scene",0);
         
@@ -270,9 +273,7 @@ public class Export
         obj2.put("name","Scene");
         
         nodesArr=new ArrayList<>();      // one node for every mesh
-        for (n=0;n!=meshCount;n++) {
-            nodesArr.add(n);
-        }
+        nodesArr.add(0);
         obj2.put("nodes",nodesArr);
         
         arrList=new ArrayList<>();
@@ -280,16 +281,29 @@ public class Export
         json.put("scenes",arrList);
         
             // the nodes, pointed from scene
-            // one for each mesh
-            
+            // one for each bone
+
+        rotation=new float[]{0.0f,0.0f,0.0f,1.0f};      // always the same, we can share
+        scale=new float[]{1.0f,1.0f,1.0f};
+        
         nodesArr=new ArrayList<>();
         
-        for (n=0;n!=meshCount;n++) {
-            mesh=meshList.get(n);
+        for (n=0;n!=skeleton.bones.size();n++) {
+            bone=skeleton.bones.get(n);
 
             nodeObj=new LinkedHashMap<>();
-            nodeObj.put("mesh",n);
-            nodeObj.put("name",mesh.name);
+            
+            nodeObj.put("name",bone.name);
+            translation=new float[3];
+            translation[0]=bone.pnt.x;
+            translation[1]=bone.pnt.y;
+            translation[2]=bone.pnt.z;
+            nodeObj.put("translation",translation);
+            nodeObj.put("rotation",rotation);
+            nodeObj.put("scale",scale);
+            if (bone.meshIdx!=-1) nodeObj.put("mesh",bone.meshIdx);
+            
+            if (!bone.children.isEmpty()) nodeObj.put("children",bone.children);
             
             nodesArr.add(nodeObj);
         }

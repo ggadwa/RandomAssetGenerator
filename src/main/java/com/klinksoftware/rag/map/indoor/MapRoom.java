@@ -1,4 +1,4 @@
-package com.klinksoftware.rag.map;
+package com.klinksoftware.rag.map.indoor;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;

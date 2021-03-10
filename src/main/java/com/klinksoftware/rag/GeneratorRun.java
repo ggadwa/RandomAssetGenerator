@@ -4,29 +4,30 @@ import javax.swing.*;
 
 public class GeneratorRun extends SwingWorker<String,Void>
 {
-    private JButton         runButton;
-    private JTabbedPane     tab;
-    private JTextArea       mapTextArea,modelTextArea;
+    private AppWindow           appWindow;
     
-    public GeneratorRun(JButton runButton,JTabbedPane tab,JTextArea mapTextArea,JTextArea modelTextArea)
+    public GeneratorRun(AppWindow appWindow)
     {
-        this.runButton=runButton;
-        this.tab=tab;
-        this.mapTextArea=mapTextArea;
-        this.modelTextArea=modelTextArea;
+        this.appWindow=appWindow;
     }
     
     @Override
     protected String doInBackground() throws Exception
     {
-        runButton.setEnabled(false);
+        appWindow.enableRunButton(false);
         
-        switch (tab.getSelectedIndex()) {
-            case 0:
-                GeneratorMain.runMap(mapTextArea.getText());
+        switch (appWindow.getSelectedTab()) {
+            case AppWindow.UI_TAB_MAP_INDOOR:
+                GeneratorMain.runMapIndoor(appWindow.getMapIndoorText());
                 break;
-            case 1:
-                GeneratorMain.runModel(modelTextArea.getText());
+            case AppWindow.UI_TAB_MAP_OUTDOOR:
+            case AppWindow.UI_TAB_MAP_TRACK:
+                break;
+            case AppWindow.UI_TAB_MODEL_HUMANOID:
+                GeneratorMain.runModelHumanoid(appWindow.getHumanoidModelText());
+                break;
+            case AppWindow.UI_TAB_BITMAPS:
+                GeneratorMain.runBitmaps(appWindow.getBitmapText());
                 break;
         }
 
@@ -36,6 +37,6 @@ public class GeneratorRun extends SwingWorker<String,Void>
     @Override
     protected void done()
     {
-        runButton.setEnabled(true);
+        appWindow.enableRunButton(true);
     }    
 }
