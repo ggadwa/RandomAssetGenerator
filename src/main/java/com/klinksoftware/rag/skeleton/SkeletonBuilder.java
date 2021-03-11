@@ -1,14 +1,17 @@
 package com.klinksoftware.rag.skeleton;
 
+import com.klinksoftware.rag.*;
+import com.klinksoftware.rag.utility.RagPoint;
+
 public class SkeletonBuilder
 {
-    /*
         //
         // leg limb
         //
         
-    buildLimbLeg(limbIdx,parentBoneIdx,radius,rotOffset,footLength,footRot,toeCount,flipped)
+    public void buildLimbLeg(Skeleton skeleton,int limbIdx,int parentBoneIdx,float radius,float rotOffset,float footLength,float footRot,int toeCount,boolean flipped)
     {
+        /*
         let pnt,vct,pushVct,legRadius;
         let hipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx,heelBoneIdx,knuckleBoneIdx,toeBoneIdx;
         let n,toeRadius,toeDistance,fx,meshScale;
@@ -39,12 +42,12 @@ public class SkeletonBuilder
         ankleBoneIdx=bones.push(new ModelBoneClass(('Ankle_'+limbIdx),kneeBoneIdx,new PointClass((pnt.x+(vct.x*0.8)),(pnt.y+(vct.y*0.8)),(pnt.z+(vct.z*0.8)))))-1;
         heelBoneIdx=bones.push(new ModelBoneClass(('Heel_'+limbIdx),ankleBoneIdx,new PointClass((pnt.x+(vct.x*0.95)),(pnt.y+(vct.y*0.95)),(pnt.z+(vct.z*0.95)))))-1;
         
-        bones[hipBoneIdx].gravityLockDistance=Math.trunc(legRadius*genRandom.randomFloat(1.0,0.3));
+        bones[hipBoneIdx].gravityLockDistance=Math.trunc(legRadius*(1.0f+(GeneratorMain.random.nextFloat()*0.3f));
         bones[kneeBoneIdx].gravityLockDistance=legRadius;
         bones[ankleBoneIdx].gravityLockDistance=legRadius;
         bones[heelBoneIdx].gravityLockDistance=legRadius;
         
-        meshScale=genRandom.randomFloat(0.7,0.3);
+        meshScale=0.7f+(GeneratorMain.random.nextFloat()*0.3f);
         
         this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_LEG,limbIdx,constants.LIMB_AXIS_Y,flipped,8,5,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,0.0,meshScale),[hipBoneIdx,kneeBoneIdx,ankleBoneIdx,heelBoneIdx]));
         
@@ -59,7 +62,7 @@ public class SkeletonBuilder
         footPnt.y=0.0;
         footBoneIdx=bones.push(new ModelBoneClass(('Foot_'+limbIdx),heelBoneIdx,footPnt))-1;
 
-        bones[footBoneIdx].gravityLockDistance=legRadius*genRandom.randomFloat(1.2,0.3);
+        bones[footBoneIdx].gravityLockDistance=legRadius*(1.2f+(GeneratorMain.random.nextFloat()*0.3f));
         
         this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FOOT,limbIdx,constants.LIMB_AXIS_Z,flipped,5,5,false,new PointClass(1.0,0.7,1.0),new PointClass(1.0,0.0,1.0),[heelBoneIdx,footBoneIdx]));
 
@@ -92,14 +95,16 @@ public class SkeletonBuilder
             
             fx+=toeDistance;
         }
+        */
     }
 
         //
         // arm limb
         //
     
-    buildLimbArm(limbIdx,parentBoneIdx,radius,length,rotOffset,fingerCount,flipped)
+    public void buildLimbArm(Skeleton skeleton,int limbIdx,int parentBoneIdx,float radius,float length,float rotOffset,int fingerCount,boolean flipped)
     {
+        /*
         let armRadius,armLength,axis,pnt,vct,pushVct;
         let shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx,knuckleBoneIdx,fingerBoneIdx;
         let handPnt,handRadius,armLimbIdx,handLimbIdx;
@@ -137,13 +142,13 @@ public class SkeletonBuilder
         bones[elbowBoneIdx].gravityLockDistance=armRadius;
         bones[wristBoneIdx].gravityLockDistance=armRadius;
         
-        meshScale=genRandom.randomFloat(0.7,0.3);
+        meshScale=0.7+(GeneratorMain.random.nextFloat()*0.3f);
         
         armLimbIdx=skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_ARM,limbIdx,axis,flipped,8,5,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,1.0,meshScale),[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]))-1;
         
             // hand limb
             
-        handRadius=Math.trunc(armRadius*genRandom.randomFloat(1.0,0.3));
+        handRadius=armRadius*(1.0f+(GeneratorMain.random.nextFloat()*0.3f));
         handPnt=new PointClass((pnt.x+vct.x),(pnt.y+vct.y),(pnt.z+vct.z));
         
         handBoneIdx=bones.push(new ModelBoneClass(('Hand_'+limbIdx),wristBoneIdx,handPnt))-1;
@@ -168,7 +173,7 @@ public class SkeletonBuilder
         
         fingerVct=vct.copy();
         fingerVct.normalize();
-        fingerVct.scale(genRandom.randomInt(armRadius,armRadius));
+        fingerVct.scale(armRadius+(GeneratorMain.random.nextFloat()*armRadius));
         fingerPnt=new PointClass((knucklePnt.x+fingerVct.x),(knucklePnt.y+fingerVct.y),(knucklePnt.z+fingerVct.z));
 
         fy=knucklePnt.y-Math.trunc(fingerCount*0.5)*fingerDistance;
@@ -184,14 +189,16 @@ public class SkeletonBuilder
             
             fy+=fingerDistance;
         }
+        */
     }
     
         //
         // whip limbs
         //
     
-    buildLimbWhip(limbIdx,parentBoneIdx,radius,length,rotOffset)
+    public void buildLimbWhip(Skeleton skeleton,int limbIdx,int parentBoneIdx,float radius,float length,float rotOffset)
     {
+        /*
         let whipRadius,whipLength,axis,pnt,vct,pushVct;
         let whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx;
         let skeleton=this.model.skeleton;
@@ -229,14 +236,16 @@ public class SkeletonBuilder
         bones[whip3BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.3);
 
         skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_WHIP,limbIdx,axis,false,8,5,false,null,null,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx]));
+        */
     }
     
         //
         // head limb
         //
         
-    buildLimbHead(limbIdx,parentBoneIdx,neckLength,neckRadius,jawRadius,headRadius,hasJaw)
+    public void buildLimbHead(Skeleton skeleton,int limbIdx,int parentBoneIdx,float neckLength,float neckRadius,float jawRadius,float headRadius,boolean hasJaw)
     {
+        /*
         let pnt,jawBackPnt,jawFrontPnt,neckPnt,vct;
         let neckStartBoneIdx,neckEndBoneIdx;
         let jawBackBoneIdx,jawFrontBoneIdx;
@@ -258,19 +267,19 @@ public class SkeletonBuilder
         
         pnt=parentBone.position.copy();
         vct=new PointClass(0,-neckStartLength,0);
-        vct.rotateX(null,-genRandom.randomFloat(0,25.0));
+        vct.rotateX(null,-(GeneratorMain.random.nextFloat()*25.0f));
         pnt.addPoint(vct);
             
         neckStartBoneIdx=bones.push(new ModelBoneClass(('Neck_Bottom_'+limbIdx),parentBoneIdx,pnt))-1;
         
         neckPnt=pnt.copy();
         vct=new PointClass(0,-neckLength,0);
-        vct.rotateX(null,-genRandom.randomFloat(0,25.0));
+        vct.rotateX(null,-(GeneratorMain.random.nextFloat()*25.0f));
         neckPnt.addPoint(vct);
         
         neckEndBoneIdx=bones.push(new ModelBoneClass(('Neck_Top_'+limbIdx),neckStartBoneIdx,neckPnt))-1;
         
-        bones[neckStartBoneIdx].gravityLockDistance=neckRadius*genRandom.randomFloat(0.8,0.2);
+        bones[neckStartBoneIdx].gravityLockDistance=neckRadius*(0.8f+(GeneratorMain.random.nextFloat()*0.2f));
         bones[neckEndBoneIdx].gravityLockDistance=neckRadius;
 
         this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_NECK,0,constants.LIMB_AXIS_Y,false,5,5,false,new PointClass(1.0,0.3,1.0),new PointClass(1.0,0.1,1.0),[neckStartBoneIdx,neckEndBoneIdx]));
@@ -278,12 +287,12 @@ public class SkeletonBuilder
             // default placements
             
         headOffset=10;
-        headRot=-genRandom.randomFloat(0,25.0);
+        headRot=-(GeneratorMain.random.nextFloat()*25.0f);
         
             // create the jaw
             
         if (hasJaw) {
-            jawRadius=Math.trunc(headRadius*genRandom.randomFloat(0.3,0.3));
+            jawRadius=Math.trunc(headRadius*(0.3f+(GeneratorMain.random.nextFloat()*0.3f));
             
             jawBackPnt=neckPnt.copy();
             vct=new PointClass(0,-headOffset,-((headRadius*0.6)-(jawRadius*0.5)));
@@ -294,14 +303,14 @@ public class SkeletonBuilder
             bones[jawBackBoneIdx].gravityLockDistance=jawRadius;
 
             jawFrontPnt=neckPnt.copy();
-            vct=new PointClass(0,-headOffset,((headRadius*genRandom.randomFloat(0.5,0.3))-(jawRadius*0.5)));
+            vct=new PointClass(0,-headOffset,((headRadius*(0.5f+(GeneratorMain.random.nextFloat()*0.3f))-(jawRadius*0.5)));
             jawFrontPnt.addPoint(vct);
 
             jawFrontBoneIdx=bones.push(new ModelBoneClass(('Jaw_Front_'+limbIdx),jawBackBoneIdx,jawFrontPnt))-1;
             
             bones[jawFrontBoneIdx].gravityLockDistance=jawRadius;
             
-            scaleMax=new PointClass(genRandom.randomFloat(0.7,0.3),genRandom.randomFloat(0.7,0.3),genRandom.randomFloat(0.7,0.3));
+            scaleMax=new PointClass((0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)));
             scaleMin=scaleMax.copy();
             scaleMin.y=0.1;
             
@@ -310,7 +319,7 @@ public class SkeletonBuilder
         
             // create the head
         
-        headLength=Math.trunc(headRadius*genRandom.randomFloat(0.4,0.4));
+        headLength=Math.trunc(headRadius*(0.4f+(GeneratorMain.random.nextFloat()*0.4f));
         
         pnt=neckPnt.copy();
         vct=new PointClass(0,-headOffset,0);        // no rot here
@@ -328,70 +337,232 @@ public class SkeletonBuilder
         bones[headBottomBoneIdx].gravityLockDistance=headRadius;
         bones[headTopBoneIdx].gravityLockDistance=headRadius;
         
-        scaleMin=new PointClass(genRandom.randomFloat(0.7,0.3),genRandom.randomFloat(0.7,0.3),genRandom.randomFloat(0.7,0.3));
+        scaleMin=new PointClass((0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)));
         scaleMax=scaleMin.copy();
         if (hasJaw) scaleMax.y=0.1;
         
         this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HEAD,0,constants.LIMB_AXIS_Y,false,10,10,false,scaleMin,scaleMax,[headBottomBoneIdx,headTopBoneIdx]));
+        */
     }
+    
     
         //
         // general body
         //
         
-    buildBody(minHipHigh,extraHipHigh,minBodyHigh,extraBodyHigh,minRadius,extraRadius,waistReduce,hunchAng)
+    public void buildBody(Skeleton skeleton,float hunchAng)
     {
-        let hipPnt,waistPnt,torsoPnt,topTorsoPnt;
-        let bodyLimb,bodyLimbIdx;
-        let bodyHigh,hipHigh,waistHigh,torsoHigh,torsoTopHigh,meshScale;
-        let baseBoneIdx,hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx;
-        let skeleton=this.model.skeleton;
-        let bones=skeleton.bones;
+        int         hipBoneIdx,waistBoneIdx,torsoBoneIdx,topTorsoBoneIdx;
+        float       nf,high,gravityLockDistance,meshScale,
+                    radius,extraRadius,legHighFactor,
+                    hipHigh,waistHigh,torsoHigh,torsoTopHigh;
+        RagPoint    hipPnt,waistPnt,torsoPnt,topTorsoPnt;
         
-            // random heights
-            
-        bodyHigh=Math.trunc(genRandom.randomInt(minBodyHigh,extraBodyHigh)*this.sizeFactor)
-            
-        hipHigh=Math.trunc(genRandom.randomInt(minHipHigh,extraHipHigh)*this.sizeFactor);
-        waistHigh=hipHigh+Math.trunc(bodyHigh*0.33);
-        torsoHigh=waistHigh+Math.trunc(bodyHigh*0.33);
-        torsoTopHigh=torsoHigh+Math.trunc(bodyHigh*0.33);
+        high=(float)((double)GeneratorMain.settings.get("height"));
+        radius=(float)((double)GeneratorMain.settings.get("radius"));
+        extraRadius=radius*0.5f;
+        legHighFactor=(float)((double)GeneratorMain.settings.get("legHeightFactor"));
         
-            // the base bone
+            // random heights, as a section of
+            // the full height
             
-        baseBoneIdx=bones.push(new ModelBoneClass('Base',-1,new PointClass(0,0,0)))-1;
+        hipHigh=high*legHighFactor;
+        
+        waistHigh=GeneratorMain.random.nextFloat();
+        torsoHigh=GeneratorMain.random.nextFloat();
+        torsoTopHigh=GeneratorMain.random.nextFloat();
+        nf=(float)Math.sqrt((waistHigh*waistHigh)+(torsoHigh*torsoHigh)+(torsoTopHigh*torsoTopHigh));
+        
+        waistHigh=hipHigh+((waistHigh/nf)*(high-hipHigh));
+        torsoHigh=waistHigh+((torsoHigh/nf)*(high-hipHigh));
+        torsoTopHigh=torsoHigh+((torsoTopHigh/nf)*(high-hipHigh));
 
             // the spine
         
-        hipPnt=new PointClass(0,-hipHigh,0);
-        hipBoneIdx=bones.push(new ModelBoneClass('Hip',baseBoneIdx,hipPnt))-1;
+        hipPnt=new RagPoint(0,hipHigh,0);
+        gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
+        hipBoneIdx=skeleton.addChildBone(0,"Hip",-1,gravityLockDistance,hipPnt);            // 0 is always the root bone
         
-        waistPnt=new PointClass(0,-waistHigh,hipPnt.z);
-        if (hunchAng!==0.0) waistPnt.rotateX(hipPnt,-(hunchAng*genRandom.randomFloat(0.5,0.05)));
-        waistBoneIdx=bones.push(new ModelBoneClass('Waist',hipBoneIdx,waistPnt))-1;
+        waistPnt=new RagPoint(0,waistHigh,hipPnt.z);
+        if (hunchAng!=0.0f) waistPnt.rotateAroundPoint(hipPnt,new RagPoint(-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)),0.0f,0.0f));
+        gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
+        waistBoneIdx=skeleton.addChildBone(hipBoneIdx,"Waist",-1,gravityLockDistance,waistPnt);
         
-        torsoPnt=new PointClass(0,-torsoHigh,waistPnt.z);
-        if (hunchAng!==0.0) torsoPnt.rotateX(waistPnt,-(hunchAng*genRandom.randomFloat(0.7,0.05)));
-        torsoBoneIdx=bones.push(new ModelBoneClass('Torso',waistBoneIdx,torsoPnt))-1;
+        torsoPnt=new RagPoint(0,torsoHigh,waistPnt.z);
+        if (hunchAng!=0.0f) torsoPnt.rotateAroundPoint(waistPnt,new RagPoint(-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)),0.0f,0.0f));
+        gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
+        torsoBoneIdx=skeleton.addChildBone(waistBoneIdx,"Torso",-1,gravityLockDistance,torsoPnt);
         
-        topTorsoPnt=new PointClass(0,-torsoTopHigh,torsoPnt.z);
-        if (hunchAng!==0.0) topTorsoPnt.rotateX(torsoPnt,-(hunchAng*genRandom.randomFloat(0.9,0.05)));
-        torsoTopBoneIdx=bones.push(new ModelBoneClass('Torso_Top',torsoBoneIdx,topTorsoPnt))-1;
-        
-        bones[hipBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(minRadius,extraRadius)*this.sizeFactor);
-        bones[waistBoneIdx].gravityLockDistance=Math.trunc((genRandom.randomInt(minRadius,extraRadius)*waistReduce)*this.sizeFactor);
-        bones[torsoBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(minRadius,extraRadius)*this.sizeFactor);
-        bones[torsoTopBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(minRadius,extraRadius)*this.sizeFactor);
+        topTorsoPnt=new RagPoint(0,torsoTopHigh,torsoPnt.z);
+        if (hunchAng!=0.0f) topTorsoPnt.rotateAroundPoint(torsoPnt,new RagPoint(-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)),0.0f,0.0f));
+        gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
+        topTorsoBoneIdx=skeleton.addChildBone(torsoBoneIdx,"Torso_Top",-1,gravityLockDistance,topTorsoPnt);
 
             // the body limb
             
-        meshScale=genRandom.randomFloat(0.7,0.3);
-            
-        bodyLimb=new ModelLimbClass(constants.LIMB_TYPE_BODY,0,constants.LIMB_AXIS_Y,false,12,12,true,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,1.0,meshScale),[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
-        bodyLimbIdx=skeleton.limbs.push(bodyLimb)-1;
-        
-        return(bodyLimbIdx);
+        meshScale=0.7f+(GeneratorMain.random.nextFloat()*0.3f);
+        skeleton.addLimb(Limb.LIMB_TYPE_BODY,Limb.LIMB_AXIS_Y,false,12,12,true,new RagPoint(1.0f,1.0f,meshScale),new RagPoint(1.0f,1.0f,meshScale),new int[]{hipBoneIdx,waistBoneIdx,torsoBoneIdx,topTorsoBoneIdx});
     }
 
-    */
+    public void buildArms(Skeleton skeleton,boolean standing)
+    {
+        int             boneIdx,fingerCount;
+        float           radius,limbRadius,armLength;
+        boolean         topArms,midArms;
+        
+            // some settings
+            
+        radius=(float)((double)GeneratorMain.settings.get("radius"));
+        limbRadius=radius*0.1f;
+        limbRadius+=(GeneratorMain.random.nextFloat()*(limbRadius*0.2f));
+        armLength=radius+(GeneratorMain.random.nextFloat()*radius);
+        fingerCount=GeneratorMain.random.nextInt(5);
+        
+            // determine number of arms
+        
+        topArms=false;
+        midArms=false;
+        
+        if (!standing) {
+            topArms=(GeneratorMain.random.nextFloat()<0.3f);
+        }
+        else {
+            topArms=(GeneratorMain.random.nextFloat()<0.9f);
+            midArms=(GeneratorMain.random.nextFloat()<0.2f);
+        }
+        
+            // the arm pairs
+            
+        if (topArms) {
+            boneIdx=skeleton.findBoneIndex("Torso_Top");
+        
+            if (GeneratorMain.random.nextFloat()<0.8f) {
+                buildLimbArm(skeleton,1,boneIdx,limbRadius,armLength,90.0f,fingerCount,false);
+                buildLimbArm(skeleton,2,boneIdx,limbRadius,armLength,270.0f,fingerCount,true);
+            }
+            else {
+                buildLimbWhip(skeleton,1,boneIdx,limbRadius,armLength,90.0f);
+                buildLimbWhip(skeleton,2,boneIdx,limbRadius,armLength,270.0f);
+            }
+        }
+        
+        if (midArms) {
+            boneIdx=skeleton.findBoneIndex("Torso");
+        
+            if (GeneratorMain.random.nextFloat()<0.8f) {
+                buildLimbArm(skeleton,3,boneIdx,limbRadius,armLength,90.0f,fingerCount,false);
+                buildLimbArm(skeleton,4,boneIdx,limbRadius,armLength,270.0f,fingerCount,true);
+            }
+            else {
+                buildLimbWhip(skeleton,3,boneIdx,limbRadius,armLength,90.0f);
+                buildLimbWhip(skeleton,4,boneIdx,limbRadius,armLength,270.0f);
+            }
+        }
+    }
+    
+        //
+        // legs
+        //
+        
+    public void buildLegs(Skeleton skeleton,boolean standing)
+    {
+        int         boneIdx,toeCount;
+        float       limbRadius,footRot,footLength;
+        
+            // some settings
+            
+        limbRadius=((float)((double)GeneratorMain.settings.get("radius")))*0.1f;
+        limbRadius+=(GeneratorMain.random.nextFloat()*(limbRadius*0.2f));
+        footRot=GeneratorMain.random.nextFloat()*15.0f;
+        footLength=limbRadius+(GeneratorMain.random.nextFloat()*limbRadius);
+        toeCount=GeneratorMain.random.nextInt(5);
+
+            // hip legs
+            
+        boneIdx=skeleton.findBoneIndex("Hip");
+        buildLimbLeg(skeleton,1,boneIdx,limbRadius,90.0f,footLength,footRot,toeCount,false);
+        buildLimbLeg(skeleton,2,boneIdx,limbRadius,270.0f,footLength,-footRot,toeCount,true);
+
+            // front legs
+            
+        if (!standing) {
+            boneIdx=skeleton.findBoneIndex("Torso_Top");
+            buildLimbLeg(skeleton,3,boneIdx,limbRadius,90.0f,footLength,footRot,toeCount,false);
+            buildLimbLeg(skeleton,4,boneIdx,limbRadius,270.0f,footLength,-footRot,toeCount,true);
+        }
+    }
+    
+        //
+        // tails
+        //
+        
+    public void buildTail(Skeleton skeleton,boolean stranding)
+    {
+        int         boneIdx;
+        float       radius,limbRadius,whipLength;
+        
+        if (GeneratorMain.random.nextFloat()<0.7f) return;
+        
+        radius=(float)((double)GeneratorMain.settings.get("radius"));
+        limbRadius=radius*0.1f;
+        limbRadius+=(GeneratorMain.random.nextFloat()*(limbRadius*0.2f));
+        whipLength=radius+(GeneratorMain.random.nextFloat()*radius);
+        
+        boneIdx=skeleton.findBoneIndex("Hip");
+        buildLimbWhip(skeleton,5,boneIdx,limbRadius,whipLength,180.0f);
+    }
+    
+        //
+        // heads
+        //
+        
+    public void buildHead(Skeleton skeleton)
+    {
+        int         boneIdx;
+        float       radius,headRadius,jawRadius,neckLength,neckRadius;
+        
+        radius=(float)((double)GeneratorMain.settings.get("radius"));
+        headRadius=radius-(GeneratorMain.random.nextFloat()*(radius*0.7f));
+        neckRadius=headRadius*(0.3f+(GeneratorMain.random.nextFloat()*0.5f));
+        jawRadius=headRadius*(0.9f+(GeneratorMain.random.nextFloat()*0.3f));
+        neckLength=headRadius*(0.1f+(GeneratorMain.random.nextFloat()*0.3f));
+        
+        boneIdx=skeleton.findBoneIndex("Torso_Top");
+        buildLimbHead(skeleton,0,boneIdx,neckLength,neckRadius,jawRadius,headRadius,true);
+    }
+    
+        //
+        // build skeleton bones
+        //
+
+    public Skeleton build()
+    {
+        float               hunchAng;
+        boolean             standing;
+        Skeleton            skeleton;
+        
+        skeleton=new Skeleton();
+        
+            // get a hunch angle which determines
+            // if we are on 2 or 4 feet
+        
+        standing=(GeneratorMain.random.nextFloat()<0.7f);
+        if (!standing) {        
+            hunchAng=(60.0f+(GeneratorMain.random.nextFloat()*95.0f));
+        }
+        else {
+            hunchAng=GeneratorMain.random.nextFloat()*30.0f;
+        }
+        
+            // build the skeleton
+
+        buildBody(skeleton,hunchAng);
+        buildLegs(skeleton,standing);
+        buildArms(skeleton,standing);
+        buildTail(skeleton,standing);
+        buildHead(skeleton);
+        
+        return(skeleton);
+     }
+
 }

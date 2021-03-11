@@ -4,6 +4,7 @@ import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.export.*;
 import com.klinksoftware.rag.mesh.*;
+import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
@@ -11,6 +12,7 @@ import java.util.*;
 public class ModelHumanoidBuilder
 {
     private String                  basePath;
+    private Skeleton                skeleton;
     private MeshList                meshList;
     private BitmapGenerator         mapBitmapList;
     
@@ -25,7 +27,6 @@ public class ModelHumanoidBuilder
         
     public void build()
     {
-        float               height;
         String              modelName;
         
             // always use a single body bitmap
@@ -36,16 +37,17 @@ public class ModelHumanoidBuilder
             // some settings
          
         modelName=(String)GeneratorMain.settings.get("name");
-        height=(float)((double)GeneratorMain.settings.get("height"));       
+        //height=(float)((double)GeneratorMain.settings.get("height"));
         
-            // model components
+            // build the skeleton
+            
+        skeleton=(new SkeletonBuilder()).build();
+        
+            // build the meshes around the limbs
             
         meshList=new MeshList();
         
-            // build the skeleton
         /*
-        genSkeleton=new GenSkeletonMonsterClass(this.view,model,sizeFactor);
-        genSkeleton.build();
         
         genMesh=new GenMeshMonsterClass(this.view,model,modelBitmap);
         genMesh.build();
@@ -53,16 +55,16 @@ public class ModelHumanoidBuilder
         */
         
 
-        /*
+
             // write out the model
         
         try {
-            (new Export()).export(meshList,basePath,modelName);
+            (new Export()).export(skeleton,meshList,basePath,modelName);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-*/
+
     }
 }

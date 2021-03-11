@@ -49,7 +49,7 @@ public class MeshList
             mesh=meshes.get(n);
             
             mesh.getCenterPoint(center);
-            skeleton.addChildBone(0,mesh.name,n,center);
+            skeleton.addChildBone(0,mesh.name,n,1.0f,center);
             mesh.makeVertexesRelativeToPoint(center);
         }
         

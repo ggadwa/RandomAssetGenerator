@@ -7,29 +7,29 @@ import java.util.*;
 
 public class Limb
 {
-    public final int LIMB_TYPE_BODY=0;
-    public final int LIMB_TYPE_NECK=1;
-    public final int LIMB_TYPE_HEAD=2;
-    public final int LIMB_TYPE_JAW=3;
-    public final int LIMB_TYPE_ARM=4;
-    public final int LIMB_TYPE_HAND=5;
-    public final int LIMB_TYPE_FINGER=6;
-    public final int LIMB_TYPE_LEG=7;
-    public final int LIMB_TYPE_FOOT=8;
-    public final int LIMB_TYPE_TOE=9;
-    public final int LIMB_TYPE_WHIP=10;
+    public static final int LIMB_TYPE_BODY=0;
+    public static final int LIMB_TYPE_NECK=1;
+    public static final int LIMB_TYPE_HEAD=2;
+    public static final int LIMB_TYPE_JAW=3;
+    public static final int LIMB_TYPE_ARM=4;
+    public static final int LIMB_TYPE_HAND=5;
+    public static final int LIMB_TYPE_FINGER=6;
+    public static final int LIMB_TYPE_LEG=7;
+    public static final int LIMB_TYPE_FOOT=8;
+    public static final int LIMB_TYPE_TOE=9;
+    public static final int LIMB_TYPE_WHIP=10;
 
-    public final int LIMB_AXIS_X=0;
-    public final int LIMB_AXIS_Y=1;
-    public final int LIMB_AXIS_Z=2;
+    public static final int LIMB_AXIS_X=0;
+    public static final int LIMB_AXIS_Y=1;
+    public static final int LIMB_AXIS_Z=2;
     
     public int                  limbType,axis,
                                 acrossSurfaceCount,aroundSurfaceCount;
     public boolean              flipped,randomize;
     public RagPoint             scaleMin,scaleMax;
-    public ArrayList<Integer>   boneIndexes;
+    public int[]                boneIndexes;
     
-    public Limb(int limbType,int axis,boolean flipped,int acrossSurfaceCount,int aroundSurfaceCount,boolean randomize,RagPoint scaleMin,RagPoint scaleMax,ArrayList<Integer> boneIndexes)
+    public Limb(int limbType,int axis,boolean flipped,int acrossSurfaceCount,int aroundSurfaceCount,boolean randomize,RagPoint scaleMin,RagPoint scaleMax,int[] boneIndexes)
     {
         this.limbType=limbType;
         this.axis=axis;
@@ -44,6 +44,6 @@ public class Limb
     
     public int getRandomBoneIndex()
     {
-        return(boneIndexes.get(GeneratorMain.random.nextInt(boneIndexes.size())));
+        return(boneIndexes[GeneratorMain.random.nextInt(boneIndexes.length)]);
     }
 }

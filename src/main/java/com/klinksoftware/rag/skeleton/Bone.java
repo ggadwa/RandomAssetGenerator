@@ -7,14 +7,16 @@ import java.util.*;
 public class Bone
 {
     public final int                    meshIdx;
+    public final float                  gravityLockDistance;
     public final String                 name;
     public final RagPoint               pnt;
     public final ArrayList<Integer>     children;
     
-    public Bone(String name,int meshIdx,RagPoint pnt)
+    public Bone(String name,int meshIdx,float gravityLockDistance,RagPoint pnt)
     {
         this.name=name;
         this.meshIdx=meshIdx;
+        this.gravityLockDistance=gravityLockDistance;
         this.pnt=new RagPoint(pnt.x,pnt.y,pnt.z);
         
         children=new ArrayList<>();
