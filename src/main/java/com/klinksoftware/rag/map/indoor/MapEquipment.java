@@ -30,7 +30,7 @@ public class MapEquipment
         x=room.offset.x+((float)gx*segmentSize);
         z=room.offset.z+((float)gz*segmentSize);
             
-        meshList.add(MeshUtility.createCube(room,(name+"_pedestal"),"accessory",x,(x+segmentSize),room.offset.y,(room.offset.y+floorDepth),z,(z+segmentSize),true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize));
+        meshList.add(MeshMapUtility.createCube(room,(name+"_pedestal"),"accessory",x,(x+segmentSize),room.offset.y,(room.offset.y+floorDepth),z,(z+segmentSize),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP,segmentSize));
     }
         
         //
@@ -53,7 +53,7 @@ public class MapEquipment
         y=room.offset.y+floorDepth;
         z=(room.offset.z+((float)gz*segmentSize))+widOffset;
 
-        meshList.add(MeshUtility.createCube(room,(name+"_computer_"+pieceCount),"computer",x,(x+wid),y,(y+high),z,(z+wid),true,true,true,true,true,false,false,MeshUtility.UV_BOX,segmentSize));
+        meshList.add(MeshMapUtility.createCube(room,(name+"_computer_"+pieceCount),"computer",x,(x+wid),y,(y+high),z,(z+wid),true,true,true,true,true,false,false,MeshMapUtility.UV_BOX,segmentSize));
     }
    
         //
@@ -84,12 +84,12 @@ public class MapEquipment
         standHigh=high*0.1f;
         
         rotAngle=new RagPoint(0.0f,(GeneratorMain.random.nextBoolean()?0.0f:90.0f),0.0f);
-        mesh=MeshUtility.createCube(room,(name+"_monitor_box_"+pieceCount),"accessory",(x-deskHalfWid),(x+deskHalfWid),y,(y+high),(z-deskShortHalfWid),(z+deskShortHalfWid),true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize);
+        mesh=MeshMapUtility.createCube(room,(name+"_monitor_box_"+pieceCount),"accessory",(x-deskHalfWid),(x+deskHalfWid),y,(y+high),(z-deskShortHalfWid),(z+deskShortHalfWid),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP,segmentSize);
         
         y+=high;
 
         rotAngle.setFromValues(0.0f,(GeneratorMain.random.nextFloat()*360.0f),0.0f);
-        mesh.combine(MeshUtility.createCubeRotated(room,(name+"_monitor_stand_"+pieceCount),"accessory",(x-standHalfWid),(x+standHalfWid),y,(y+standHigh),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,false,false,false,MeshUtility.UV_MAP,segmentSize));
+        mesh.combine(MeshMapUtility.createCubeRotated(room,(name+"_monitor_stand_"+pieceCount),"accessory",(x-standHalfWid),(x+standHalfWid),y,(y+standHigh),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,false,false,false,MeshMapUtility.UV_MAP,segmentSize));
         
         meshList.add(mesh);
         
@@ -98,7 +98,7 @@ public class MapEquipment
         x=(room.offset.x+((float)gx*segmentSize))+widOffset;
         y+=standHigh;
         
-        meshList.add(MeshUtility.createCubeRotated(room,(name+"_monitor_"+pieceCount),"monitor",x,(x+wid),y,(y+high),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,true,true,false,MeshUtility.UV_BOX,segmentSize));
+        meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_monitor_"+pieceCount),"monitor",x,(x+wid),y,(y+high),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX,segmentSize));
     }
     
         //
@@ -121,7 +121,7 @@ public class MapEquipment
         juncHalfWid=juncWid*0.5f;
         
         rotAngle=new RagPoint(0.0f,(GeneratorMain.random.nextBoolean()?0.0f:90.0f),0.0f);
-        meshList.add(MeshUtility.createCubeRotated(room,(name+"_panel_"+pieceCount),"panel",(x-juncHalfWid),(x+juncHalfWid),(y+pipeHigh),((y+pipeHigh)+juncWid),(z-pipeRadius),(z+pipeRadius),rotAngle,true,true,true,true,true,true,false,MeshUtility.UV_BOX,segmentSize));
+        meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_panel_"+pieceCount),"panel",(x-juncHalfWid),(x+juncHalfWid),(y+pipeHigh),((y+pipeHigh)+juncWid),(z-pipeRadius),(z+pipeRadius),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX,segmentSize));
         
             // the pipes
             
@@ -132,10 +132,10 @@ public class MapEquipment
         centerPnt=new RagPoint(x,y,z);
         
         if (upperPipe) {
-            mesh=MeshUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",centerPnt,((y+pipeHigh)+juncWid),(room.offset.y+((float)room.storyCount*segmentSize)),pipeRadius,false,false);
+            mesh=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",centerPnt,((y+pipeHigh)+juncWid),(room.offset.y+((float)room.storyCount*segmentSize)),pipeRadius,false,false);
         }
         if (lowerPipe) {
-            mesh2=MeshUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",centerPnt,y,(y+pipeHigh),pipeRadius,false,false);
+            mesh2=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",centerPnt,y,(y+pipeHigh),pipeRadius,false,false);
             if (mesh==null) {
                 mesh=mesh2;
             }
@@ -167,11 +167,11 @@ public class MapEquipment
         mesh=null;
         
         if (tubeBotCapHigh!=0.0f) {
-            mesh=MeshUtility.createMeshCylinderSimple(room,(name+"_top"),"accessory",centerPnt,yBotCapTy,yBotCapBy,tubeCapRadius,true,false);
+            mesh=MeshMapUtility.createMeshCylinderSimple(room,(name+"_top"),"accessory",centerPnt,yBotCapTy,yBotCapBy,tubeCapRadius,true,false);
         }
         
         if (tubeTopCapHigh!=0.0f) {
-            mesh2=MeshUtility.createMeshCylinderSimple(room,(name+"_top"),"accessory",centerPnt,yTopCapTy,yTopCapBy,tubeCapRadius,true,true);
+            mesh2=MeshMapUtility.createMeshCylinderSimple(room,(name+"_top"),"accessory",centerPnt,yTopCapTy,yTopCapBy,tubeCapRadius,true,true);
             if (mesh==null) {
                 mesh=mesh2;
             }
@@ -184,12 +184,12 @@ public class MapEquipment
 
             // the tube
         
-        meshList.add(MeshUtility.createMeshCylinderSimple(room,(name+"_glass"),"glass",centerPnt,yTopCapBy,yBotCapTy,tubeRadius,false,false));
+        meshList.add(MeshMapUtility.createMeshCylinderSimple(room,(name+"_glass"),"glass",centerPnt,yTopCapBy,yBotCapTy,tubeRadius,false,false));
         
             // the liquid in the tube
         
         y=yBotCapTy+(GeneratorMain.random.nextFloat()*(yTopCapBy-yBotCapTy));    
-        meshList.add(MeshUtility.createMeshCylinderSimple(room,(name+"_liquid"),"liquid",centerPnt,y,yBotCapTy,(tubeRadius*0.98f),true,false));
+        meshList.add(MeshMapUtility.createMeshCylinderSimple(room,(name+"_liquid"),"liquid",centerPnt,y,yBotCapTy,(tubeRadius*0.98f),true,false));
     }
     
     public void addTube(MapRoom room,int gx,int gz,float tubeRadius,float tubeHigh,float tubeCapRadius,float tubeTopCapHigh,float tubeBotCapHigh,int pieceCount)

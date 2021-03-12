@@ -26,11 +26,13 @@ public class Limb
     public int                  limbType,axis,
                                 acrossSurfaceCount,aroundSurfaceCount;
     public boolean              flipped,randomize;
+    public String               name;
     public RagPoint             scaleMin,scaleMax;
     public int[]                boneIndexes;
     
-    public Limb(int limbType,int axis,boolean flipped,int acrossSurfaceCount,int aroundSurfaceCount,boolean randomize,RagPoint scaleMin,RagPoint scaleMax,int[] boneIndexes)
+    public Limb(String name,int limbType,int axis,boolean flipped,int acrossSurfaceCount,int aroundSurfaceCount,boolean randomize,RagPoint scaleMin,RagPoint scaleMax,int[] boneIndexes)
     {
+        this.name=name;
         this.limbType=limbType;
         this.axis=axis;
         this.flipped=flipped;

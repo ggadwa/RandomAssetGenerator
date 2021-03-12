@@ -7,17 +7,29 @@ public class RagBound
     public RagBound(float v1,float v2)
     {
         if (v1<v2) {
-            this.min=v1;
-            this.max=v2;
+            min=v1;
+            max=v2;
         }
         else {
-            this.min=v2;
-            this.max=v1;
+            min=v2;
+            max=v1;
         }
+    }
+    
+    public float getMidPoint()
+    {
+        return((max+min)*0.5f);
     }
     
     public float getSize()
     {
-        return(this.max-this.min);
+        return(max-min);
     }
+    
+    public void adjust(float value)
+    {
+        if (value<min) min=value;
+        if (value>max) max=value;
+    }
+
 }

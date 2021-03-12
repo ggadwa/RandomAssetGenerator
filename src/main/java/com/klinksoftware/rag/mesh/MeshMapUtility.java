@@ -7,7 +7,7 @@ import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
 
-public class MeshUtility
+public class MeshMapUtility
 {
     public static final int STAIR_STEP_COUNT=10;
 
@@ -266,58 +266,7 @@ public class MeshUtility
         indexArray.addAll(Arrays.asList(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3)));
         return(trigIdx+4);
     }
-/*
-    public static int addBox(MeshList meshList,String name,String bitmapName,float negX,float posX,float negY,float posY,float negZ,float posZ,boolean isNegX,boolean isPosX,boolean isNegY,boolean isPosY,boolean isNegZ,boolean isPosZ,float segmentSize)
-    {
-        int                 trigIdx;
-        ArrayList<Float>    vertexArray;
-        ArrayList<Integer>  indexArray;
-        int[]               indexes;
-        float[]             vertexes,normals,uvs;
-        RagPoint            centerPnt;
-        
-        trigIdx=0;
-        
-        vertexArray=new ArrayList<>();
-        indexArray=new ArrayList<>();
-        
-        if (isNegX) {
-            vertexArray.addAll(Arrays.asList(negX,negY,negZ,negX,negY,posZ,negX,posY,posZ,negX,posY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isPosX) {
-            vertexArray.addAll(Arrays.asList(posX,negY,negZ,posX,negY,posZ,posX,posY,posZ,posX,posY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isNegY) {
-            vertexArray.addAll(Arrays.asList(negX,negY,negZ,negX,negY,posZ,posX,negY,posZ,posX,negY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isPosY) {
-            vertexArray.addAll(Arrays.asList(negX,posY,negZ,negX,posY,posZ,posX,posY,posZ,posX,posY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isNegZ) {
-            vertexArray.addAll(Arrays.asList(negX,negY,negZ,posX,negY,negZ,posX,posY,negZ,negX,posY,negZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isPosZ) {
-            vertexArray.addAll(Arrays.asList(negX,negY,posZ,posX,negY,posZ,posX,posY,posZ,negX,posY,posZ));
-            trigIdx=addQuadToIndexes(indexArray,trigIdx);
-        }
-        
-            // calculate the normal, tangent, uv
-            
-        centerPnt=new RagPoint(((negX+posX)*0.5f),((negY+posY)*0.5f),((negZ+posZ)*0.5f));
-     
-        vertexes=floatArrayListToFloat(vertexArray);
-        indexes=intArrayListToInt(indexArray);
-        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
 
-        return(meshList.add(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes)));
-    }
-   */ 
         //
         // room pieces
         //
@@ -341,8 +290,8 @@ public class MeshUtility
         
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
-        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+        normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         
         return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
     }
@@ -389,8 +338,8 @@ public class MeshUtility
 
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
-        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+        normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         
         return(new Mesh(name,"wall",vertexes,normals,uvs,indexes));
     }
@@ -549,8 +498,8 @@ public class MeshUtility
             
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
-        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+        normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         
         meshList.add(new Mesh(name,"step",vertexes,normals,uvs,indexes));
     }
@@ -587,10 +536,10 @@ public class MeshUtility
             vertexArray.addAll(Arrays.asList(xMin,yMax,zMax));     
             
             switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+                case MeshMapUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,0.0f));
                     break;
-                case MeshUtility.UV_BOX:
+                case MeshMapUtility.UV_BOX:
                     uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,0.499f,0.499f,0.499f,0.499f,0.0f));
                     break;
             }
@@ -608,10 +557,10 @@ public class MeshUtility
             vertexArray.addAll(Arrays.asList(xMax,yMax,zMax));
             
             switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+                case MeshMapUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f));
                     break;
-                case MeshUtility.UV_BOX:
+                case MeshMapUtility.UV_BOX:
                     uvArray.addAll(Arrays.asList(0.0f,0.499f,0.0f,0.0f,0.499f,0.0f,0.499f,0.499f));
                     break;
             }
@@ -629,10 +578,10 @@ public class MeshUtility
             vertexArray.addAll(Arrays.asList(xMax,yMax,zMin));
             
             switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+                case MeshMapUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(1.0f,0.0f,1.0f,1.0f,0.0f,1.0f,0.0f,0.0f));
                     break;
-                case MeshUtility.UV_BOX:
+                case MeshMapUtility.UV_BOX:
                     uvArray.addAll(Arrays.asList(1.0f,0.0f,1.0f,0.499f,0.5f,0.499f,0.5f,0.0f));
                     break;
             }
@@ -650,10 +599,10 @@ public class MeshUtility
             vertexArray.addAll(Arrays.asList(xMax,yMax,zMax));
             
             switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+                case MeshMapUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,0.0f));
                     break;
-                case MeshUtility.UV_BOX:
+                case MeshMapUtility.UV_BOX:
                     uvArray.addAll(Arrays.asList(0.5f,0.0f,0.5f,0.499f,1.0f,0.499f,1.0f,0.0f));
                     break;
             }
@@ -671,10 +620,10 @@ public class MeshUtility
             vertexArray.addAll(Arrays.asList(xMax,yMax,zMax));
             
             switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+                case MeshMapUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,0.0f));
                     break;
-                case MeshUtility.UV_BOX:
+                case MeshMapUtility.UV_BOX:
                     uvArray.addAll(Arrays.asList(0.0f,0.499f,0.0f,1.0f,0.499f,1.0f,0.499f,0.499f));
                     break;
             }
@@ -692,10 +641,10 @@ public class MeshUtility
             vertexArray.addAll(Arrays.asList(xMax,yMin,zMax));
             
             switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+                case MeshMapUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,0.0f));
                     break;
-                case MeshUtility.UV_BOX:
+                case MeshMapUtility.UV_BOX:
                     uvArray.addAll(Arrays.asList(0.0f,0.499f,0.0f,1.0f,0.499f,1.0f,0.499f,0.499f));
                     break;
             }
@@ -727,9 +676,9 @@ public class MeshUtility
 
             // create the mesh
             
-        normals=MeshUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        if (uvMode==MeshUtility.UV_MAP) {
-            uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+        normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        if (uvMode==MeshMapUtility.UV_MAP) {
+            uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
         }
         else {
             uvs=floatArrayListToFloat(uvArray);

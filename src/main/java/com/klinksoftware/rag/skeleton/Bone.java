@@ -6,7 +6,7 @@ import java.util.*;
 
 public class Bone
 {
-    public final int                    meshIdx;
+    public int                          meshIdx;
     public final float                  gravityLockDistance;
     public final String                 name;
     public final RagPoint               pnt;
@@ -26,5 +26,4 @@ public class Bone
     {
         children.add(index);
     }
-
 }

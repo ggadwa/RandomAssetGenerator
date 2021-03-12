@@ -73,8 +73,8 @@ public class RagPoint
             ry=(y*cs)-(z*sn);
             rz=(y*sn)+(z*cs);
 
-            this.y=ry;
-            this.z=rz;
+            y=ry;
+            z=rz;
         }
         
             // rotate Y
@@ -110,5 +110,20 @@ public class RagPoint
             y+=centerPnt.y;
             z+=centerPnt.z;
         }
+    }
+    
+    public void rotateX(float fx)
+    {
+        float       rd,sn,cs,ry,rz;
+        
+        rd=fx*((float)Math.PI/180.0f);
+        sn=(float)Math.sin(rd);
+        cs=(float)Math.cos(rd);
+
+        ry=(y*cs)-(z*sn);
+        rz=(y*sn)+(z*cs);
+
+        y=ry;
+        z=rz;
     }
 }

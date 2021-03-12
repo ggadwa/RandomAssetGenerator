@@ -2,7 +2,7 @@
     "name": "test_humanoid_model",
     "seed": 0,
     "colorScheme": "random",
-    "height":1.0,
+    "height":5.0,
     "radius":0.2,
     "legHeightFactor":0.5
 }

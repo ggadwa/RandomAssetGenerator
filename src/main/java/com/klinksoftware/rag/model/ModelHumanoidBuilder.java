@@ -20,6 +20,38 @@ public class ModelHumanoidBuilder
     {
         this.basePath=basePath;
     }
+    
+        //
+        // wrap the limbs with a mesh
+        //
+    
+    public void wrapLimbs()
+    {
+        int         n,meshIdx;
+        Limb        limb;
+        RagPoint    fullBodyScale;
+        Mesh        mesh;
+        
+            // random body scaling
+            
+        fullBodyScale=new RagPoint(1.0f,(1.0f-(GeneratorMain.random.nextFloat()*0.3f)),(1.0f-(GeneratorMain.random.nextFloat()*0.2f)));
+        
+            // wrap all the limbs
+            // with meshes
+            
+        for (n=0;n!=skeleton.limbs.size();n++) {
+            limb=skeleton.limbs.get(n);
+
+            mesh=MeshModelUtility.buildMeshAroundBoneLimb(skeleton,limb,"body");
+            if (limb.randomize) MeshModelUtility.randomScaleVertexToBones(mesh);
+
+                // add to model mesh
+                // and set to first bone in set
+                
+            //meshIdx=meshList.add(mesh);
+            //skeleton.setBoneMeshIndex(limb.boneIndexes[0],meshIdx);
+        }
+    }
 
         //
         // build a model
@@ -46,15 +78,7 @@ public class ModelHumanoidBuilder
             // build the meshes around the limbs
             
         meshList=new MeshList();
-        
-        /*
-        
-        genMesh=new GenMeshMonsterClass(this.view,model,modelBitmap);
-        genMesh.build();
-
-        */
-        
-
+        wrapLimbs();
 
             // write out the model
         

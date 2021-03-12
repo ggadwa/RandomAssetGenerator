@@ -40,7 +40,7 @@ public class MapAltar
             zMin=room.offset.z+(tz*segmentSize);
             zMax=room.offset.z+(bz*segmentSize);
 
-            mesh2=MeshUtility.createCube(room,(this.name+"_altar"),"platform",xMin,xMax,y,(y+stepHigh),zMin,zMax,true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize);
+            mesh2=MeshMapUtility.createCube(room,(this.name+"_altar"),"platform",xMin,xMax,y,(y+stepHigh),zMin,zMax,true,true,true,true,true,false,false,MeshMapUtility.UV_MAP,segmentSize);
             
             if (mesh==null) {
                 mesh=mesh2;

@@ -373,9 +373,9 @@ public class SkeletonBuilder
         torsoTopHigh=GeneratorMain.random.nextFloat();
         nf=(float)Math.sqrt((waistHigh*waistHigh)+(torsoHigh*torsoHigh)+(torsoTopHigh*torsoTopHigh));
         
-        waistHigh=hipHigh+((waistHigh/nf)*(high-hipHigh));
-        torsoHigh=waistHigh+((torsoHigh/nf)*(high-hipHigh));
-        torsoTopHigh=torsoHigh+((torsoTopHigh/nf)*(high-hipHigh));
+        waistHigh=(waistHigh/nf)*(high-hipHigh);
+        torsoHigh=(torsoHigh/nf)*(high-hipHigh);
+        torsoTopHigh=(torsoTopHigh/nf)*(high-hipHigh);
 
             // the spine
         
@@ -383,25 +383,25 @@ public class SkeletonBuilder
         gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
         hipBoneIdx=skeleton.addChildBone(0,"Hip",-1,gravityLockDistance,hipPnt);            // 0 is always the root bone
         
-        waistPnt=new RagPoint(0,waistHigh,hipPnt.z);
-        if (hunchAng!=0.0f) waistPnt.rotateAroundPoint(hipPnt,new RagPoint(-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)),0.0f,0.0f));
+        waistPnt=new RagPoint(0,waistHigh,0);
+        if (hunchAng!=0.0f) waistPnt.rotateX(hunchAng-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)));
         gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
         waistBoneIdx=skeleton.addChildBone(hipBoneIdx,"Waist",-1,gravityLockDistance,waistPnt);
         
-        torsoPnt=new RagPoint(0,torsoHigh,waistPnt.z);
-        if (hunchAng!=0.0f) torsoPnt.rotateAroundPoint(waistPnt,new RagPoint(-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)),0.0f,0.0f));
+        torsoPnt=new RagPoint(0,torsoHigh,0);
+        if (hunchAng!=0.0f) torsoPnt.rotateX(hunchAng-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)));
         gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
         torsoBoneIdx=skeleton.addChildBone(waistBoneIdx,"Torso",-1,gravityLockDistance,torsoPnt);
         
-        topTorsoPnt=new RagPoint(0,torsoTopHigh,torsoPnt.z);
-        if (hunchAng!=0.0f) topTorsoPnt.rotateAroundPoint(torsoPnt,new RagPoint(-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)),0.0f,0.0f));
+        topTorsoPnt=new RagPoint(0,torsoTopHigh,0);
+        if (hunchAng!=0.0f) topTorsoPnt.rotateX(hunchAng-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)));
         gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
         topTorsoBoneIdx=skeleton.addChildBone(torsoBoneIdx,"Torso_Top",-1,gravityLockDistance,topTorsoPnt);
 
             // the body limb
             
         meshScale=0.7f+(GeneratorMain.random.nextFloat()*0.3f);
-        skeleton.addLimb(Limb.LIMB_TYPE_BODY,Limb.LIMB_AXIS_Y,false,12,12,true,new RagPoint(1.0f,1.0f,meshScale),new RagPoint(1.0f,1.0f,meshScale),new int[]{hipBoneIdx,waistBoneIdx,torsoBoneIdx,topTorsoBoneIdx});
+        skeleton.addLimb("body",Limb.LIMB_TYPE_BODY,Limb.LIMB_AXIS_Y,false,12,12,true,new RagPoint(1.0f,1.0f,meshScale),new RagPoint(1.0f,1.0f,meshScale),new int[]{hipBoneIdx,waistBoneIdx,torsoBoneIdx,topTorsoBoneIdx});
     }
 
     public void buildArms(Skeleton skeleton,boolean standing)

@@ -198,7 +198,7 @@ public class MapIndoorBuilder
             
             for (x=min;x<=max;x++) {
                 if ((GeneratorMain.random.nextBoolean()) || (x==noSkipX) || (doAll)) {
-                    mapStory.addStairs(x,1,MeshUtility.STAIR_DIR_NEG_Z,0);
+                    mapStory.addStairs(x,1,MeshMapUtility.STAIR_DIR_NEG_Z,0);
                 }
             }
             return;
@@ -213,7 +213,7 @@ public class MapIndoorBuilder
             
             for (x=min;x<=max;x++) {
                 if ((GeneratorMain.random.nextBoolean()) || (x==noSkipX) || (doAll)) {
-                    mapStory.addStairs(x,(room.piece.size.z-2),MeshUtility.STAIR_DIR_POS_Z,0);
+                    mapStory.addStairs(x,(room.piece.size.z-2),MeshMapUtility.STAIR_DIR_POS_Z,0);
                 }
             }
             return;
@@ -228,7 +228,7 @@ public class MapIndoorBuilder
             
             for (z=min;z<=max;z++) {
                 if ((GeneratorMain.random.nextBoolean()) || (z==noSkipZ) || (doAll)) {
-                    mapStory.addStairs(1,z,MeshUtility.STAIR_DIR_NEG_X,0);
+                    mapStory.addStairs(1,z,MeshMapUtility.STAIR_DIR_NEG_X,0);
                 }
             }
             return;
@@ -243,7 +243,7 @@ public class MapIndoorBuilder
             
             for (z=min;z<=max;z++) {
                 if ((GeneratorMain.random.nextBoolean()) || (z==noSkipZ) || (doAll)) {
-                    mapStory.addStairs((room.piece.size.x-2),z,MeshUtility.STAIR_DIR_POS_X,0);
+                    mapStory.addStairs((room.piece.size.x-2),z,MeshMapUtility.STAIR_DIR_POS_X,0);
                 }
             }
             return;
@@ -469,9 +469,9 @@ public class MapIndoorBuilder
                 
                 // meshes
 
-            meshList.add(MeshUtility.buildRoomWalls(room,centerPnt,("wall_"+Integer.toString(n)),segmentSize));
-            meshList.add(MeshUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y,segmentSize));
-            if (ceilings) meshList.add(MeshUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY,segmentSize));
+            meshList.add(MeshMapUtility.buildRoomWalls(room,centerPnt,("wall_"+Integer.toString(n)),segmentSize));
+            meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y,segmentSize));
+            if (ceilings) meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY,segmentSize));
             
                 // decorations
 

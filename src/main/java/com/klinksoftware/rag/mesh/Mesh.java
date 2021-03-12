@@ -72,6 +72,16 @@ public class Mesh
         }
     }
     
+    public void transformUVs(float uAdd,float vAdd,float uReduce,float vReduce)
+    {
+        int         n;
+        
+        for (n=0;n<uvs.length;n+=2) {
+            uvs[n]=(uvs[n]*uReduce)+uAdd;
+            uvs[n+1]=(uvs[n+1]*uReduce)+uAdd;
+        }
+    }
+    
     public void combine(Mesh mesh)
     {
         int         n,idx,indexOffset;

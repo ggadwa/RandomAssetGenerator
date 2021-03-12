@@ -40,12 +40,17 @@ public class Skeleton
         return(-1);
     }
     
-    public int addLimb(int limbType,int axis,boolean flipped,int acrossSurfaceCount,int aroundSurfaceCount,boolean randomize,RagPoint scaleMin,RagPoint scaleMax,int[] boneIndexes)
+    public void setBoneMeshIndex(int boneIdx,int meshIdx)
+    {
+        bones.get(boneIdx).meshIdx=meshIdx;
+    }
+    
+    public int addLimb(String name,int limbType,int axis,boolean flipped,int acrossSurfaceCount,int aroundSurfaceCount,boolean randomize,RagPoint scaleMin,RagPoint scaleMax,int[] boneIndexes)
     {
         int         idx;
         
         idx=limbs.size();
-        limbs.add(new Limb(limbType,axis,flipped,acrossSurfaceCount,aroundSurfaceCount,randomize,scaleMin,scaleMax,boneIndexes));
+        limbs.add(new Limb(name,limbType,axis,flipped,acrossSurfaceCount,aroundSurfaceCount,randomize,scaleMin,scaleMax,boneIndexes));
         
         return(idx);
     }

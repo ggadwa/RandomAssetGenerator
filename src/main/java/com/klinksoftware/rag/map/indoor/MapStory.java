@@ -43,29 +43,29 @@ public class MapStory
         
         switch (dir)
         {
-            case MeshUtility.STAIR_DIR_POS_Z:
+            case MeshMapUtility.STAIR_DIR_POS_Z:
                 room.setGridAllStories(x,z,FLAG_STEPS);
                 room.setGridAllStories(x,(z+1),FLAG_STEPS);
                 if ((z-1)>=0) room.setGridAllStories(x,(z-1),FLAG_STEPS);   // area ahead of steps
                 break;
-            case MeshUtility.STAIR_DIR_NEG_Z:
+            case MeshMapUtility.STAIR_DIR_NEG_Z:
                 room.setGridAllStories(x,z,FLAG_STEPS);
                 room.setGridAllStories(x,(z-1),FLAG_STEPS);
                 if ((z+1)<(room.piece.size.z-1)) room.setGridAllStories(x,(z+1),FLAG_STEPS);   // area ahead of steps
                 break;
-            case MeshUtility.STAIR_DIR_POS_X:
+            case MeshMapUtility.STAIR_DIR_POS_X:
                 room.setGridAllStories(x,z,FLAG_STEPS);
                 room.setGridAllStories((x+1),z,FLAG_STEPS);
                 if ((x-1)>=0) room.setGridAllStories((x-1),z,FLAG_STEPS);   // area ahead of steps
                 break;
-            case MeshUtility.STAIR_DIR_NEG_X:
+            case MeshMapUtility.STAIR_DIR_NEG_X:
                 room.setGridAllStories(x,z,FLAG_STEPS);
                 room.setGridAllStories((x-1),z,FLAG_STEPS);
                 if ((x+1)<(room.piece.size.x-1)) room.setGridAllStories((x+1),z,FLAG_STEPS);   // area ahead of steps
                 break;
         }
         
-        MeshUtility.buildStairs(meshList,room,name,(room.offset.x+((float)x*segmentSize)),y,(room.offset.z+((float)z*segmentSize)),dir,1.0f,true,segmentSize);
+        MeshMapUtility.buildStairs(meshList,room,name,(room.offset.x+((float)x*segmentSize)),y,(room.offset.z+((float)z*segmentSize)),dir,1.0f,true,segmentSize);
     }
     
         //
@@ -269,45 +269,45 @@ public class MapStory
                 if (hasNegXWall(storyIdx,x,z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,negZ,negX,ty,posZ,negX,by,posZ,negX,by,negZ));
                     normalArray.addAll(Arrays.asList(-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f));
-                    trigIdx=MeshUtility.addQuadToIndexes(indexArray,trigIdx);
+                    trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
                 
                 if (hasPosXWall(storyIdx,x,z)) {
                     vertexArray.addAll(Arrays.asList(posX,ty,negZ,posX,ty,posZ,posX,by,posZ,posX,by,negZ));
                     normalArray.addAll(Arrays.asList(1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f));
-                    trigIdx=MeshUtility.addQuadToIndexes(indexArray,trigIdx);
+                    trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
                 
                     // always draw the top
                     
                 vertexArray.addAll(Arrays.asList(negX,ty,negZ,negX,ty,posZ,posX,ty,posZ,posX,ty,negZ));
                 normalArray.addAll(Arrays.asList(0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f));
-                trigIdx=MeshUtility.addQuadToIndexes(indexArray,trigIdx);
+                trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
 
                 if (!skipBottom) {
                     vertexArray.addAll(Arrays.asList(negX,by,negZ,negX,by,posZ,posX,by,posZ,posX,by,negZ));
                     normalArray.addAll(Arrays.asList(0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f));
-                    trigIdx=MeshUtility.addQuadToIndexes(indexArray,trigIdx);
+                    trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
                 
                 if (hasNegZWall(storyIdx,x,z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,negZ,posX,ty,negZ,posX,by,negZ,negX,by,negZ));
                     normalArray.addAll(Arrays.asList(0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f));
-                    trigIdx=MeshUtility.addQuadToIndexes(indexArray,trigIdx);
+                    trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
                 
                 if (hasPosZWall(storyIdx,x,z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,posZ,posX,ty,posZ,posX,by,posZ,negX,by,posZ));
                     normalArray.addAll(Arrays.asList(0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f));
-                    trigIdx=MeshUtility.addQuadToIndexes(indexArray,trigIdx);
+                    trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
             }
         }
         
-        vertexes=MeshUtility.floatArrayListToFloat(vertexArray);
-        normals=MeshUtility.floatArrayListToFloat(normalArray);
-        indexes=MeshUtility.intArrayListToInt(indexArray);
-        uvs=MeshUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+        vertexes=MeshMapUtility.floatArrayListToFloat(vertexArray);
+        normals=MeshMapUtility.floatArrayListToFloat(normalArray);
+        indexes=MeshMapUtility.intArrayListToInt(indexArray);
+        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
 
         meshList.add(new Mesh(name,"platform",vertexes,normals,uvs,indexes));
     }
@@ -332,19 +332,19 @@ public class MapStory
         
         switch (dir)
         {
-            case MeshUtility.STAIR_DIR_POS_Z:
+            case MeshMapUtility.STAIR_DIR_POS_Z:
                 room.setGridAllStories(x,(z-1),FLAG_STEPS);
                 z+=2;
                 break;
-            case MeshUtility.STAIR_DIR_NEG_Z:
+            case MeshMapUtility.STAIR_DIR_NEG_Z:
                 room.setGridAllStories(x,(z+-1),FLAG_STEPS);
                 z-=2;
                 break;
-            case MeshUtility.STAIR_DIR_POS_X:
+            case MeshMapUtility.STAIR_DIR_POS_X:
                 room.setGridAllStories((x-1),z,FLAG_STEPS);
                 x+=2;
                 break;
-            case MeshUtility.STAIR_DIR_NEG_X:
+            case MeshMapUtility.STAIR_DIR_NEG_X:
                 room.setGridAllStories((x+1),z,FLAG_STEPS);
                 x-=2;
                 break;
