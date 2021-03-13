@@ -353,29 +353,22 @@ public class SkeletonBuilder
     public void buildBody(Skeleton skeleton,float hunchAng)
     {
         int         hipBoneIdx,waistBoneIdx,torsoBoneIdx,topTorsoBoneIdx;
-        float       nf,high,gravityLockDistance,meshScale,
-                    radius,extraRadius,legHighFactor,
+        float       high,gravityLockDistance,meshScale,
+                    radius,extraRadius,
                     hipHigh,waistHigh,torsoHigh,torsoTopHigh;
         RagPoint    hipPnt,waistPnt,torsoPnt,topTorsoPnt;
         
         high=(float)((double)GeneratorMain.settings.get("height"));
         radius=(float)((double)GeneratorMain.settings.get("radius"));
         extraRadius=radius*0.5f;
-        legHighFactor=(float)((double)GeneratorMain.settings.get("legHeightFactor"));
         
             // random heights, as a section of
             // the full height
             
-        hipHigh=high*legHighFactor;
-        
-        waistHigh=GeneratorMain.random.nextFloat();
-        torsoHigh=GeneratorMain.random.nextFloat();
-        torsoTopHigh=GeneratorMain.random.nextFloat();
-        nf=(float)Math.sqrt((waistHigh*waistHigh)+(torsoHigh*torsoHigh)+(torsoTopHigh*torsoTopHigh));
-        
-        waistHigh=(waistHigh/nf)*(high-hipHigh);
-        torsoHigh=(torsoHigh/nf)*(high-hipHigh);
-        torsoTopHigh=(torsoTopHigh/nf)*(high-hipHigh);
+        hipHigh=high*(0.45f+(GeneratorMain.random.nextFloat()*0.2f));
+        waistHigh=(high-hipHigh)*(0.3f+(GeneratorMain.random.nextFloat()*0.03f));
+        torsoHigh=(high-hipHigh)*(0.3f+(GeneratorMain.random.nextFloat()*0.03f));
+        torsoTopHigh=high-(hipHigh+waistHigh+torsoHigh);
 
             // the spine
         
@@ -385,16 +378,22 @@ public class SkeletonBuilder
         
         waistPnt=new RagPoint(0,waistHigh,0);
         if (hunchAng!=0.0f) waistPnt.rotateX(hunchAng-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)));
+        waistPnt.y+=hipPnt.y;
+        waistPnt.z+=hipPnt.z;
         gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
         waistBoneIdx=skeleton.addChildBone(hipBoneIdx,"Waist",-1,gravityLockDistance,waistPnt);
         
         torsoPnt=new RagPoint(0,torsoHigh,0);
         if (hunchAng!=0.0f) torsoPnt.rotateX(hunchAng-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)));
+        torsoPnt.y+=waistPnt.y;
+        torsoPnt.z+=waistPnt.z;
         gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
         torsoBoneIdx=skeleton.addChildBone(waistBoneIdx,"Torso",-1,gravityLockDistance,torsoPnt);
         
         topTorsoPnt=new RagPoint(0,torsoTopHigh,0);
         if (hunchAng!=0.0f) topTorsoPnt.rotateX(hunchAng-(0.5f+(GeneratorMain.random.nextFloat()*0.05f)));
+        topTorsoPnt.y+=torsoPnt.y;
+        topTorsoPnt.z+=torsoPnt.z;
         gravityLockDistance=radius*(GeneratorMain.random.nextFloat()*extraRadius);
         topTorsoBoneIdx=skeleton.addChildBone(torsoBoneIdx,"Torso_Top",-1,gravityLockDistance,topTorsoPnt);
 
@@ -553,6 +552,8 @@ public class SkeletonBuilder
         else {
             hunchAng=GeneratorMain.random.nextFloat()*30.0f;
         }
+        
+        hunchAng=0.0f;
         
             // build the skeleton
 

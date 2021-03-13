@@ -56,4 +56,32 @@ public class MeshList
         return(skeleton);
     }
     
+    private void rebuildModelMeshWithSkeletonRecurse(Skeleton skeleton,Bone bone,RagPoint offsetPnt)
+    {
+        int         n;
+        RagPoint    nextOffsetPnt;
+        
+        nextOffsetPnt=new RagPoint(bone.pnt.x,bone.pnt.y,bone.pnt.z);
+        
+        if (offsetPnt!=null) {
+            bone.pnt.x-=offsetPnt.x;
+            bone.pnt.y-=offsetPnt.y;
+            bone.pnt.z-=offsetPnt.z;
+        }
+        
+        if (bone.meshIdx!=-1) meshes.get(bone.meshIdx).makeVertexesRelativeToPoint(bone.pnt);
+        
+        for (n=0;n!=bone.children.size();n++) {
+            rebuildModelMeshWithSkeletonRecurse(skeleton,skeleton.bones.get(bone.children.get(n)),nextOffsetPnt);
+        }
+    }
+    
+    public void rebuildModelMeshWithSkeleton(Skeleton skeleton)
+    {
+            // when constructing the bones are
+            // all absolute, this makes everything relative
+        
+        rebuildModelMeshWithSkeletonRecurse(skeleton,skeleton.bones.get(0),null);
+    }
+    
 }

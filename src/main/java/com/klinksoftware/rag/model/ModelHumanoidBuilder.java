@@ -30,7 +30,7 @@ public class ModelHumanoidBuilder
         int         n,meshIdx;
         Limb        limb;
         RagPoint    fullBodyScale;
-        Mesh        mesh;
+        Mesh        mesh,limbMesh;
         
             // random body scaling
             
@@ -39,18 +39,24 @@ public class ModelHumanoidBuilder
             // wrap all the limbs
             // with meshes
             
+        mesh=null;
+            
         for (n=0;n!=skeleton.limbs.size();n++) {
             limb=skeleton.limbs.get(n);
 
-            mesh=MeshModelUtility.buildMeshAroundBoneLimb(skeleton,limb,"body");
-            if (limb.randomize) MeshModelUtility.randomScaleVertexToBones(mesh);
-
-                // add to model mesh
-                // and set to first bone in set
-                
-            //meshIdx=meshList.add(mesh);
-            //skeleton.setBoneMeshIndex(limb.boneIndexes[0],meshIdx);
+            limbMesh=MeshModelUtility.buildMeshAroundBoneLimb(skeleton,limb,"body");
+            if (limb.randomize) MeshModelUtility.randomScaleVertexToBones(limbMesh);
+            
+            if (mesh==null) {
+                mesh=limbMesh;
+            }
+            else {
+                mesh.combine(limbMesh);
+            }
         }
+        
+        meshIdx=meshList.add(mesh);
+        skeleton.setBoneMeshIndex(0,meshIdx);       // only one mesh, attached to root
     }
 
         //
@@ -69,7 +75,6 @@ public class ModelHumanoidBuilder
             // some settings
          
         modelName=(String)GeneratorMain.settings.get("name");
-        //height=(float)((double)GeneratorMain.settings.get("height"));
         
             // build the skeleton
             
@@ -79,6 +84,12 @@ public class ModelHumanoidBuilder
             
         meshList=new MeshList();
         wrapLimbs();
+        
+            // skeletons and meshes are created with absolute
+            // points, we need to change this to relative before
+            // saving the model
+            
+        meshList.rebuildModelMeshWithSkeleton(skeleton);
 
             // write out the model
         

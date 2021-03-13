@@ -18,7 +18,7 @@ public class MeshModelUtility
         // gravity distance
         //
         
-    public static void findBoundsForBoneList(ArrayList<Bone> boneList,RagBound xBound,RagBound yBound,RagBound zBound)
+    private static void findBoundsForBoneList(ArrayList<Bone> boneList,RagBound xBound,RagBound yBound,RagBound zBound)
     {
         int                 n;
         RagPoint            pnt;
@@ -36,7 +36,7 @@ public class MeshModelUtility
         }
     }
 
-    public static float findMaxGravityForBoneList(ArrayList<Bone> boneList)
+    private static float findMaxGravityForBoneList(ArrayList<Bone> boneList)
     {
         int         n;
         float       maxGravityDist;
@@ -57,7 +57,7 @@ public class MeshModelUtility
         // center point
         //
   
-    public static Mesh buildGlobeAroundSkeletonX(String name,String bitmapName,int acrossSurfaceCount,int aroundSurfaceCount,RagPoint centerPnt,float acrossRadius,float aroundRadius)
+    private static Mesh buildGlobeAroundSkeletonX(String name,String bitmapName,int acrossSurfaceCount,int aroundSurfaceCount,RagPoint centerPnt,float acrossRadius,float aroundRadius)
     {
         int                 x,yz,
                             vIdx,v2Idx,vNextIdx,v2NextIdx,
@@ -112,30 +112,34 @@ public class MeshModelUtility
             
             xAng+=xAngAdd;
         }
-        /*
+
             // end points
        
-        minIdx=vIdx;
+        minIdx=vertexArray.size()/3;
 
-        v=vertexList[vIdx++];
-        v.position.setFromValues((centerPnt.x-acrossRadius),centerPnt.y,centerPnt.z);
-        v.uv.setFromValues(0.5,0.0);
+        vertexArray.add(centerPnt.x-acrossRadius);
+        vertexArray.add(centerPnt.y);
+        vertexArray.add(centerPnt.z);
+        
+        uvArray.add(0.5f);
+        uvArray.add(0.0f);
 
-        maxIdx=vIdx;
+        maxIdx=vertexArray.size()/3;
 
-        v=vertexList[vIdx++];
-        v.position.setFromValues((centerPnt.x+acrossRadius),centerPnt.y,centerPnt.z);
-        v.uv.setFromValues(0.5,1.0);
+        vertexArray.add(centerPnt.x+acrossRadius);
+        vertexArray.add(centerPnt.y);
+        vertexArray.add(centerPnt.z);
+        
+        uvArray.add(0.5f);
+        uvArray.add(1.0f);
         
             // build the triangles on
             // all the strips except the
             // end points
+
+        for (x=0;x!=(acrossSurfaceCount-3);x++) {
             
-        iIdx=0;
-        
-        for (x=0;x!==(acrossSurfaceCount-3);x++) {
-            
-            for (yz=0;yz!==aroundSurfaceCount;yz++) {
+            for (yz=0;yz!=aroundSurfaceCount;yz++) {
                 
                 vIdx=(x*(aroundSurfaceCount+1))+yz;
                 v2Idx=((x+1)*(aroundSurfaceCount+1))+yz;
@@ -143,34 +147,34 @@ public class MeshModelUtility
                 vNextIdx=(x*(aroundSurfaceCount+1))+(yz+1);
                 v2NextIdx=((x+1)*(aroundSurfaceCount+1))+(yz+1);
                  
-                indexes[iIdx++]=v2Idx;
-                indexes[iIdx++]=vIdx;
-                indexes[iIdx++]=vNextIdx;
+                indexArray.add(v2Idx);
+                indexArray.add(vIdx);
+                indexArray.add(vNextIdx);
 
-                indexes[iIdx++]=v2Idx;
-                indexes[iIdx++]=vNextIdx;
-                indexes[iIdx++]=v2NextIdx;
+                indexArray.add(v2Idx);
+                indexArray.add(vNextIdx);
+                indexArray.add(v2NextIdx);
             }
         }
         
             // min end point
         
-        for (yz=0;yz!==aroundSurfaceCount;yz++) {
-            indexes[iIdx++]=yz;
-            indexes[iIdx++]=minIdx;
-            indexes[iIdx++]=yz+1;
+        for (yz=0;yz!=aroundSurfaceCount;yz++) {
+            indexArray.add(yz);
+            indexArray.add(minIdx);
+            indexArray.add(yz+1);
         }
         
             // max end point
             
         maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
 
-        for (yz=0;yz!==aroundSurfaceCount;yz++) {
-            indexes[iIdx++]=maxOff+yz;
-            indexes[iIdx++]=maxIdx;
-            indexes[iIdx++]=maxOff+(yz+1);
+        for (yz=0;yz!=aroundSurfaceCount;yz++) {
+            indexArray.add(maxOff+yz);
+            indexArray.add(maxIdx);
+            indexArray.add(maxOff+(yz+1));
         }
-        */
+
             // create the mesh
             
         vertexes=floatArrayListToFloat(vertexArray);
@@ -181,7 +185,7 @@ public class MeshModelUtility
         return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
     }
     
-    public static Mesh buildGlobeAroundSkeletonY(String name,String bitmapName,int acrossSurfaceCount,int aroundSurfaceCount,RagPoint centerPnt,float acrossRadius,float aroundRadius)
+    private static Mesh buildGlobeAroundSkeletonY(String name,String bitmapName,int acrossSurfaceCount,int aroundSurfaceCount,RagPoint centerPnt,float acrossRadius,float aroundRadius)
     {
         int                 xz,y,
                             vIdx,v2Idx,vNextIdx,v2NextIdx,
@@ -236,30 +240,34 @@ public class MeshModelUtility
             
             yAng+=yAngAdd;
         }
-        /*
+
             // end points
         
-        minIdx=vIdx;
+        minIdx=vertexArray.size()/3;
 
-        v=vertexList[vIdx++];
-        v.position.setFromValues(centerPnt.x,(centerPnt.y-acrossRadius),centerPnt.z);
-        v.uv.setFromValues(0.5,0.0);
+        vertexArray.add(centerPnt.x);
+        vertexArray.add(centerPnt.y-acrossRadius);
+        vertexArray.add(centerPnt.z);
+        
+        uvArray.add(0.5f);
+        uvArray.add(0.0f);
     
-        maxIdx=vIdx;
+        maxIdx=vertexArray.size()/3;
 
-        v=vertexList[vIdx++];
-        v.position.setFromValues(centerPnt.x,(centerPnt.y+acrossRadius),centerPnt.z);
-        v.uv.setFromValues(0.5,1.0);
+        vertexArray.add(centerPnt.x);
+        vertexArray.add(centerPnt.y+acrossRadius);
+        vertexArray.add(centerPnt.z);
+        
+        uvArray.add(0.5f);
+        uvArray.add(1.0f);
     
             // build the triangles on
             // all the strips except the
             // end points
+  
+        for (y=0;y!=(acrossSurfaceCount-3);y++) {
             
-        iIdx=0;
-        
-        for (y=0;y!==(acrossSurfaceCount-3);y++) {
-            
-            for (xz=0;xz!==aroundSurfaceCount;xz++) {
+            for (xz=0;xz!=aroundSurfaceCount;xz++) {
                 
                 vIdx=(y*(aroundSurfaceCount+1))+xz;
                 v2Idx=((y+1)*(aroundSurfaceCount+1))+xz;
@@ -267,34 +275,34 @@ public class MeshModelUtility
                 vNextIdx=(y*(aroundSurfaceCount+1))+(xz+1);
                 v2NextIdx=((y+1)*(aroundSurfaceCount+1))+(xz+1);
                  
-                indexes[iIdx++]=v2Idx;
-                indexes[iIdx++]=vIdx;
-                indexes[iIdx++]=vNextIdx;
+                indexArray.add(v2Idx);
+                indexArray.add(vIdx);
+                indexArray.add(vNextIdx);
 
-                indexes[iIdx++]=v2Idx;
-                indexes[iIdx++]=vNextIdx;
-                indexes[iIdx++]=v2NextIdx;
+                indexArray.add(v2Idx);
+                indexArray.add(vNextIdx);
+                indexArray.add(v2NextIdx);
             }
         }
         
             // min end point
         
-        for (xz=0;xz!==aroundSurfaceCount;xz++) {
-            indexes[iIdx++]=xz;
-            indexes[iIdx++]=minIdx;
-            indexes[iIdx++]=xz+1;
+        for (xz=0;xz!=aroundSurfaceCount;xz++) {
+            indexArray.add(xz);
+            indexArray.add(minIdx);
+            indexArray.add(xz+1);
         }
         
             // max end point
         
         maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
 
-        for (xz=0;xz!==aroundSurfaceCount;xz++) {
-            indexes[iIdx++]=maxOff+xz;
-            indexes[iIdx++]=maxIdx;
-            indexes[iIdx++]=maxOff+(xz+1);
+        for (xz=0;xz!=aroundSurfaceCount;xz++) {
+            indexArray.add(maxOff+xz);
+            indexArray.add(maxIdx);
+            indexArray.add(maxOff+(xz+1));
         }
-        */
+
             // create the mesh
             
         vertexes=floatArrayListToFloat(vertexArray);
@@ -305,7 +313,7 @@ public class MeshModelUtility
         return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
     }
     
-    public static Mesh buildGlobeAroundSkeletonZ(String name,String bitmapName,int acrossSurfaceCount,int aroundSurfaceCount,RagPoint centerPnt,float acrossRadius,float aroundRadius)
+    private static Mesh buildGlobeAroundSkeletonZ(String name,String bitmapName,int acrossSurfaceCount,int aroundSurfaceCount,RagPoint centerPnt,float acrossRadius,float aroundRadius)
     {
         int                 xy,z,
                             vIdx,v2Idx,vNextIdx,v2NextIdx,
@@ -360,30 +368,34 @@ public class MeshModelUtility
             
             zAng+=zAngAdd;
         }
-        /*
+
             // end points
         
-        minIdx=vIdx;
+        minIdx=vertexArray.size()/3;
 
-        v=vertexList[vIdx++];
-        v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z-acrossRadius));
-        v.uv.setFromValues(0.5,0.0);
+        vertexArray.add(centerPnt.x);
+        vertexArray.add(centerPnt.y);
+        vertexArray.add(centerPnt.z-acrossRadius);
+        
+        uvArray.add(0.5f);
+        uvArray.add(0.0f);
     
-        maxIdx=vIdx;
+        maxIdx=vertexArray.size()/3;
 
-        v=vertexList[vIdx++];
-        v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z+acrossRadius));
-        v.uv.setFromValues(0.5,1.0);
+        vertexArray.add(centerPnt.x);
+        vertexArray.add(centerPnt.y);
+        vertexArray.add(centerPnt.z+acrossRadius);
+        
+        uvArray.add(0.5f);
+        uvArray.add(1.0f);
         
             // build the triangles on
             // all the strips except the
             // end points
+ 
+        for (z=0;z!=(acrossSurfaceCount-3);z++) {
             
-        iIdx=0;
-        
-        for (z=0;z!==(acrossSurfaceCount-3);z++) {
-            
-            for (xy=0;xy!==aroundSurfaceCount;xy++) {
+            for (xy=0;xy!=aroundSurfaceCount;xy++) {
                 
                 vIdx=(z*(aroundSurfaceCount+1))+xy;
                 v2Idx=((z+1)*(aroundSurfaceCount+1))+xy;
@@ -391,34 +403,34 @@ public class MeshModelUtility
                 vNextIdx=(z*(aroundSurfaceCount+1))+(xy+1);
                 v2NextIdx=((z+1)*(aroundSurfaceCount+1))+(xy+1);
                  
-                indexes[iIdx++]=v2Idx;
-                indexes[iIdx++]=vIdx;
-                indexes[iIdx++]=vNextIdx;
+                indexArray.add(v2Idx);
+                indexArray.add(vIdx);
+                indexArray.add(vNextIdx);
 
-                indexes[iIdx++]=v2Idx;
-                indexes[iIdx++]=vNextIdx;
-                indexes[iIdx++]=v2NextIdx;
+                indexArray.add(v2Idx);
+                indexArray.add(vNextIdx);
+                indexArray.add(v2NextIdx);
             }
         }
         
             // min end point
         
-        for (xy=0;xy!==aroundSurfaceCount;xy++) {
-            indexes[iIdx++]=xy;
-            indexes[iIdx++]=minIdx;
-            indexes[iIdx++]=xy+1;
+        for (xy=0;xy!=aroundSurfaceCount;xy++) {
+            indexArray.add(xy);
+            indexArray.add(minIdx);
+            indexArray.add(xy+1);
         }
         
             // max end point
         
         maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
 
-        for (xy=0;xy!==aroundSurfaceCount;xy++) {
-            indexes[iIdx++]=maxOff+xy;
-            indexes[iIdx++]=maxIdx;
-            indexes[iIdx++]=maxOff+(xy+1);
+        for (xy=0;xy!=aroundSurfaceCount;xy++) {
+            indexArray.add(maxOff+xy);
+            indexArray.add(maxIdx);
+            indexArray.add(maxOff+(xy+1));
         }
-        */
+
             // create the mesh
             
         vertexes=floatArrayListToFloat(vertexArray);
@@ -433,9 +445,10 @@ public class MeshModelUtility
         // shrink wrap the globe around a
         // collection of points
         //
-/*        
-    shrinkWrapGlobe(vertexList,boneList,centerPnt)
+    
+    private static void shrinkWrapGlobe(Mesh mesh,ArrayList<Bone> boneList,RagPoint centerPnt)
     {
+        /*
         let n,k;
         let v,bone,dist,shrinkDist,gravityMaxDistance;
         let nVertex=vertexList.length;
@@ -446,23 +459,35 @@ public class MeshModelUtility
         let gravityVector=new PointClass(0,0,0);
         let moveCount=0;
         let boneHit;
+        */
+        
+        int                 n,k,vIdx,nVertex,moveCount;
+        float               dist,shrinkDist,gravityMaxDistance;
+        boolean             anyMove,boneHit;
+        boolean[]           moving;
+        Bone                bone;
+        RagPoint            pnt;
         
             // move distance for shrinking bones
             
-        shrinkDist=10.0;
-        gravityMaxDistance=5000;
+        shrinkDist=10.0f;
+        gravityMaxDistance=5000.0f;
         
             // keep a parallel list of
             // what bones are moving (bones
             // stop when they get within the
             // gravity min distance of all gravity bones)
         
-        for (n=0;n!==nVertex;n++) {
-            moving.push(true);
-        }
+        nVertex=mesh.vertexes.length/3;
+        moving=new boolean[nVertex];
+        
+        Arrays.fill(moving,true);
         
             // loop the moves
             
+        moveCount=0;
+        pnt=new RagPoint(0.0f,0.0f,0.0f);
+        
         while (moveCount<1000) {
             
             moveCount++;
@@ -470,7 +495,7 @@ public class MeshModelUtility
         
                 // run through the vertices
 
-            for (n=0;n!==nVertex;n++) {
+            for (n=0;n!=nVertex;n++) {
 
                     // is this one moving?
 
@@ -478,16 +503,21 @@ public class MeshModelUtility
 
                     // get the vertex
 
-                v=vertexList[n];
+                vIdx=n*3;
+                pnt.x=mesh.vertexes[vIdx];
+                pnt.y=mesh.vertexes[vIdx+1];
+                pnt.z=mesh.vertexes[vIdx+2];
+                
+                /*
                                
                     // get the gravity to each bone
 
                 boneHit=false;
                 moveVector.setFromValues(0,0,0);
                 
-                for (k=0;k!==nBone;k++) {
-                    bone=boneList[k];
-                    dist=bone.position.distance(v.position);
+                for (k=0;k!=nBone;k++) {
+                    bone=boneList.get(k);
+                    dist=bone.pnt.distance(pnt);
                     
                         // if too close, then all movement stops
                         
@@ -531,6 +561,7 @@ public class MeshModelUtility
                     // around again
                     
                 anyMove=true;
+                */
             }
             
                 // no moves?  Then done
@@ -542,7 +573,7 @@ public class MeshModelUtility
         //
         // attach vertices to nearest bone
         //
-        
+/*        
     attachVertexToBones(vertexList,boneList,centerPnt)
     {
         let n,k,v;
@@ -754,11 +785,11 @@ public class MeshModelUtility
                 mesh.transformUVs(0.0f,0.0f,0.5f,0.5f);
                 break;
         }
-
+        
             // shrink wrap the globe and rebuild
             // any normals, etc
             
-        //this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
+        //shrinkWrapGlobe(mesh,boneList,centerPnt);
         //this.attachVertexToBones(vertexList,boneList,centerPnt);
         //this.scaleVertexToBones(vertexList,limb.scaleMin,limb.scaleMax);
 

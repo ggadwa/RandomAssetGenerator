@@ -3,6 +3,5 @@
     "seed": 0,
     "colorScheme": "random",
     "height":5.0,
-    "radius":0.2,
-    "legHeightFactor":0.5
+    "radius":1.0
 }

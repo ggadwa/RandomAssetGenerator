@@ -25,6 +25,16 @@ public class RagPoint
         z*=f;
     }
     
+    public float distance(RagPoint pnt)
+    {
+        float       px,py,pz;
+        
+        px=x-pnt.x;
+        py=y-pnt.y;
+        pz=z-pnt.z;
+        return((float)Math.sqrt((px*px)+(py*py)+(pz*pz)));
+    }
+    
     public void normalize()
     {
         float       f;
