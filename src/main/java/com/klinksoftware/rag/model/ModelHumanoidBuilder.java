@@ -45,7 +45,6 @@ public class ModelHumanoidBuilder
             limb=skeleton.limbs.get(n);
 
             limbMesh=MeshModelUtility.buildMeshAroundBoneLimb(skeleton,limb,"body");
-            if (limb.randomize) MeshModelUtility.randomScaleVertexToBones(limbMesh);
             
             if (mesh==null) {
                 mesh=limbMesh;

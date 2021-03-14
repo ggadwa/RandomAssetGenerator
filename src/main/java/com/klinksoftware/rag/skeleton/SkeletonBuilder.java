@@ -48,8 +48,7 @@ public class SkeletonBuilder
         bones[heelBoneIdx].gravityLockDistance=legRadius;
         
         meshScale=0.7f+(GeneratorMain.random.nextFloat()*0.3f);
-        
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_LEG,limbIdx,constants.LIMB_AXIS_Y,flipped,8,5,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,0.0,meshScale),[hipBoneIdx,kneeBoneIdx,ankleBoneIdx,heelBoneIdx]));
+        skeleton.addLimb(("leg_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_LEG,Limb.LIMB_AXIS_Y,flipped,8,5,new RagPoint(1.0f,1.0f,meshScale),new int[]{hipBoneIdx,kneeBoneIdx,ankleBoneIdx,heelBoneIdx});
         
             // the foot bones
             // feet are always parallel to ground, towards front
@@ -64,7 +63,7 @@ public class SkeletonBuilder
 
         bones[footBoneIdx].gravityLockDistance=legRadius*(1.2f+(GeneratorMain.random.nextFloat()*0.3f));
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FOOT,limbIdx,constants.LIMB_AXIS_Z,flipped,5,5,false,new PointClass(1.0,0.7,1.0),new PointClass(1.0,0.0,1.0),[heelBoneIdx,footBoneIdx]));
+        skeleton.addLimb(("foot_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_FOOT,Limb.LIMB_AXIS_Z,flipped,5,5,new RagPoint(1.0f,0.7f,1.0f),new int[]{heelBoneIdx,footBoneIdx});
 
             // toe limbs
             
@@ -91,7 +90,7 @@ public class SkeletonBuilder
             bones[knuckleBoneIdx].gravityLockDistance=toeRadius;
             bones[toeBoneIdx].gravityLockDistance=toeRadius;
             
-            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,constants.LIMB_AXIS_Z,flipped,4,4,false,new PointClass(1.0,0.7,1.0),new PointClass(1.0,0.0,1.0),[knuckleBoneIdx,toeBoneIdx]));
+            skeleton.addLimb(("leg_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),Limb.LIMB_TYPE_TOE,Limb.LIMB_AXIS_Z,flipped,4,4,new RagPoint(1.0f,0.7f,1.0f),new int[]{knuckleBoneIdx,toeBoneIdx});
             
             fx+=toeDistance;
         }
@@ -143,8 +142,7 @@ public class SkeletonBuilder
         bones[wristBoneIdx].gravityLockDistance=armRadius;
         
         meshScale=0.7+(GeneratorMain.random.nextFloat()*0.3f);
-        
-        armLimbIdx=skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_ARM,limbIdx,axis,flipped,8,5,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,1.0,meshScale),[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]))-1;
+        skeleton.addLimb(("arm_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_ARM,axis,flipped,8,5,new RagPoint(1.0f,1.0f,meshScale),new int[]{shoulderBoneIdx,elbowBoneIdx,wristBoneIdx});
         
             // hand limb
             
@@ -155,7 +153,7 @@ public class SkeletonBuilder
         
         bones[handBoneIdx].gravityLockDistance=handRadius;
         
-        handLimbIdx=this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HAND,limbIdx,axis,flipped,5,5,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,1.0,meshScale),[handBoneIdx]))-1;
+        skeleton.addLimb(("hand_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_HAND,axis,flipped,5,5,new RagPoint(1.0f,1.0f,meshScale),new int[]{handBoneIdx});
 
             // finger limbs
             
@@ -185,7 +183,7 @@ public class SkeletonBuilder
             bones[knuckleBoneIdx].gravityLockDistance=fingerRadius;
             bones[fingerBoneIdx].gravityLockDistance=fingerRadius;
             
-            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,axis,flipped,4,4,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,1.0,meshScale),[knuckleBoneIdx,fingerBoneIdx]));
+            skeleton.addLimb(("finger_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),Limb.LIMB_TYPE_FINGER,axis,flipped,4,4,new RagPoint(1.0f,1.0f,meshScale),new int[]{knuckleBoneIdx,fingerBoneIdx});
             
             fy+=fingerDistance;
         }
@@ -235,7 +233,7 @@ public class SkeletonBuilder
         bones[whip2BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.6);
         bones[whip3BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.3);
 
-        skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_WHIP,limbIdx,axis,false,8,5,false,null,null,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx]));
+        skeleton.addLimb(("whip_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_WHIP,axis,false,8,5,new RagPoint(1.0f,1.0f,1.0f),new int[]{whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx});
         */
     }
     
@@ -282,7 +280,7 @@ public class SkeletonBuilder
         bones[neckStartBoneIdx].gravityLockDistance=neckRadius*(0.8f+(GeneratorMain.random.nextFloat()*0.2f));
         bones[neckEndBoneIdx].gravityLockDistance=neckRadius;
 
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_NECK,0,constants.LIMB_AXIS_Y,false,5,5,false,new PointClass(1.0,0.3,1.0),new PointClass(1.0,0.1,1.0),[neckStartBoneIdx,neckEndBoneIdx]));
+        skeleton.addLimb(("neck_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_NECK,Limb.LIMB_AXIS_Y,false,5,5,new RagPoint(1.0f,0.3f,1.0f),new int[]{neckStartBoneIdx,neckEndBoneIdx});
         
             // default placements
             
@@ -314,7 +312,7 @@ public class SkeletonBuilder
             scaleMin=scaleMax.copy();
             scaleMin.y=0.1;
             
-            this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_JAW,0,constants.LIMB_AXIS_Z,false,6,6,false,scaleMin,scaleMax,[jawBackBoneIdx,jawFrontBoneIdx]));
+            skeleton.addLimb(("jaw_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_JAW,Limb.LIMB_AXIS_Z,false,6,6,new RagPoint(1.0f,1.0f,meshScale),new int[]{jawBackBoneIdx,jawFrontBoneIdx});
         }
         
             // create the head
@@ -341,7 +339,7 @@ public class SkeletonBuilder
         scaleMax=scaleMin.copy();
         if (hasJaw) scaleMax.y=0.1;
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HEAD,0,constants.LIMB_AXIS_Y,false,10,10,false,scaleMin,scaleMax,[headBottomBoneIdx,headTopBoneIdx]));
+        skeleton.addLimb(("head_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_HEAD,Limb.LIMB_AXIS_Y,false,10,10,new RagPoint(1.0f,1.0f,meshScale),new int[]{headBottomBoneIdx,headTopBoneIdx});
         */
     }
     
@@ -400,7 +398,7 @@ public class SkeletonBuilder
             // the body limb
             
         meshScale=0.7f+(GeneratorMain.random.nextFloat()*0.3f);
-        skeleton.addLimb("body",Limb.LIMB_TYPE_BODY,Limb.LIMB_AXIS_Y,false,12,12,true,new RagPoint(1.0f,1.0f,meshScale),new RagPoint(1.0f,1.0f,meshScale),new int[]{hipBoneIdx,waistBoneIdx,torsoBoneIdx,topTorsoBoneIdx});
+        skeleton.addLimb("body",Limb.LIMB_TYPE_BODY,Limb.LIMB_AXIS_Y,false,12,12,new RagPoint(1.0f,1.0f,meshScale),new int[]{hipBoneIdx,waistBoneIdx,torsoBoneIdx,topTorsoBoneIdx});
     }
 
     public void buildArms(Skeleton skeleton,boolean standing)
@@ -552,8 +550,6 @@ public class SkeletonBuilder
         else {
             hunchAng=GeneratorMain.random.nextFloat()*30.0f;
         }
-        
-        hunchAng=0.0f;
         
             // build the skeleton
 

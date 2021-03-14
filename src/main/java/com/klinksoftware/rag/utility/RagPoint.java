@@ -18,6 +18,20 @@ public class RagPoint
         this.z=z;
     }
     
+    public void setFromSubPoint(RagPoint p1,RagPoint p2)
+    {
+        this.x=p1.x-p2.x;
+        this.y=p1.y-p2.y;
+        this.z=p1.z-p2.z;
+    }
+    
+    public void addPoint(RagPoint p)
+    {
+        this.x+=p.x;
+        this.y+=p.y;
+        this.z+=p.z;
+    }
+    
     public void scale(float f)
     {
         x*=f;

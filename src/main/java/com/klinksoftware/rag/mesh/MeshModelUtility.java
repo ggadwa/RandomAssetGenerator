@@ -446,32 +446,18 @@ public class MeshModelUtility
         // collection of points
         //
     
-    private static void shrinkWrapGlobe(Mesh mesh,ArrayList<Bone> boneList,RagPoint centerPnt)
+    private static void shrinkWrapGlobe(Mesh mesh,ArrayList<Bone> boneList,RagPoint centerPnt,float gravityMaxDistance)
     {
-        /*
-        let n,k;
-        let v,bone,dist,shrinkDist,gravityMaxDistance;
-        let nVertex=vertexList.length;
-        let nBone=boneList.length;
-        let moving=[];
-        let anyMove;
-        let moveVector=new PointClass(0,0,0);
-        let gravityVector=new PointClass(0,0,0);
-        let moveCount=0;
-        let boneHit;
-        */
-        
-        int                 n,k,vIdx,nVertex,moveCount;
-        float               dist,shrinkDist,gravityMaxDistance;
+        int                 n,k,vIdx,nVertex,nBone,moveCount;
+        float               dist,shrinkDist;
         boolean             anyMove,boneHit;
         boolean[]           moving;
         Bone                bone;
-        RagPoint            pnt;
+        RagPoint            pnt,moveVector,gravityVector;
         
             // move distance for shrinking bones
             
-        shrinkDist=10.0f;
-        gravityMaxDistance=5000.0f;
+        shrinkDist=gravityMaxDistance*0.001f;
         
             // keep a parallel list of
             // what bones are moving (bones
@@ -479,6 +465,8 @@ public class MeshModelUtility
             // gravity min distance of all gravity bones)
         
         nVertex=mesh.vertexes.length/3;
+        nBone=boneList.size();
+        
         moving=new boolean[nVertex];
         
         Arrays.fill(moving,true);
@@ -487,6 +475,8 @@ public class MeshModelUtility
             
         moveCount=0;
         pnt=new RagPoint(0.0f,0.0f,0.0f);
+        moveVector=new RagPoint(0.0f,0.0f,0.0f);
+        gravityVector=new RagPoint(0.0f,0.0f,0.0f);
         
         while (moveCount<1000) {
             
@@ -508,12 +498,10 @@ public class MeshModelUtility
                 pnt.y=mesh.vertexes[vIdx+1];
                 pnt.z=mesh.vertexes[vIdx+2];
                 
-                /*
-                               
                     // get the gravity to each bone
 
                 boneHit=false;
-                moveVector.setFromValues(0,0,0);
+                moveVector.setFromValues(0.0f,0.0f,0.0f);
                 
                 for (k=0;k!=nBone;k++) {
                     bone=boneList.get(k);
@@ -532,9 +520,9 @@ public class MeshModelUtility
                     
                         // otherwise add in gravity
                         
-                    gravityVector.setFromSubPoint(bone.position,v.position);
+                    gravityVector.setFromSubPoint(bone.pnt,pnt);
                     gravityVector.normalize();
-                    gravityVector.scale((1.0-(dist/gravityMaxDistance))*shrinkDist);
+                    gravityVector.scale((1.0f-(dist/gravityMaxDistance))*shrinkDist);
                     
                     moveVector.addPoint(gravityVector);
                     
@@ -550,18 +538,19 @@ public class MeshModelUtility
                     // the gravity move
                     
                 if (!boneHit) {
-                    moveVector.setFromSubPoint(centerPnt,v.position);
+                    moveVector.setFromSubPoint(centerPnt,pnt);
                     moveVector.normalize();
                     moveVector.scale(shrinkDist);
                 }
 
-                v.position.addPoint(moveVector);
+                mesh.vertexes[vIdx]+=moveVector.x;
+                mesh.vertexes[vIdx+1]+=moveVector.y;
+                mesh.vertexes[vIdx+2]+=moveVector.z;
                 
                     // we did a move so we go
                     // around again
                     
                 anyMove=true;
-                */
             }
             
                 // no moves?  Then done
@@ -569,113 +558,26 @@ public class MeshModelUtility
             if (!anyMove) break;
         }
     }
-    
-        //
-        // attach vertices to nearest bone
-        //
-/*        
-    attachVertexToBones(vertexList,boneList,centerPnt)
-    {
-        let n,k,v;
-        let bone,boneIdx,d,dist;
-        let nVertex=vertexList.length;
-        let nBone=boneList.length;
         
-        for (n=0;n!==nVertex;n++) {
-            v=vertexList[n];
-            
-                // attach a bone
-                
-            boneIdx=-1;
-            
-            for (k=0;k!==nBone;k++) {
-                bone=boneList[k];
-                if (bone.idx===-1) continue;        // this is a temp bone, skip it
-
-                d=bone.position.distance(v.position);
-                if (boneIdx===-1) {
-                    boneIdx=boneList[k].idx;
-                    dist=d;
-                }
-                else {
-                    if (d<dist) {
-                        boneIdx=boneList[k].idx;
-                        dist=d;
-                    }
-                }
-            }
-            
-            v.boneIdx=boneIdx;
-        }
-    }
-    
         //
         // scale all the vertexes along
-        // the line to the bone, use this to
-        // squish a model in a certain direction
+        // the line of the bones, to
+        // squish the model in a certain direction
         //
         
-    scaleVertexToBones(vertexList,scaleMin,scaleMax)
+    private static void scaleVertexToBones(Mesh mesh,RagPoint centerPnt,RagPoint scale)
     {
-        let n,v;
-        let nVertex=vertexList.length;
-        let bones=this.model.skeleton.bones;
+        int         n,vIdx,nVertex;
         
-        for (n=0;n!==nVertex;n++) {
-            v=vertexList[n];
-            if (v.boneIdx!==-1) v.position.scaleFromMinMaxPoint(bones[v.boneIdx].position,scaleMin,scaleMax);
+        nVertex=mesh.vertexes.length/3;
+        
+        for (n=0;n!=nVertex;n++) {
+            vIdx=n*3;
+            
+            mesh.vertexes[vIdx]=((mesh.vertexes[vIdx]-centerPnt.x)*scale.x)+centerPnt.x;
+            mesh.vertexes[vIdx+1]=((mesh.vertexes[vIdx+1]-centerPnt.y)*scale.y)+centerPnt.y;
+            mesh.vertexes[vIdx+2]=((mesh.vertexes[vIdx+2]-centerPnt.z)*scale.z)+centerPnt.z;
         }
-    }
-    */
-        //
-        // random vertex moves along
-        // the line to the attached bone
-        //
-        
-    public static void randomScaleVertexToBones(Mesh mesh)
-    {
-    /*
-        let n,k,v,v2,f;
-        let bone,pos;
-        let nVertex=vertexList.length;
-        let bones=this.model.skeleton.bones;
-        
-        let prevMove=new Uint8Array(nVertex);
-        
-        pos=new PointClass(0,0,0);
-
-        for (n=0;n!==nVertex;n++) {
-            v=vertexList[n];
-            if (v.boneIdx===-1) continue;
-            
-                // some vertexes are in the same place,
-                // we don't want to move them separately or
-                // the mesh breaks up
-                
-            if (prevMove[n]!==0) continue;
-            
-                // get original position
-                
-            pos.setFromPoint(v.position);
-            
-                // move the vertex
-                // and any similar vertex
-            
-            bone=bones[v.boneIdx];
-            f=0.9+(genRandom.random()*0.2);
-            
-            for (k=0;k!==nVertex;k++) {
-                if (prevMove[k]!==0) continue;
-                v2=vertexList[k];
-                if ((k===n) || (v2.position.truncEquals(pos))) {
-                    v2.position.subPoint(bone.position);
-                    v2.position.scale(f);
-                    v2.position.addPoint(bone.position);
-                    prevMove[k]=1;
-                }
-            }
-        }
-    */
     }
 
         //
@@ -750,6 +652,7 @@ public class MeshModelUtility
             // build the globe around the bones
             
         mesh=null;
+        aroundRadius=0.0f;
         maxGravity=findMaxGravityForBoneList(boneList);
         
         switch (limb.axis) {
@@ -789,68 +692,10 @@ public class MeshModelUtility
             // shrink wrap the globe and rebuild
             // any normals, etc
             
-        //shrinkWrapGlobe(mesh,boneList,centerPnt);
-        //this.attachVertexToBones(vertexList,boneList,centerPnt);
-        //this.scaleVertexToBones(vertexList,limb.scaleMin,limb.scaleMax);
+        shrinkWrapGlobe(mesh,boneList,centerPnt,aroundRadius);
+        scaleVertexToBones(mesh,centerPnt,limb.scale);
 
         return(mesh);
     }
-    /*
-        //
-        // builds the normals based on bones
-        //
-        
-    buildNormalsToBones(vertexList)
-    {
-        let n,k,v,bone,bonePos,dist,curDist;
-        let xBound,yBound,zBound,centerPnt;
-        let nVertex=vertexList.length;
-        let bones=this.model.skeleton.bones;
-        let nBone=bones.length;
-        
-            // get the center in case there's a no-attachment
-            // bone (this shouldn't happen right now)
-            
-        xBound=new BoundClass(0,0);
-        yBound=new BoundClass(0,0);
-        zBound=new BoundClass(0,0);
-        
-        this.findBoundsForBoneList(bones,xBound,yBound,zBound);
-        centerPnt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
-        
-            // find the closest bone in the bone list,
-            // even though we have attachments, we need to
-            // use the enlarged bone list because it
-            // gives up better normals
-        
-        for (n=0;n!==nVertex;n++) {
-            v=vertexList[n];
-            
-            curDist=-1;
-            bonePos=null;
-            
-            for (k=0;k!==nBone;k++) {
-                bone=bones[k];
-                dist=bone.position.distance(v.position);
-                
-                if ((dist<curDist) || (curDist===-1)) {
-                    curDist=dist;
-                    bonePos=bone.position;
-                }
-            }
-            
-                // rebuild the normals
-                
-            if (bonePos===null) {
-                v.normal.setFromSubPoint(v.position,centerPnt);
-            }
-            else {
-                v.normal.setFromSubPoint(v.position,bonePos);
-            }
-            
-            v.normal.normalize();
-        }
-    }    
-    
-    */
+
 }
