@@ -150,4 +150,24 @@ public class RagPoint
         y=ry;
         z=rz;
     }
+    
+    public void rotateY(float fy)
+    {
+        float       rd,sn,cs,rx,rz;
+        
+        rd=fy*((float)Math.PI/180.0f);
+        sn=(float)Math.sin(rd);
+        cs=(float)Math.cos(rd);
+
+        rx=(z*sn)+(x*cs);
+        rz=(z*cs)-(x*sn);
+
+        x=rx;
+        z=rz;
+    }
+    
+    public RagPoint copy()
+    {
+        return(new RagPoint(x,y,z));
+    }
 }

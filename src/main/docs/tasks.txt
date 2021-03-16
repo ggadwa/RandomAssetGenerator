@@ -1,6 +1,6 @@
 
-- build skeletons, use on regular map building
-- need a bitmap generator
+- humanoid
+   - no Y < 0 (to flatten feet)
 
 
 

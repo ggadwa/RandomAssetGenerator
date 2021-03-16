@@ -579,6 +579,23 @@ public class MeshModelUtility
             mesh.vertexes[vIdx+2]=((mesh.vertexes[vIdx+2]-centerPnt.z)*scale.z)+centerPnt.z;
         }
     }
+    
+        //
+        // no vertexes can extend past floor, everything
+        // there is flat
+        //
+    
+    private static void clipFloorVertexes(Mesh mesh)
+    {
+        int         n,vIdx,nVertex;
+        
+        nVertex=mesh.vertexes.length/3;
+        
+        for (n=0;n!=nVertex;n++) {
+            vIdx=n*3;
+            if (mesh.vertexes[vIdx+1]<0) mesh.vertexes[vIdx+1]=0.0f;
+        }
+    }
 
         //
         // build mesh around limb
@@ -694,6 +711,7 @@ public class MeshModelUtility
             
         shrinkWrapGlobe(mesh,boneList,centerPnt,aroundRadius);
         scaleVertexToBones(mesh,centerPnt,limb.scale);
+        clipFloorVertexes(mesh);
 
         return(mesh);
     }

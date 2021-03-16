@@ -57,10 +57,12 @@ public class GeneratorMain
             // seed the random
             // if seed == 0, then seed is set randomly
             
-        seed=(int)settings.get("seed");
+        seed=(long)settings.get("seed");
         if (seed==0) seed=Calendar.getInstance().getTimeInMillis();
         
         random=new Random(seed);
+        
+        System.out.println("seed="+Long.toString(seed));
         
             // the color scheme
             
