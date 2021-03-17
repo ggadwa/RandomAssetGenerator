@@ -23,42 +23,37 @@ public class BitmapBody extends BitmapBase
         
     private void generateFurChunk(int lft,int top,int rgt,int bot)
     {
-        /*
-        let n,x,y;
-        let darken,boost,lineColor;
-        let wid=rgt-lft;
-        let high=bot-top;
-        let halfHigh=Math.trunc(high*0.5);
-        let furColor=this.getRandomFurColor();
+        int                 n,x,y,high,halfHigh;
+        float               darken;
+        RagColor            furColor,lineColor;
         
-        this.drawRect(lft,top,rgt,bot,furColor);
+        high=bot-top;
+        halfHigh=high/2;
+        
+        furColor=getRandomColor();
+        
+            // fur background
+            
+        drawRect(lft,top,rgt,bot,furColor);
 
             // hair
             
-        for (x=lft;x!==rgt;x++) {
+        for (x=lft;x!=rgt;x++) {
             
                 // hair color
                 
-            if ((n%2)===0) {
-                darken=0.5+(genRandom.random()*0.3);
-                lineColor=this.darkenColor(furColor,darken);
-            }
-            else {
-                boost=0.1+(genRandom.random()*0.3);
-                lineColor=this.boostColor(furColor,boost);
-            }
+            lineColor=this.adjustColorRandom(furColor,0.7f,1.3f);
             
                 // hair half from top
                 
-            y=halfHigh+genRandom.randomInt(top,halfHigh);
-            this.drawRandomLine(x,(top-5),x,(y+5),lft,top,rgt,bot,10,lineColor,false);
+            y=halfHigh+(top+GeneratorMain.random.nextInt(halfHigh));
+            drawRandomLine(x,(top-5),x,(y+5),lft,top,rgt,bot,10,lineColor,false);
             
                 // hair half from bottom
                 
-            y=high-(halfHigh+genRandom.randomInt(top,halfHigh));
-            this.drawRandomLine(x,(y-5),x,(bot+5),lft,top,rgt,bot,10,lineColor,false);
+            y=high-(halfHigh+GeneratorMain.random.nextInt(halfHigh));
+            drawRandomLine(x,(y-5),x,(bot+5),lft,top,rgt,bot,10,lineColor,false);
         }
-*/
     }
     
         //
@@ -67,48 +62,49 @@ public class BitmapBody extends BitmapBase
         
     private void generateClothChunk(int lft,int top,int rgt,int bot)
     {
-        /*
-        let n,x,x2,y,y2,lineCount;
-        let darken,lineColor;
-        let wid=rgt-lft;
-        let high=bot-top;
-        let clothColor=this.getRandomColor();
-         
-        this.drawRect(lft,top,rgt,bot,clothColor);
-        this.addNoiseRect(lft,top,rgt,bot,0.8,0.9,0.5);        
+        int                 n,x,y,x2,y2,
+                            wid,high,lineCount;
+        RagColor            clothColor,lineColor;
+        
+        clothColor=getRandomColor();
+        
+        wid=rgt-lft;
+        high=bot-top;
+        
+        createPerlinNoiseData(32,32);
+        createNormalNoiseData(1.5f,0.5f);
+
+        drawRect(lft,top,rgt,bot,clothColor);
+        drawPerlinNoiseRect(lft,top,rgt,bot,0.8f,1.3f);
+        drawNormalNoiseRect(lft,top,rgt,bot);
  
             // lines
             
-        lineCount=genRandom.randomInt(30,30);
+        lineCount=30+GeneratorMain.random.nextInt(30);
             
-        for (n=0;n!==lineCount;n++) {
-            x=genRandom.randomInt(lft,wid);
-            y=genRandom.randomInt(top,high);
-            y2=genRandom.randomInt(top,high);
+        for (n=0;n!=lineCount;n++) {
+            x=lft+GeneratorMain.random.nextInt(wid);
+            y=top+GeneratorMain.random.nextInt(high);
+            y2=top+GeneratorMain.random.nextInt(high);
             
-            darken=0.6+(genRandom.random()*0.25);
-            lineColor=this.darkenColor(clothColor,darken);
-            
-            this.drawRandomLine(x,y,x,y2,lft,top,rgt,bot,30,lineColor,false);
+            lineColor=this.adjustColorRandom(clothColor,0.6f,0.25f);
+            drawRandomLine(x,y,x,y2,lft,top,rgt,bot,30,lineColor,false);
         }
         
-        lineCount=genRandom.randomInt(30,30);
+        lineCount=30+GeneratorMain.random.nextInt(30);
             
-        for (n=0;n!==lineCount;n++) {
-            x=genRandom.randomInt(lft,wid);
-            x2=genRandom.randomInt(lft,wid);
-            y=genRandom.randomInt(top,high);
+        for (n=0;n!=lineCount;n++) {
+            x=lft+GeneratorMain.random.nextInt(wid);
+            x2=lft+GeneratorMain.random.nextInt(wid);
+            y=top+GeneratorMain.random.nextInt(high);
             
-            darken=0.6+(genRandom.random()*0.25);
-            lineColor=this.darkenColor(clothColor,darken);
-            
-            this.drawRandomLine(x,y,x2,y,lft,top,rgt,bot,30,lineColor,false);
+            lineColor=this.adjustColorRandom(clothColor,0.6f,0.25f);
+            drawRandomLine(x,y,x2,y,lft,top,rgt,bot,30,lineColor,false);
         }
         
             // blur it
             
-        this.blur(lft,top,rgt,bot,25,false);
-*/
+        blur(colorData,lft,top,rgt,bot,25,false);
     }
     
         //
@@ -243,21 +239,18 @@ public class BitmapBody extends BitmapBase
         
     private void generateFaceChunkEye(int x,int top,int bot,RagColor eyeColor)
     {
-        /*
-        this.draw3DOval(this.normalCTX,x,(top+80),(x+30),(top+90),0.0,1.0,1,0,this.whiteColor,this.blackColor);
-        this.drawOval((x+10),(top+81),(x+20),(top+89),eyeColor,null);
-        
-*/
+        drawOval(x,(top+80),(x+30),(top+90),0.0f,1.0f,0.0f,0.0f,2,0.5f,this.COLOR_WHITE,this.COLOR_BLACK,0.5f,false,false,1.0f,0.0f);
+        drawOval((x+10),(top+81),(x+20),(top+89),0.0f,1.0f,0.0f,0.0f,2,0.5f,eyeColor,null,0.5f,false,false,1.0f,0.0f);
     }
     
     private void generateFaceChunk(int lft,int top,int rgt,int bot)
     {
-        /*
-        let eyeColor=this.getRandomColor();
+        RagColor        eyeColor;
+        
+        eyeColor=this.getRandomColor();
         
         this.generateFaceChunkEye(480,top,bot,eyeColor);
         this.generateFaceChunkEye(430,top,bot,eyeColor);
-*/
     }
 
         //
@@ -266,6 +259,7 @@ public class BitmapBody extends BitmapBase
     
     private void generateRandomChunk(int lft,int top,int rgt,int bot,boolean isFace)
     {
+        /*
         switch (GeneratorMain.random.nextInt(5)) {
             
             case 0:
@@ -288,6 +282,8 @@ public class BitmapBody extends BitmapBase
                 generateSpots(lft,top,rgt,bot);
                 break;
         }
+        */
+        generateClothChunk(lft,top,rgt,bot);
         
         if (isFace) generateFaceChunk(lft,top,rgt,bot);
     }

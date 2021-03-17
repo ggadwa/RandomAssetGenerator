@@ -50,6 +50,7 @@ public class GeneratorMain
         }
         catch (Exception e)
         {
+            System.out.println("unable to read settings: "+e.getMessage());
             e.printStackTrace();
             return(null);
         }
@@ -57,13 +58,13 @@ public class GeneratorMain
             // seed the random
             // if seed == 0, then seed is set randomly
             
-        seed=(long)settings.get("seed");
+        seed=(int)settings.get("seed");
         if (seed==0) seed=Calendar.getInstance().getTimeInMillis();
         
         random=new Random(seed);
         
         System.out.println("seed="+Long.toString(seed));
-        
+
             // the color scheme
             
         colorScheme=BitmapBase.getColorScheme((String)settings.get("colorScheme"));

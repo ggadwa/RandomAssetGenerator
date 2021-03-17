@@ -207,71 +207,58 @@ public class SkeletonBuilder
         
     public void buildLimbHead(Skeleton skeleton,int limbIdx,int parentBoneIdx,float neckLength,float neckRadius,float jawRadius,float headRadius,boolean hasJaw)
     {
-        /*
-        let pnt,jawBackPnt,jawFrontPnt,neckPnt,vct;
-        let ;
-        let ;
-        let 
-        let neckStartLength,headOffset,headLength,headRot;
-        let scaleMin,scaleMax;
-        
-        int                 neckStartBoneIdx,neckEndBoneIdx,jawBackBoneIdx,jawFrontBoneIdx,headBottomBoneIdx,headTopBoneIdx;
+        int                 neckStartBoneIdx,neckEndBoneIdx,jawBackBoneIdx,
+                            jawFrontBoneIdx,headBottomBoneIdx,headTopBoneIdx;
+        float               neckStartLength,headOffset,headRot,headLength;
         Bone                parentBone;
+        RagPoint            pnt,vct,neckPnt,jawBackPnt,jawFrontPnt,scale;
         
         parentBone=skeleton.bones.get(parentBoneIdx);
         
-        neckLength*=this.sizeFactor;
-        neckRadius*=this.sizeFactor;
-        jawRadius*=this.sizeFactor;
-        headRadius*=this.sizeFactor;
-        
             // create the neck
             
-        neckStartLength=(parentBone.gravityLockDistance-(neckLength*0.5))*this.sizeFactor;
+        neckStartLength=parentBone.gravityLockDistance-(neckLength*0.5f);
         
         pnt=parentBone.pnt.copy();
-        vct=new RagPoint(0.0f,-neckStartLength,0.0f);
+        vct=new RagPoint(0.0f,neckStartLength,0.0f);
         vct.rotateX(-(GeneratorMain.random.nextFloat()*25.0f));
         pnt.addPoint(vct);
             
-        neckStartBoneIdx=skeleton.addChildBone(parentBoneIdx,("neck_bottom_"+Integer.toString(limbIdx)),-1,(neckRadius*(0.8f+(GeneratorMain.random.nextFloat()*0.2f))),pnt));
+        neckStartBoneIdx=skeleton.addChildBone(parentBoneIdx,("neck_bottom_"+Integer.toString(limbIdx)),-1,(neckRadius*(0.8f+(GeneratorMain.random.nextFloat()*0.2f))),pnt);
         
         neckPnt=pnt.copy();
-        vct=new RagPoint(0.0f,-neckLength,0.0f);
+        vct=new RagPoint(0.0f,neckLength,0.0f);
         vct.rotateX(-(GeneratorMain.random.nextFloat()*25.0f));
         neckPnt.addPoint(vct);
         
-        neckEndBoneIdx=skeleton.addChildBone(neckStartBoneIdx,("neck_top_"+Integer.toString(limbIdx)),-1,neckRadius,neckPnt));
+        neckEndBoneIdx=skeleton.addChildBone(neckStartBoneIdx,("neck_top_"+Integer.toString(limbIdx)),-1,neckRadius,neckPnt);
 
         skeleton.addLimb(("neck_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_NECK,Limb.LIMB_AXIS_Y,false,5,5,new RagPoint(1.0f,0.3f,1.0f),new int[]{neckStartBoneIdx,neckEndBoneIdx});
         
             // default placements
             
-        headOffset=10;
+        headOffset=headRadius*0.05f;
         headRot=-(GeneratorMain.random.nextFloat()*25.0f);
         
             // create the jaw
             
         if (hasJaw) {
-            jawRadius=(headRadius*(0.3f+(GeneratorMain.random.nextFloat()*0.3f));
+            jawRadius=headRadius*(0.3f+(GeneratorMain.random.nextFloat()*0.3f));
             
             jawBackPnt=neckPnt.copy();
-            vct=new RagPoint(0.0f,-headOffset,-((headRadius*0.6f)-(jawRadius*0.5f)));
+            vct=new RagPoint(0.0f,headOffset,-((headRadius*0.6f)-(jawRadius*0.5f)));
             jawBackPnt.addPoint(vct);
             
-            jawBackBoneIdx=skeleton.addChildBone(neckEndBoneIdx,("jaw_back_"+Integer.toString(limbIdx)),-1,jawRadius,jawBackPnt));
+            jawBackBoneIdx=skeleton.addChildBone(neckEndBoneIdx,("jaw_back_"+Integer.toString(limbIdx)),-1,jawRadius,jawBackPnt);
 
             jawFrontPnt=neckPnt.copy();
-            vct=new RagPoint(0.0f,-headOffset,((headRadius*(0.5f+(GeneratorMain.random.nextFloat()*0.3f))-(jawRadius*0.5)));
+            vct=new RagPoint(0.0f,headOffset,((headRadius*(0.5f+(GeneratorMain.random.nextFloat()*0.3f))-(jawRadius*0.5f))));
             jawFrontPnt.addPoint(vct);
 
-            jawFrontBoneIdx=skeleton.addChildBone(jawBackBoneIdx,("jaw_front_"+Integer.toString(limbIdx)),-1,jawRadius,jawFrontPnt));
+            jawFrontBoneIdx=skeleton.addChildBone(jawBackBoneIdx,("jaw_front_"+Integer.toString(limbIdx)),-1,jawRadius,jawFrontPnt);
             
-            scaleMax=new RagPoint((0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)));
-            scaleMin=scaleMax.copy();
-            scaleMin.y=0.1;
-            
-            skeleton.addLimb(("jaw_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_JAW,Limb.LIMB_AXIS_Z,false,6,6,new RagPoint(1.0f,1.0f,meshScale),new int[]{jawBackBoneIdx,jawFrontBoneIdx});
+            scale=new RagPoint((0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)));
+            skeleton.addLimb(("jaw_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_JAW,Limb.LIMB_AXIS_Z,false,6,6,scale,new int[]{jawBackBoneIdx,jawFrontBoneIdx});
         }
         
             // create the head
@@ -279,24 +266,20 @@ public class SkeletonBuilder
         headLength=headRadius*(0.4f+(GeneratorMain.random.nextFloat()*0.4f));
         
         pnt=neckPnt.copy();
-        vct=new RagPoint(0.0f,-headOffset,0.0f);        // no rot here
+        vct=new RagPoint(0.0f,headOffset,0.0f);        // no rot here
         pnt.addPoint(vct);
         
-        headBottomBoneIdx=skeleton.addChildBone(neckEndBoneIdx,("head_bottom_"+Integer.toString(limbIdx)),-1,headRadius,pnt));
+        headBottomBoneIdx=skeleton.addChildBone(neckEndBoneIdx,("head_bottom_"+Integer.toString(limbIdx)),-1,headRadius,pnt);
         
         pnt=pnt.copy();
-        vct=new RagPoint(0.0f,-headLength,0.0f);
+        vct=new RagPoint(0.0f,headLength,0.0f);
         vct.rotateX(headRot);
         pnt.addPoint(vct);
         
-        headTopBoneIdx=skeleton.addChildBone(headBottomBoneIdx,("head_top_"+Integer.toString(limbIdx)),-1,headRadius,pnt));
+        headTopBoneIdx=skeleton.addChildBone(headBottomBoneIdx,("head_top_"+Integer.toString(limbIdx)),-1,headRadius,pnt);
         
-        scaleMin=new RagPoint((0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)));
-        scaleMax=scaleMin.copy();
-        if (hasJaw) scaleMax.y=0.1;
-        
-        skeleton.addLimb(("head_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_HEAD,Limb.LIMB_AXIS_Y,false,10,10,new RagPoint(1.0f,1.0f,meshScale),new int[]{headBottomBoneIdx,headTopBoneIdx});
-        */
+        scale=new RagPoint((0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)),(0.7f+(GeneratorMain.random.nextFloat()*0.3f)));
+        skeleton.addLimb(("head_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_HEAD,Limb.LIMB_AXIS_Y,false,10,10,scale,new int[]{headBottomBoneIdx,headTopBoneIdx});
     }
     
         //
