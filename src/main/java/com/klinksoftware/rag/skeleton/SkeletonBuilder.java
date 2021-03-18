@@ -479,7 +479,7 @@ public class SkeletonBuilder
             // get a hunch angle which determines
             // if we are on 2 or 4 feet
         
-        standing=(GeneratorMain.random.nextFloat()<0.7f);
+        standing=(GeneratorMain.random.nextFloat()<0.7f)||((boolean)GeneratorMain.settings.get("standing"));
         if (!standing) {        
             hunchAng=(60.0f+(GeneratorMain.random.nextFloat()*95.0f));
         }

@@ -190,7 +190,7 @@ public class GeneratorMain
         }
         
         try {
-            (new BitmapBody()).generate(BitmapBrick.VARIATION_NONE,basePath,"body");
+            (new BitmapSkin()).generate(BitmapBrick.VARIATION_NONE,basePath,"body");
         }
         catch (Exception e)
         {
@@ -228,7 +228,9 @@ public class GeneratorMain
             (new BitmapGlass()).generate(BitmapGlass.VARIATION_NONE,basePath,"glass");
             (new BitmapGround()).generate(BitmapGround.VARIATION_NONE,basePath,"ground");
             (new BitmapLiquid()).generate(BitmapLiquid.VARIATION_NONE,basePath,"liquid");
-            (new BitmapBody()).generate(BitmapBody.VARIATION_NONE,basePath,"body");
+            (new BitmapSkin()).generate(BitmapSkin.VARIATION_BODY,basePath,"body");
+            (new BitmapSkin()).generate(BitmapSkin.VARIATION_LIMB,basePath,"limb");
+            (new BitmapSkin()).generate(BitmapSkin.VARIATION_HEAD,basePath,"head");
         }
         catch (Exception e)
         {

@@ -10,7 +10,7 @@ public class BitmapGenerator
     private boolean     hasWallBitmap,hasFloorBitmap,hasCeilingBitmap,hasStepBitmap,
                         hasPlatformBitmap,hasPillarBitmap,hasBoxBitmap,hasComputerBitmap,
                         hasPanelBitmap,hasMonitorBitmap,hasPipeBitmap,hasLiquidBitmap,
-                        hasGlassBitmap,hasAccessoryBitmap,hasBodyBitmap;
+                        hasGlassBitmap,hasAccessoryBitmap,hasBodyBitmap,hasLimbBitmap,hasHeadBitmap;
     private String      basePath;
     
     public BitmapGenerator(String basePath)
@@ -32,6 +32,8 @@ public class BitmapGenerator
         hasGlassBitmap=false;
         hasAccessoryBitmap=false;
         hasBodyBitmap=false;
+        hasLimbBitmap=false;
+        hasHeadBitmap=false;
     }
 
     public void generateWall()
@@ -318,9 +320,27 @@ public class BitmapGenerator
     {
         if (hasBodyBitmap) return;
         
-        (new BitmapBody()).generate(BitmapBody.VARIATION_NONE,basePath,"body");
+        (new BitmapSkin()).generate(BitmapSkin.VARIATION_BODY,basePath,"body");
         
         hasBodyBitmap=true;
+    }
+    
+    public void generateLimb()
+    {
+        if (hasLimbBitmap) return;
+        
+        (new BitmapSkin()).generate(BitmapSkin.VARIATION_LIMB,basePath,"limb");
+        
+        hasLimbBitmap=true;
+    }
+    
+    public void generateHead()
+    {
+        if (hasHeadBitmap) return;
+        
+        (new BitmapSkin()).generate(BitmapSkin.VARIATION_HEAD,basePath,"head");
+        
+        hasHeadBitmap=true;
     }
     
         // this is a little hacky but it's a way to tell what

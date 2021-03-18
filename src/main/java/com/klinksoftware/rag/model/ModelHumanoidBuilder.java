@@ -70,6 +70,8 @@ public class ModelHumanoidBuilder
         
         mapBitmapList=new BitmapGenerator(basePath);
         mapBitmapList.generateBody();
+        mapBitmapList.generateLimb();
+        mapBitmapList.generateHead();
         
             // some settings
          

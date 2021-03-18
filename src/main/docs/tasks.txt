@@ -1,6 +1,12 @@
 
+- map indoor
+   - all decorations true/false flags
+   - add catwalk decoration (2->4 changes, do x/z first, then random switch to opposite, repeat)
+
 - humanoid
-   - no Y < 0 (to flatten feet)
+   - randomize legs + arms
+   - forceBilateral flag for limbs
+   - separate meshes
 
 
 

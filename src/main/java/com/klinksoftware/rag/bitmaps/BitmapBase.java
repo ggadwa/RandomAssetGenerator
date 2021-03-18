@@ -1580,6 +1580,56 @@ public class BitmapBase
         }
     }
     
+    protected void drawOvalDarken(int lft,int top,int rgt,int bot,float darken)
+    {
+        int         n,x,y,mx,my,wid,high,idx;
+        float       halfWid,halfHigh,rad;
+        float[]     origColorData;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+            // we darken against the original
+            // bitmap as ovals tend to overdraw
+            
+        origColorData=colorData.clone();
+        
+            // the drawing size
+            
+        wid=(rgt-lft)-1;
+        high=(bot-top)-1;         // avoids clipping on bottom from being on wid,high
+        mx=lft+(wid/2);
+        my=top+(high/2);
+        
+            // fill the oval
+
+        while ((wid>0) && (high>0)) {
+
+            halfWid=(float)wid*0.5f;
+            halfHigh=(float)high*0.5f;
+            
+            for (n=0;n!=1000;n++) {
+                rad=(float)(Math.PI*2.0)*((float)n*0.001f);
+
+                x=mx+(int)(halfWid*(float)Math.sin(rad));
+                if ((x<0) || (x>=textureSize)) continue;
+
+                y=my-(int)(halfHigh*(float)Math.cos(rad));
+                if ((y<0) || (y>=textureSize)) continue;
+
+                    // the color
+                
+                idx=((y*textureSize)+x)*4;
+                
+                colorData[idx]=origColorData[idx]*darken;
+                colorData[idx+1]=origColorData[idx+1]*darken;
+                colorData[idx+2]=origColorData[idx+2]*darken;
+            }
+            
+            wid--;
+            high--;
+        }
+    }
+    
         //
         // color stripes, gradients, waves
         //
