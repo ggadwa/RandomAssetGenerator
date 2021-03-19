@@ -27,35 +27,30 @@ public class ModelHumanoidBuilder
     
     public void wrapLimbs()
     {
-        int         n,meshIdx;
+        int         n,boneIdx,meshIdx;
         Limb        limb;
-        RagPoint    fullBodyScale;
-        Mesh        mesh,limbMesh;
-        
-            // random body scaling
-            
-        fullBodyScale=new RagPoint(1.0f,(1.0f-(GeneratorMain.random.nextFloat()*0.3f)),(1.0f-(GeneratorMain.random.nextFloat()*0.2f)));
+        Mesh        mesh;
+        RagPoint    bonePnt;
         
             // wrap all the limbs
             // with meshes
             
-        mesh=null;
-            
         for (n=0;n!=skeleton.limbs.size();n++) {
             limb=skeleton.limbs.get(n);
-
-            limbMesh=MeshModelUtility.buildMeshAroundBoneLimb(skeleton,limb,"body");
             
-            if (mesh==null) {
-                mesh=limbMesh;
-            }
-            else {
-                mesh.combine(limbMesh);
-            }
+                // mesh roots to first bone in list
+                
+            boneIdx=limb.boneIndexes[0];
+
+                // wrap the mesh
+                
+            mesh=MeshModelUtility.buildMeshAroundBoneLimb(skeleton,limb);
+            
+                // add mesh and attach to bone
+                
+            meshIdx=meshList.add(mesh);
+            skeleton.setBoneMeshIndex(boneIdx,meshIdx);
         }
-        
-        meshIdx=meshList.add(mesh);
-        skeleton.setBoneMeshIndex(0,meshIdx);       // only one mesh, attached to root
     }
 
         //

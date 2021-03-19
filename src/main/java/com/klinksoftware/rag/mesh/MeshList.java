@@ -61,6 +61,13 @@ public class MeshList
         int         n;
         RagPoint    nextOffsetPnt;
         
+            // everything is absolute now so just
+            // move the mesh to where the bone will be relative
+            
+        if (bone.meshIdx!=-1) meshes.get(bone.meshIdx).makeVertexesRelativeToPoint(bone.pnt);
+        
+            // now move the bone and recurse
+            
         nextOffsetPnt=new RagPoint(bone.pnt.x,bone.pnt.y,bone.pnt.z);
         
         if (offsetPnt!=null) {
@@ -68,8 +75,6 @@ public class MeshList
             bone.pnt.y-=offsetPnt.y;
             bone.pnt.z-=offsetPnt.z;
         }
-        
-        if (bone.meshIdx!=-1) meshes.get(bone.meshIdx).makeVertexesRelativeToPoint(bone.pnt);
         
         for (n=0;n!=bone.children.size();n++) {
             rebuildModelMeshWithSkeletonRecurse(skeleton,skeleton.bones.get(bone.children.get(n)),nextOffsetPnt);

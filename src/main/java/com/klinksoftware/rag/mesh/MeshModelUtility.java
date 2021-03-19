@@ -253,7 +253,7 @@ public class MeshModelUtility
         uvArray.add(0.0f);
     
         maxIdx=vertexArray.size()/3;
-
+        
         vertexArray.add(centerPnt.x);
         vertexArray.add(centerPnt.y+acrossRadius);
         vertexArray.add(centerPnt.z);
@@ -601,7 +601,7 @@ public class MeshModelUtility
         // build mesh around limb
         //
         
-    public static Mesh buildMeshAroundBoneLimb(Skeleton skeleton,Limb limb,String bitmapName)
+    public static Mesh buildMeshAroundBoneLimb(Skeleton skeleton,Limb limb)
     {
         int                     n,k,boneCount;
         float                   f,gravityLockDistance,maxGravity,
@@ -676,36 +676,20 @@ public class MeshModelUtility
             case Limb.LIMB_AXIS_X:
                 acrossRadius=(xBound.getSize()*0.5f)+maxGravity;
                 aroundRadius=(yBound.getSize()>zBound.getSize())?((yBound.getSize()*0.5f)+maxGravity):((zBound.getSize()*0.5f)+maxGravity);
-                mesh=buildGlobeAroundSkeletonX(limb.name,bitmapName,limb.acrossSurfaceCount,limb.aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius);
+                mesh=buildGlobeAroundSkeletonX(limb.name,limb.bitmapName,limb.acrossSurfaceCount,limb.aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius);
                 break;
             case Limb.LIMB_AXIS_Y:
                 acrossRadius=(yBound.getSize()*0.5f)+maxGravity;
                 aroundRadius=(xBound.getSize()>zBound.getSize())?((xBound.getSize()*0.5f)+maxGravity):((zBound.getSize()*0.5f)+maxGravity);
-                mesh=buildGlobeAroundSkeletonY(limb.name,bitmapName,limb.acrossSurfaceCount,limb.aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius);
+                mesh=buildGlobeAroundSkeletonY(limb.name,limb.bitmapName,limb.acrossSurfaceCount,limb.aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius);
                 break;
             case Limb.LIMB_AXIS_Z:
                 acrossRadius=(zBound.getSize()*0.5f)+maxGravity;
                 aroundRadius=(xBound.getSize()>yBound.getSize())?((xBound.getSize()*0.5f)+maxGravity):((yBound.getSize()*0.5f)+maxGravity);
-                mesh=buildGlobeAroundSkeletonZ(limb.name,bitmapName,limb.acrossSurfaceCount,limb.aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius);
+                mesh=buildGlobeAroundSkeletonZ(limb.name,limb.bitmapName,limb.acrossSurfaceCount,limb.aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius);
                 break;
         }
-        
-            // reset the UVs to work within the
-            // texture chunks
-
-        switch (limb.limbType) {
-            case Limb.LIMB_TYPE_BODY:
-                mesh.transformUVs(0.0f,0.5f,0.5f,0.5f);
-                break;
-            case Limb.LIMB_TYPE_HEAD:
-            case Limb.LIMB_TYPE_JAW:
-                mesh.transformUVs(0.5f,0.0f,0.5f,0.5f);
-                break;
-            default:
-                mesh.transformUVs(0.0f,0.0f,0.5f,0.5f);
-                break;
-        }
-        
+                
             // shrink wrap the globe and rebuild
             // any normals, etc
             
