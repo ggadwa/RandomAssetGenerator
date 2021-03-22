@@ -282,10 +282,10 @@ public class BitmapSkin extends BitmapBase
         // faces
         //
         
-    private void generateFaceChunkEye(int x,int top,int bot,RagColor eyeColor)
+    private void generateFaceChunkEye(int x,int y,RagColor eyeColor)
     {
-        drawOval(x,(top+80),(x+30),(top+90),0.0f,1.0f,0.0f,0.0f,2,0.5f,this.COLOR_WHITE,this.COLOR_BLACK,0.5f,false,false,1.0f,0.0f);
-        drawOval((x+10),(top+81),(x+20),(top+89),0.0f,1.0f,0.0f,0.0f,2,0.5f,eyeColor,null,0.5f,false,false,1.0f,0.0f);
+        drawOval(x,y,(x+40),(y+15),0.0f,1.0f,0.0f,0.0f,2,0.5f,this.COLOR_WHITE,this.COLOR_BLACK,0.5f,false,false,1.0f,0.0f);
+        drawOval((x+15),(y+1),(x+25),(y+14),0.0f,1.0f,0.0f,0.0f,2,0.5f,eyeColor,null,0.5f,false,false,1.0f,0.0f);
     }
 
         //
@@ -334,8 +334,10 @@ public class BitmapSkin extends BitmapBase
         
         eyeColor=this.getRandomColor();
         
-        this.generateFaceChunkEye(480,0,textureSize,eyeColor);
-        this.generateFaceChunkEye(430,0,textureSize,eyeColor);
+        drawOval(415,235,505,245,0.0f,1.0f,0.0f,0.0f,2,0.5f,this.COLOR_BLACK,this.COLOR_BLACK,0.5f,false,false,1.0f,0.0f);
+        
+        this.generateFaceChunkEye(415,295,eyeColor);
+        this.generateFaceChunkEye(465,295,eyeColor);
     }
     
         //

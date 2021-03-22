@@ -13,10 +13,10 @@ public class SkeletonBuilder
     {
         int                 n,hipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx,
                             heelBoneIdx,knuckleBoneIdx,toeBoneIdx;
-        float               fx,meshScale,toeRadius;
+        float               meshScale,footRadius,toeRadius;
         Bone                parentBone;
         RagPoint            pnt,vct,pushVct,footVct,footPnt,
-                            knuckleVct,knucklePnt,toePnt;
+                            knuckleVct,knucklePnt,toePnt,toeAdd;
         
         parentBone=skeleton.bones.get(parentBoneIdx);
         
@@ -45,6 +45,8 @@ public class SkeletonBuilder
         
             // the foot bones
             // feet are always parallel to ground, towards front
+            
+        footRadius=(legRadius*(1.2f+(GeneratorMain.random.nextFloat()*0.3f)));
        
         footVct=new RagPoint(0.0f,0.0f,footLength);
         footVct.rotateY(footRot);
@@ -52,30 +54,32 @@ public class SkeletonBuilder
         footPnt=skeleton.bones.get(heelBoneIdx).pnt.copy();
         footPnt.addPoint(footVct);
         footPnt.y=0.0f;
-        footBoneIdx=skeleton.addChildBone(heelBoneIdx,("foot_"+Integer.toString(limbIdx)),-1,(legRadius*(1.2f+(GeneratorMain.random.nextFloat()*0.3f))),footPnt);
+        footBoneIdx=skeleton.addChildBone(heelBoneIdx,("foot_"+Integer.toString(limbIdx)),-1,footRadius,footPnt);
         skeleton.addLimb(("foot_"+Integer.toString(limbIdx)),Limb.LIMB_TYPE_FOOT,Limb.LIMB_AXIS_Z,flipped,5,5,new RagPoint(1.0f,0.7f,1.0f),new int[]{heelBoneIdx,footBoneIdx});
 
             // toe limbs
             
         if (toeCount==0) return;
         
-        toeRadius=legRadius/(float)toeCount;
+        toeRadius=(footRadius*1.5f)/(float)toeCount;
         
         knuckleVct=footVct.copy();
         knuckleVct.normalize();
         knuckleVct.scale(footLength*0.4f);
-        knucklePnt=new RagPoint((footPnt.x+knuckleVct.x),0.0f,(footPnt.z+knuckleVct.z));
+        knucklePnt=new RagPoint((footPnt.x+knuckleVct.x),(toeRadius*0.5f),(footPnt.z+knuckleVct.z));
         
-        toePnt=new RagPoint((knucklePnt.x+knuckleVct.x),0.0f,(knucklePnt.z+knuckleVct.z));
-
-        fx=knucklePnt.x;
+        toePnt=new RagPoint((knucklePnt.x+knuckleVct.x),(toeRadius*0.5f),(knucklePnt.z+knuckleVct.z));
+        
+        toeAdd=new RagPoint(toeRadius,0.0f,0.0f);
+        toeAdd.rotateY(footRot);
 
         for (n=0;n!=toeCount;n++) {
-            knuckleBoneIdx=skeleton.addChildBone(heelBoneIdx,("toe_knuckle_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),-1,toeRadius,new RagPoint(fx,knucklePnt.y,knucklePnt.z));
-            toeBoneIdx=skeleton.addChildBone(knuckleBoneIdx,("toe_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),-1,toeRadius,new RagPoint(fx,toePnt.y,toePnt.z));
+            knuckleBoneIdx=skeleton.addChildBone(heelBoneIdx,("toe_knuckle_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),-1,toeRadius,knucklePnt);
+            toeBoneIdx=skeleton.addChildBone(knuckleBoneIdx,("toe_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),-1,toeRadius,toePnt);
             skeleton.addLimb(("toe_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),Limb.LIMB_TYPE_TOE,Limb.LIMB_AXIS_Z,flipped,4,4,new RagPoint(1.0f,0.7f,1.0f),new int[]{knuckleBoneIdx,toeBoneIdx});
             
-            fx+=toeRadius;
+            knucklePnt.addPoint(toeAdd);
+            toePnt.addPoint(toeAdd);
         }
     }
 
@@ -121,7 +125,7 @@ public class SkeletonBuilder
         
             // hand limb
             
-        handRadius=armRadius*(1.0f+(GeneratorMain.random.nextFloat()*0.3f));
+        handRadius=armRadius*(1.1f+(GeneratorMain.random.nextFloat()*0.5f));
         handPnt=new RagPoint((pnt.x+vct.x),(pnt.y+vct.y),(pnt.z+vct.z));
         
         handBoneIdx=skeleton.addChildBone(wristBoneIdx,("hand_"+Integer.toString(limbIdx)),-1,handRadius,handPnt);
@@ -131,7 +135,7 @@ public class SkeletonBuilder
             
         if (fingerCount==0) return;
         
-        fingerRadius=armRadius/(float)fingerCount;
+        fingerRadius=(handRadius*1.5f)/(float)fingerCount;
         
         knuckleVct=vct.copy();
         knuckleVct.normalize();
@@ -143,7 +147,7 @@ public class SkeletonBuilder
         fingerVct.scale(armRadius+(GeneratorMain.random.nextFloat()*armRadius));
         fingerPnt=new RagPoint((knucklePnt.x+fingerVct.x),(knucklePnt.y+fingerVct.y),(knucklePnt.z+fingerVct.z));
 
-        fy=knucklePnt.y;
+        fy=fingerPnt.y;
         
         for (n=0;n!=fingerCount;n++) {
             knuckleBoneIdx=skeleton.addChildBone(handBoneIdx,("finger_knuckle_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),-1,fingerRadius,new RagPoint(knucklePnt.x,fy,knucklePnt.z));
@@ -310,6 +314,7 @@ public class SkeletonBuilder
         float       ang;
         
         for (n=0;n!=armCount;n++) {
+            ang=(float)(GeneratorMain.random.nextInt(4)*90)+(25.0f-(GeneratorMain.random.nextFloat()*50.0f));
             ang=GeneratorMain.random.nextFloat()*360.0f;
             if (GeneratorMain.random.nextFloat()<0.8f) {
                 buildLimbArm(skeleton,(n+limbNameOffset),boneIdx,limbRadius,armLength,ang,fingerCount,false);
@@ -342,7 +347,7 @@ public class SkeletonBuilder
             
         radius=(float)((double)GeneratorMain.settings.get("radius"));
         limbRadius=radius*(0.15f+(GeneratorMain.random.nextFloat()*0.2f));
-        armLength=radius+(GeneratorMain.random.nextFloat()*radius);
+        armLength=(radius*1.5f)+(GeneratorMain.random.nextFloat()*radius);
         armCount=1+GeneratorMain.random.nextInt(3);
         fingerCount=GeneratorMain.random.nextInt(5);
         

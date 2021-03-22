@@ -170,9 +170,9 @@ public class MeshModelUtility
         maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
 
         for (yz=0;yz!=aroundSurfaceCount;yz++) {
-            indexArray.add(maxOff+yz);
-            indexArray.add(maxIdx);
             indexArray.add(maxOff+(yz+1));
+            indexArray.add(maxIdx);
+            indexArray.add(maxOff+yz);
         }
 
             // create the mesh
@@ -298,9 +298,9 @@ public class MeshModelUtility
         maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
 
         for (xz=0;xz!=aroundSurfaceCount;xz++) {
-            indexArray.add(maxOff+xz);
-            indexArray.add(maxIdx);
             indexArray.add(maxOff+(xz+1));
+            indexArray.add(maxIdx);
+            indexArray.add(maxOff+xz);
         }
 
             // create the mesh
@@ -426,9 +426,9 @@ public class MeshModelUtility
         maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
 
         for (xy=0;xy!=aroundSurfaceCount;xy++) {
-            indexArray.add(maxOff+xy);
-            indexArray.add(maxIdx);
             indexArray.add(maxOff+(xy+1));
+            indexArray.add(maxIdx);
+            indexArray.add(maxOff+xy);
         }
 
             // create the mesh
@@ -446,7 +446,7 @@ public class MeshModelUtility
         // collection of points
         //
     
-    private static void shrinkWrapGlobe(Mesh mesh,ArrayList<Bone> boneList,RagPoint centerPnt,float gravityMaxDistance)
+    private static void shrinkWrapGlobe(Mesh mesh,ArrayList<Bone> boneList,int axis,RagPoint centerPnt,float gravityMaxDistance)
     {
         int                 n,k,vIdx,nVertex,nBone,moveCount;
         float               dist,shrinkDist;
@@ -454,6 +454,10 @@ public class MeshModelUtility
         boolean[]           moving;
         Bone                bone;
         RagPoint            pnt,moveVector,gravityVector;
+        
+            // if a single bone, can't shrink anything
+            
+        if (boneList.size()<=1) return;
         
             // move distance for shrinking bones
             
@@ -510,8 +514,9 @@ public class MeshModelUtility
                         // if too close, then all movement stops
                         
                     if (dist<bone.gravityLockDistance) {
-                        moving[n]=false;
-                        break;
+                        continue;
+                        //moving[n]=false;
+                        //break;
                     }
                     
                         // outside of max gravity well
@@ -543,9 +548,9 @@ public class MeshModelUtility
                     moveVector.scale(shrinkDist);
                 }
 
-                mesh.vertexes[vIdx]+=moveVector.x;
-                mesh.vertexes[vIdx+1]+=moveVector.y;
-                mesh.vertexes[vIdx+2]+=moveVector.z;
+                if ((axis==Limb.LIMB_AXIS_Y) || (axis==Limb.LIMB_AXIS_Z)) mesh.vertexes[vIdx]+=moveVector.x;
+                if ((axis==Limb.LIMB_AXIS_X) || (axis==Limb.LIMB_AXIS_Z)) mesh.vertexes[vIdx+1]+=moveVector.y;
+                if ((axis==Limb.LIMB_AXIS_X) || (axis==Limb.LIMB_AXIS_Y)) mesh.vertexes[vIdx+2]+=moveVector.z;
                 
                     // we did a move so we go
                     // around again
@@ -594,6 +599,56 @@ public class MeshModelUtility
         for (n=0;n!=nVertex;n++) {
             vIdx=n*3;
             if (mesh.vertexes[vIdx+1]<0) mesh.vertexes[vIdx+1]=0.0f;
+        }
+    }
+    
+        //
+        // rebuild the normal by finding the nearest bone
+        // and tracing the normal from there
+        //
+    
+    private static void rebuildNormals(Mesh mesh,ArrayList<Bone> boneList)
+    {
+        int         n,k,vIdx,nVertex,nBone,boneIdx;
+        float       d,dist;
+        Bone        bone;
+        RagPoint    pnt;
+        
+        nBone=boneList.size();
+        nVertex=mesh.vertexes.length/3;
+        
+        pnt=new RagPoint(0.0f,0.0f,0.0f);
+        
+        for (n=0;n!=nVertex;n++) {
+            vIdx=n*3;
+            
+            pnt.x=mesh.vertexes[vIdx];
+            pnt.y=mesh.vertexes[vIdx+1];
+            pnt.z=mesh.vertexes[vIdx+2];
+            
+                // find closest bone
+                
+            boneIdx=-1;
+            dist=0;
+            
+            for (k=0;k!=nBone;k++) {
+                bone=boneList.get(k);
+                
+                d=pnt.distance(bone.pnt);
+                if ((d<dist) || (boneIdx==-1)) {
+                    dist=d;
+                    boneIdx=k;
+                }
+            }
+            
+                // get normal
+                
+            pnt.subPoint(boneList.get(boneIdx).pnt);
+            pnt.normalize();
+            
+            mesh.normals[vIdx]=pnt.x;
+            mesh.normals[vIdx+1]=pnt.y;
+            mesh.normals[vIdx+2]=pnt.z;
         }
     }
 
@@ -693,9 +748,10 @@ public class MeshModelUtility
             // shrink wrap the globe and rebuild
             // any normals, etc
             
-        shrinkWrapGlobe(mesh,boneList,centerPnt,aroundRadius);
+        shrinkWrapGlobe(mesh,boneList,limb.axis,centerPnt,aroundRadius);
         scaleVertexToBones(mesh,centerPnt,limb.scale);
         clipFloorVertexes(mesh);
+        rebuildNormals(mesh,boneList);
 
         return(mesh);
     }

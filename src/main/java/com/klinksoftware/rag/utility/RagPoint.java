@@ -32,6 +32,13 @@ public class RagPoint
         this.z+=p.z;
     }
     
+    public void subPoint(RagPoint p)
+    {
+        this.x-=p.x;
+        this.y-=p.y;
+        this.z-=p.z;
+    }
+    
     public void scale(float f)
     {
         x*=f;
