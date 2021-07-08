@@ -28,6 +28,8 @@ public class AppWindow implements WindowListener
     private JTextArea       mapIndoorTextArea,mapOutdoorTextArea,mapTrackTextArea,
                             modelHumanoidTextArea,bitmapTextArea;
     
+    private TestCanvas      testCanvas;
+    
         //
         // window events
         //
@@ -115,7 +117,8 @@ public class AppWindow implements WindowListener
     {
         switch (buttonId) {
             case TOOL_BUTTON_RUN:
-                (new GeneratorRun(this)).execute();
+                testCanvas.run();
+                //(new GeneratorRun(this)).execute();
                 break;
         }
     }
@@ -208,6 +211,11 @@ public class AppWindow implements WindowListener
         tab.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
         tab.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
         
+        
+        
+        testCanvas=new TestCanvas();
+        tab.addTab("Map Indoor",null,testCanvas,"Map Indoor Creation Settings");
+        /*
             // map indoor json
             
         mapIndoorTextArea=new JTextArea();
@@ -287,7 +295,7 @@ public class AppWindow implements WindowListener
         bitmapTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
             
         tab.addTab("Bitmaps",null,bitmapTextScroll,"Generate All Bitmaps");
-                
+                */
         gbc=new GridBagConstraints();
         gbc.fill=GridBagConstraints.BOTH;
         gbc.gridx=0;

@@ -6,10 +6,7 @@
    - add fat + room (like the one with broken edges but a plus at the top
 
 - humanoid
-   - gravity part only works against other axis
-   - rebuild normals from closest bone
-   - randomize legs
-   - forceBilateral flag for limbs
+   - randomize legs (w/forceBilateral)
 
 - map outdoor
    1 make a big square with a lot of segments
