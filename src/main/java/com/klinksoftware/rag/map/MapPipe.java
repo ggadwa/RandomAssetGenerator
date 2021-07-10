@@ -1,4 +1,4 @@
-package com.klinksoftware.rag.map.indoor;
+package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.mesh.*;
@@ -9,17 +9,15 @@ public class MapPipe
     private static final int PIPE_SIDE_COUNT=12;
     private static final int PIPE_CURVE_SEGMENT_COUNT=5;
 
-    private float           segmentSize;
     private String          name;
     private MeshList        meshList;
     private MapRoom         room;
     
-    public MapPipe(MeshList meshList,MapRoom room,String name,float segmentSize)
+    public MapPipe(MeshList meshList,MapRoom room,String name)
     {
         this.meshList=meshList;
         this.room=room;
         this.name=name;
-        this.segmentSize=segmentSize;
     }
     
     /*
@@ -456,27 +454,27 @@ public class MapPipe
             // get # of pipes (on a grid so they can collide
             // properly) and their relative sizes
             
-        gridSize=Math.trunc(segmentSize/2);
+        gridSize=Math.trunc(MapIndoorBuilder.SEGMENT_SIZE/2);
         radius=Math.trunc(gridSize*0.3);
         
             // the pipe platform
         
         yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(x,z);
         
-        x=room.xBound.min+(x*segmentSize);
-        z=room.zBound.min+(z*segmentSize);
+        x=room.xBound.min+(x*MapIndoorBuilder.SEGMENT_SIZE);
+        z=room.zBound.min+(z*MapIndoorBuilder.SEGMENT_SIZE);
         
-        platformBoundX=new BoundClass(x,(x+segmentSize));
-        platformBoundZ=new BoundClass(z,(z+segmentSize));
+        platformBoundX=new BoundClass(x,(x+MapIndoorBuilder.SEGMENT_SIZE));
+        platformBoundZ=new BoundClass(z,(z+MapIndoorBuilder.SEGMENT_SIZE));
         
         platformBoundY=new BoundClass((yBound.max-floorDepth),room.yBound.max);
-        this.map.meshList.add(MeshUtility.createCube(room,"","platform",platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,MeshUtility.UV_MAP,segmentSize));
+        this.map.meshList.add(MeshUtility.createCube(room,"","platform",platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,MeshUtility.UV_MAP,MapIndoorBuilder.SEGMENT_SIZE));
         
             // determine direction
         
         dir=room.getDirectionTowardsNearestWall(x,z);
         
-        dirLen=dir.len-Math.trunc((segmentSize*0.5)+(radius*2));
+        dirLen=dir.len-Math.trunc((MapIndoorBuilder.SEGMENT_SIZE*0.5)+(radius*2));
         if (dirLen<0) dirLen=100;
         
             // create the pipes

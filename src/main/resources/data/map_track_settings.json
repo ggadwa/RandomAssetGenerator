@@ -1,7 +1,0 @@
-{
-    "name": "test_track_map",
-    "seed": 0,
-    "colorScheme": "random",
-    "maxSegmentCount": 25,
-    "segmentSize": 10.0
-}

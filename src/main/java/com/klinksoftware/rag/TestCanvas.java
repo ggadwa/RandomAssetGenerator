@@ -11,11 +11,11 @@ public class TestCanvas extends Canvas
     private static final int MAP_FLOOR_COUNT=10;
     private static final int MAP_MAX_BRANCH_COUNT=10;
     private static final int MAP_MAX_LINE_COUNT=20;
-    private static final int MAP_MIN_RECT_EDGE_FILL=4;
+    private static final int MAX_FILL_RECURSE_COUNT=40;
     
     private Image drawBuffer;
     private Random random;
-    private byte[] mapBytes,mapCopyBytes;
+    private byte[] mapBytes;
     
     public TestCanvas()
     {
@@ -130,7 +130,7 @@ public class TestCanvas extends Canvas
         int n;
         int offset,floorOffset;
         
-        if (recurseCount>10) return(false);
+        if (recurseCount>MAX_FILL_RECURSE_COUNT) return(false);
         
         floorOffset=floorIdx*(MAP_WID*MAP_HIGH);
         if (mapBytes[floorOffset+((y*MAP_WID)+x)]!=0) return(true);
@@ -163,7 +163,8 @@ public class TestCanvas extends Canvas
     
     private void buildSingleFloor(int floorIdx)
     {
-        int x,y,mx,my;
+        int x,y,mx,my,floorOffset;
+        byte[] mapBackup;
         Rect rect;
         
             // start in the middle and keep a list
@@ -180,9 +181,15 @@ public class TestCanvas extends Canvas
             
         recurseSnakeDraw(floorIdx,(MAP_WID/2),(MAP_HIGH/2),0,0,rect,MAP_MAX_BRANCH_COUNT,0);
         
+        mapBackup=new byte[MAP_FLOOR_COUNT*(MAP_WID*MAP_HIGH)];
+        floorOffset=floorIdx*(MAP_WID*MAP_HIGH);
+        
         for (y=rect.ty;y<rect.by;y++) {
             for (x=rect.lx;x<rect.rx;x++) {
-                floodFill(floorIdx,x,y,0);
+                if (mapBytes[floorOffset+((y*MAP_WID)+x)]!=0) continue;
+                
+                System.arraycopy(mapBytes,0,mapBackup,0,mapBytes.length);
+                if (!floodFill(floorIdx,x,y,0)) System.arraycopy(mapBackup,0,mapBytes,0,mapBytes.length);
             }
         }
 //        

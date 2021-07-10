@@ -1,9 +1,7 @@
 package com.klinksoftware.rag;
 
-import com.klinksoftware.rag.map.indoor.*;
-import com.klinksoftware.rag.map.outdoor.*;
-import com.klinksoftware.rag.map.track.*;
 import com.klinksoftware.rag.bitmaps.*;
+import com.klinksoftware.rag.map.*;
 import com.klinksoftware.rag.model.*;
 
 import java.io.*;
@@ -67,7 +65,7 @@ public class GeneratorMain
 
             // the color scheme
             
-        colorScheme=BitmapBase.getColorScheme((String)settings.get("colorScheme"));
+        colorScheme=BitmapBase.COLOR_SCHEME_RANDOM; // random.nextInt(BitmapBase.COLOR_SCHEME_COUNT);
         
             // create the model directory
         
@@ -81,13 +79,13 @@ public class GeneratorMain
     }
     
         //
-        // map: indoor
+        // map
         //
     
-    public static void runMapIndoor(String jsonSettingsStr)
+    public static void runMap(String jsonSettingsStr)
     {
         String              basePath;
-        MapIndoorBuilder    mapIndoorBuilder;
+        MapBuilder    mapIndoorBuilder;
         
         System.out.println("starting map build");
         
@@ -97,7 +95,7 @@ public class GeneratorMain
             // run the map indoor creation
        
         try {
-            mapIndoorBuilder=new MapIndoorBuilder(basePath);
+            mapIndoorBuilder=new MapBuilder(basePath);
             mapIndoorBuilder.build();
         }
         catch (Exception e)
@@ -109,69 +107,13 @@ public class GeneratorMain
     }
     
         //
-        // map: outdoor
+        // model
         //
     
-    public static void runMapOutdoor(String jsonSettingsStr)
-    {
-        String              basePath;
-        MapOutdoorBuilder   mapOutdoorBuilder;
-        
-        System.out.println("starting map build");
-        
-        basePath=runGenericSettings(jsonSettingsStr);
-        if (basePath==null) return;
-        
-            // run the map outdoor creation
-       
-        try {
-            mapOutdoorBuilder=new MapOutdoorBuilder(basePath);
-            mapOutdoorBuilder.build();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        
-        System.out.println("finished map build");
-    }
-    
-        //
-        // map: track
-        //
-    
-    public static void runMapTrack(String jsonSettingsStr)
-    {
-        String              basePath;
-        MapTrackBuilder     mapTrackBuilder;
-        
-        System.out.println("starting map build");
-        
-        basePath=runGenericSettings(jsonSettingsStr);
-        if (basePath==null) return;
-        
-            // run the map indoor creation
-       
-        try {
-            mapTrackBuilder=new MapTrackBuilder(basePath);
-            mapTrackBuilder.build();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        
-        System.out.println("finished map build");
-    }
-    
-        //
-        // model: humanoid
-        //
-    
-    public static void runModelHumanoid(String jsonSettingsStr)
+    public static void runModel(String jsonSettingsStr)
     {
         String                  basePath;
-        ModelHumanoidBuilder    modelHumanoidBuilder;
+        ModelBuilder    modelHumanoidBuilder;
         
         System.out.println("starting model build");
         
@@ -181,7 +123,7 @@ public class GeneratorMain
             // run the model humanoid creation
        
         try {
-            modelHumanoidBuilder=new ModelHumanoidBuilder(basePath);
+            modelHumanoidBuilder=new ModelBuilder(basePath);
             modelHumanoidBuilder.build();
         }
         catch (Exception e)

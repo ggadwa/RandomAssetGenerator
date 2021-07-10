@@ -1,4 +1,4 @@
-package com.klinksoftware.rag.map.indoor;
+package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.mesh.*;
@@ -6,17 +6,15 @@ import com.klinksoftware.rag.utility.*;
 
 public class MapPillar
 {
-    private float           segmentSize;
     private String          name;
     private MeshList        meshList;
     private MapRoom         room;
     
-    public MapPillar(MeshList meshList,MapRoom room,String name,float segmentSize)
+    public MapPillar(MeshList meshList,MapRoom room,String name)
     {
         this.meshList=meshList;
         this.room=room;
         this.name=name;
-        this.segmentSize=segmentSize;
     }
    
         //
@@ -84,16 +82,16 @@ public class MapPillar
         
             // the y bounds
          
-        baseHigh=segmentSize*(0.1f+(GeneratorMain.random.nextFloat()*0.2f));
+        baseHigh=MapBuilder.SEGMENT_SIZE*(0.1f+(GeneratorMain.random.nextFloat()*0.2f));
         by=this.room.offset.y;
-        ty=(this.room.offset.y+(this.room.storyCount*this.segmentSize));
+        ty=(this.room.offset.y+(this.room.storyCount*MapBuilder.SEGMENT_SIZE));
         pillarBy=by+baseHigh;
         pillarTy=ty-baseHigh;
         
             // build the pillars
             
-        offset=segmentSize*0.5f;
-        radius=segmentSize*(0.1f+(GeneratorMain.random.nextFloat()*0.2f));
+        offset=MapBuilder.SEGMENT_SIZE*0.5f;
+        radius=MapBuilder.SEGMENT_SIZE*(0.1f+(GeneratorMain.random.nextFloat()*0.2f));
         baseRadius=radius*(1.3f+(GeneratorMain.random.nextFloat()*0.2f));
         
         cylinderSegments=MeshMapUtility.createCylinderSegmentList(5,3,0.2f);
@@ -105,16 +103,16 @@ public class MapPillar
             for (gx=lx;gx<rx;gx++) {
                 if (pattern[gx-lx][gz-tz]==0x0) continue;
                 
-                centerPnt.x=room.offset.x+(((float)gx*segmentSize)+offset);
-                centerPnt.z=room.offset.z+(((float)gz*segmentSize)+offset);
+                centerPnt.x=room.offset.x+(((float)gx*MapBuilder.SEGMENT_SIZE)+offset);
+                centerPnt.z=room.offset.z+(((float)gz*MapBuilder.SEGMENT_SIZE)+offset);
 
                 nameSuffix=Integer.toString(gx)+"_"+Integer.toString(gz);
                 
                 mesh=MeshMapUtility.createCylinder(room,(this.name+"_"+nameSuffix),"pillar",centerPnt,pillarTy,pillarBy,cylinderSegments,radius,false,false);
 
                 if (squareBase) {
-                    mesh.combine(MeshMapUtility.createCube(room,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),pillarBy,by,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,true,true,false,true,false,MeshMapUtility.UV_MAP,segmentSize));
-                    mesh.combine(MeshMapUtility.createCube(room,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),ty,pillarTy,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP,segmentSize));
+                    mesh.combine(MeshMapUtility.createCube(room,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),pillarBy,by,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,true,true,false,true,false,MeshMapUtility.UV_MAP));
+                    mesh.combine(MeshMapUtility.createCube(room,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),ty,pillarTy,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP));
                 }
                 else {
                     mesh.combine(MeshMapUtility.createMeshCylinderSimple(room,(name+"_base_bot_"+nameSuffix),"pillar",centerPnt,pillarBy,by,baseRadius,true,false));

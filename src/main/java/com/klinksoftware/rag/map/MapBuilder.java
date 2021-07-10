@@ -1,4 +1,4 @@
-package com.klinksoftware.rag.map.indoor;
+package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.*;
@@ -9,9 +9,10 @@ import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
 
-public class MapIndoorBuilder
+public class MapBuilder
 {
     public static final int         ROOM_RANDOM_LOCATION_DISTANCE=100;
+    public static final float       SEGMENT_SIZE=10.0f;
     
     private String                  basePath;
     private MeshList                meshList;
@@ -19,7 +20,7 @@ public class MapIndoorBuilder
     private BitmapGenerator         mapBitmapList;
     private MapPieceList            mapPieceList;
     
-    public MapIndoorBuilder(String basePath)
+    public MapBuilder(String basePath)
     {
         this.basePath=basePath;
     }
@@ -28,7 +29,7 @@ public class MapIndoorBuilder
         // mesh building utilities
         //
         
-    private void removeSharedWalls(ArrayList<MapRoom> rooms,float segmentSize)
+    private void removeSharedWalls(ArrayList<MapRoom> rooms)
     {
         int         n,k,t,roomCount,vIdx,vIdx2,
                     nextIdx,nextIdx2,
@@ -56,11 +57,11 @@ public class MapIndoorBuilder
                     nextIdx=vIdx+1;
                     if (nextIdx==vertexCount) nextIdx=0;
                                         
-                    ax=(room.piece.vertexes[vIdx][0]*segmentSize)+room.offset.x;
-                    az=(room.piece.vertexes[vIdx][1]*segmentSize)+room.offset.z;
+                    ax=(room.piece.vertexes[vIdx][0]*SEGMENT_SIZE)+room.offset.x;
+                    az=(room.piece.vertexes[vIdx][1]*SEGMENT_SIZE)+room.offset.z;
                     
-                    ax2=(room.piece.vertexes[nextIdx][0]*segmentSize)+room.offset.x;
-                    az2=(room.piece.vertexes[nextIdx][1]*segmentSize)+room.offset.z;
+                    ax2=(room.piece.vertexes[nextIdx][0]*SEGMENT_SIZE)+room.offset.x;
+                    az2=(room.piece.vertexes[nextIdx][1]*SEGMENT_SIZE)+room.offset.z;
                     
                     vIdx2=0;
                     
@@ -68,11 +69,11 @@ public class MapIndoorBuilder
                         nextIdx2=vIdx2+1;
                         if (nextIdx2==vertexCount2) nextIdx2=0;
                         
-                        bx=(room2.piece.vertexes[vIdx2][0]*segmentSize)+room2.offset.x;
-                        bz=(room2.piece.vertexes[vIdx2][1]*segmentSize)+room2.offset.z;
+                        bx=(room2.piece.vertexes[vIdx2][0]*SEGMENT_SIZE)+room2.offset.x;
+                        bz=(room2.piece.vertexes[vIdx2][1]*SEGMENT_SIZE)+room2.offset.z;
 
-                        bx2=(room2.piece.vertexes[nextIdx2][0]*segmentSize)+room2.offset.x;
-                        bz2=(room2.piece.vertexes[nextIdx2][1]*segmentSize)+room2.offset.z;
+                        bx2=(room2.piece.vertexes[nextIdx2][0]*SEGMENT_SIZE)+room2.offset.x;
+                        bz2=(room2.piece.vertexes[nextIdx2][1]*SEGMENT_SIZE)+room2.offset.z;
                         
                         if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) {
                             
@@ -80,14 +81,14 @@ public class MapIndoorBuilder
                                 // bounds of the other rooms y size
                                 
                             for (t=0;t!=room.storyCount;t++) {
-                                y=room.offset.y+(t*segmentSize);
-                                if ((y>=(room2.offset.y+(room2.storyCount*segmentSize))) || ((y+segmentSize)<=room2.offset.y)) continue;
+                                y=room.offset.y+(t*SEGMENT_SIZE);
+                                if ((y>=(room2.offset.y+(room2.storyCount*SEGMENT_SIZE))) || ((y+SEGMENT_SIZE)<=room2.offset.y)) continue;
                                 
                                 room.hideVertex(t,vIdx);
                             }
                             for (t=0;t!=room2.storyCount;t++) {
-                                y=room2.offset.y+(t*segmentSize);
-                                if ((y>=(room.offset.y+(room.storyCount*segmentSize))) || ((y+segmentSize)<=room.offset.y)) continue;
+                                y=room2.offset.y+(t*SEGMENT_SIZE);
+                                if ((y>=(room.offset.y+(room.storyCount*SEGMENT_SIZE))) || ((y+SEGMENT_SIZE)<=room.offset.y)) continue;
                                 
                                 room2.hideVertex(t,vIdx2);
                             }
@@ -106,7 +107,7 @@ public class MapIndoorBuilder
         // room decorations
         //
    
-    private void buildDecoration(MapRoom room,int roomIdx,float segmentSize)
+    private void buildDecoration(MapRoom room,int roomIdx)
     {
         int         decorationType;
         
@@ -137,16 +138,16 @@ public class MapIndoorBuilder
         switch (decorationType) {
             case 0:
                 mapBitmapList.generatePlatform();
-                (new MapStory(meshList,room,("story_"+Integer.toString(roomIdx)),segmentSize)).build();
+                (new MapStory(meshList,room,("story_"+Integer.toString(roomIdx)))).build();
                 break;
             case 1:
                 mapBitmapList.generatePillar();
-                (new MapPillar(meshList,room,("pillar_"+Integer.toString(roomIdx)),segmentSize)).build();
+                (new MapPillar(meshList,room,("pillar_"+Integer.toString(roomIdx)))).build();
                 break;
             case 2:
                 mapBitmapList.generateBox();
                 mapBitmapList.generateAccessory();
-                (new MapStorage(meshList,room,("storage_"+Integer.toString(roomIdx)),segmentSize)).build();
+                (new MapStorage(meshList,room,("storage_"+Integer.toString(roomIdx)))).build();
                 break;
             case 3:
                 mapBitmapList.generateComputer();
@@ -156,15 +157,15 @@ public class MapIndoorBuilder
                 mapBitmapList.generatePipe();
                 mapBitmapList.generateLiquid();
                 mapBitmapList.generateGlass();
-                (new MapEquipment(meshList,room,("computer_"+Integer.toString(roomIdx)),segmentSize)).build();
+                (new MapEquipment(meshList,room,("computer_"+Integer.toString(roomIdx)))).build();
                 break;
             case 4:
                 mapBitmapList.generatePipe();
-                (new MapPipe(meshList,room,("pipe_"+Integer.toString(roomIdx)),segmentSize)).build();
+                (new MapPipe(meshList,room,("pipe_"+Integer.toString(roomIdx)))).build();
                 break;
             case 5:
                 mapBitmapList.generatePlatform();
-                (new MapAltar(meshList,room,("alter_"+Integer.toString(roomIdx)),segmentSize)).build();
+                (new MapAltar(meshList,room,("alter_"+Integer.toString(roomIdx)))).build();
                 break;
         }
     }
@@ -173,7 +174,7 @@ public class MapIndoorBuilder
         // room steps
         //
         
-    private void buildSteps(MapRoom room,String name,MapRoom toRoom,float segmentSize)
+    private void buildSteps(MapRoom room,String name,MapRoom toRoom)
     {
         int                 x,z,noSkipX,noSkipZ,min,max;
         boolean             doAll;
@@ -186,7 +187,7 @@ public class MapIndoorBuilder
 
             // step meshes
             
-        mapStory=new MapStory(meshList,room,name,segmentSize);
+        mapStory=new MapStory(meshList,room,name);
         
         if (room.offset.z==(toRoom.offset.z+toRoom.size.z)) {
             touchRange=room.getTouchWallRange(toRoom,true);
@@ -254,7 +255,7 @@ public class MapIndoorBuilder
         // add additional room
         //
     
-    private void addAdditionalRoom(ArrayList<MapRoom> rooms,MapRoom room,MapRoom touchRoom,float storyChangePercentage,float segmentSize)
+    private void addAdditionalRoom(ArrayList<MapRoom> rooms,MapRoom room,MapRoom touchRoom,float storyChangePercentage)
     {
             // start at same height
             
@@ -264,7 +265,7 @@ public class MapIndoorBuilder
             
         if ((room.offset.y==0) && (touchRoom.piece.decorate) && (touchRoom.storyCount>1)) {
             if (GeneratorMain.random.nextFloat()<storyChangePercentage) {
-                room.offset.y+=segmentSize;
+                room.offset.y+=SEGMENT_SIZE;
                 touchRoom.requiredStairs.add(room);
             }
         }
@@ -282,9 +283,9 @@ public class MapIndoorBuilder
     {
         int                 n,k,roomCount,maxRoomCount,maxExtensionRoomCount,
                             touchIdx,failCount,placeCount,moveCount;
-        float               segmentSize,storyChangePercentage,
+        float               storyChangePercentage,
                             roomTopY,origX,origZ,xAdd,zAdd;
-        boolean             ceilings,decorations,bigRoomsOnly;
+        boolean             ceilings,decorations;
         String              mapName;
         RagPoint            centerPnt;
         MapRoom             room,connectRoom;
@@ -298,13 +299,11 @@ public class MapIndoorBuilder
             // some settings
          
         mapName=(String)GeneratorMain.settings.get("name");
-        maxRoomCount=(int)GeneratorMain.settings.get("maxRoomCount");
-        maxExtensionRoomCount=(int)GeneratorMain.settings.get("maxExtensionRoomCount");
-        storyChangePercentage=(float)((double)GeneratorMain.settings.get("storyChangePercentage"));
-        ceilings=(boolean)GeneratorMain.settings.get("ceilings");
-        decorations=(boolean)GeneratorMain.settings.get("decorations");
-        bigRoomsOnly=(boolean)GeneratorMain.settings.get("bigRoomsOnly");
-        segmentSize=((Double)GeneratorMain.settings.get("segmentSize")).floatValue();
+        maxRoomCount=15+GeneratorMain.random.nextInt(20);
+        maxExtensionRoomCount=5+GeneratorMain.random.nextInt(10);
+        storyChangePercentage=0.2f+(GeneratorMain.random.nextFloat()*0.2f);
+        ceilings=false;
+        decorations=false;
         
             // map components
             
@@ -313,7 +312,7 @@ public class MapIndoorBuilder
         
              // first room in center of map
             
-        room=new MapRoom(mapPieceList.getDefaultPiece(),segmentSize);
+        room=new MapRoom(mapPieceList.getDefaultPiece());
         room.offset.setFromValues(0.0f,0.0f,0.0f);
         rooms.add(room);
         
@@ -324,14 +323,14 @@ public class MapIndoorBuilder
         
         while ((rooms.size()<maxRoomCount) && (failCount>0)) {
                 
-            room=new MapRoom(mapPieceList.getRandomPiece(bigRoomsOnly),segmentSize);
+            room=new MapRoom(mapPieceList.getRandomPiece());
             
             placeCount=10;
             
             while (placeCount>0) {
-                room.offset.x=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*segmentSize;
+                room.offset.x=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
                 room.offset.y=0;
-                room.offset.z=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*segmentSize;
+                room.offset.z=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
                 if (!room.collides(rooms)) break;
                 
                 placeCount--;
@@ -344,8 +343,8 @@ public class MapIndoorBuilder
             
                 // migrate it in to center of map
   
-            xAdd=-(Math.signum(room.offset.x)*segmentSize);
-            zAdd=-(Math.signum(room.offset.z)*segmentSize);
+            xAdd=-(Math.signum(room.offset.x)*SEGMENT_SIZE);
+            zAdd=-(Math.signum(room.offset.z)*SEGMENT_SIZE);
             
             moveCount=ROOM_RANDOM_LOCATION_DISTANCE;
             
@@ -367,7 +366,7 @@ public class MapIndoorBuilder
                     touchIdx=room.touches(rooms);
                     if (touchIdx!=-1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),storyChangePercentage,segmentSize);
+                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),storyChangePercentage);
                             break;
                         }
                     }
@@ -381,7 +380,7 @@ public class MapIndoorBuilder
                     touchIdx=room.touches(rooms);
                     if (touchIdx!=-1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),storyChangePercentage,segmentSize);
+                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),storyChangePercentage);
                             break;
                         }
                     }
@@ -404,7 +403,7 @@ public class MapIndoorBuilder
         roomCount=rooms.size();
         
         for (n=0;n!=maxExtensionRoomCount;n++) {
-            room=new MapRoom(mapPieceList.getRandomPiece(bigRoomsOnly),segmentSize);
+            room=new MapRoom(mapPieceList.getRandomPiece());
             
             failCount=25;
             
@@ -414,7 +413,7 @@ public class MapIndoorBuilder
                 room.offset.setFromValues((connectRoom.offset.x-room.size.x),connectRoom.offset.y,connectRoom.offset.z);     // on left
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                        addAdditionalRoom(rooms,room,connectRoom,0.0f);
                         break;
                     }
                 }
@@ -422,7 +421,7 @@ public class MapIndoorBuilder
                 room.offset.setFromValues((connectRoom.offset.x+connectRoom.size.x),connectRoom.offset.y,connectRoom.offset.z);     // on right
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                        addAdditionalRoom(rooms,room,connectRoom,0.0f);
                         break;
                     }
                 }
@@ -430,7 +429,7 @@ public class MapIndoorBuilder
                 room.offset.setFromValues(connectRoom.offset.x,connectRoom.offset.y,(connectRoom.offset.z-room.size.z));     // on top
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                        addAdditionalRoom(rooms,room,connectRoom,0.0f);
                         break;
                     }
                 }
@@ -438,7 +437,7 @@ public class MapIndoorBuilder
                 room.offset.setFromValues(connectRoom.offset.x,connectRoom.offset.y,(connectRoom.offset.z+connectRoom.size.z));     // on bottom
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        addAdditionalRoom(rooms,room,connectRoom,0.0f,segmentSize);
+                        addAdditionalRoom(rooms,room,connectRoom,0.0f);
                         break;
                     }
                 }
@@ -449,7 +448,7 @@ public class MapIndoorBuilder
 
             // eliminate all combined walls
            
-        removeSharedWalls(rooms,segmentSize);
+        removeSharedWalls(rooms);
 
             // maps always need walls, floors and ceilings
             
@@ -464,18 +463,18 @@ public class MapIndoorBuilder
         for (n=0;n!=roomCount;n++) {
             room=rooms.get(n);
             
-            roomTopY=room.offset.y+(room.storyCount*segmentSize);
-            centerPnt=new RagPoint((room.offset.x+(room.size.x*0.5f)),(room.offset.y+((segmentSize*room.storyCount)*0.5f)),(room.offset.z+(room.size.z*0.5f)));
+            roomTopY=room.offset.y+(room.storyCount*SEGMENT_SIZE);
+            centerPnt=new RagPoint((room.offset.x+(room.size.x*0.5f)),(room.offset.y+((SEGMENT_SIZE*room.storyCount)*0.5f)),(room.offset.z+(room.size.z*0.5f)));
                 
                 // meshes
 
-            meshList.add(MeshMapUtility.buildRoomWalls(room,centerPnt,("wall_"+Integer.toString(n)),segmentSize));
-            meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y,segmentSize));
-            if (ceilings) meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY,segmentSize));
+            meshList.add(MeshMapUtility.buildRoomWalls(room,centerPnt,("wall_"+Integer.toString(n))));
+            meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y));
+            if (ceilings) meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY));
             
                 // decorations
 
-            if ((room.piece.decorate) && (decorations)) this.buildDecoration(room,n,segmentSize);
+            if ((room.piece.decorate) && (decorations)) this.buildDecoration(room,n);
         }
         
             // any steps
@@ -484,7 +483,7 @@ public class MapIndoorBuilder
             room=rooms.get(n);
             
             for (k=0;k!=room.requiredStairs.size();k++) {
-                buildSteps(room,("room_"+Integer.toString(n)+"_step_"+Integer.toString(k)),room.requiredStairs.get(k),segmentSize);
+                buildSteps(room,("room_"+Integer.toString(n)+"_step_"+Integer.toString(k)),room.requiredStairs.get(k));
             }
         }
         

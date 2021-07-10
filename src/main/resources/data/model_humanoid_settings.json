@@ -1,7 +1,6 @@
 {
     "name": "test_humanoid_model",
     "seed": 15,
-    "colorScheme": "random",
     "height":5.0,
     "radius":1.0,
     "standing":true,

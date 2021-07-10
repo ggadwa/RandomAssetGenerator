@@ -1,4 +1,4 @@
-package com.klinksoftware.rag.map.indoor;
+package com.klinksoftware.rag.map;
 
 public class MapPiece
 {

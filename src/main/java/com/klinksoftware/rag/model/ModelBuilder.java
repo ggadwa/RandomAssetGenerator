@@ -9,14 +9,14 @@ import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
 
-public class ModelHumanoidBuilder
+public class ModelBuilder
 {
     private String                  basePath;
     private Skeleton                skeleton;
     private MeshList                meshList;
     private BitmapGenerator         mapBitmapList;
     
-    public ModelHumanoidBuilder(String basePath)
+    public ModelBuilder(String basePath)
     {
         this.basePath=basePath;
     }

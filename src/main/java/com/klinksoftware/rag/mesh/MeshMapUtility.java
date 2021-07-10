@@ -1,8 +1,9 @@
 package com.klinksoftware.rag.mesh;
 
-import com.klinksoftware.rag.map.indoor.MapPiece;
-import com.klinksoftware.rag.map.indoor.MapRoom;
+import com.klinksoftware.rag.map.MapPiece;
+import com.klinksoftware.rag.map.MapRoom;
 import com.klinksoftware.rag.*;
+import com.klinksoftware.rag.map.MapBuilder;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
@@ -271,7 +272,7 @@ public class MeshMapUtility
         // room pieces
         //
    
-    public static Mesh buildRoomFloorCeiling(MapRoom room,RagPoint centerPnt,String name,String bitmapName,float y,float segmentSize)
+    public static Mesh buildRoomFloorCeiling(MapRoom room,RagPoint centerPnt,String name,String bitmapName,float y)
     {
         ArrayList<Float>    vertexArray;
         ArrayList<Integer>  indexArray;
@@ -291,12 +292,12 @@ public class MeshMapUtility
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
         
         return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
     }
        
-    public static Mesh buildRoomWalls(MapRoom room,RagPoint centerPnt,String name,float segmentSize)
+    public static Mesh buildRoomWalls(MapRoom room,RagPoint centerPnt,String name)
     {
         int                 n,k,k2,vertexCount,trigIdx;
         float               y;
@@ -325,21 +326,21 @@ public class MeshMapUtility
                 k2=k+1;
                 if (k2==vertexCount) k2=0;
                 
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*segmentSize)+room.offset.x),(y+segmentSize),((piece.vertexes[k][1]*segmentSize)+room.offset.z)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*segmentSize)+room.offset.x),(y+segmentSize),((piece.vertexes[k2][1]*segmentSize)+room.offset.z)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*segmentSize)+room.offset.x),y,((piece.vertexes[k2][1]*segmentSize)+room.offset.z)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*segmentSize)+room.offset.x),y,((piece.vertexes[k][1]*segmentSize)+room.offset.z)));
+                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.offset.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.offset.z)));
+                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.offset.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.offset.z)));
+                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.offset.x),y,((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.offset.z)));
+                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.offset.x),y,((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.offset.z)));
 
                 trigIdx=addQuadToIndexes(indexArray,trigIdx);
             }
 
-            y+=segmentSize;
+            y+=MapBuilder.SEGMENT_SIZE;
         }
 
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
         
         return(new Mesh(name,"wall",vertexes,normals,uvs,indexes));
     }
@@ -348,7 +349,7 @@ public class MeshMapUtility
         // staircases
         //
      
-    public static void buildStairs(MeshList meshList,MapRoom room,String name,float x,float y,float z,int dir,float stepWidth,boolean sides,float segmentSize)
+    public static void buildStairs(MeshList meshList,MapRoom room,String name,float x,float y,float z,int dir,float stepWidth,boolean sides)
     {
         int                 n,trigIdx;
         float               sx,sx2,sy,sz,sz2,
@@ -363,8 +364,8 @@ public class MeshMapUtility
         
             // step sizes
             
-        stepSize=(segmentSize*2.0f)/(float)STAIR_STEP_COUNT;
-        stepHigh=segmentSize/(float)STAIR_STEP_COUNT;
+        stepSize=(MapBuilder.SEGMENT_SIZE*2.0f)/(float)STAIR_STEP_COUNT;
+        stepHigh=MapBuilder.SEGMENT_SIZE/(float)STAIR_STEP_COUNT;
         
         centerPnt=null;
 
@@ -382,14 +383,14 @@ public class MeshMapUtility
             case STAIR_DIR_POS_Z:
             case STAIR_DIR_NEG_Z:
                 sx=x;
-                sx2=sx+(segmentSize*stepWidth);
-                centerPnt=new RagPoint((x+(segmentSize*0.5f)),room.offset.y,(z+segmentSize));
+                sx2=sx+(MapBuilder.SEGMENT_SIZE*stepWidth);
+                centerPnt=new RagPoint((x+(MapBuilder.SEGMENT_SIZE*0.5f)),room.offset.y,(z+MapBuilder.SEGMENT_SIZE));
                 break;
             case STAIR_DIR_POS_X:
             case STAIR_DIR_NEG_X:
                 sz=z;
-                sz2=sz+(segmentSize*stepWidth);
-                centerPnt=new RagPoint((x+segmentSize),room.offset.y,(z+(segmentSize*0.5f)));
+                sz2=sz+(MapBuilder.SEGMENT_SIZE*stepWidth);
+                centerPnt=new RagPoint((x+MapBuilder.SEGMENT_SIZE),room.offset.y,(z+(MapBuilder.SEGMENT_SIZE*0.5f)));
                 break;
         }
         
@@ -409,7 +410,7 @@ public class MeshMapUtility
                     sz2=sz+stepSize;
                     break;
                 case STAIR_DIR_NEG_Z:
-                    sz=(z+segmentSize)-(n*stepSize);
+                    sz=(z+MapBuilder.SEGMENT_SIZE)-(n*stepSize);
                     sz2=sz-stepSize;
                     break;
                 case STAIR_DIR_POS_X:
@@ -417,7 +418,7 @@ public class MeshMapUtility
                     sx2=sx+stepSize;
                     break;
                 case STAIR_DIR_NEG_X:
-                    sx=(x+segmentSize)-(n*stepSize);
+                    sx=(x+MapBuilder.SEGMENT_SIZE)-(n*stepSize);
                     sx2=sx-stepSize;
                     break;
             }
@@ -466,27 +467,27 @@ public class MeshMapUtility
             // step back
         
         if (sides) {
-            sy=y+segmentSize;
+            sy=y+MapBuilder.SEGMENT_SIZE;
             
             switch (dir) {
                 case STAIR_DIR_POS_Z:
-                    sx=x+(segmentSize*stepWidth);
-                    sz=z+(segmentSize*2.0f);
+                    sx=x+(MapBuilder.SEGMENT_SIZE*stepWidth);
+                    sz=z+(MapBuilder.SEGMENT_SIZE*2.0f);
                     vertexArray.addAll(Arrays.asList(x,y,sz,sx,y,sz,sx,sy,sz,x,sy,sz));
                     break;
                 case STAIR_DIR_NEG_Z:
-                    sx=x+(segmentSize*stepWidth);
-                    sz=z-segmentSize;
+                    sx=x+(MapBuilder.SEGMENT_SIZE*stepWidth);
+                    sz=z-MapBuilder.SEGMENT_SIZE;
                     vertexArray.addAll(Arrays.asList(x,y,sz,sx,y,sz,sx,sy,sz,x,sy,sz));
                     break;
                 case STAIR_DIR_POS_X:
-                    sx=x+(segmentSize*2.0f);
-                    sz=z+(segmentSize*stepWidth);
+                    sx=x+(MapBuilder.SEGMENT_SIZE*2.0f);
+                    sz=z+(MapBuilder.SEGMENT_SIZE*stepWidth);
                     vertexArray.addAll(Arrays.asList(sx,y,z,sx,y,sz,sx,sy,sz,sx,sy,z));
                     break;
                 case STAIR_DIR_NEG_X:
-                    sx=x-segmentSize;
-                    sz=z+(segmentSize*stepWidth);
+                    sx=x-MapBuilder.SEGMENT_SIZE;
+                    sz=z+(MapBuilder.SEGMENT_SIZE*stepWidth);
                     vertexArray.addAll(Arrays.asList(sx,y,z,sx,y,sz,sx,sy,sz,sx,sy,z));
                     break;
             }
@@ -499,7 +500,7 @@ public class MeshMapUtility
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
         
         meshList.add(new Mesh(name,"step",vertexes,normals,uvs,indexes));
     }
@@ -508,7 +509,7 @@ public class MeshMapUtility
         // cubes
         //
 
-    public static Mesh createCubeRotated(MapRoom room,String name,String bitmapName,float xMin,float xMax,float yMin,float yMax,float zMin,float zMax,RagPoint rotAngle,boolean left,boolean right,boolean front,boolean back,boolean top,boolean bottom,boolean normalsIn,int uvMode,float segmentSize)
+    public static Mesh createCubeRotated(MapRoom room,String name,String bitmapName,float xMin,float xMax,float yMin,float yMax,float zMin,float zMax,RagPoint rotAngle,boolean left,boolean right,boolean front,boolean back,boolean top,boolean bottom,boolean normalsIn,int uvMode)
     {
         int                 n,idx;
         ArrayList<Float>    vertexArray,uvArray;
@@ -678,7 +679,7 @@ public class MeshMapUtility
             
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
         if (uvMode==MeshMapUtility.UV_MAP) {
-            uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/segmentSize));
+            uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
         }
         else {
             uvs=floatArrayListToFloat(uvArray);
@@ -687,9 +688,9 @@ public class MeshMapUtility
         return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
     }
     
-    public static Mesh createCube(MapRoom room,String name,String bitmapName,float xMin,float xMax,float yMin,float yMax,float zMin,float zMax,boolean left,boolean right,boolean front,boolean back,boolean top,boolean bottom,boolean normalsIn,int uvMode,float segmentSize)
+    public static Mesh createCube(MapRoom room,String name,String bitmapName,float xMin,float xMax,float yMin,float yMax,float zMin,float zMax,boolean left,boolean right,boolean front,boolean back,boolean top,boolean bottom,boolean normalsIn,int uvMode)
     {
-        return(createCubeRotated(room,name,bitmapName,xMin,xMax,yMin,yMax,zMin,zMax,null,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize));
+        return(createCubeRotated(room,name,bitmapName,xMin,xMax,yMin,yMax,zMin,zMax,null,left,right,front,back,top,bottom,normalsIn,uvMode));
     }
    
         //

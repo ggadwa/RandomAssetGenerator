@@ -1,4 +1,4 @@
-package com.klinksoftware.rag.map.indoor;
+package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.mesh.*;
@@ -6,17 +6,15 @@ import com.klinksoftware.rag.utility.*;
 
 public class MapEquipment
 {
-    private float           segmentSize;
     private String          name;
     private MeshList        meshList;
     private MapRoom         room;
     
-    public MapEquipment(MeshList meshList,MapRoom room,String name,float segmentSize)
+    public MapEquipment(MeshList meshList,MapRoom room,String name)
     {
         this.meshList=meshList;
         this.room=room;
         this.name=name;
-        this.segmentSize=segmentSize;
     }
     
         //
@@ -27,10 +25,10 @@ public class MapEquipment
     {
         float       x,z;
         
-        x=room.offset.x+((float)gx*segmentSize);
-        z=room.offset.z+((float)gz*segmentSize);
+        x=room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE);
+        z=room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE);
             
-        meshList.add(MeshMapUtility.createCube(room,(name+"_pedestal"),"accessory",x,(x+segmentSize),room.offset.y,(room.offset.y+floorDepth),z,(z+segmentSize),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP,segmentSize));
+        meshList.add(MeshMapUtility.createCube(room,(name+"_pedestal"),"accessory",x,(x+MapBuilder.SEGMENT_SIZE),room.offset.y,(room.offset.y+floorDepth),z,(z+MapBuilder.SEGMENT_SIZE),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP));
     }
         
         //
@@ -47,13 +45,13 @@ public class MapEquipment
         
             // computer bank
         
-        widOffset=(segmentSize-wid)*0.5f;
+        widOffset=(MapBuilder.SEGMENT_SIZE-wid)*0.5f;
         
-        x=(room.offset.x+((float)gx*segmentSize))+widOffset;
+        x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+widOffset;
         y=room.offset.y+floorDepth;
-        z=(room.offset.z+((float)gz*segmentSize))+widOffset;
+        z=(room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE))+widOffset;
 
-        meshList.add(MeshMapUtility.createCube(room,(name+"_computer_"+pieceCount),"computer",x,(x+wid),y,(y+high),z,(z+wid),true,true,true,true,true,false,false,MeshMapUtility.UV_BOX,segmentSize));
+        meshList.add(MeshMapUtility.createCube(room,(name+"_computer_"+pieceCount),"computer",x,(x+wid),y,(y+high),z,(z+wid),true,true,true,true,true,false,false,MeshMapUtility.UV_BOX));
     }
    
         //
@@ -70,11 +68,11 @@ public class MapEquipment
         
             // the desk and stand
             
-        widOffset=(segmentSize-wid)*0.5f;
+        widOffset=(MapBuilder.SEGMENT_SIZE-wid)*0.5f;
         
-        x=(room.offset.x+((float)gx*segmentSize))+(segmentSize*0.5f);
+        x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
         y=room.offset.y;
-        z=(room.offset.z+((float)gz*segmentSize))+(segmentSize*0.5f);
+        z=(room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
         
         deskHalfWid=wid*0.5f;
         deskShortHalfWid=deskHalfWid*0.9f;
@@ -84,21 +82,21 @@ public class MapEquipment
         standHigh=high*0.1f;
         
         rotAngle=new RagPoint(0.0f,(GeneratorMain.random.nextBoolean()?0.0f:90.0f),0.0f);
-        mesh=MeshMapUtility.createCube(room,(name+"_monitor_box_"+pieceCount),"accessory",(x-deskHalfWid),(x+deskHalfWid),y,(y+high),(z-deskShortHalfWid),(z+deskShortHalfWid),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP,segmentSize);
+        mesh=MeshMapUtility.createCube(room,(name+"_monitor_box_"+pieceCount),"accessory",(x-deskHalfWid),(x+deskHalfWid),y,(y+high),(z-deskShortHalfWid),(z+deskShortHalfWid),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP);
         
         y+=high;
 
         rotAngle.setFromValues(0.0f,(GeneratorMain.random.nextFloat()*360.0f),0.0f);
-        mesh.combine(MeshMapUtility.createCubeRotated(room,(name+"_monitor_stand_"+pieceCount),"accessory",(x-standHalfWid),(x+standHalfWid),y,(y+standHigh),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,false,false,false,MeshMapUtility.UV_MAP,segmentSize));
+        mesh.combine(MeshMapUtility.createCubeRotated(room,(name+"_monitor_stand_"+pieceCount),"accessory",(x-standHalfWid),(x+standHalfWid),y,(y+standHigh),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,false,false,false,MeshMapUtility.UV_MAP));
         
         meshList.add(mesh);
         
             // the monitor
             
-        x=(room.offset.x+((float)gx*segmentSize))+widOffset;
+        x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+widOffset;
         y+=standHigh;
         
-        meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_monitor_"+pieceCount),"monitor",x,(x+wid),y,(y+high),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX,segmentSize));
+        meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_monitor_"+pieceCount),"monitor",x,(x+wid),y,(y+high),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX));
     }
     
         //
@@ -112,16 +110,16 @@ public class MapEquipment
         RagPoint        rotAngle,centerPnt;
         Mesh            mesh,mesh2;
         
-        x=(room.offset.x+((float)gx*segmentSize))+(segmentSize*0.5f);
+        x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
         y=room.offset.y;
-        z=(room.offset.z+((float)gz*segmentSize))+(segmentSize*0.5f);
+        z=(room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
         
             // the junction
             
         juncHalfWid=juncWid*0.5f;
         
         rotAngle=new RagPoint(0.0f,(GeneratorMain.random.nextBoolean()?0.0f:90.0f),0.0f);
-        meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_panel_"+pieceCount),"panel",(x-juncHalfWid),(x+juncHalfWid),(y+pipeHigh),((y+pipeHigh)+juncWid),(z-pipeRadius),(z+pipeRadius),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX,segmentSize));
+        meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_panel_"+pieceCount),"panel",(x-juncHalfWid),(x+juncHalfWid),(y+pipeHigh),((y+pipeHigh)+juncWid),(z-pipeRadius),(z+pipeRadius),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX));
         
             // the pipes
             
@@ -132,7 +130,7 @@ public class MapEquipment
         centerPnt=new RagPoint(x,y,z);
         
         if (upperPipe) {
-            mesh=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",centerPnt,((y+pipeHigh)+juncWid),(room.offset.y+((float)room.storyCount*segmentSize)),pipeRadius,false,false);
+            mesh=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",centerPnt,((y+pipeHigh)+juncWid),(room.offset.y+((float)room.storyCount*MapBuilder.SEGMENT_SIZE)),pipeRadius,false,false);
         }
         if (lowerPipe) {
             mesh2=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",centerPnt,y,(y+pipeHigh),pipeRadius,false,false);
@@ -197,8 +195,8 @@ public class MapEquipment
         float           x,z,radius;
         RagPoint        centerPnt;
         
-        x=(room.offset.x+((float)gx*segmentSize))+(segmentSize*0.5f);
-        z=(room.offset.z+((float)gz*segmentSize))+(segmentSize*0.5f);
+        x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
+        z=(room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
 
         centerPnt=new RagPoint(x,room.offset.y,z);
         
@@ -241,25 +239,25 @@ public class MapEquipment
         
             // sizes
             
-        roomHigh=(float)room.storyCount*segmentSize;
+        roomHigh=(float)room.storyCount*MapBuilder.SEGMENT_SIZE;
         
-        bankWid=(segmentSize*0.5f)+(GeneratorMain.random.nextFloat()*(segmentSize*0.3f));
-        bankHigh=bankWid*(1.0f+(GeneratorMain.random.nextFloat()*(segmentSize*0.15f)));
+        bankWid=(MapBuilder.SEGMENT_SIZE*0.5f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
+        bankHigh=bankWid*(1.0f+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.15f)));
         
-        terminalWid=(segmentSize*0.5f)+(GeneratorMain.random.nextFloat()*(segmentSize*0.3f));
-        terminalHigh=(segmentSize*0.2f)+(GeneratorMain.random.nextFloat()*(segmentSize*0.3f));
+        terminalWid=(MapBuilder.SEGMENT_SIZE*0.5f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
+        terminalHigh=(MapBuilder.SEGMENT_SIZE*0.2f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
         
-        juncWid=(segmentSize*0.4f)+(GeneratorMain.random.nextFloat()*(segmentSize*0.2f));
-        pipeHigh=(segmentSize*0.2f)+(GeneratorMain.random.nextFloat()*(segmentSize*0.2f));
-        pipeRadius=(segmentSize*0.05f)+(GeneratorMain.random.nextFloat()*(segmentSize*0.1f));
+        juncWid=(MapBuilder.SEGMENT_SIZE*0.4f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.2f));
+        pipeHigh=(MapBuilder.SEGMENT_SIZE*0.2f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.2f));
+        pipeRadius=(MapBuilder.SEGMENT_SIZE*0.05f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.1f));
         
-        tubeRadius=(segmentSize*0.2f)+(GeneratorMain.random.nextFloat()*(segmentSize*0.15f));
+        tubeRadius=(MapBuilder.SEGMENT_SIZE*0.2f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.15f));
         tubeHigh=(roomHigh*0.2f)+(GeneratorMain.random.nextFloat()*(roomHigh*0.3f));
         tubeCapRadius=tubeRadius*(1.0f+(GeneratorMain.random.nextFloat()*0.15f));
         tubeTopCapHigh=(roomHigh*0.05f)+(GeneratorMain.random.nextFloat()*(roomHigh*0.1f));
         tubeBotCapHigh=(roomHigh*0.05f)+(GeneratorMain.random.nextFloat()*(roomHigh*0.1f));
 
-        floorDepth=segmentSize*0.1f;
+        floorDepth=MapBuilder.SEGMENT_SIZE*0.1f;
         
             // if enough room, make a path
             // through the equipment

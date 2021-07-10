@@ -1,4 +1,4 @@
-package com.klinksoftware.rag.map.indoor;
+package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.mesh.*;
@@ -6,17 +6,15 @@ import com.klinksoftware.rag.utility.*;
 
 public class MapAltar
 {
-    private float           segmentSize;
     private String          name;
     private MeshList        meshList;
     private MapRoom         room;
     
-    public MapAltar(MeshList meshList,MapRoom room,String name,float segmentSize)
+    public MapAltar(MeshList meshList,MapRoom room,String name)
     {
         this.meshList=meshList;
         this.room=room;
         this.name=name;
-        this.segmentSize=segmentSize;
     }
     
         //
@@ -35,12 +33,12 @@ public class MapAltar
         y=this.room.offset.y;
         
         for (n=0;n!=levelCount;n++) {
-            xMin=room.offset.x+(lx*segmentSize);
-            xMax=room.offset.x+(rx*segmentSize);
-            zMin=room.offset.z+(tz*segmentSize);
-            zMax=room.offset.z+(bz*segmentSize);
+            xMin=room.offset.x+(lx*MapBuilder.SEGMENT_SIZE);
+            xMax=room.offset.x+(rx*MapBuilder.SEGMENT_SIZE);
+            zMin=room.offset.z+(tz*MapBuilder.SEGMENT_SIZE);
+            zMax=room.offset.z+(bz*MapBuilder.SEGMENT_SIZE);
 
-            mesh2=MeshMapUtility.createCube(room,(this.name+"_altar"),"platform",xMin,xMax,y,(y+stepHigh),zMin,zMax,true,true,true,true,true,false,false,MeshMapUtility.UV_MAP,segmentSize);
+            mesh2=MeshMapUtility.createCube(room,(this.name+"_altar"),"platform",xMin,xMax,y,(y+stepHigh),zMin,zMax,true,true,true,true,true,false,false,MeshMapUtility.UV_MAP);
             
             if (mesh==null) {
                 mesh=mesh2;
@@ -94,7 +92,7 @@ public class MapAltar
         float       stepHigh;
         Mesh        mesh;
         
-        stepHigh=segmentSize*0.1f;
+        stepHigh=MapBuilder.SEGMENT_SIZE*0.1f;
         
             // rooms with 10x10 can get half or quarter versions
             

@@ -17,14 +17,11 @@ public class GeneratorRun extends SwingWorker<String,Void>
         appWindow.enableRunButton(false);
         
         switch (appWindow.getSelectedTab()) {
-            case AppWindow.UI_TAB_MAP_INDOOR:
-                GeneratorMain.runMapIndoor(appWindow.getMapIndoorText());
+            case AppWindow.UI_TAB_MAP:
+                GeneratorMain.runMap(appWindow.getMapText());
                 break;
-            case AppWindow.UI_TAB_MAP_OUTDOOR:
-            case AppWindow.UI_TAB_MAP_TRACK:
-                break;
-            case AppWindow.UI_TAB_MODEL_HUMANOID:
-                GeneratorMain.runModelHumanoid(appWindow.getHumanoidModelText());
+            case AppWindow.UI_TAB_MODEL:
+                GeneratorMain.runModel(appWindow.getModelText());
                 break;
             case AppWindow.UI_TAB_BITMAPS:
                 GeneratorMain.runBitmaps(appWindow.getBitmapText());
