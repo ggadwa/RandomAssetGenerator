@@ -259,8 +259,8 @@ public class SkeletonBuilder
                     hipHigh,waistHigh,torsoHigh,torsoTopHigh;
         RagPoint    hipPnt,waistPnt,torsoPnt,topTorsoPnt;
         
-        high=(float)((double)GeneratorMain.settings.get("height"));
-        radius=(float)((double)GeneratorMain.settings.get("radius"));
+        high=5.0f; // TODO randomize
+        radius=1.0f; // TODO randomize
         extraRadius=radius*0.5f;
         
             // random heights, as a section of
@@ -345,7 +345,7 @@ public class SkeletonBuilder
         
             // some settings
             
-        radius=(float)((double)GeneratorMain.settings.get("radius"));
+        radius=1.0f; // TODO - randomize
         limbRadius=radius*(0.15f+(GeneratorMain.random.nextFloat()*0.2f));
         armLength=(radius*1.5f)+(GeneratorMain.random.nextFloat()*radius);
         armCount=1+GeneratorMain.random.nextInt(3);
@@ -400,7 +400,7 @@ public class SkeletonBuilder
         
             // some settings
             
-        radius=(float)((double)GeneratorMain.settings.get("radius"));
+        radius=1.0f; // TODO randomize
         limbRadius=radius*(0.2f+(GeneratorMain.random.nextFloat()*0.2f));
         footRot=GeneratorMain.random.nextFloat()*15.0f;
         footLength=limbRadius+(GeneratorMain.random.nextFloat()*(limbRadius*2.0f));
@@ -432,7 +432,7 @@ public class SkeletonBuilder
         
         if (GeneratorMain.random.nextFloat()<0.7f) return;
         
-        radius=(float)((double)GeneratorMain.settings.get("radius"));
+        radius=1.0f; // TODO randomize
         limbRadius=radius*(0.1f+(GeneratorMain.random.nextFloat()*0.1f));
         whipLength=radius+(GeneratorMain.random.nextFloat()*radius);
         
@@ -449,7 +449,7 @@ public class SkeletonBuilder
         int         boneIdx;
         float       radius,headRadius;
         
-        radius=(float)((double)GeneratorMain.settings.get("radius"));
+        radius=1.0f; // TODO randomize
         headRadius=radius*(0.3f+(GeneratorMain.random.nextFloat()*0.5f));
         
         boneIdx=skeleton.findBoneIndex("Torso_Top");
@@ -471,7 +471,7 @@ public class SkeletonBuilder
             // get a hunch angle which determines
             // if we are on 2 or 4 feet
         
-        standing=(GeneratorMain.random.nextFloat()<0.7f)||((boolean)GeneratorMain.settings.get("standing"));
+        standing=(GeneratorMain.random.nextFloat()<0.7f)||(true);       // TODO - randomize
         if (!standing) {        
             hunchAng=(60.0f+(GeneratorMain.random.nextFloat()*95.0f));
         }
@@ -481,7 +481,7 @@ public class SkeletonBuilder
         
             // build the skeleton
             
-        forceBilateral=(boolean)GeneratorMain.settings.get("forceBilateral");
+        forceBilateral=true; // TODO randomize -- (boolean)GeneratorMain.settings.get("forceBilateral");
 
         buildBody(skeleton,hunchAng);
         buildLegs(skeleton,standing,((!standing)||(forceBilateral)));

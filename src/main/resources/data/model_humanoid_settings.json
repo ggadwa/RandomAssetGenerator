@@ -1,8 +1,0 @@
-{
-    "name": "test_humanoid_model",
-    "seed": 15,
-    "height":5.0,
-    "radius":1.0,
-    "standing":true,
-    "forceBilateral":false
-}

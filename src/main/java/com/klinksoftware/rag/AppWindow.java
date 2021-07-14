@@ -3,28 +3,34 @@ package com.klinksoftware.rag;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
+import java.text.*;
 import javax.swing.*;
+import javax.swing.text.*;
 
 public class AppWindow implements WindowListener
 {
-    public static final int         WINDOW_WIDTH=1000;
-    public static final int         WINDOW_HEIGHT=600;
-    public static final int         TOOLBAR_HEIGHT=38;
+    public static final int WINDOW_WIDTH=1000;
+    public static final int WINDOW_HEIGHT=600;
+    public static final int TOOLBAR_HEIGHT=38;
+    public static final int HEADER_HEIGHT=22;
+    public static final int SETTINGS_WIDTH=250;
     
-    private static final int        TOOL_BUTTON_RUN=0;
+    private static final int TOOL_BUTTON_RUN=0;
     
-    public static final int         UI_TAB_MAP=0;
-    public static final int         UI_TAB_MODEL=1;
-    public static final int         UI_TAB_BITMAPS=2;
+    public static final int UI_TYPE_MAP=0;
+    public static final int UI_TYPE_MODEL=1;
+    public static final int UI_TYPE_BITMAPS=2;
     
-    private JFrame          frame;
-    private JToolBar        toolBar;
-    private JButton         runButton;
-    private JTabbedPane     tab;
-    private JScrollPane     mapTextScroll,
-                            modelTextScroll,bitmapTextScroll;
-    private JTextArea       mapIndoorTextArea,mapOutdoorTextArea,mapTrackTextArea,
-                            modelHumanoidTextArea,bitmapTextArea;
+    private JFrame frame;
+    private JPanel settingsPanel,spacerPanel;
+    private JToolBar toolBar;
+    private JButton runButton;
+    private JLabel typeLabel,nameLabel;
+    private JTextField nameField;
+    private JComboBox typeComboBox;
+    private GradientLabel settingsLabel,logLabel;
+    private JScrollPane logScroll;
+    private JTextArea log;
     
         //
         // window events
@@ -70,29 +76,25 @@ public class AppWindow implements WindowListener
         // getters
         //
     
+    public int getSelectedType()
+    {
+        return(typeComboBox.getSelectedIndex());
+    }
+    
+    public String getName()
+    {
+        return(nameField.getText());
+    }
+    
+    public void writeLog(String str)
+    {
+        log.append(str);
+        log.append("\n");
+    }
+    
     public void enableRunButton(boolean enabled)
     {
         runButton.setEnabled(enabled);
-    }
-    
-    public int getSelectedTab()
-    {
-        return(tab.getSelectedIndex());
-    }
-    
-    public String getMapText()
-    {
-        return(mapIndoorTextArea.getText());
-    }
-    
-    public String getModelText()
-    {
-        return(modelHumanoidTextArea.getText());
-    }
-    
-    public String getBitmapText()
-    {
-        return(bitmapTextArea.getText());
     }
     
         //
@@ -133,9 +135,8 @@ public class AppWindow implements WindowListener
     
     public void start()
     {
-        URL                 iconURL;
-        Image               image;
-        GridBagConstraints  gbc;
+        URL iconURL;
+        Image image;
         
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -173,85 +174,56 @@ public class AppWindow implements WindowListener
             
         toolBar=new JToolBar();
         toolBar.setFloatable(false);
-        toolBar.setPreferredSize(new Dimension(Integer.MAX_VALUE,TOOLBAR_HEIGHT));
-        toolBar.setMinimumSize(new Dimension(Integer.MAX_VALUE,TOOLBAR_HEIGHT));
         toolBar.setMaximumSize(new Dimension(Integer.MAX_VALUE,TOOLBAR_HEIGHT));
         
         toolBar.add(Box.createHorizontalGlue());
         runButton=addToolButton("tool_run",TOOL_BUTTON_RUN,"Run");
+        frame.add(toolBar,new GridBagConstraints(0,0,3,1,1.0,0.0,GridBagConstraints.CENTER,GridBagConstraints.BOTH,new Insets(0,0,0,0),0,0));
         
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=0;
-        gbc.weightx=1.0;
-        gbc.weighty=0.0;
-        frame.add(toolBar,gbc);
-        
-            // tabs
+            // the settings
             
-        tab=new JTabbedPane();
-        tab.setFont(new Font("Arial",Font.PLAIN,18));
-        tab.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
-        tab.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
-        tab.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        settingsLabel=new GradientLabel("Settings",new Color(196,196,255),new Color(128,128,255),false);
+        frame.add(settingsLabel,new GridBagConstraints(0,1,1,1,0.4,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
         
-            // map
-            
-        mapIndoorTextArea=new JTextArea();
-        mapIndoorTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
-        mapIndoorTextArea.setText(GeneratorMain.getSettingJson("map_indoor"));
+        settingsPanel=new JPanel(new GridBagLayout());
+        settingsPanel.setBackground(Color.WHITE);
+        frame.add(settingsPanel,new GridBagConstraints(0,2,1,1,0.4,1.0,GridBagConstraints.CENTER,GridBagConstraints.BOTH,new Insets(0,0,0,0),0,0));
         
-        mapTextScroll=new JScrollPane(mapIndoorTextArea); 
-        mapTextScroll.setBorder(BorderFactory.createEmptyBorder());
-        mapTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        mapTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        mapTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
-        mapTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
-        mapTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
+        typeLabel=new JLabel("Type:");
+        typeLabel.setHorizontalAlignment(JLabel.RIGHT);
+        settingsPanel.add(typeLabel,new GridBagConstraints(0,0,1,1,0.2,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(2,2,2,2),0,0));
         
-        tab.addTab("Map",null,mapTextScroll,"Map Creation Settings");
+        typeComboBox=new JComboBox(new String[]{"Map","Model","Bitmaps"});
+        settingsPanel.add(typeComboBox,new GridBagConstraints(1,0,1,1,0.8,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(2,2,2,2),0,0));
         
-            // model json
-            
-        modelHumanoidTextArea=new JTextArea();
-        modelHumanoidTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
-        modelHumanoidTextArea.setText(GeneratorMain.getSettingJson("model_humanoid"));
+        nameLabel=new JLabel("Name:");
+        nameLabel.setHorizontalAlignment(JLabel.RIGHT);       
+        settingsPanel.add(nameLabel,new GridBagConstraints(0,1,1,1,0.2,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(2,2,2,2),0,0));
         
-        modelTextScroll=new JScrollPane(modelHumanoidTextArea); 
-        modelTextScroll.setBorder(BorderFactory.createEmptyBorder());
-        modelTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        modelTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        modelTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
-        modelTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
-        modelTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
-        
-        tab.addTab("Model",null,modelTextScroll,"Model Creation Settings");
-        
-            // generic bitmap generator
-            
-        bitmapTextArea=new JTextArea();
-        bitmapTextArea.setFont(new Font("Courier New",Font.PLAIN,14));
-        bitmapTextArea.setText(GeneratorMain.getSettingJson("bitmaps"));
-        
-        bitmapTextScroll=new JScrollPane(bitmapTextArea); 
-        bitmapTextScroll.setBorder(BorderFactory.createEmptyBorder());
-        bitmapTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        bitmapTextScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        bitmapTextScroll.setPreferredSize(new Dimension(Integer.MAX_VALUE,100));
-        bitmapTextScroll.setMinimumSize(new Dimension(Integer.MAX_VALUE,100));
-        bitmapTextScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
-            
-        tab.addTab("Bitmaps",null,bitmapTextScroll,"Generate All Bitmaps");
+        nameField=new JTextField("test");
+        settingsPanel.add(nameField,new GridBagConstraints(1,1,1,1,0.8,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(2,2,2,2),0,0));
 
-        gbc=new GridBagConstraints();
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.gridx=0;
-        gbc.gridy=1;
-        gbc.weightx=1.0;
-        gbc.weighty=1.0;
-        frame.add(tab,gbc);
+        spacerPanel=new JPanel();
+        spacerPanel.setBackground(Color.WHITE);
+        settingsPanel.add(spacerPanel,new GridBagConstraints(0,2,1,1,0.0,1.0,GridBagConstraints.CENTER,GridBagConstraints.BOTH,new Insets(0,0,0,0),0,0));
 
+            // log
+        
+        logLabel=new GradientLabel("Log",new Color(196,196,255),new Color(128,128,255),true);
+        frame.add(logLabel,new GridBagConstraints(2,1,1,1,0.6,0.0,GridBagConstraints.CENTER,GridBagConstraints.HORIZONTAL,new Insets(0,0,0,0),0,0));
+
+        log=new JTextArea();
+        log.setFont(new Font("Courier New",Font.PLAIN,14));
+        log.setText("application started\n");
+        log.setEditable(false);
+        
+        logScroll=new JScrollPane(log); 
+        logScroll.setBorder(BorderFactory.createMatteBorder(0,1,0,0,Color.BLACK));
+        logScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        logScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        frame.add(logScroll,new GridBagConstraints(2,2,1,2,0.6,1.0,GridBagConstraints.CENTER,GridBagConstraints.BOTH,new Insets(0,0,0,0),0,0));
+        
             // all the event listeners
             
         frame.addWindowListener(this);

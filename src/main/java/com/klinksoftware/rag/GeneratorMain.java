@@ -5,63 +5,29 @@ import com.klinksoftware.rag.map.*;
 import com.klinksoftware.rag.model.*;
 
 import java.io.*;
-import java.nio.file.*;
 import java.util.*;
-import com.fasterxml.jackson.core.type.*;
-import com.fasterxml.jackson.databind.*;
 
 public class GeneratorMain
 {
     public static int                   colorScheme=BitmapBase.COLOR_SCHEME_RANDOM;
-    public static Map<String,Object>    settings;
+    public static String                name,basePath;
     public static Random                random;
     
         //
-        // generic settings and setup for all build types
+        // generic setup for all build types
         //
     
-    public static String getSettingJson(String name)
+    private static String genericSetup(AppWindow appWindow,String namePrefix)
     {
-        File        jsonFile;
-        
-        try {
-            jsonFile=new File(GeneratorMain.class.getClassLoader().getResource("data/"+name+"_settings.json").getFile());
-            return(new String(Files.readAllBytes(jsonFile.toPath())));
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-            return("");
-        }
-    }
-    
-    private static String runGenericSettings(String jsonSettingsStr)
-    {
-        long                seed;
-        String              basePath,name;
-        File                file;
-        
-            // get the json settings
-            
-        try {
-            settings=(new ObjectMapper()).readValue(jsonSettingsStr,new TypeReference<Map<String,Object>>(){});
-        }
-        catch (Exception e)
-        {
-            System.out.println("unable to read settings: "+e.getMessage());
-            e.printStackTrace();
-            return(null);
-        }
+        long seed;
+        File file;
         
             // seed the random
-            // if seed == 0, then seed is set randomly
             
-        seed=(int)settings.get("seed");
-        if (seed==0) seed=Calendar.getInstance().getTimeInMillis();
+        seed=Calendar.getInstance().getTimeInMillis();
+        appWindow.writeLog("seed="+Long.toString(seed));
         
         random=new Random(seed);
-        
-        System.out.println("seed="+Long.toString(seed));
 
             // the color scheme
             
@@ -69,7 +35,7 @@ public class GeneratorMain
         
             // create the model directory
         
-        name=(String)settings.get("name");
+        name=namePrefix+"_"+appWindow.getName();
         basePath="output"+File.separator+name;
         
         file=new File(basePath+File.separator+"textures");
@@ -82,36 +48,37 @@ public class GeneratorMain
         // map
         //
     
-    public static void runMap(String jsonSettingsStr)
+    public static void runMap(AppWindow appWindow)
     {
-        String              basePath;
-        MapBuilder    mapIndoorBuilder;
+        String        basePath;
+        MapBuilder    mapBuilder;
         
-        System.out.println("starting map build");
+        appWindow.writeLog("starting map build");
         
-        basePath=runGenericSettings(jsonSettingsStr);
+        basePath=genericSetup(appWindow,"map");
         if (basePath==null) return;
         
-            // run the map indoor creation
+            // run the map builder
        
         try {
-            mapIndoorBuilder=new MapBuilder(basePath);
-            mapIndoorBuilder.build();
+            mapBuilder=new MapBuilder();
+            mapBuilder.build();
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
         
-        System.out.println("finished map build");
+        appWindow.writeLog("finished map build");
     }
     
         //
         // model
         //
     
-    public static void runModel(String jsonSettingsStr)
+    public static void runModel(AppWindow appWindow)
     {
+        /*
         String                  basePath;
         ModelBuilder    modelHumanoidBuilder;
         
@@ -123,7 +90,7 @@ public class GeneratorMain
             // run the model humanoid creation
        
         try {
-            modelHumanoidBuilder=new ModelBuilder(basePath);
+            modelHumanoidBuilder=new ModelBuilder();
             modelHumanoidBuilder.build();
         }
         catch (Exception e)
@@ -140,15 +107,16 @@ public class GeneratorMain
         }
         
         System.out.println("finished model build");
+*/
     }
     
-    public static void runBitmaps(String jsonSettingsStr)
+    public static void runBitmaps(AppWindow appWindow)
     {
         String          basePath;
         
-        System.out.println("starting bitmap build");
+        appWindow.writeLog("starting bitmap build");
         
-        basePath=runGenericSettings(jsonSettingsStr);
+        basePath=genericSetup(appWindow,"bitmap");
         if (basePath==null) return;
 
         try {
@@ -179,6 +147,6 @@ public class GeneratorMain
             e.printStackTrace();
         }
         
-        System.out.println("finished bitmap build");
+        appWindow.writeLog("finished bitmap build");
     }
 }

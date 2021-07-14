@@ -63,14 +63,14 @@ public class ModelBuilder
         
             // always use a single body bitmap
         
-        mapBitmapList=new BitmapGenerator(basePath);
+        mapBitmapList=new BitmapGenerator();
         mapBitmapList.generateBody();
         mapBitmapList.generateLimb();
         mapBitmapList.generateHead();
         
             // some settings
          
-        modelName=(String)GeneratorMain.settings.get("name");
+        modelName=GeneratorMain.name;
         
             // build the skeleton
             

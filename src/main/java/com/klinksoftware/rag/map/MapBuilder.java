@@ -14,16 +14,10 @@ public class MapBuilder
     public static final int         ROOM_RANDOM_LOCATION_DISTANCE=100;
     public static final float       SEGMENT_SIZE=10.0f;
     
-    private String                  basePath;
     private MeshList                meshList;
     private Skeleton                skeleton;
     private BitmapGenerator         mapBitmapList;
     private MapPieceList            mapPieceList;
-    
-    public MapBuilder(String basePath)
-    {
-        this.basePath=basePath;
-    }
 
         //
         // mesh building utilities
@@ -293,12 +287,12 @@ public class MapBuilder
         
             // some generator classes
         
-        mapBitmapList=new BitmapGenerator(basePath);
+        mapBitmapList=new BitmapGenerator();
         mapPieceList=new MapPieceList();
         
             // some settings
          
-        mapName=(String)GeneratorMain.settings.get("name");
+        mapName=GeneratorMain.name;
         maxRoomCount=15+GeneratorMain.random.nextInt(20);
         maxExtensionRoomCount=5+GeneratorMain.random.nextInt(10);
         storyChangePercentage=0.2f+(GeneratorMain.random.nextFloat()*0.2f);
@@ -494,7 +488,7 @@ public class MapBuilder
             // write out the model
         
         try {
-            (new Export()).export(skeleton,meshList,basePath,mapName);
+            (new Export()).export(skeleton,meshList,GeneratorMain.basePath,mapName);
         }
         catch (Exception e)
         {

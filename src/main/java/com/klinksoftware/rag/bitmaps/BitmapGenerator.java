@@ -11,12 +11,9 @@ public class BitmapGenerator
                         hasPlatformBitmap,hasPillarBitmap,hasBoxBitmap,hasComputerBitmap,
                         hasPanelBitmap,hasMonitorBitmap,hasPipeBitmap,hasLiquidBitmap,
                         hasGlassBitmap,hasAccessoryBitmap,hasBodyBitmap,hasLimbBitmap,hasHeadBitmap;
-    private String      basePath;
     
-    public BitmapGenerator(String basePath)
+    public BitmapGenerator()
     {
-        this.basePath=basePath;
-        
         hasWallBitmap=false;
         hasFloorBitmap=false;
         hasCeilingBitmap=false;
@@ -62,7 +59,7 @@ public class BitmapGenerator
                 break;
         }
 
-        bitmapBase.generate(variationMode,basePath,"wall");
+        bitmapBase.generate(variationMode,GeneratorMain.basePath,"wall");
         
         hasWallBitmap=true;
     }
@@ -105,7 +102,7 @@ public class BitmapGenerator
                 break;
         }
         
-        bitmapBase.generate(variationMode,basePath,"floor");
+        bitmapBase.generate(variationMode,GeneratorMain.basePath,"floor");
         
         hasFloorBitmap=true;
     }
@@ -136,7 +133,7 @@ public class BitmapGenerator
                 break;
         }
         
-        bitmapBase.generate(variationMode,basePath,"ceiling");
+        bitmapBase.generate(variationMode,GeneratorMain.basePath,"ceiling");
         
         hasCeilingBitmap=true;
     }
@@ -167,7 +164,7 @@ public class BitmapGenerator
                 break;
         }
         
-        bitmapBase.generate(variationMode,basePath,"platform");
+        bitmapBase.generate(variationMode,GeneratorMain.basePath,"platform");
 
         hasPlatformBitmap=true;
     }
@@ -194,7 +191,7 @@ public class BitmapGenerator
                 break;
         }
         
-        bitmapBase.generate(variationMode,basePath,"step");
+        bitmapBase.generate(variationMode,GeneratorMain.basePath,"step");
 
         hasStepBitmap=true;
     }
@@ -225,7 +222,7 @@ public class BitmapGenerator
                 break;
         }
         
-        bitmapBase.generate(variationMode,basePath,"pillar");
+        bitmapBase.generate(variationMode,GeneratorMain.basePath,"pillar");
 
         hasPillarBitmap=true;
     }
@@ -248,7 +245,7 @@ public class BitmapGenerator
                 break;
         }
         
-        bitmapBase.generate(variationMode,basePath,"box");
+        bitmapBase.generate(variationMode,GeneratorMain.basePath,"box");
 
         hasBoxBitmap=true;
     }
@@ -257,7 +254,7 @@ public class BitmapGenerator
     {
         if (hasComputerBitmap) return;
         
-        (new BitmapComputer()).generate(BitmapComputer.VARIATION_COMPUTER_BANK,basePath,"computer");
+        (new BitmapComputer()).generate(BitmapComputer.VARIATION_COMPUTER_BANK,GeneratorMain.basePath,"computer");
         
         hasComputerBitmap=true;
     }
@@ -266,7 +263,7 @@ public class BitmapGenerator
     {
         if (hasPanelBitmap) return;
         
-        (new BitmapComputer()).generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"panel");
+        (new BitmapComputer()).generate(BitmapComputer.VARIATION_CONTROL_PANEL,GeneratorMain.basePath,"panel");
         
         hasPanelBitmap=true;
     }
@@ -275,7 +272,7 @@ public class BitmapGenerator
     {
         if (hasMonitorBitmap) return;
         
-        (new BitmapComputer()).generate(BitmapComputer.VARIATION_MONITOR,basePath,"monitor");
+        (new BitmapComputer()).generate(BitmapComputer.VARIATION_MONITOR,GeneratorMain.basePath,"monitor");
         
         hasMonitorBitmap=true;
     }
@@ -284,7 +281,7 @@ public class BitmapGenerator
     {
         if (hasPipeBitmap) return;
         
-        (new BitmapMetal()).generate(BitmapMetal.VARIATION_PIPE,basePath,"pipe");
+        (new BitmapMetal()).generate(BitmapMetal.VARIATION_PIPE,GeneratorMain.basePath,"pipe");
         
         hasPipeBitmap=true;
     }
@@ -293,7 +290,7 @@ public class BitmapGenerator
     {
         if (hasLiquidBitmap) return;
         
-        (new BitmapLiquid()).generate(BitmapLiquid.VARIATION_NONE,basePath,"liquid");
+        (new BitmapLiquid()).generate(BitmapLiquid.VARIATION_NONE,GeneratorMain.basePath,"liquid");
         
         hasLiquidBitmap=true;
     }
@@ -302,7 +299,7 @@ public class BitmapGenerator
     {
         if (hasGlassBitmap) return;
         
-        (new BitmapGlass()).generate(BitmapGlass.VARIATION_NONE,basePath,"glass");
+        (new BitmapGlass()).generate(BitmapGlass.VARIATION_NONE,GeneratorMain.basePath,"glass");
         
         hasGlassBitmap=true;
     }
@@ -311,7 +308,7 @@ public class BitmapGenerator
     {
         if (hasAccessoryBitmap) return;
         
-        (new BitmapMetal()).generate(BitmapMetal.VARIATION_SHEET,basePath,"accessory");
+        (new BitmapMetal()).generate(BitmapMetal.VARIATION_SHEET,GeneratorMain.basePath,"accessory");
         
         hasAccessoryBitmap=true;
     }
@@ -320,7 +317,7 @@ public class BitmapGenerator
     {
         if (hasBodyBitmap) return;
         
-        (new BitmapSkin()).generate(BitmapSkin.VARIATION_BODY,basePath,"body");
+        (new BitmapSkin()).generate(BitmapSkin.VARIATION_BODY,GeneratorMain.basePath,"body");
         
         hasBodyBitmap=true;
     }
@@ -329,7 +326,7 @@ public class BitmapGenerator
     {
         if (hasLimbBitmap) return;
         
-        (new BitmapSkin()).generate(BitmapSkin.VARIATION_LIMB,basePath,"limb");
+        (new BitmapSkin()).generate(BitmapSkin.VARIATION_LIMB,GeneratorMain.basePath,"limb");
         
         hasLimbBitmap=true;
     }
@@ -338,7 +335,7 @@ public class BitmapGenerator
     {
         if (hasHeadBitmap) return;
         
-        (new BitmapSkin()).generate(BitmapSkin.VARIATION_HEAD,basePath,"head");
+        (new BitmapSkin()).generate(BitmapSkin.VARIATION_HEAD,GeneratorMain.basePath,"head");
         
         hasHeadBitmap=true;
     }
