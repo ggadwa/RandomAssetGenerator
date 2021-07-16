@@ -1,9 +1,15 @@
 
 
+- get rid of margins, use a grid mask
+- build floors based on grid mask
+
+- build multiple overlapping stories
+- knock out floor that overlap
+- figure out stairs later
 
 
-- add pieces:
-    room square X, room diagonal X
+
+
 - add bitmap
     geometric art (from test canvas)
 

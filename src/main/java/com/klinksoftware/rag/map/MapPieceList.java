@@ -21,7 +21,7 @@ public class MapPieceList
             // at data/pieces.json
             
         try {
-            jsonFile=new File(getClass().getClassLoader().getResource("data/pieces_indoor.json").getFile());
+            jsonFile=new File(getClass().getClassLoader().getResource("data/pieces.json").getFile());
             jsonStr=new String(Files.readAllBytes(jsonFile.toPath()));
 
             pieces=(new ObjectMapper()).readValue(jsonStr,new TypeReference<List<MapPiece>>(){});
@@ -97,6 +97,7 @@ public class MapPieceList
         int                 idx;
         
         idx=GeneratorMain.random.nextInt(this.pieces.size());
+        //idx=21;   // testing new pieces
         return(this.dupTransformPiece(this.pieces.get(idx),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean()));
     }
 
