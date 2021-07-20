@@ -49,9 +49,9 @@ public class MapPieceList
             // and flip
         
         if (rotate) {
-            k=piece.size.x;
-            piece.size.x=piece.size.z;
-            piece.size.z=k;
+            k=piece.sizeX;
+            piece.sizeX=piece.sizeZ;
+            piece.sizeZ=k;
             
             k=piece.margins[0];
             piece.margins[0]=piece.margins[2];
@@ -68,8 +68,8 @@ public class MapPieceList
                 piece.vertexes[n][0]=piece.vertexes[n][1];
                 piece.vertexes[n][1]=f;
             }
-            if (flipX) piece.vertexes[n][0]=piece.size.x-piece.vertexes[n][0];
-            if (flipZ) piece.vertexes[n][1]=piece.size.z-piece.vertexes[n][1];
+            if (flipX) piece.vertexes[n][0]=piece.sizeX-piece.vertexes[n][0];
+            if (flipZ) piece.vertexes[n][1]=piece.sizeZ-piece.vertexes[n][1];
         }
         
         if (flipX) {
@@ -87,18 +87,14 @@ public class MapPieceList
         return(piece);
     }
     
-    public MapPiece getDefaultPiece()
-    {
-        return(this.pieces.get(0));
-    }
-
     public MapPiece getRandomPiece()
     {
         int                 idx;
         
         idx=GeneratorMain.random.nextInt(this.pieces.size());
-        //idx=21;   // testing new pieces
-        return(this.dupTransformPiece(this.pieces.get(idx),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean()));
+        //idx=26;   // testing new pieces
+        return(this.dupTransformPiece(this.pieces.get(idx),false,false,false));
+        //return(this.dupTransformPiece(this.pieces.get(idx),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean()));
     }
 
 }

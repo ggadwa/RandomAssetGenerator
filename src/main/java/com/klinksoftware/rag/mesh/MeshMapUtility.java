@@ -272,22 +272,42 @@ public class MeshMapUtility
         // room pieces
         //
    
-    public static Mesh buildRoomFloorCeiling(MapRoom room,RagPoint centerPnt,String name,String bitmapName,float y)
+    public static Mesh buildRoomFloorCeiling(MapRoom room,RagPoint centerPnt,String name,String bitmapName,boolean floor)
     {
+        int                 x,z,trigIdx;
+        float               px,py,pz;
         ArrayList<Float>    vertexArray;
         ArrayList<Integer>  indexArray;
-        int[]               indexes;
+        int[]               indexes,grid;
         float[]             vertexes,normals,uvs;
+        MapPiece            piece;
+        
+        piece=room.piece;
+        
+        py=room.story*(MapBuilder.SEGMENT_SIZE+MapBuilder.STORY_SPACER_HEIGHT+MapBuilder.FLOOR_HEIGHT);
+        if (!floor) py+=(MapBuilder.SEGMENT_SIZE+MapBuilder.STORY_SPACER_HEIGHT);
+        
+        grid=floor?room.floorGrid:room.ceilingGrid;
         
         vertexArray=new ArrayList<>();
         indexArray=new ArrayList<>();
         
-        vertexArray.addAll(Arrays.asList(room.offset.x,y,room.offset.z));
-        vertexArray.addAll(Arrays.asList((room.offset.x+room.size.x),y,room.offset.z));
-        vertexArray.addAll(Arrays.asList((room.offset.x+room.size.x),y,(room.offset.z+room.size.z)));
-        vertexArray.addAll(Arrays.asList(room.offset.x,y,(room.offset.z+room.size.z)));
-
-        addQuadToIndexes(indexArray,0);
+        trigIdx=0;
+        
+        for (z=0;z!=piece.sizeZ;z++) {
+            pz=room.z+(z*MapBuilder.SEGMENT_SIZE);
+            for (x=0;x!=piece.sizeX;x++) {
+                if (grid[(z*piece.sizeX)+x]==0) continue;
+                
+                px=room.x+(x*MapBuilder.SEGMENT_SIZE);
+                vertexArray.addAll(Arrays.asList(px,py,pz));
+                vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,pz));
+                vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,(pz+MapBuilder.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(px,py,(pz+MapBuilder.SEGMENT_SIZE)));
+                
+                trigIdx=addQuadToIndexes(indexArray,trigIdx);
+            }
+        }
         
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
@@ -299,8 +319,8 @@ public class MeshMapUtility
        
     public static Mesh buildRoomWalls(MapRoom room,RagPoint centerPnt,String name)
     {
-        int                 n,k,k2,vertexCount,trigIdx;
-        float               y;
+        int                 k,k2,vertexCount,trigIdx;
+        float               y,y2;
         ArrayList<Float>    vertexArray;
         ArrayList<Integer>  indexArray;
         int[]               indexes;
@@ -316,25 +336,28 @@ public class MeshMapUtility
         indexArray=new ArrayList<>();
 
         trigIdx=0;
-        y=room.offset.y;
+        y=room.story*(MapBuilder.SEGMENT_SIZE+MapBuilder.STORY_SPACER_HEIGHT+MapBuilder.FLOOR_HEIGHT);
+        y2=y+MapBuilder.SEGMENT_SIZE;
         
-        for (n=0;n!=room.storyCount;n++) {
-            
-            for (k=0;k!=vertexCount;k++) {
-                if (room.isWallHidden(n,k)) continue;
-                
-                k2=k+1;
-                if (k2==vertexCount) k2=0;
-                
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.offset.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.offset.z)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.offset.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.offset.z)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.offset.x),y,((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.offset.z)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.offset.x),y,((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.offset.z)));
+        for (k=0;k!=vertexCount;k++) {
+
+            k2=k+1;
+            if (k2==vertexCount) k2=0;
+
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y2+MapBuilder.STORY_SPACER_HEIGHT),((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y2+MapBuilder.STORY_SPACER_HEIGHT),((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),y2,((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),y2,((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+            trigIdx=addQuadToIndexes(indexArray,trigIdx);
+
+            if (!room.isWallHidden(k)) {
+                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),y,((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),y,((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
 
                 trigIdx=addQuadToIndexes(indexArray,trigIdx);
             }
-
-            y+=MapBuilder.SEGMENT_SIZE;
         }
 
         vertexes=floatArrayListToFloat(vertexArray);
@@ -351,6 +374,7 @@ public class MeshMapUtility
      
     public static void buildStairs(MeshList meshList,MapRoom room,String name,float x,float y,float z,int dir,float stepWidth,boolean sides)
     {
+        /*
         int                 n,trigIdx;
         float               sx,sx2,sy,sz,sz2,
                             stepSize,stepHigh;
@@ -503,6 +527,7 @@ public class MeshMapUtility
         uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
         
         meshList.add(new Mesh(name,"step",vertexes,normals,uvs,indexes));
+*/
     }
     
         //

@@ -6,35 +6,40 @@ import java.util.ArrayList;
 
 public class MapRoom
 {
-    public static final int     MAX_STORIES=5;
-    
-    public int                  storyCount;
+    public int                  story;
+    public float                x,z,sizeX,sizeZ;
     public byte[]               vertexHideArray;
-    public int[]                grid;
+    public int[]                grid,floorGrid,ceilingGrid;
     public MapPiece             piece;
-    public RagPoint             offset,size;
     public ArrayList<MapRoom>   requiredStairs;
     
     public MapRoom(MapPiece piece)
     {
         this.piece=piece;
 
-        this.storyCount=this.piece.storyMinimum+GeneratorMain.random.nextInt(MAX_STORIES-this.piece.storyMinimum);
+        this.story=0;
         
-        this.offset=new RagPoint(0.0f,0.0f,0.0f);
-        this.size=new RagPoint((MapBuilder.SEGMENT_SIZE*piece.size.x),(MapBuilder.SEGMENT_SIZE*this.storyCount),(MapBuilder.SEGMENT_SIZE*piece.size.z));
+        this.x=0.0f;
+        this.z=0.0f;
+        this.sizeX=MapBuilder.SEGMENT_SIZE*piece.sizeX;
+        this.sizeZ=MapBuilder.SEGMENT_SIZE*piece.sizeZ;
+        
+            // need a copy of floor grid
+            
+        floorGrid=piece.floorGrid.clone();
+        ceilingGrid=piece.floorGrid.clone();
 
             // flags for staircases
             
         requiredStairs=new ArrayList<>();
 
-            // vertex hiding array, had 3 possible stories
+            // vertex hiding array
             
-        vertexHideArray=new byte[piece.vertexes.length*MAX_STORIES];
+        vertexHideArray=new byte[piece.vertexes.length];
         
             // grids for blocking off floor/stories/etc
             
-        grid=new int[(piece.size.x*piece.size.z)*MAX_STORIES];
+        grid=new int[piece.sizeX*piece.sizeZ];
     }
     
         //
@@ -48,11 +53,12 @@ public class MapRoom
         
         for (n=0;n!=rooms.size();n++) {
             checkRoom=rooms.get(n);
+            if (checkRoom.story!=story) continue;
             
-            if (offset.x>=(checkRoom.offset.x+checkRoom.size.x)) continue;
-            if ((offset.x+size.x)<=checkRoom.offset.x) continue;
-            if (offset.z>=(checkRoom.offset.z+checkRoom.size.z)) continue;
-            if ((offset.z+size.z)<=checkRoom.offset.z) continue;
+            if (x>=(checkRoom.x+checkRoom.sizeX)) continue;
+            if ((x+sizeX)<=checkRoom.x) continue;
+            if (z>=(checkRoom.z+checkRoom.sizeZ)) continue;
+            if ((z+sizeZ)<=checkRoom.z) continue;
             
             return(true);
         }
@@ -67,16 +73,17 @@ public class MapRoom
         
         for (n=0;n!=rooms.size();n++) {
             checkRoom=rooms.get(n);
+            if (checkRoom.story!=story) continue;
             
-            if ((offset.x==(checkRoom.offset.x+checkRoom.size.x)) || ((offset.x+size.x)==checkRoom.offset.x)) {
-                if (offset.z>=(checkRoom.offset.z+checkRoom.size.z)) continue;
-                if ((offset.z+size.z)<=checkRoom.offset.z) continue;
+            if ((x==(checkRoom.x+checkRoom.sizeX)) || ((x+sizeX)==checkRoom.x)) {
+                if (z>=(checkRoom.z+checkRoom.sizeZ)) continue;
+                if ((z+sizeZ)<=checkRoom.z) continue;
                 return(n);
             }
             
-            if ((offset.z==(checkRoom.offset.z+checkRoom.size.z)) || ((offset.z+size.z)==checkRoom.offset.z)) {
-                if (offset.x>=(checkRoom.offset.x+checkRoom.size.x)) continue;
-                if ((offset.x+size.x)<=checkRoom.offset.x) continue;
+            if ((z==(checkRoom.z+checkRoom.sizeZ)) || ((z+sizeZ)==checkRoom.z)) {
+                if (x>=(checkRoom.x+checkRoom.sizeX)) continue;
+                if ((x+sizeX)<=checkRoom.x) continue;
                 return(n);
             }
         }
@@ -105,11 +112,11 @@ public class MapRoom
             nextIdx=vIdx+1;
             if (nextIdx==vertexCount) nextIdx=0;
 
-            ax=(piece.vertexes[vIdx][0]*MapBuilder.SEGMENT_SIZE)+offset.x;
-            az=(piece.vertexes[vIdx][1]*MapBuilder.SEGMENT_SIZE)+offset.z;
+            ax=(piece.vertexes[vIdx][0]*MapBuilder.SEGMENT_SIZE)+x;
+            az=(piece.vertexes[vIdx][1]*MapBuilder.SEGMENT_SIZE)+z;
 
-            ax2=(piece.vertexes[nextIdx][0]*MapBuilder.SEGMENT_SIZE)+offset.x;
-            az2=(piece.vertexes[nextIdx][1]*MapBuilder.SEGMENT_SIZE)+offset.z;
+            ax2=(piece.vertexes[nextIdx][0]*MapBuilder.SEGMENT_SIZE)+x;
+            az2=(piece.vertexes[nextIdx][1]*MapBuilder.SEGMENT_SIZE)+z;
 
             vIdx2=0;
 
@@ -117,11 +124,11 @@ public class MapRoom
                 nextIdx2=vIdx2+1;
                 if (nextIdx2==vertexCount2) nextIdx2=0;
 
-                bx=(checkRoom.piece.vertexes[vIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.offset.x;
-                bz=(checkRoom.piece.vertexes[vIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.offset.z;
+                bx=(checkRoom.piece.vertexes[vIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.x;
+                bz=(checkRoom.piece.vertexes[vIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.z;
 
-                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.offset.x;
-                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.offset.z;
+                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.x;
+                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.z;
 
                 if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) return(true);
 
@@ -155,11 +162,11 @@ public class MapRoom
             nextIdx=vIdx+1;
             if (nextIdx==vertexCount) nextIdx=0;
 
-            ax=(piece.vertexes[vIdx][0]*MapBuilder.SEGMENT_SIZE)+offset.x;
-            az=(piece.vertexes[vIdx][1]*MapBuilder.SEGMENT_SIZE)+offset.z;
+            ax=(piece.vertexes[vIdx][0]*MapBuilder.SEGMENT_SIZE)+x;
+            az=(piece.vertexes[vIdx][1]*MapBuilder.SEGMENT_SIZE)+z;
 
-            ax2=(piece.vertexes[nextIdx][0]*MapBuilder.SEGMENT_SIZE)+offset.x;
-            az2=(piece.vertexes[nextIdx][1]*MapBuilder.SEGMENT_SIZE)+offset.z;
+            ax2=(piece.vertexes[nextIdx][0]*MapBuilder.SEGMENT_SIZE)+x;
+            az2=(piece.vertexes[nextIdx][1]*MapBuilder.SEGMENT_SIZE)+z;
 
             vIdx2=0;
 
@@ -167,11 +174,11 @@ public class MapRoom
                 nextIdx2=vIdx2+1;
                 if (nextIdx2==vertexCount2) nextIdx2=0;
 
-                bx=(checkRoom.piece.vertexes[vIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.offset.x;
-                bz=(checkRoom.piece.vertexes[vIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.offset.z;
+                bx=(checkRoom.piece.vertexes[vIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.x;
+                bz=(checkRoom.piece.vertexes[vIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.z;
 
-                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.offset.x;
-                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.offset.z;
+                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.x;
+                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.z;
 
                 if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) {
                     if (xRun) {
@@ -207,37 +214,28 @@ public class MapRoom
         // vertexes
         //
     
-    public void hideVertex(int story,int vIdx)
+    public void hideVertex(int vIdx)
     {
-        vertexHideArray[(story*piece.vertexes.length)+vIdx]=0x1;
+        vertexHideArray[vIdx]=0x1;
     }
     
-    public boolean isWallHidden(int story,int vIdx)
+    public boolean isWallHidden(int vIdx)
     {
-        return(vertexHideArray[(story*piece.vertexes.length)+vIdx]==0x1);
+        return(vertexHideArray[vIdx]==0x1);
     }
     
         //
         // grids (for marking off areas used by things)
         //
     
-    public void setGrid(int story,int x,int z,int flag)
+    public void setGrid(int x,int z,int flag)
     {
-        grid[((piece.size.x*piece.size.z)*story)+(z*piece.size.z)+x]=flag;
+        grid[(piece.sizeX*piece.sizeZ)+(z*piece.sizeZ)+x]=flag;
     }
     
-    public void setGridAllStories(int x,int z,int flag)
+    public int getGrid(int x,int z)
     {
-        int     n;
-        
-        for (n=0;n!=(storyCount+1);n++) {
-            setGrid(n,x,z,flag);
-        }
-    }
-    
-    public int getGrid(int story,int x,int z)
-    {
-        return(grid[((piece.size.x*piece.size.z)*story)+(z*piece.size.z)+x]);
+        return(grid[(piece.sizeX*piece.sizeZ)+(z*piece.sizeZ)+x]);
     }
 
 }

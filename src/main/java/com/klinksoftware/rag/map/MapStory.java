@@ -34,6 +34,7 @@ public class MapStory
     
     public void addStairs(int x,int z,int dir,int storyIdx)
     {
+        /*
         float           y,floorHigh;
         
         floorHigh=MapBuilder.SEGMENT_SIZE*0.1f;
@@ -64,6 +65,7 @@ public class MapStory
         }
         
         MeshMapUtility.buildStairs(meshList,room,name,(room.offset.x+((float)x*MapBuilder.SEGMENT_SIZE)),y,(room.offset.z+((float)z*MapBuilder.SEGMENT_SIZE)),dir,1.0f,true);
+*/
     }
     
         //
@@ -72,6 +74,7 @@ public class MapStory
        
     private boolean hasNegXWall(int storyIdx,int x,int z)
     {
+        /*
         int     flag,flag2;
         
         if (x==0) return(true);
@@ -82,11 +85,13 @@ public class MapStory
         if ((flag2==FLAG_NONE) || (flag2==FLAG_STEPS)) return(true);
         if (flag==flag2) return(false);           // if both the same type of wall, eliminate
         if ((flag==FLAG_PLATFORM) && (flag2==FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
+*/
         return(true);
     }
     
     private boolean hasPosXWall(int storyIdx,int x,int z)
     {
+        /*
         int     flag,flag2;
         
         if (x==(this.room.piece.size.x-1)) return(true);
@@ -97,11 +102,13 @@ public class MapStory
         if ((flag2==FLAG_NONE) || (flag2==FLAG_STEPS)) return(true);
         if (flag==flag2) return(false);           // if both the same type of wall, eliminate
         if ((flag==FLAG_PLATFORM) && (flag2==FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
+*/
         return(true);
     }
     
     private boolean hasNegZWall(int storyIdx,int x,int z)
     {
+        /*
         int     flag,flag2;
         
         if (z==0) return(true);
@@ -112,11 +119,13 @@ public class MapStory
         if ((flag2==FLAG_NONE) || (flag2==FLAG_STEPS)) return(true);
         if (flag==flag2) return(false);           // if both the same type of wall, eliminate
         if ((flag==FLAG_PLATFORM) && (flag2==FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
+*/
         return(true);
     }
     
     private boolean hasPosZWall(int storyIdx,int x,int z)
     {
+        /*
         int     flag,flag2;
         
         if (z==(this.room.piece.size.z-1)) return(true);
@@ -127,11 +136,13 @@ public class MapStory
         if ((flag2==FLAG_NONE) || (flag2==FLAG_STEPS)) return(true);
         if (flag==flag2) return(false);           // if both the same type of wall, eliminate
         if ((flag==FLAG_PLATFORM) && (flag2==FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
+*/
         return(true);
     }
     
     private void setupRandomPlatforms(int startX,int startZ,int storyIdx)
     {
+        /*
         int         x,z,gx,gz,sx,sz,
                     dir,orgDir;
         boolean     wallStop;
@@ -218,10 +229,12 @@ public class MapStory
                 }
             }
         }
+*/
     }
     
     private void addPlatforms(int storyIdx)
     {
+        /*
         int                 x,z,trigIdx,flag;
         float               ty,by,negX,posX,negZ,posZ,floorHigh;
         boolean             skipBottom;
@@ -308,6 +321,7 @@ public class MapStory
         uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
 
         meshList.add(new Mesh(name,"platform",vertexes,normals,uvs,indexes));
+*/
     }
 
         //
@@ -316,6 +330,7 @@ public class MapStory
         
     public void build()
     {
+        /*
         int         n,x,z,dir;
         
         
@@ -357,6 +372,6 @@ public class MapStory
             setupRandomPlatforms(x,z,1);
             addPlatforms(1);
         //}
-
+*/
     }
 }

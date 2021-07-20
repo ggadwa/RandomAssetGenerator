@@ -23,12 +23,14 @@ public class MapEquipment
         
     private void addPedestal(MapRoom room,int gx,int gz,float floorDepth)
     {
+        /*
         float       x,z;
         
         x=room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE);
         z=room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE);
             
         meshList.add(MeshMapUtility.createCube(room,(name+"_pedestal"),"accessory",x,(x+MapBuilder.SEGMENT_SIZE),room.offset.y,(room.offset.y+floorDepth),z,(z+MapBuilder.SEGMENT_SIZE),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP));
+    */
     }
         
         //
@@ -37,6 +39,7 @@ public class MapEquipment
         
     private void addBank(MapRoom room,int gx,int gz,float wid,float high,float floorDepth,int pieceCount)
     {
+        /*
         float       x,y,z,widOffset;
         
             // bank platform
@@ -52,6 +55,7 @@ public class MapEquipment
         z=(room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE))+widOffset;
 
         meshList.add(MeshMapUtility.createCube(room,(name+"_computer_"+pieceCount),"computer",x,(x+wid),y,(y+high),z,(z+wid),true,true,true,true,true,false,false,MeshMapUtility.UV_BOX));
+*/
     }
    
         //
@@ -60,6 +64,7 @@ public class MapEquipment
         
     public void addTerminal(MapRoom room,int gx,int gz,float wid,float high,int pieceCount)
     {
+        /*
         float       x,y,z,widOffset,
                     deskHalfWid,deskShortHalfWid,
                     standWid,standHalfWid,standHigh;
@@ -97,6 +102,7 @@ public class MapEquipment
         y+=standHigh;
         
         meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_monitor_"+pieceCount),"monitor",x,(x+wid),y,(y+high),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX));
+    */
     }
     
         //
@@ -105,6 +111,7 @@ public class MapEquipment
        
     public void addJunction(MapRoom room,int gx,int gz,float juncWid,float pipeHigh,float pipeRadius,int pieceCount)
     {
+        /*
         boolean         upperPipe,lowerPipe;
         float           x,y,z,juncHalfWid;
         RagPoint        rotAngle,centerPnt;
@@ -143,6 +150,7 @@ public class MapEquipment
         }
         
         meshList.add(mesh);
+*/
     }
     
         //
@@ -151,6 +159,7 @@ public class MapEquipment
 
     private void addTubeInternal(RagPoint centerPnt,String tubeName,float tubeRadius,float tubeHigh,float tubeCapRadius,float tubeTopCapHigh,float tubeBotCapHigh)
     {
+        /*
         float       yBotCapBy,yBotCapTy,yTopCapBy,yTopCapTy,y;
         Mesh        mesh,mesh2;
         
@@ -188,10 +197,12 @@ public class MapEquipment
         
         y=yBotCapTy+(GeneratorMain.random.nextFloat()*(yTopCapBy-yBotCapTy));    
         meshList.add(MeshMapUtility.createMeshCylinderSimple(room,(name+"_liquid"),"liquid",centerPnt,y,yBotCapTy,(tubeRadius*0.98f),true,false));
+*/
     }
     
     public void addTube(MapRoom room,int gx,int gz,float tubeRadius,float tubeHigh,float tubeCapRadius,float tubeTopCapHigh,float tubeBotCapHigh,int pieceCount)
     {
+        /*
         float           x,z,radius;
         RagPoint        centerPnt;
         
@@ -201,6 +212,7 @@ public class MapEquipment
         centerPnt=new RagPoint(x,room.offset.y,z);
         
         addTubeInternal(centerPnt,(name+"_tube_"+pieceCount),tubeRadius,tubeHigh,tubeCapRadius,tubeTopCapHigh,tubeBotCapHigh);
+*/
     }
    
         //
@@ -209,6 +221,7 @@ public class MapEquipment
     
     public void build()
     {
+        /*
         int     x,z,lx,rx,tz,bz,skipX,skipZ,
                 pieceType,pieceCount;
         float   bankWid,bankHigh,
@@ -302,6 +315,7 @@ public class MapEquipment
                 this.room.setGrid(0,x,z,1);
             }
         }
+*/
     }
 
 }

@@ -13,6 +13,8 @@ public class MapBuilder
 {
     public static final int         ROOM_RANDOM_LOCATION_DISTANCE=100;
     public static final float       SEGMENT_SIZE=10.0f;
+    public static final float       STORY_SPACER_HEIGHT=2.0f;
+    public static final float       FLOOR_HEIGHT=1.0f;
     
     private MeshList                meshList;
     private Skeleton                skeleton;
@@ -51,11 +53,11 @@ public class MapBuilder
                     nextIdx=vIdx+1;
                     if (nextIdx==vertexCount) nextIdx=0;
                                         
-                    ax=(room.piece.vertexes[vIdx][0]*SEGMENT_SIZE)+room.offset.x;
-                    az=(room.piece.vertexes[vIdx][1]*SEGMENT_SIZE)+room.offset.z;
+                    ax=(room.piece.vertexes[vIdx][0]*SEGMENT_SIZE)+room.x;
+                    az=(room.piece.vertexes[vIdx][1]*SEGMENT_SIZE)+room.z;
                     
-                    ax2=(room.piece.vertexes[nextIdx][0]*SEGMENT_SIZE)+room.offset.x;
-                    az2=(room.piece.vertexes[nextIdx][1]*SEGMENT_SIZE)+room.offset.z;
+                    ax2=(room.piece.vertexes[nextIdx][0]*SEGMENT_SIZE)+room.x;
+                    az2=(room.piece.vertexes[nextIdx][1]*SEGMENT_SIZE)+room.z;
                     
                     vIdx2=0;
                     
@@ -63,28 +65,19 @@ public class MapBuilder
                         nextIdx2=vIdx2+1;
                         if (nextIdx2==vertexCount2) nextIdx2=0;
                         
-                        bx=(room2.piece.vertexes[vIdx2][0]*SEGMENT_SIZE)+room2.offset.x;
-                        bz=(room2.piece.vertexes[vIdx2][1]*SEGMENT_SIZE)+room2.offset.z;
+                        bx=(room2.piece.vertexes[vIdx2][0]*SEGMENT_SIZE)+room2.x;
+                        bz=(room2.piece.vertexes[vIdx2][1]*SEGMENT_SIZE)+room2.z;
 
-                        bx2=(room2.piece.vertexes[nextIdx2][0]*SEGMENT_SIZE)+room2.offset.x;
-                        bz2=(room2.piece.vertexes[nextIdx2][1]*SEGMENT_SIZE)+room2.offset.z;
+                        bx2=(room2.piece.vertexes[nextIdx2][0]*SEGMENT_SIZE)+room2.x;
+                        bz2=(room2.piece.vertexes[nextIdx2][1]*SEGMENT_SIZE)+room2.z;
                         
                         if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) {
                             
-                                // only blank out walls that are within the
-                                // bounds of the other rooms y size
+                                // only blank out walls that are at the same story
                                 
-                            for (t=0;t!=room.storyCount;t++) {
-                                y=room.offset.y+(t*SEGMENT_SIZE);
-                                if ((y>=(room2.offset.y+(room2.storyCount*SEGMENT_SIZE))) || ((y+SEGMENT_SIZE)<=room2.offset.y)) continue;
-                                
-                                room.hideVertex(t,vIdx);
-                            }
-                            for (t=0;t!=room2.storyCount;t++) {
-                                y=room2.offset.y+(t*SEGMENT_SIZE);
-                                if ((y>=(room.offset.y+(room.storyCount*SEGMENT_SIZE))) || ((y+SEGMENT_SIZE)<=room.offset.y)) continue;
-                                
-                                room2.hideVertex(t,vIdx2);
+                            if (room.story==room2.story) {
+                                room.hideVertex(vIdx);
+                                room2.hideVertex(vIdx2);
                             }
                         }
                         
@@ -103,6 +96,7 @@ public class MapBuilder
    
     private void buildDecoration(MapRoom room,int roomIdx)
     {
+        /*
         int         decorationType;
         
             // some decorations can't work in some rooms
@@ -162,6 +156,7 @@ public class MapBuilder
                 (new MapAltar(meshList,room,("alter_"+Integer.toString(roomIdx)))).build();
                 break;
         }
+*/
     }
 
         //
@@ -170,6 +165,7 @@ public class MapBuilder
         
     private void buildSteps(MapRoom room,String name,MapRoom toRoom)
     {
+        /*
         int                 x,z,noSkipX,noSkipZ,min,max;
         boolean             doAll;
         RagBound            touchRange;
@@ -183,7 +179,7 @@ public class MapBuilder
             
         mapStory=new MapStory(meshList,room,name);
         
-        if (room.offset.z==(toRoom.offset.z+toRoom.size.z)) {
+        if (room.z==(toRoom.z+toRoom.size.z)) {
             touchRange=room.getTouchWallRange(toRoom,true);
             min=(int)touchRange.min;
             max=(int)touchRange.max;
@@ -198,7 +194,7 @@ public class MapBuilder
             }
             return;
         }
-        if ((room.offset.z+room.size.z)==toRoom.offset.z) {
+        if ((room.z+room.size.z)==toRoom.z) {
             touchRange=room.getTouchWallRange(toRoom,true);
             min=(int)touchRange.min;
             max=(int)touchRange.max;
@@ -213,7 +209,7 @@ public class MapBuilder
             }
             return;
         }
-        if (room.offset.x==(toRoom.offset.x+toRoom.size.x)) {
+        if (room.x==(toRoom.x+toRoom.size.x)) {
             touchRange=room.getTouchWallRange(toRoom,false);
             min=(int)touchRange.min;
             max=(int)touchRange.max;
@@ -228,7 +224,7 @@ public class MapBuilder
             }
             return;
         }
-        if ((room.offset.x+room.size.x)==toRoom.offset.x) {
+        if ((room.x+room.size.x)==toRoom.x) {
             touchRange=room.getTouchWallRange(toRoom,false);
             min=(int)touchRange.min;
             max=(int)touchRange.max;
@@ -243,71 +239,32 @@ public class MapBuilder
             }
             return;
         }
+*/
     }
 
         //
-        // add additional room
+        // build a single story of a room
         //
     
-    private void addAdditionalRoom(ArrayList<MapRoom> rooms,MapRoom room,MapRoom touchRoom,float storyChangePercentage)
+    private void addStory(ArrayList<MapRoom> rooms,int story)
     {
-            // start at same height
+        int         n,maxRoomCount,maxExtensionRoomCount,
+                    roomCount,placeCount,moveCount,failCount,
+                    touchIdx;
+        float       origX,origZ,xAdd,zAdd;
+        MapRoom     room,connectRoom;
+        
+            // number of rooms on this story
             
-        room.offset.y=touchRoom.offset.y;
-        
-            // can we change height?
-            
-        if ((room.offset.y==0) && (touchRoom.piece.decorate) && (touchRoom.storyCount>1)) {
-            if (GeneratorMain.random.nextFloat()<storyChangePercentage) {
-                room.offset.y+=SEGMENT_SIZE;
-                touchRoom.requiredStairs.add(room);
-            }
-        }
-                            
-            // add the room
-                            
-        rooms.add(room);
-    }  
-
-        //
-        // build a map
-        //
-        
-    public void build()
-    {
-        int                 n,k,roomCount,maxRoomCount,maxExtensionRoomCount,
-                            touchIdx,failCount,placeCount,moveCount;
-        float               storyChangePercentage,
-                            roomTopY,origX,origZ,xAdd,zAdd;
-        boolean             ceilings,decorations;
-        String              mapName;
-        RagPoint            centerPnt;
-        MapRoom             room,connectRoom;
-        ArrayList<MapRoom>  rooms;
-        
-            // some generator classes
-        
-        mapBitmapList=new BitmapGenerator();
-        mapPieceList=new MapPieceList();
-        
-            // some settings
-         
-        mapName=GeneratorMain.name;
-        maxRoomCount=15+GeneratorMain.random.nextInt(20);
-        maxExtensionRoomCount=5+GeneratorMain.random.nextInt(10);
-        storyChangePercentage=0.2f+(GeneratorMain.random.nextFloat()*0.2f);
-        ceilings=false;
-        decorations=false;
-        
-            // map components
-            
-        rooms=new ArrayList<>();
-        meshList=new MeshList();
+        maxRoomCount=10+GeneratorMain.random.nextInt(15);
+        maxExtensionRoomCount=GeneratorMain.random.nextInt(5);
         
              // first room in center of map
             
-        room=new MapRoom(mapPieceList.getDefaultPiece());
-        room.offset.setFromValues(0.0f,0.0f,0.0f);
+        room=new MapRoom(mapPieceList.getRandomPiece());
+        room.x=0.0f;
+        room.z=0.0f;
+        room.story=story;
         rooms.add(room);
         
             // other rooms start outside of center
@@ -322,9 +279,9 @@ public class MapBuilder
             placeCount=10;
             
             while (placeCount>0) {
-                room.offset.x=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
-                room.offset.y=0;
-                room.offset.z=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
+                room.x=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
+                room.z=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
+                room.story=story;
                 if (!room.collides(rooms)) break;
                 
                 placeCount--;
@@ -337,14 +294,14 @@ public class MapBuilder
             
                 // migrate it in to center of map
   
-            xAdd=-(Math.signum(room.offset.x)*SEGMENT_SIZE);
-            zAdd=-(Math.signum(room.offset.z)*SEGMENT_SIZE);
+            xAdd=-(Math.signum(room.x)*SEGMENT_SIZE);
+            zAdd=-(Math.signum(room.z)*SEGMENT_SIZE);
             
             moveCount=ROOM_RANDOM_LOCATION_DISTANCE;
             
             while (moveCount>0) {
-                origX=room.offset.x;
-                origZ=room.offset.z;
+                origX=room.x;
+                origZ=room.z;
                 
                     // we move each chunk independently, if we can't
                     // move either x or z, then fail this room
@@ -352,29 +309,29 @@ public class MapBuilder
                     // if we can move, check for a touch than a shared
                     // wall, if we have one, then the room is good
                     
-                room.offset.x+=xAdd;
+                room.x+=xAdd;
                 if (room.collides(rooms)) {
-                    room.offset.x-=xAdd;
+                    room.x-=xAdd;
                 }
                 else {
                     touchIdx=room.touches(rooms);
                     if (touchIdx!=-1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),storyChangePercentage);
+                            rooms.add(room);
                             break;
                         }
                     }
                 }
                 
-                room.offset.z+=zAdd;
+                room.z+=zAdd;
                 if (room.collides(rooms)) {
-                    room.offset.z-=zAdd;
+                    room.z-=zAdd;
                 }
                 else {
                     touchIdx=room.touches(rooms);
                     if (touchIdx!=-1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            addAdditionalRoom(rooms,room,rooms.get(touchIdx),storyChangePercentage);
+                            rooms.add(room);
                             break;
                         }
                     }
@@ -382,7 +339,7 @@ public class MapBuilder
                 
                     // if we couldn't move at all, fail this room
                     
-                if ((room.offset.x==origX) && (room.offset.z==origZ)) {
+                if ((room.x==origX) && (room.z==origZ)) {
                     failCount--;
                     break;
                 }
@@ -404,40 +361,79 @@ public class MapBuilder
             while (failCount>0) {
                 connectRoom=rooms.get(GeneratorMain.random.nextInt(roomCount));
                 
-                room.offset.setFromValues((connectRoom.offset.x-room.size.x),connectRoom.offset.y,connectRoom.offset.z);     // on left
+                room.x=connectRoom.x-room.sizeX;
+                room.z=connectRoom.z;     // on left
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        addAdditionalRoom(rooms,room,connectRoom,0.0f);
+                        rooms.add(room);
                         break;
                     }
                 }
 
-                room.offset.setFromValues((connectRoom.offset.x+connectRoom.size.x),connectRoom.offset.y,connectRoom.offset.z);     // on right
+                room.x=connectRoom.x+connectRoom.sizeX;
+                room.z=connectRoom.z;     // on right
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        addAdditionalRoom(rooms,room,connectRoom,0.0f);
+                        rooms.add(room);
                         break;
                     }
                 }
             
-                room.offset.setFromValues(connectRoom.offset.x,connectRoom.offset.y,(connectRoom.offset.z-room.size.z));     // on top
+                room.x=connectRoom.x;
+                room.z=connectRoom.z-room.sizeZ;     // on top
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        addAdditionalRoom(rooms,room,connectRoom,0.0f);
+                        rooms.add(room);
                         break;
                     }
                 }
             
-                room.offset.setFromValues(connectRoom.offset.x,connectRoom.offset.y,(connectRoom.offset.z+connectRoom.size.z));     // on bottom
+                room.x=connectRoom.x;
+                room.z=connectRoom.z+connectRoom.sizeZ;     // on bottom
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        addAdditionalRoom(rooms,room,connectRoom,0.0f);
+                        rooms.add(room);
                         break;
                     }
                 }
             
                 failCount--;
             }
+        }
+    }
+
+        //
+        // build a map
+        //
+        
+    public void build()
+    {
+        int                 n,k,roomCount,storyCount;
+        boolean             ceilings,decorations;
+        String              mapName;
+        RagPoint            centerPnt;
+        MapRoom             room;
+        ArrayList<MapRoom>  rooms;
+        
+            // some generator classes
+        
+        mapBitmapList=new BitmapGenerator();
+        mapPieceList=new MapPieceList();
+        
+            // some settings
+         
+        mapName=GeneratorMain.name;
+        storyCount=1;
+        ceilings=false;
+        decorations=false;
+        
+            // map components
+            
+        rooms=new ArrayList<>();
+        meshList=new MeshList();
+        
+        for (n=0;n!=storyCount;n++) {
+            addStory(rooms,n);
         }
 
             // eliminate all combined walls
@@ -457,14 +453,13 @@ public class MapBuilder
         for (n=0;n!=roomCount;n++) {
             room=rooms.get(n);
             
-            roomTopY=room.offset.y+(room.storyCount*SEGMENT_SIZE);
-            centerPnt=new RagPoint((room.offset.x+(room.size.x*0.5f)),(room.offset.y+((SEGMENT_SIZE*room.storyCount)*0.5f)),(room.offset.z+(room.size.z*0.5f)));
+            centerPnt=new RagPoint((room.x+(room.sizeX*0.5f)),((room.story*(SEGMENT_SIZE+this.STORY_SPACER_HEIGHT+this.FLOOR_HEIGHT))+((SEGMENT_SIZE+this.STORY_SPACER_HEIGHT)*0.5f)),(room.z+(room.sizeZ*0.5f)));
                 
                 // meshes
 
             meshList.add(MeshMapUtility.buildRoomWalls(room,centerPnt,("wall_"+Integer.toString(n))));
-            meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",room.offset.y));
-            if (ceilings) meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",roomTopY));
+            meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",true));
+            if (ceilings) meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",false));
             
                 // decorations
 

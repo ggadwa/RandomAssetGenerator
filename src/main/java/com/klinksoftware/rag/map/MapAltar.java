@@ -23,6 +23,7 @@ public class MapAltar
 
     public Mesh addAltar(int lx,int rx,int tz,int bz,float stepHigh)
     {
+        /*
         int         n,x,z,dx,dz,levelCount;
         float       y,xMin,xMax,zMin,zMax;
         Mesh        mesh,mesh2;
@@ -80,6 +81,8 @@ public class MapAltar
         }
         
         return(mesh);
+*/
+        return(null);
     }
             
         //
@@ -88,6 +91,7 @@ public class MapAltar
 
     public void build()
     {
+        /*
         int         mx,mz;
         float       stepHigh;
         Mesh        mesh;
@@ -122,6 +126,7 @@ public class MapAltar
         }
         
         meshList.add(mesh);
+*/
     }
 
 }

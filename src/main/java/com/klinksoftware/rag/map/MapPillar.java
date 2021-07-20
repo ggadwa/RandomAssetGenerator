@@ -23,6 +23,7 @@ public class MapPillar
     
     public void build()
     {
+        /*
         int         x,z,gx,gz,lx,rx,tz,bz;
         float       baseHigh,by,pillarTy,ty,pillarBy,
                     offset,radius,baseRadius;
@@ -124,5 +125,6 @@ public class MapPillar
                 room.setGrid(0,gx,gz,1);
             }
         }
+*/
     }
 }

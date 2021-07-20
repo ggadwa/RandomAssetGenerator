@@ -23,6 +23,7 @@ public class MapStorage
     
     private void addBoxes(int gx,int gz,float boxSize,int storageCount)
     {
+        /*
         int         stackLevel,stackCount;
         float       x,y,z,boxHalfSize;
         RagPoint    rotAngle;
@@ -64,6 +65,7 @@ public class MapStorage
         }
         
         meshList.add(mesh);
+*/
     }
     
         //
@@ -72,6 +74,7 @@ public class MapStorage
         
     private void addShelf(int gx,int gz,int xSize,int zSize,float shelfHigh,float shelfLegWid,float xShelfMargin,float zShelfMargin,float floorDepth,int storageCount)
     {
+        /*
         int             x2,z2,stackLevel,stackCount,boxCount;
         float           x,y,z,bx,bz,
                         tableXMin,tableXMax,tableZMin,tableZMax,
@@ -163,6 +166,7 @@ public class MapStorage
             
         if (shelfMesh!=null) meshList.add(shelfMesh);
         if (boxMesh!=null) meshList.add(boxMesh);
+*/
     }
             
         //
@@ -171,6 +175,7 @@ public class MapStorage
 
     public void build()
     {
+        /*
         int     x,z,x2,z2,lx,rx,tz,bz,xSize,zSize,
                 storageCount;
         float   boxSize,shelfHigh,shelfLegWid,xShelfMargin,zShelfMargin,
@@ -264,6 +269,7 @@ public class MapStorage
                 }
             }
         }
+*/
     }
 
 }

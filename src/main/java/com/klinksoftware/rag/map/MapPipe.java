@@ -508,6 +508,7 @@ public class MapPipe
     
     public void build()
     {
+        /*
         int     x,z,lx,rx,tz,bz,skipX,skipZ,
                 pieceCount;
         
@@ -559,5 +560,6 @@ public class MapPipe
                 this.room.setGrid(0,x,z,1);
             }
         }
+*/
     }
 }
