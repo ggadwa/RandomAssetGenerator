@@ -284,8 +284,8 @@ public class MeshMapUtility
         
         piece=room.piece;
         
-        py=room.story*(MapBuilder.SEGMENT_SIZE+MapBuilder.STORY_SPACER_HEIGHT+MapBuilder.FLOOR_HEIGHT);
-        if (!floor) py+=(MapBuilder.SEGMENT_SIZE+MapBuilder.STORY_SPACER_HEIGHT);
+        py=room.story*(MapBuilder.SEGMENT_SIZE+MapBuilder.FLOOR_HEIGHT);
+        if (!floor) py+=MapBuilder.SEGMENT_SIZE;
         
         grid=floor?room.floorGrid:room.ceilingGrid;
         
@@ -336,28 +336,24 @@ public class MeshMapUtility
         indexArray=new ArrayList<>();
 
         trigIdx=0;
-        y=room.story*(MapBuilder.SEGMENT_SIZE+MapBuilder.STORY_SPACER_HEIGHT+MapBuilder.FLOOR_HEIGHT);
+        y=room.story*(MapBuilder.SEGMENT_SIZE+MapBuilder.FLOOR_HEIGHT);
         y2=y+MapBuilder.SEGMENT_SIZE;
         
         for (k=0;k!=vertexCount;k++) {
 
             k2=k+1;
             if (k2==vertexCount) k2=0;
+            
+                // the wall
+                
+            if (room.isWallHidden(k)) continue;
+            
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),y,((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),y,((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
 
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y2+MapBuilder.STORY_SPACER_HEIGHT),((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y2+MapBuilder.STORY_SPACER_HEIGHT),((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),y2,((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),y2,((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
             trigIdx=addQuadToIndexes(indexArray,trigIdx);
-
-            if (!room.isWallHidden(k)) {
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),y,((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),y,((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-
-                trigIdx=addQuadToIndexes(indexArray,trigIdx);
-            }
         }
 
         vertexes=floatArrayListToFloat(vertexArray);

@@ -13,7 +13,6 @@ public class MapBuilder
 {
     public static final int         ROOM_RANDOM_LOCATION_DISTANCE=100;
     public static final float       SEGMENT_SIZE=10.0f;
-    public static final float       STORY_SPACER_HEIGHT=2.0f;
     public static final float       FLOOR_HEIGHT=1.0f;
     
     private MeshList                meshList;
@@ -27,10 +26,10 @@ public class MapBuilder
         
     private void removeSharedWalls(ArrayList<MapRoom> rooms)
     {
-        int         n,k,t,roomCount,vIdx,vIdx2,
+        int         n,k,roomCount,vIdx,vIdx2,
                     nextIdx,nextIdx2,
                     vertexCount,vertexCount2;
-        float       y,ax,az,ax2,az2,bx,bz,bx2,bz2;
+        float       ax,az,ax2,az2,bx,bz,bx2,bz2;
         MapRoom     room,room2;
         
             // run through ever room against every other room
@@ -76,8 +75,8 @@ public class MapBuilder
                                 // only blank out walls that are at the same story
                                 
                             if (room.story==room2.story) {
-                                room.hideVertex(vIdx);
-                                room2.hideVertex(vIdx2);
+                                room.hideWall(vIdx);
+                                room2.hideWall(vIdx2);
                             }
                         }
                         
@@ -453,7 +452,7 @@ public class MapBuilder
         for (n=0;n!=roomCount;n++) {
             room=rooms.get(n);
             
-            centerPnt=new RagPoint((room.x+(room.sizeX*0.5f)),((room.story*(SEGMENT_SIZE+this.STORY_SPACER_HEIGHT+this.FLOOR_HEIGHT))+((SEGMENT_SIZE+this.STORY_SPACER_HEIGHT)*0.5f)),(room.z+(room.sizeZ*0.5f)));
+            centerPnt=new RagPoint((room.x+(room.sizeX*0.5f)),((room.story*(SEGMENT_SIZE+this.FLOOR_HEIGHT))+(SEGMENT_SIZE*0.5f)),(room.z+(room.sizeZ*0.5f)));
                 
                 // meshes
 

@@ -8,7 +8,7 @@ public class MapRoom
 {
     public int                  story;
     public float                x,z,sizeX,sizeZ;
-    public byte[]               vertexHideArray;
+    public byte[]               wallHideArray;
     public int[]                grid,floorGrid,ceilingGrid;
     public MapPiece             piece;
     public ArrayList<MapRoom>   requiredStairs;
@@ -33,9 +33,9 @@ public class MapRoom
             
         requiredStairs=new ArrayList<>();
 
-            // vertex hiding array
+            // wall hiding
             
-        vertexHideArray=new byte[piece.vertexes.length];
+        wallHideArray=new byte[piece.vertexes.length];
         
             // grids for blocking off floor/stories/etc
             
@@ -211,17 +211,19 @@ public class MapRoom
     }
     
         //
-        // vertexes
+        // hiding walls
+        // the vertex offset is the first vertex of the
+        // the wall (ascending) to hide
         //
     
-    public void hideVertex(int vIdx)
+    public void hideWall(int vertexOffset)
     {
-        vertexHideArray[vIdx]=0x1;
+        wallHideArray[vertexOffset]=0x1;
     }
     
-    public boolean isWallHidden(int vIdx)
+    public boolean isWallHidden(int vertexOffset)
     {
-        return(vertexHideArray[vIdx]==0x1);
+        return(wallHideArray[vertexOffset]==0x1);
     }
     
         //

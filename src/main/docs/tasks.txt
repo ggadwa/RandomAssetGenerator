@@ -1,18 +1,17 @@
 
-- need to flip/rotate floor grids
-- need to delete one pair of top space walls
+
 
 * floors by grid
 * turn off stories
-* add top wall (STORY_SPACER_HEIGHT)
 * build floors based on grid mask
-
-- get rid of margins, use a grid mask
-
+* get rid of margins, use a grid mask
+* need to flip/rotate floor grids
 
 - build multiple overlapping stories
 - knock out floor that overlap
 - figure out stairs later
+
+- need frames in doorways to make up for missing headers and no-space walls
 
 - equipment could have a desk?
 - need a chair room?

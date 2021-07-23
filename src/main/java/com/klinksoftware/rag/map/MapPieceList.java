@@ -34,7 +34,8 @@ public class MapPieceList
     
     private MapPiece dupTransformPiece(MapPiece origPiece,boolean rotate,boolean flipX,boolean flipZ)
     {
-        int         n,k;
+        int         n,k,x,z;
+        int[]       tempGrid;
         float       f;
         MapPiece    piece;
         
@@ -46,20 +47,18 @@ public class MapPieceList
             
         piece=origPiece.clone();
         
-            // and flip
+            // flip and rotate
         
         if (rotate) {
             k=piece.sizeX;
             piece.sizeX=piece.sizeZ;
             piece.sizeZ=k;
             
-            k=piece.margins[0];
-            piece.margins[0]=piece.margins[2];
-            piece.margins[2]=k;
-            
-            k=piece.margins[1];
-            piece.margins[1]=piece.margins[3];
-            piece.margins[3]=k;
+            for (z=0;z!=piece.sizeZ;z++) {
+                for (x=0;x!=piece.sizeX;x++) {
+                    piece.floorGrid[(z*piece.sizeX)+x]=origPiece.floorGrid[(x*origPiece.sizeX)+z];
+                }
+            }
         }
             
         for (n=0;n!=piece.vertexes.length;n++) {
@@ -73,15 +72,29 @@ public class MapPieceList
         }
         
         if (flipX) {
-            k=piece.margins[0];
-            piece.margins[0]=piece.margins[2];
-            piece.margins[2]=k;
+            tempGrid=new int[piece.sizeX];
+            
+            for (z=0;z!=piece.sizeZ;z++) {
+                for (x=0;x!=piece.sizeX;x++) {
+                    tempGrid[x]=piece.floorGrid[(z*piece.sizeX)+x];
+                }
+                for (x=0;x!=piece.sizeX;x++) {
+                    piece.floorGrid[(z*piece.sizeX)+x]=tempGrid[(piece.sizeX-x)-1];
+                }
+            }
         }
         
         if (flipZ) {
-            k=piece.margins[1];
-            piece.margins[1]=piece.margins[3];
-            piece.margins[3]=k;
+            tempGrid=new int[piece.sizeZ];
+            
+            for (x=0;x!=piece.sizeX;x++) {
+                for (z=0;z!=piece.sizeZ;z++) {
+                    tempGrid[z]=piece.floorGrid[(z*piece.sizeX)+x];
+                }
+                for (z=0;z!=piece.sizeZ;z++) {
+                    piece.floorGrid[(z*piece.sizeX)+x]=tempGrid[(piece.sizeZ-z)-1];
+                }
+            }
         }
         
         return(piece);
@@ -93,8 +106,7 @@ public class MapPieceList
         
         idx=GeneratorMain.random.nextInt(this.pieces.size());
         //idx=26;   // testing new pieces
-        return(this.dupTransformPiece(this.pieces.get(idx),false,false,false));
-        //return(this.dupTransformPiece(this.pieces.get(idx),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean()));
+        return(this.dupTransformPiece(this.pieces.get(idx),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean()));
     }
 
 }
