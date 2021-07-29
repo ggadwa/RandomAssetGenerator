@@ -21,7 +21,7 @@ public class MapBuilder
     private MapPieceList            mapPieceList;
 
         //
-        // mesh building utilities
+        // deleting shared walls, floors, and ceilings
         //
         
     private void removeSharedWalls(ArrayList<MapRoom> rooms)
@@ -84,6 +84,69 @@ public class MapBuilder
                     }
                     
                     vIdx++;
+                }
+            }
+        }
+    }
+    
+    private void removeSharedFloorCeilings(ArrayList<MapRoom> rooms)
+    {
+        int         n,k,roomCount,x,z,gx,gz,
+                    gx2,gz2,kx,kz;
+        MapRoom     room,room2;
+        MapPiece    piece,piece2;
+        
+            // run through ever room against every other room
+            // and pull any floors that are the same as
+            // a ceiling below it
+            
+        roomCount=rooms.size();
+        
+        for (n=0;n!=roomCount;n++) {
+            room=rooms.get(n);
+            piece=room.piece;
+            
+                // room has to be below, and
+                // intersect
+                
+            for (k=0;k!=roomCount;k++) {
+                room2=rooms.get(k);
+                if ((room2.story+1)!=room.story) continue;
+                
+                if (room.x>(room2.x+room2.sizeX)) continue;
+                if ((room.x+room.sizeX)<room2.x) continue;
+                if (room.z>(room2.z+room2.sizeZ)) continue;
+                if ((room.z+room.sizeZ)<room2.z) continue;
+                    
+                    // get grid offsets
+                    
+                piece2=room2.piece;
+                
+                gx=(int)(room.x/MapBuilder.SEGMENT_SIZE);
+                gz=(int)(room.z/MapBuilder.SEGMENT_SIZE);
+                gx2=(int)(room2.x/MapBuilder.SEGMENT_SIZE);
+                gz2=(int)(room2.z/MapBuilder.SEGMENT_SIZE);
+                    
+                    // knock out any shared segments
+            
+                for (z=0;z!=piece.sizeZ;z++) {
+                    for (x=0;x!=piece.sizeX;x++) {
+                        if (room.floorGrid[(z*piece.sizeX)+x]==0) continue;
+
+                            // find grid spot in room2
+                            // if that grid spot doesn't exist or
+                            // is not filled, then leave floor
+                            
+                        kx=(x+gx)-gx2;
+                        kz=(z+gz)-gz2;
+
+                        if ((kx<0) || (kz<0) || (kx>=piece2.sizeX) || (kz>=piece2.sizeZ)) continue;
+                        if (room2.floorGrid[(kz*piece2.sizeX)+kx]==0) continue;
+                        
+                            // eliminate this floor and ceiling
+
+                        room.floorGrid[(z*piece.sizeX)+x]=0;
+                    }
                 }
             }
         }
@@ -274,13 +337,13 @@ public class MapBuilder
         while ((rooms.size()<maxRoomCount) && (failCount>0)) {
                 
             room=new MapRoom(mapPieceList.getRandomPiece());
+            room.story=story;
             
             placeCount=10;
             
             while (placeCount>0) {
                 room.x=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
                 room.z=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
-                room.story=story;
                 if (!room.collides(rooms)) break;
                 
                 placeCount--;
@@ -354,6 +417,7 @@ public class MapBuilder
         
         for (n=0;n!=maxExtensionRoomCount;n++) {
             room=new MapRoom(mapPieceList.getRandomPiece());
+            room.story=story;
             
             failCount=25;
             
@@ -422,7 +486,7 @@ public class MapBuilder
             // some settings
          
         mapName=GeneratorMain.name;
-        storyCount=1;
+        storyCount=3;
         ceilings=false;
         decorations=false;
         
@@ -438,6 +502,11 @@ public class MapBuilder
             // eliminate all combined walls
            
         removeSharedWalls(rooms);
+        
+            // and mark off floors/ceilings that
+            // are over each other
+            
+        removeSharedFloorCeilings(rooms);
 
             // maps always need walls, floors and ceilings
             
@@ -456,9 +525,9 @@ public class MapBuilder
                 
                 // meshes
 
-            meshList.add(MeshMapUtility.buildRoomWalls(room,centerPnt,("wall_"+Integer.toString(n))));
-            meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("floor_"+Integer.toString(n)),"floor",true));
-            if (ceilings) meshList.add(MeshMapUtility.buildRoomFloorCeiling(room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",false));
+            MeshMapUtility.buildRoomWalls(meshList,room,centerPnt,("wall_"+Integer.toString(n)));
+            MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("floor_"+Integer.toString(n)),"floor",true);
+            if (ceilings) MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",false);
             
                 // decorations
 

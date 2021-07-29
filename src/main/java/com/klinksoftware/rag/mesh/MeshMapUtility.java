@@ -272,7 +272,7 @@ public class MeshMapUtility
         // room pieces
         //
    
-    public static Mesh buildRoomFloorCeiling(MapRoom room,RagPoint centerPnt,String name,String bitmapName,boolean floor)
+    public static void buildRoomFloorCeiling(MeshList meshList,MapRoom room,RagPoint centerPnt,String name,String bitmapName,boolean floor)
     {
         int                 x,z,trigIdx;
         float               px,py,pz;
@@ -309,15 +309,17 @@ public class MeshMapUtility
             }
         }
         
+        if (trigIdx==0) return;
+        
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
         uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
         
-        return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
+        meshList.add(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
     }
        
-    public static Mesh buildRoomWalls(MapRoom room,RagPoint centerPnt,String name)
+    public static void buildRoomWalls(MeshList meshList,MapRoom room,RagPoint centerPnt,String name)
     {
         int                 k,k2,vertexCount,trigIdx;
         float               y,y2;
@@ -361,7 +363,7 @@ public class MeshMapUtility
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
         uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
         
-        return(new Mesh(name,"wall",vertexes,normals,uvs,indexes));
+        meshList.add(new Mesh(name,"wall",vertexes,normals,uvs,indexes));
     }
   
         //

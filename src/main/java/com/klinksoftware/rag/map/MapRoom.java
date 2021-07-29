@@ -100,6 +100,8 @@ public class MapRoom
         int         vIdx,vIdx2,nextIdx,nextIdx2,
                     vertexCount,vertexCount2;
         float       ax,az,ax2,az2,bx,bz,bx2,bz2;
+
+        if (checkRoom.story!=story) return(false);
         
             // check to see if two rooms share a wall segment
         
@@ -148,6 +150,8 @@ public class MapRoom
         float               f,ax,az,ax2,az2,bx,bz,bx2,bz2,
                             touchMin,touchMax;
         ArrayList<Float>    touchPoints;
+        
+        if (checkRoom.story!=story) return(null);
 
         touchPoints=new ArrayList<>();
         
