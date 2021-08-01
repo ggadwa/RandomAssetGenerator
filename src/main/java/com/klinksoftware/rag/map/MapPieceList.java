@@ -105,7 +105,7 @@ public class MapPieceList
         int                 idx;
         
         idx=GeneratorMain.random.nextInt(this.pieces.size());
-        //idx=26;   // testing new pieces
+        //idx=15;   // testing new pieces
         return(this.dupTransformPiece(this.pieces.get(idx),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean(),GeneratorMain.random.nextBoolean()));
     }
 

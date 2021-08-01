@@ -295,11 +295,11 @@ public class MeshMapUtility
         trigIdx=0;
         
         for (z=0;z!=piece.sizeZ;z++) {
-            pz=room.z+(z*MapBuilder.SEGMENT_SIZE);
+            pz=(room.z+z)*MapBuilder.SEGMENT_SIZE;
             for (x=0;x!=piece.sizeX;x++) {
                 if (grid[(z*piece.sizeX)+x]==0) continue;
                 
-                px=room.x+(x*MapBuilder.SEGMENT_SIZE);
+                px=(room.x+x)*MapBuilder.SEGMENT_SIZE;
                 vertexArray.addAll(Arrays.asList(px,py,pz));
                 vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,pz));
                 vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,(pz+MapBuilder.SEGMENT_SIZE)));
@@ -350,10 +350,10 @@ public class MeshMapUtility
                 
             if (room.isWallHidden(k)) continue;
             
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]*MapBuilder.SEGMENT_SIZE)+room.x),y,((piece.vertexes[k2][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]*MapBuilder.SEGMENT_SIZE)+room.x),y,((piece.vertexes[k][1]*MapBuilder.SEGMENT_SIZE)+room.z)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]+room.x)*MapBuilder.SEGMENT_SIZE),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]+room.x)*MapBuilder.SEGMENT_SIZE),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k2][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]+room.x)*MapBuilder.SEGMENT_SIZE),y,((piece.vertexes[k2][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]+room.x)*MapBuilder.SEGMENT_SIZE),y,((piece.vertexes[k][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
 
             trigIdx=addQuadToIndexes(indexArray,trigIdx);
         }

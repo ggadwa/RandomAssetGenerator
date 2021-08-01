@@ -1,14 +1,6 @@
 
+- need extra trigs for pieces
 
-
-* floors by grid
-* turn off stories
-* build floors based on grid mask
-* get rid of margins, use a grid mask
-* need to flip/rotate floor grids
-
-- build multiple overlapping stories
-- knock out floor that overlap
 - figure out stairs later
 
 - need frames in doorways to make up for missing headers and no-space walls

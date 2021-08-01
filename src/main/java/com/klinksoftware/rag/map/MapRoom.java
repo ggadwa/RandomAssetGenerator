@@ -6,8 +6,7 @@ import java.util.ArrayList;
 
 public class MapRoom
 {
-    public int                  story;
-    public float                x,z,sizeX,sizeZ;
+    public int                  x,z,story;
     public byte[]               wallHideArray;
     public int[]                grid,floorGrid,ceilingGrid;
     public MapPiece             piece;
@@ -17,12 +16,10 @@ public class MapRoom
     {
         this.piece=piece;
 
-        this.story=0;
+        this.x=0;
+        this.z=0;
         
-        this.x=0.0f;
-        this.z=0.0f;
-        this.sizeX=MapBuilder.SEGMENT_SIZE*piece.sizeX;
-        this.sizeZ=MapBuilder.SEGMENT_SIZE*piece.sizeZ;
+        this.story=0;
         
             // need a copy of floor grid
             
@@ -55,10 +52,10 @@ public class MapRoom
             checkRoom=rooms.get(n);
             if (checkRoom.story!=story) continue;
             
-            if (x>=(checkRoom.x+checkRoom.sizeX)) continue;
-            if ((x+sizeX)<=checkRoom.x) continue;
-            if (z>=(checkRoom.z+checkRoom.sizeZ)) continue;
-            if ((z+sizeZ)<=checkRoom.z) continue;
+            if (x>=(checkRoom.x+checkRoom.piece.sizeX)) continue;
+            if ((x+piece.sizeX)<=checkRoom.x) continue;
+            if (z>=(checkRoom.z+checkRoom.piece.sizeZ)) continue;
+            if ((z+piece.sizeZ)<=checkRoom.z) continue;
             
             return(true);
         }
@@ -75,15 +72,15 @@ public class MapRoom
             checkRoom=rooms.get(n);
             if (checkRoom.story!=story) continue;
             
-            if ((x==(checkRoom.x+checkRoom.sizeX)) || ((x+sizeX)==checkRoom.x)) {
-                if (z>=(checkRoom.z+checkRoom.sizeZ)) continue;
-                if ((z+sizeZ)<=checkRoom.z) continue;
+            if ((x==(checkRoom.x+checkRoom.piece.sizeX)) || ((x+piece.sizeX)==checkRoom.x)) {
+                if (z>=(checkRoom.z+checkRoom.piece.sizeZ)) continue;
+                if ((z+piece.sizeZ)<=checkRoom.z) continue;
                 return(n);
             }
             
-            if ((z==(checkRoom.z+checkRoom.sizeZ)) || ((z+sizeZ)==checkRoom.z)) {
-                if (x>=(checkRoom.x+checkRoom.sizeX)) continue;
-                if ((x+sizeX)<=checkRoom.x) continue;
+            if ((z==(checkRoom.z+checkRoom.piece.sizeZ)) || ((z+piece.sizeZ)==checkRoom.z)) {
+                if (x>=(checkRoom.x+checkRoom.piece.sizeX)) continue;
+                if ((x+piece.sizeX)<=checkRoom.x) continue;
                 return(n);
             }
         }
@@ -114,11 +111,11 @@ public class MapRoom
             nextIdx=vIdx+1;
             if (nextIdx==vertexCount) nextIdx=0;
 
-            ax=(piece.vertexes[vIdx][0]*MapBuilder.SEGMENT_SIZE)+x;
-            az=(piece.vertexes[vIdx][1]*MapBuilder.SEGMENT_SIZE)+z;
+            ax=x+piece.vertexes[vIdx][0];
+            az=z+piece.vertexes[vIdx][1];
 
-            ax2=(piece.vertexes[nextIdx][0]*MapBuilder.SEGMENT_SIZE)+x;
-            az2=(piece.vertexes[nextIdx][1]*MapBuilder.SEGMENT_SIZE)+z;
+            ax2=x+piece.vertexes[nextIdx][0];
+            az2=z+piece.vertexes[nextIdx][1];
 
             vIdx2=0;
 
@@ -126,11 +123,11 @@ public class MapRoom
                 nextIdx2=vIdx2+1;
                 if (nextIdx2==vertexCount2) nextIdx2=0;
 
-                bx=(checkRoom.piece.vertexes[vIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.x;
-                bz=(checkRoom.piece.vertexes[vIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.z;
+                bx=checkRoom.x+checkRoom.piece.vertexes[vIdx2][0];
+                bz=checkRoom.z+checkRoom.piece.vertexes[vIdx2][1];
 
-                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.x;
-                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.z;
+                bx2=checkRoom.x+checkRoom.piece.vertexes[nextIdx2][0];
+                bz2=checkRoom.z+checkRoom.piece.vertexes[nextIdx2][1];
 
                 if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) return(true);
 
@@ -166,11 +163,11 @@ public class MapRoom
             nextIdx=vIdx+1;
             if (nextIdx==vertexCount) nextIdx=0;
 
-            ax=(piece.vertexes[vIdx][0]*MapBuilder.SEGMENT_SIZE)+x;
-            az=(piece.vertexes[vIdx][1]*MapBuilder.SEGMENT_SIZE)+z;
+            ax=x+piece.vertexes[vIdx][0];
+            az=z+piece.vertexes[vIdx][1];
 
-            ax2=(piece.vertexes[nextIdx][0]*MapBuilder.SEGMENT_SIZE)+x;
-            az2=(piece.vertexes[nextIdx][1]*MapBuilder.SEGMENT_SIZE)+z;
+            ax2=x+piece.vertexes[nextIdx][0];
+            az2=z+piece.vertexes[nextIdx][1];
 
             vIdx2=0;
 
@@ -178,11 +175,11 @@ public class MapRoom
                 nextIdx2=vIdx2+1;
                 if (nextIdx2==vertexCount2) nextIdx2=0;
 
-                bx=(checkRoom.piece.vertexes[vIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.x;
-                bz=(checkRoom.piece.vertexes[vIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.z;
+                bx=checkRoom.x+checkRoom.piece.vertexes[vIdx2][0];
+                bz=checkRoom.z+checkRoom.piece.vertexes[vIdx2][1];
 
-                bx2=(checkRoom.piece.vertexes[nextIdx2][0]*MapBuilder.SEGMENT_SIZE)+checkRoom.x;
-                bz2=(checkRoom.piece.vertexes[nextIdx2][1]*MapBuilder.SEGMENT_SIZE)+checkRoom.z;
+                bx2=checkRoom.x+checkRoom.piece.vertexes[nextIdx2][0];
+                bz2=checkRoom.z+checkRoom.piece.vertexes[nextIdx2][1];
 
                 if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) {
                     if (xRun) {

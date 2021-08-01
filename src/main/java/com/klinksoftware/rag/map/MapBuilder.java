@@ -52,11 +52,11 @@ public class MapBuilder
                     nextIdx=vIdx+1;
                     if (nextIdx==vertexCount) nextIdx=0;
                                         
-                    ax=(room.piece.vertexes[vIdx][0]*SEGMENT_SIZE)+room.x;
-                    az=(room.piece.vertexes[vIdx][1]*SEGMENT_SIZE)+room.z;
+                    ax=room.x+room.piece.vertexes[vIdx][0];
+                    az=room.z+room.piece.vertexes[vIdx][1];
                     
-                    ax2=(room.piece.vertexes[nextIdx][0]*SEGMENT_SIZE)+room.x;
-                    az2=(room.piece.vertexes[nextIdx][1]*SEGMENT_SIZE)+room.z;
+                    ax2=room.x+room.piece.vertexes[nextIdx][0];
+                    az2=room.z+room.piece.vertexes[nextIdx][1];
                     
                     vIdx2=0;
                     
@@ -64,11 +64,11 @@ public class MapBuilder
                         nextIdx2=vIdx2+1;
                         if (nextIdx2==vertexCount2) nextIdx2=0;
                         
-                        bx=(room2.piece.vertexes[vIdx2][0]*SEGMENT_SIZE)+room2.x;
-                        bz=(room2.piece.vertexes[vIdx2][1]*SEGMENT_SIZE)+room2.z;
+                        bx=room2.x+room2.piece.vertexes[vIdx2][0];
+                        bz=room2.z+room2.piece.vertexes[vIdx2][1];
 
-                        bx2=(room2.piece.vertexes[nextIdx2][0]*SEGMENT_SIZE)+room2.x;
-                        bz2=(room2.piece.vertexes[nextIdx2][1]*SEGMENT_SIZE)+room2.z;
+                        bx2=room2.x+room2.piece.vertexes[nextIdx2][0];
+                        bz2=room2.z+room2.piece.vertexes[nextIdx2][1];
                         
                         if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) {
                             
@@ -91,8 +91,8 @@ public class MapBuilder
     
     private void removeSharedFloorCeilings(ArrayList<MapRoom> rooms)
     {
-        int         n,k,roomCount,x,z,gx,gz,
-                    gx2,gz2,kx,kz;
+        int         n,k,roomCount,x,z,
+                    kx,kz;
         MapRoom     room,room2;
         MapPiece    piece,piece2;
         
@@ -113,19 +113,14 @@ public class MapBuilder
                 room2=rooms.get(k);
                 if ((room2.story+1)!=room.story) continue;
                 
-                if (room.x>(room2.x+room2.sizeX)) continue;
-                if ((room.x+room.sizeX)<room2.x) continue;
-                if (room.z>(room2.z+room2.sizeZ)) continue;
-                if ((room.z+room.sizeZ)<room2.z) continue;
+                if (room.x>(room2.x+room2.piece.sizeX)) continue;
+                if ((room.x+room.piece.sizeX)<room2.x) continue;
+                if (room.z>(room2.z+room2.piece.sizeZ)) continue;
+                if ((room.z+room.piece.sizeZ)<room2.z) continue;
                     
                     // get grid offsets
                     
                 piece2=room2.piece;
-                
-                gx=(int)(room.x/MapBuilder.SEGMENT_SIZE);
-                gz=(int)(room.z/MapBuilder.SEGMENT_SIZE);
-                gx2=(int)(room2.x/MapBuilder.SEGMENT_SIZE);
-                gz2=(int)(room2.z/MapBuilder.SEGMENT_SIZE);
                     
                     // knock out any shared segments
             
@@ -137,8 +132,8 @@ public class MapBuilder
                             // if that grid spot doesn't exist or
                             // is not filled, then leave floor
                             
-                        kx=(x+gx)-gx2;
-                        kz=(z+gz)-gz2;
+                        kx=(x+room.x)-room2.x;
+                        kz=(z+room.z)-room2.z;
 
                         if ((kx<0) || (kz<0) || (kx>=piece2.sizeX) || (kz>=piece2.sizeZ)) continue;
                         if (room2.floorGrid[(kz*piece2.sizeX)+kx]==0) continue;
@@ -146,6 +141,7 @@ public class MapBuilder
                             // eliminate this floor and ceiling
 
                         room.floorGrid[(z*piece.sizeX)+x]=0;
+                        room2.ceilingGrid[(kz*piece2.sizeX)+kx]=0;
                     }
                 }
             }
@@ -308,123 +304,130 @@ public class MapBuilder
         // build a single story of a room
         //
     
-    private void addStory(ArrayList<MapRoom> rooms,int story)
+    private int addStory(ArrayList<MapRoom> rooms,int startX,int startZ,int story,int roomCount,int roomExtensionCount)
     {
-        int         n,maxRoomCount,maxExtensionRoomCount,
-                    roomCount,placeCount,moveCount,failCount,
-                    touchIdx;
+        int         n,placeCount,moveCount,failCount,
+                    touchIdx,firstRoomIdx,endRoomIdx;
         float       origX,origZ,xAdd,zAdd;
         MapRoom     room,connectRoom;
         
-            // number of rooms on this story
-            
-        maxRoomCount=10+GeneratorMain.random.nextInt(15);
-        maxExtensionRoomCount=GeneratorMain.random.nextInt(5);
-        
-             // first room in center of map
+            // first room is alone so it
+            // always can be laid down
             
         room=new MapRoom(mapPieceList.getRandomPiece());
-        room.x=0.0f;
-        room.z=0.0f;
+        room.x=startX;
+        room.z=startZ;
         room.story=story;
         rooms.add(room);
         
-            // other rooms start outside of center
+        roomCount--;
+        if (roomCount<=0) return(rooms.size()-1);
+        
+            // other rooms start outside around the first room
             // room and gravity brings them in until they connect
+            
+        firstRoomIdx=rooms.size();
        
-        failCount=25;
-        
-        while ((rooms.size()<maxRoomCount) && (failCount>0)) {
-                
-            room=new MapRoom(mapPieceList.getRandomPiece());
-            room.story=story;
-            
-            placeCount=10;
-            
-            while (placeCount>0) {
-                room.x=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
-                room.z=(GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE)*SEGMENT_SIZE;
-                if (!room.collides(rooms)) break;
-                
-                placeCount--;
-            }
-            
-            if (placeCount==0) {        // could not place this anywhere, so fail this room
-                failCount--;
-                continue;
-            }
-            
-                // migrate it in to center of map
-  
-            xAdd=-(Math.signum(room.x)*SEGMENT_SIZE);
-            zAdd=-(Math.signum(room.z)*SEGMENT_SIZE);
-            
-            moveCount=ROOM_RANDOM_LOCATION_DISTANCE;
-            
-            while (moveCount>0) {
-                origX=room.x;
-                origZ=room.z;
-                
-                    // we move each chunk independently, if we can't
-                    // move either x or z, then fail this room
-                    
-                    // if we can move, check for a touch than a shared
-                    // wall, if we have one, then the room is good
-                    
-                room.x+=xAdd;
-                if (room.collides(rooms)) {
-                    room.x-=xAdd;
-                }
-                else {
-                    touchIdx=room.touches(rooms);
-                    if (touchIdx!=-1) {
-                        if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            rooms.add(room);
-                            break;
-                        }
-                    }
-                }
-                
-                room.z+=zAdd;
-                if (room.collides(rooms)) {
-                    room.z-=zAdd;
-                }
-                else {
-                    touchIdx=room.touches(rooms);
-                    if (touchIdx!=-1) {
-                        if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            rooms.add(room);
-                            break;
-                        }
-                    }
-                }
-                
-                    // if we couldn't move at all, fail this room
-                    
-                if ((room.x==origX) && (room.z==origZ)) {
-                    failCount--;
-                    break;
-                }
-                
-                moveCount--;
-            }
-        }
-        
-            // extension rooms
-            // these rooms try to attach to existing rooms
-            
-        roomCount=rooms.size();
-        
-        for (n=0;n!=maxExtensionRoomCount;n++) {
+        for (n=0;n!=roomCount;n++) {
             room=new MapRoom(mapPieceList.getRandomPiece());
             room.story=story;
             
             failCount=25;
             
             while (failCount>0) {
-                connectRoom=rooms.get(GeneratorMain.random.nextInt(roomCount));
+                placeCount=10;
+
+                while (placeCount>0) {
+                    room.x=startX+GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE;
+                    room.z=startZ+GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE;
+                    if (!room.collides(rooms)) break;
+
+                    placeCount--;
+                }
+
+                if (placeCount==0) {        // could not place this anywhere, so fail this room
+                    failCount--;
+                    continue;
+                }
+
+                    // migrate it in to center of map
+
+                xAdd=-Math.signum(room.x);
+                zAdd=-Math.signum(room.z);
+
+                moveCount=ROOM_RANDOM_LOCATION_DISTANCE;
+
+                while (moveCount>0) {
+                    origX=room.x;
+                    origZ=room.z;
+
+                        // we move each chunk independently, if we can't
+                        // move either x or z, then fail this room
+
+                        // if we can move, check for a touch than a shared
+                        // wall, if we have one, then the room is good
+
+                    room.x+=xAdd;
+                    if (room.collides(rooms)) {
+                        room.x-=xAdd;
+                    }
+                    else {
+                        touchIdx=room.touches(rooms);
+                        if (touchIdx!=-1) {
+                            if (room.hasSharedWalls(rooms.get(touchIdx))) {
+                                rooms.add(room);
+                                break;
+                            }
+                        }
+                    }
+
+                    room.z+=zAdd;
+                    if (room.collides(rooms)) {
+                        room.z-=zAdd;
+                    }
+                    else {
+                        touchIdx=room.touches(rooms);
+                        if (touchIdx!=-1) {
+                            if (room.hasSharedWalls(rooms.get(touchIdx))) {
+                                rooms.add(room);
+                                break;
+                            }
+                        }
+                    }
+
+                        // if we couldn't move at all, fail this room
+
+                    if ((room.x==origX) && (room.z==origZ)) {
+                        failCount--;
+                        break;
+                    }
+
+                    moveCount--;
+                }
                 
-                room.x=connectRoom.x-room.sizeX;
+                    // if we were able to get to a good place
+                    // without triggering the move count, then
+                    // its a good room
+                    
+                if (moveCount!=0) break;
+            }
+        }
+        
+        endRoomIdx=rooms.size();
+        
+            // extension rooms
+            // these rooms try to attach to existing rooms
+            
+        for (n=0;n!=roomExtensionCount;n++) {
+            room=new MapRoom(mapPieceList.getRandomPiece());
+            room.story=story;
+            
+            failCount=25;
+            
+            while (failCount>0) {
+                connectRoom=rooms.get(firstRoomIdx+GeneratorMain.random.nextInt(endRoomIdx-firstRoomIdx));
+                
+                room.x=connectRoom.x-room.piece.sizeX;
                 room.z=connectRoom.z;     // on left
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
@@ -433,7 +436,7 @@ public class MapBuilder
                     }
                 }
 
-                room.x=connectRoom.x+connectRoom.sizeX;
+                room.x=connectRoom.x+connectRoom.piece.sizeX;
                 room.z=connectRoom.z;     // on right
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
@@ -443,7 +446,7 @@ public class MapBuilder
                 }
             
                 room.x=connectRoom.x;
-                room.z=connectRoom.z-room.sizeZ;     // on top
+                room.z=connectRoom.z-room.piece.sizeZ;     // on top
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
                         rooms.add(room);
@@ -452,7 +455,7 @@ public class MapBuilder
                 }
             
                 room.x=connectRoom.x;
-                room.z=connectRoom.z+connectRoom.sizeZ;     // on bottom
+                room.z=connectRoom.z+connectRoom.piece.sizeZ;     // on bottom
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
                         rooms.add(room);
@@ -463,6 +466,11 @@ public class MapBuilder
                 failCount--;
             }
         }
+        
+            // finally return a room to start the next
+            // story on
+            
+        return(firstRoomIdx+GeneratorMain.random.nextInt(endRoomIdx-firstRoomIdx));
     }
 
         //
@@ -471,7 +479,8 @@ public class MapBuilder
         
     public void build()
     {
-        int                 n,k,roomCount,storyCount;
+        int                 n,x,z,k,roomCount,roomExtensionCount,
+                            storyCount,nextStoryRoomIdx;
         boolean             ceilings,decorations;
         String              mapName;
         RagPoint            centerPnt;
@@ -487,7 +496,7 @@ public class MapBuilder
          
         mapName=GeneratorMain.name;
         storyCount=3;
-        ceilings=false;
+        ceilings=true;
         decorations=false;
         
             // map components
@@ -495,8 +504,28 @@ public class MapBuilder
         rooms=new ArrayList<>();
         meshList=new MeshList();
         
+        x=0;
+        z=0;
+        
+        roomCount=10+GeneratorMain.random.nextInt(15);
+        roomExtensionCount=GeneratorMain.random.nextInt(5);
+        
         for (n=0;n!=storyCount;n++) {
-            addStory(rooms,n);
+            
+                // add the story
+                
+            nextStoryRoomIdx=addStory(rooms,x,z,n,roomCount,roomExtensionCount);
+            
+                // reduce room counts
+                
+            roomCount=(int)(((float)roomCount)*0.5f);
+            roomExtensionCount=(int)(((float)roomExtensionCount)*0.5f);
+            
+                // next story start
+                
+            room=rooms.get(nextStoryRoomIdx);
+            x=room.x+GeneratorMain.random.nextInt(4)-2;
+            z=room.z+GeneratorMain.random.nextInt(4)-2;
         }
 
             // eliminate all combined walls
@@ -521,7 +550,7 @@ public class MapBuilder
         for (n=0;n!=roomCount;n++) {
             room=rooms.get(n);
             
-            centerPnt=new RagPoint((room.x+(room.sizeX*0.5f)),((room.story*(SEGMENT_SIZE+this.FLOOR_HEIGHT))+(SEGMENT_SIZE*0.5f)),(room.z+(room.sizeZ*0.5f)));
+            centerPnt=new RagPoint(((room.x+room.piece.sizeX)*0.5f),((room.story*(SEGMENT_SIZE+this.FLOOR_HEIGHT))+(SEGMENT_SIZE*0.5f)),((room.z+room.piece.sizeZ)*0.5f));
                 
                 // meshes
 
