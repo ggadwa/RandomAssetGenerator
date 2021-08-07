@@ -25,7 +25,6 @@ public class GeneratorMain
             // seed the random
             
         seed=Calendar.getInstance().getTimeInMillis();
-        appWindow.writeLog("seed="+Long.toString(seed));
         
         random=new Random(seed);
 
@@ -53,8 +52,6 @@ public class GeneratorMain
         String        basePath;
         MapBuilder    mapBuilder;
         
-        appWindow.writeLog("starting map build");
-        
         basePath=genericSetup(appWindow,"map");
         if (basePath==null) return;
         
@@ -68,8 +65,6 @@ public class GeneratorMain
         {
             e.printStackTrace();
         }
-        
-        appWindow.writeLog("finished map build");
     }
     
         //
@@ -114,8 +109,6 @@ public class GeneratorMain
     {
         String          basePath;
         
-        appWindow.writeLog("starting bitmap build");
-        
         basePath=genericSetup(appWindow,"bitmap");
         if (basePath==null) return;
 
@@ -146,7 +139,5 @@ public class GeneratorMain
         {
             e.printStackTrace();
         }
-        
-        appWindow.writeLog("finished bitmap build");
     }
 }
