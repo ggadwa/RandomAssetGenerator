@@ -1,27 +1,31 @@
 package com.klinksoftware.rag.walkview;
 
-import java.awt.image.BufferedImage;
-import java.io.*;
+import com.klinksoftware.rag.utility.*;
+import com.klinksoftware.rag.GeneratorMain;
+import com.klinksoftware.rag.bitmaps.*;
 import java.nio.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import javax.imageio.ImageIO;
-import org.lwjgl.BufferUtils;
-import static org.lwjgl.opengl.ARBVertexArrayObject.*;
+import java.nio.file.*;
+import java.util.*;
+import static org.lwjgl.opengl.ARBFramebufferObject.*;
 import static org.lwjgl.opengl.GL.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import org.lwjgl.opengl.awt.*;
 import org.lwjgl.system.*;
+import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.*;
-import static org.lwjgl.stb.STBImage.*;
 
 
 public class WalkView extends AWTGLCanvas {
 
     private int vertexShaderId, fragmentShaderId, programId;
-    private int vaoId,vboId;
+    private int vertexVBOId,uvVBOId;
+    private int vertexPositionAttribute,vertexUVAttribute;
+    private int orthoUniformId,perspectiveUniformId,viewUniformId;
+    private int textureId;
+    private RagPoint eyePoint,cameraPoint,lookAtUpVector;
+    private RagMatrix4f perspectiveMatrix, viewMatrix;
 
     public WalkView(GLData glData) {
         super(glData);
@@ -32,11 +36,18 @@ public class WalkView extends AWTGLCanvas {
         String vertexSource, fragmentSource;
         String errorStr;
         
-        System.out.println("OpenGL version: " + effective.majorVersion + "." + effective.minorVersion + " (Profile: " + effective.profile + ")");
+            // some pre-allocates
+            
+        eyePoint=new RagPoint(0.0f,0.0f,0.0f);
+        cameraPoint=new RagPoint(0.0f,0.0f,0.0f);
+        lookAtUpVector=new RagPoint(0.0f,-1.0f,0.0f);
+        
+        perspectiveMatrix=new RagMatrix4f();
+        viewMatrix=new RagMatrix4f();
         
         createCapabilities();
         glClearColor(0.9f, 0.9f, 0.9f, 1);
-        //glEnable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
         
             // no shader yet
             
@@ -93,103 +104,125 @@ public class WalkView extends AWTGLCanvas {
         }
         
             // testing!  load up a texture
-/*
-            BufferedImage img = null;
-try {
-    img = ImageIO.read(new File("output"+File.separator+"bitmap_test2"+File.separator+"textures"+File.separator+"brick_color.png"));
-} catch (IOException e) {
-    e.printStackTrace();
-    return;
-}
             
-        ByteBuffer buffer = BufferUtils.createByteBuffer(img.getWidth() * img.getHeight() * 3);
-        
-        for(int y = 0; y < img.getHeight(); y++){
-            for(int x = 0; x < img.getWidth(); x++){
-                int pixel = pixels[y * img.getWidth() + x];
-                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
-                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
-                buffer.put((byte) (pixel & 0xFF));               // Blue component
-                buffer.put((byte) ((pixel >> 24) & 0xFF));    // Alpha component. Only for RGBA
-            }
-        }
-
-        buffer.flip(); //FOR THE LOVE OF GOD DO NOT FORGET THIS
-
-        // You now have a ByteBuffer filled with the color data of each pixel.
-        // Now just create a texture ID and bind it. Then you can load it using 
-        // whatever OpenGL method you want, for example:
-
-		int textureID = glGenTextures(); //Generate texture ID
-        glBindTexture(GL_TEXTURE_2D, textureID); //Bind texture ID
-        
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, img.getWidth(), img.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
- */
-/*
+            BitmapBase bitmapBase;
+            GeneratorMain.random=new Random(Calendar.getInstance().getTimeInMillis()); // hack!
             
-                    int texID = glGenTextures();
+            bitmapBase=new BitmapBrick();
+        bitmapBase.generate(BitmapBrick.VARIATION_NONE,null,"brick");
+        int textureSize=bitmapBase.getTextureSize();
+        boolean hasAlpha=bitmapBase.hasAlpha();
+        
+        
 
-        glBindTexture(GL_TEXTURE_2D, texID);
+        ByteBuffer buffer = MemoryUtil.memAlloc((textureSize*(hasAlpha?4:3))* textureSize);
+        buffer.put(bitmapBase.getColorDataAsBytes()).flip();
+
+
+	textureId = glGenTextures(); //Generate texture ID
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId); //Bind texture ID
+        glTexImage2D(GL_TEXTURE_2D, 0, (hasAlpha?GL_RGBA:GL_RGB), textureSize, textureSize, 0, (hasAlpha?GL_RGBA:GL_RGB), GL_UNSIGNED_BYTE, buffer);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
-        int format;
-        if (comp == 3) {
-            if ((w & 3) != 0) {
-                glPixelStorei(GL_UNPACK_ALIGNMENT, 2 - (w & 1));
-            }
-            format = GL_RGB;
-        } else {
-            premultiplyAlpha();
-
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-            format = GL_RGBA;
-        }
-
-        glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, image);
-*/
-/*
-        float[] vertices = new float[]{
-     0.0f,  0.5f, 0.0f,
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f
-};
- */       
+        glBindTexture(GL_TEXTURE_2D, 0);
         
+        MemoryUtil.memFree(buffer);
         
+        /*
                 float[] vertices = new float[]{
      50.0f,  50.0f, 0.0f,
-    50.0f, 100.0f, 0.0f,
-     100.0f, 100.0f, 0.0f
+    50.0f, 350.0f, 0.0f,
+     350.0f, 350.0f, 0.0f,
+     
+     50.0f,  50.0f, 0.0f,
+    350.0f, 50.0f, 0.0f,
+     350.0f, 350.0f, 0.0f,
+
+     160.0f,  160.0f, 0.0f,
+    160.0f, 460.0f, 0.0f,
+     460.0f, 460.0f, 0.0f,
+     
+     160.0f,  160.0f, 0.0f,
+    460.0f, 160.0f, 0.0f,
+     460.0f, 460.0f, 0.0f
 };
+    */
+        
+                float[] vertices = new float[]{
+     -50.0f,  -50.0f, 100.0f,
+    -50.0f, 50.0f, 100.0f,
+     50.0f, 50.0f, 100.0f,
+     
+     -50.0f,  -50.0f, 100.0f,
+    50.0f, -50.0f, 100.0f,
+     50.0f, 50.0f, 100.0f,
+
+     -1000.0f,  -1000.0f, 2000.0f,
+    -1000.0f, 1000.0f, 2000.0f,
+     1000.0f, 1000.0f, 2000.0f,
+     
+     -1000.0f,  -1000.0f, 2000.0f,
+    1000.0f, -1000.0f, 2000.0f,
+     1000.0f, 1000.0f, 2000.0f
+};
+
+                
+    float[] uvs=new float[] {
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f
+    };
                 
         FloatBuffer verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
-verticesBuffer.put(vertices).flip();
+    verticesBuffer.put(vertices).flip();
 
+        FloatBuffer uvsBuffer = MemoryUtil.memAllocFloat(uvs.length);
+    uvsBuffer.put(uvs).flip();
 
-vaoId = glGenVertexArrays();
-glBindVertexArray(vaoId);
+        // uniforms and attributes
+        
+    orthoUniformId=glGetUniformLocation(programId,"orthoMatrix");
+    perspectiveUniformId=glGetUniformLocation(programId,"perspectiveMatrix");
+    viewUniformId=glGetUniformLocation(programId,"viewMatrix");
 
-vboId = glGenBuffers();
-glBindBuffer(GL_ARRAY_BUFFER, vboId);
-glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
-memFree(verticesBuffer);
+    vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
+    vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
+    
 
-glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-// Unbind the VBO
-glBindBuffer(GL_ARRAY_BUFFER, 0);
+    vertexVBOId = glGenBuffers();
+    glBindBuffer(GL_ARRAY_BUFFER, vertexVBOId);
+    glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
+    memFree(verticesBuffer);
+    //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-// Unbind the VAO
-glBindVertexArray(0);
+    uvVBOId = glGenBuffers();
+    glBindBuffer(GL_ARRAY_BUFFER, uvVBOId);
+    glBufferData(GL_ARRAY_BUFFER, uvsBuffer, GL_STATIC_DRAW);
+    memFree(uvsBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 
 if (verticesBuffer != null) {
     MemoryUtil.memFree(verticesBuffer);
 }
+MemoryUtil.memFree(uvsBuffer);
 
+// textures never change
+glUseProgram(programId);
+glUniform1i(glGetUniformLocation(programId,"baseTex"),0);   // this is always texture slot 0
+glUseProgram(0);
     }
     
     public void shutdown()
@@ -201,55 +234,98 @@ if (verticesBuffer != null) {
 
     @Override
     public void paintGL() {
+        
+        // 30 fps here
+        
         int w = getWidth();
         int h = getHeight();
         float aspect = (float) w / h;
         double now = System.currentTimeMillis() * 0.001;
         float width = (float) Math.abs(Math.sin(now * 0.3));
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glViewport(0, 0, w, h);
         
+        
+        /*
+        
+
+        
+        
+                this.core.perspectiveMatrix.setPerspectiveMatrix(this.camera.glFOV,(this.core.canvas.width/this.core.canvas.height),this.camera.glNearZ,this.camera.glFarZ);
+
+            // the eye point is -this.camera.glNearZ behind
+            // the player
+
+        this.eyePos.setFromValues(0,0,-this.camera.glNearZ);
+        this.eyeRotMatrix.setTranslationFromPoint(this.camera.position);
+        this.eyeRotMatrix2.setRotationFromYAngle(this.camera.angle.y);
+        this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
+        this.eyeRotMatrix2.setRotationFromXAngle(this.camera.angle.x);
+        this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
+        this.eyePos.matrixMultiply(this.eyeRotMatrix);
+        
+        this.runCameraShake();
+
+            // setup the look at
+
+        this.core.viewMatrix.setLookAtMatrix(this.eyePos,this.camera.position,this.lookAtUpVector);
+
+        */
+        
+        
+        
+        
+    glUseProgram(programId);
+
+    try ( MemoryStack stack = stackPush()) {
         RagMatrix4f m=new RagMatrix4f();
         m.setOrthoMatrix(w, h, 0.0f, 100.0f);
 
-       int orthoId=glGetUniformLocation(programId,"orthoMatrix");
-       
-       FloatBuffer orthoBuffer = MemoryUtil.memAllocFloat(16);
+        FloatBuffer orthoBuffer = stack.mallocFloat(16);
         orthoBuffer.put(m.getData()).flip();
+        glUniformMatrix4fv(orthoUniformId, false, orthoBuffer);
         
+        eyePoint.setFromValues(0.0f, 0.0f, -500.0f);
+        cameraPoint.setFromValues(0.0f,0.0f,0.0f);
         
+        perspectiveMatrix.setPerspectiveMatrix(55.0f,((float)w/(float)h),500.0f,500000.0f);
+        viewMatrix.setLookAtMatrix(eyePoint,cameraPoint,lookAtUpVector);
         
+        FloatBuffer perspectiveBuffer = stack.mallocFloat(16);
+        perspectiveBuffer.put(perspectiveMatrix.getData()).flip();
+        glUniformMatrix4fv(perspectiveUniformId, false, perspectiveBuffer);
         
-glUseProgram(programId);
+        FloatBuffer viewBuffer = stack.mallocFloat(16);
+        viewBuffer.put(viewMatrix.getData()).flip();
+        glUniformMatrix4fv(viewUniformId, false, viewBuffer);
+    }
 
-glUniformMatrix4fv(orthoId, false, orthoBuffer);
 
-    // Bind to the VAO
-    glBindVertexArray(vaoId);
-    glEnableVertexAttribArray(0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D,textureId);
 
-    // Draw the vertices
-    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    // Restore state
-    glDisableVertexAttribArray(0);
-    glBindVertexArray(0);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, vertexVBOId);
+    glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
+    glEnableVertexAttribArray(vertexPositionAttribute);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexVBOId);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, uvVBOId);
+    glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, false, 0, 0);
+    glEnableVertexAttribArray(vertexUVAttribute);
 
-  glUseProgram(0);      
+
+    glDrawArrays(GL_TRIANGLES, 0, 12);
+
+    
+    glBindTexture(GL_TEXTURE_2D,0);
+    
+    glBindBuffer(GL_ARRAY_BUFFER,0);
+
+    glUseProgram(0);      
         
-        MemoryUtil.memFree(orthoBuffer);
-        
-       /*
-        
 
-        glBegin(GL_QUADS);
-        glColor3f(0.4f, 0.6f, 0.8f);
-        glVertex2f(-0.75f * width / aspect, 0.0f);
-        glVertex2f(0, -0.75f);
-        glVertex2f(+0.75f * width / aspect, 0);
-        glVertex2f(0, +0.75f);
-        glEnd();
-*/
         swapBuffers();
     }
 

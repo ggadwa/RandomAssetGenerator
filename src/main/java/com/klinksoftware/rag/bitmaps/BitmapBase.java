@@ -97,6 +97,20 @@ public class BitmapBase
     }
     
         //
+        // getters
+        //
+    
+    public boolean hasAlpha()
+    {
+        return(hasAlpha);
+    }
+    
+    public int getTextureSize()
+    {
+        return(textureSize);
+    }
+    
+        //
         // colors
         //
         
@@ -2365,26 +2379,13 @@ public class BitmapBase
         }
     }
     
-    private void writeImageData(float[] imgData,String path)
-    {
-        int                 n,k,idx,channelCount;
-        int[]               channelOffsets;
-        byte[]              imgDataByte;
-        DataBuffer          dataBuffer;
-        WritableRaster      writeRaster;
-        ColorModel          colorModel;
-        BufferedImage       bufImage;
+    private byte[] imageDataToBytes(float[] imgData) {
+        int n,idx;
+        byte[] imgDataByte;
         
-            // clamp all the floats
-            
-        clampImageData(imgData);
+        // image data if 4 floats per pixel, so covert to bytes
         
-            // image data if all floats, so covert to bytes here
-            
         if (hasAlpha) {
-            channelCount=4;
-            channelOffsets=new int[]{0,1,2,3};
-
             imgDataByte=new byte[imgData.length];
 
             for (n=0;n!=imgData.length;n++) {
@@ -2392,9 +2393,6 @@ public class BitmapBase
             }
         }
         else {
-            channelCount=3;
-            channelOffsets=new int[]{0,1,2};
-
             idx=0;
             imgDataByte=new byte[(imgData.length/4)*3];
 
@@ -2403,6 +2401,29 @@ public class BitmapBase
                 imgDataByte[idx++]=(byte)((int)(imgData[n+1]*255.0f));
                 imgDataByte[idx++]=(byte)((int)(imgData[n+2]*255.0f));
             }
+        }
+        
+        return(imgDataByte);
+    }
+    
+    private void writeImageData(float[] imgData,String path) {
+        int channelCount;
+        int[] channelOffsets;
+        byte[] imgDataByte;
+        DataBuffer dataBuffer;
+        WritableRaster writeRaster;
+        ColorModel colorModel;
+        BufferedImage bufImage;
+        
+        imgDataByte=imageDataToBytes(imgData);
+            
+        if (hasAlpha) {
+            channelCount=4;
+            channelOffsets=new int[]{0,1,2,3};
+        }
+        else {
+            channelCount=3;
+            channelOffsets=new int[]{0,1,2};
         }
         
             // save to PNG
@@ -2418,6 +2439,10 @@ public class BitmapBase
         {
             e.printStackTrace();
         }
+    }
+    
+    public byte[] getColorDataAsBytes() {
+        return(imageDataToBytes(colorData));
     }
     
         //
@@ -2459,14 +2484,23 @@ public class BitmapBase
 
         generateInternal(variationMode);
         
+            // clamp the floats
+            
+        clampImageData(colorData);
+        clampImageData(normalData);
+        clampImageData(metallicRoughnessData);
+        clampImageData(emissiveData);
+        
             // write out the bitmaps
         
-        path=basePath+File.separator+"textures"+File.separator+name;
-        
-        writeImageData(colorData,(path+"_color.png"));
-        if (hasNormal) writeImageData(normalData,(path+"_normal.png"));
-        if (hasMetallicRoughness) writeImageData(metallicRoughnessData,(path+"_metallic_roughness.png"));
-        if (hasEmissive) writeImageData(emissiveData,(path+"_emissive.png"));
+        if (basePath!=null) {
+            path=basePath+File.separator+"textures"+File.separator+name;
+
+            writeImageData(colorData,(path+"_color.png"));
+            if (hasNormal) writeImageData(normalData,(path+"_normal.png"));
+            if (hasMetallicRoughness) writeImageData(metallicRoughnessData,(path+"_metallic_roughness.png"));
+            if (hasEmissive) writeImageData(emissiveData,(path+"_emissive.png"));
+        }
     }
 
 }
