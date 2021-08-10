@@ -1,15 +1,17 @@
 package com.klinksoftware.rag.mesh;
 
 import com.klinksoftware.rag.utility.*;
-
-import java.util.*;
+import java.nio.*;
 
 public class Mesh
 {
-    public boolean      hasEmissive;
-    public String       name,bitmapName;
-    public int[]        indexes;
-    public float[]      vertexes,normals,uvs;
+    public boolean hasEmissive;
+    public String name,bitmapName;
+    public int[] indexes;
+    public float[] vertexes,normals,uvs;
+    
+    public int vboVertexId,vboNormalId,vboTangentId,vboUVId;
+    public IntBuffer indexBuf;
 
     public Mesh(String name,String bitmapName,float[] vertexes,float[] normals,float[] uvs,int[] indexes)
     {

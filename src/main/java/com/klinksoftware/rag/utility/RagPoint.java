@@ -173,6 +173,17 @@ public class RagPoint
         z=rz;
     }
     
+    public void matrixMultiply(RagMatrix4f mat)
+    {
+        float mx=(x*mat.data[0])+(y*mat.data[4])+(z*mat.data[8])+mat.data[12];
+        float my=(x*mat.data[1])+(y*mat.data[5])+(z*mat.data[9])+mat.data[13];
+        float mz=(x*mat.data[2])+(y*mat.data[6])+(z*mat.data[10])+mat.data[14];
+        
+        x=mx;
+        y=my;
+        z=mz;
+    }
+    
     public RagPoint copy()
     {
         return(new RagPoint(x,y,z));

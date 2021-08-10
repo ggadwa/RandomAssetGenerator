@@ -1,10 +1,11 @@
 package com.klinksoftware.rag.walkview;
 
 import com.klinksoftware.rag.utility.*;
-import com.klinksoftware.rag.GeneratorMain;
+import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.*;
+import com.klinksoftware.rag.mesh.*;
 import java.nio.*;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
 import static org.lwjgl.opengl.ARBFramebufferObject.*;
@@ -13,19 +14,25 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import org.lwjgl.opengl.awt.*;
 import org.lwjgl.system.*;
-import static org.lwjgl.system.MemoryStack.stackPush;
+import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
-
 
 public class WalkView extends AWTGLCanvas {
 
+    private static final float RAG_NEAR_Z=500.0f;
+    private static final float RAG_FAR_Z=500000.0f;
+    private static final long RAG_PAINT_TICK=33;
+    
+    private int wid, high;
     private int vertexShaderId, fragmentShaderId, programId;
-    private int vertexVBOId,uvVBOId;
     private int vertexPositionAttribute,vertexUVAttribute;
-    private int orthoUniformId,perspectiveUniformId,viewUniformId;
+    private int perspectiveUniformId,viewUniformId;
     private int textureId;
-    private RagPoint eyePoint,cameraPoint,lookAtUpVector;
-    private RagMatrix4f perspectiveMatrix, viewMatrix;
+    private long nextPaintTick;
+    private float aspectRatio;
+    private MeshList meshList;
+    private RagPoint eyePoint,cameraPoint,cameraAngle,lookAtUpVector;
+    private RagMatrix4f perspectiveMatrix, viewMatrix, eyeRotMatrix, eyeRotMatrix2;
 
     public WalkView(GLData glData) {
         super(glData);
@@ -33,20 +40,37 @@ public class WalkView extends AWTGLCanvas {
 
     @Override
     public void initGL() {
+        int n;
         String vertexSource, fragmentSource;
         String errorStr;
+        
+            // screen sizes
+            
+        wid=getWidth();
+        high=getHeight();
+        aspectRatio=(float)wid/(float)high;
         
             // some pre-allocates
             
         eyePoint=new RagPoint(0.0f,0.0f,0.0f);
         cameraPoint=new RagPoint(0.0f,0.0f,0.0f);
+        cameraAngle=new RagPoint(0.0f,0.0f,0.0f);
         lookAtUpVector=new RagPoint(0.0f,-1.0f,0.0f);
         
         perspectiveMatrix=new RagMatrix4f();
         viewMatrix=new RagMatrix4f();
+        eyeRotMatrix=new RagMatrix4f();
+        eyeRotMatrix2=new RagMatrix4f();
+        
+            // no mesh loaded
+            
+        meshList=null;
+        
+            // start opengl
         
         createCapabilities();
-        glClearColor(0.9f, 0.9f, 0.9f, 1);
+        glViewport(0,0,wid,high);
+        glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         
             // no shader yet
@@ -103,6 +127,13 @@ public class WalkView extends AWTGLCanvas {
             e.printStackTrace();
         }
         
+        // get locations of uniforms and attributes
+        perspectiveUniformId=glGetUniformLocation(programId,"perspectiveMatrix");
+        viewUniformId=glGetUniformLocation(programId,"viewMatrix");
+
+        vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
+        vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
+        
             // testing!  load up a texture
             
             BitmapBase bitmapBase;
@@ -131,42 +162,23 @@ public class WalkView extends AWTGLCanvas {
         
         MemoryUtil.memFree(buffer);
         
-        /*
-                float[] vertices = new float[]{
-     50.0f,  50.0f, 0.0f,
-    50.0f, 350.0f, 0.0f,
-     350.0f, 350.0f, 0.0f,
-     
-     50.0f,  50.0f, 0.0f,
-    350.0f, 50.0f, 0.0f,
-     350.0f, 350.0f, 0.0f,
-
-     160.0f,  160.0f, 0.0f,
-    160.0f, 460.0f, 0.0f,
-     460.0f, 460.0f, 0.0f,
-     
-     160.0f,  160.0f, 0.0f,
-    460.0f, 160.0f, 0.0f,
-     460.0f, 460.0f, 0.0f
-};
-    */
         
                 float[] vertices = new float[]{
-     -50.0f,  -50.0f, 100.0f,
-    -50.0f, 50.0f, 100.0f,
-     50.0f, 50.0f, 100.0f,
+     -50.0f,  -50.0f, 2000.0f,
+    -50.0f, 50.0f, 2000.0f,
+     50.0f, 50.0f, 2000.0f,
      
-     -50.0f,  -50.0f, 100.0f,
-    50.0f, -50.0f, 100.0f,
-     50.0f, 50.0f, 100.0f,
+     -50.0f,  -50.0f, 2000.0f,
+    50.0f, -50.0f, 2000.0f,
+     50.0f, 50.0f, 2000.0f,
 
-     -1000.0f,  -1000.0f, 2000.0f,
-    -1000.0f, 1000.0f, 2000.0f,
-     1000.0f, 1000.0f, 2000.0f,
+     -1000.0f,  -1000.0f, 2500.0f,
+    -1000.0f, 1000.0f, 2500.0f,
+     1000.0f, 1000.0f, 2500.0f,
      
-     -1000.0f,  -1000.0f, 2000.0f,
-    1000.0f, -1000.0f, 2000.0f,
-     1000.0f, 1000.0f, 2000.0f
+     -1000.0f,  -1000.0f, 2500.0f,
+    1000.0f, -1000.0f, 2500.0f,
+     1000.0f, 1000.0f, 2500.0f
 };
 
                 
@@ -184,45 +196,59 @@ public class WalkView extends AWTGLCanvas {
         1.0f, 0.0f,
         1.0f, 1.0f
     };
-                
-        FloatBuffer verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
-    verticesBuffer.put(vertices).flip();
-
-        FloatBuffer uvsBuffer = MemoryUtil.memAllocFloat(uvs.length);
-    uvsBuffer.put(uvs).flip();
-
-        // uniforms and attributes
-        
-    orthoUniformId=glGetUniformLocation(programId,"orthoMatrix");
-    perspectiveUniformId=glGetUniformLocation(programId,"perspectiveMatrix");
-    viewUniformId=glGetUniformLocation(programId,"viewMatrix");
-
-    vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
-    vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
     
+    int[] indexes=new int[] {0,1,2,3,4,5,6,7,8,9,10,11};
+    
+        Mesh mesh=new Mesh("test","bitmap",vertices,null,uvs,indexes);
+        meshList=new MeshList();
+        meshList.add(mesh);
 
-    vertexVBOId = glGenBuffers();
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBOId);
-    glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
-    memFree(verticesBuffer);
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        for (n=0;n!=meshList.count();n++) {
+            stageMesh(meshList.get(n));
+        }
 
-    uvVBOId = glGenBuffers();
-    glBindBuffer(GL_ARRAY_BUFFER, uvVBOId);
-    glBufferData(GL_ARRAY_BUFFER, uvsBuffer, GL_STATIC_DRAW);
-    memFree(uvsBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    
+        // enable everything we need to draw
+        glUseProgram(programId);
+        glUniform1i(glGetUniformLocation(programId,"baseTex"),0);   // this is always texture slot 0
+        glEnableVertexAttribArray(vertexPositionAttribute);
+        glEnableVertexAttribArray(vertexUVAttribute);
+        glUseProgram(0);
 
+        // redraw timing
+        nextPaintTick=System.currentTimeMillis();
+    }
+    
+    private void stageMesh(Mesh mesh) {
+        FloatBuffer buf;
+        
+        // vertexes
+        buf = MemoryUtil.memAllocFloat(mesh.vertexes.length);
+        buf.put(mesh.vertexes).flip();
 
-if (verticesBuffer != null) {
-    MemoryUtil.memFree(verticesBuffer);
-}
-MemoryUtil.memFree(uvsBuffer);
+        mesh.vboVertexId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
+        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+        memFree(buf);
 
-// textures never change
-glUseProgram(programId);
-glUniform1i(glGetUniformLocation(programId,"baseTex"),0);   // this is always texture slot 0
-glUseProgram(0);
+        // uvs
+        buf = MemoryUtil.memAllocFloat(mesh.uvs.length);
+        buf.put(mesh.uvs).flip();
+
+        mesh.vboUVId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboUVId);
+        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+        memFree(buf);
+        
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        
+        // indexes
+        mesh.indexBuf=MemoryUtil.memAllocInt(mesh.indexes.length);
+        mesh.indexBuf.put(mesh.indexes).flip();
+    }
+    
+    private void releaseMesh(Mesh mesh) {
     }
     
     public void shutdown()
@@ -234,98 +260,89 @@ glUseProgram(0);
 
     @Override
     public void paintGL() {
+        int n,nMesh;
+        long tick;
+        Mesh mesh;
         
-        // 30 fps here
+        // redraw timing
+        tick=System.currentTimeMillis();
+        if (nextPaintTick>tick) return;
         
-        int w = getWidth();
-        int h = getHeight();
-        float aspect = (float) w / h;
-        double now = System.currentTimeMillis() * 0.001;
-        float width = (float) Math.abs(Math.sin(now * 0.3));
+        while (nextPaintTick>tick) {
+            nextPaintTick+=RAG_PAINT_TICK;
+        }
+        
+            // clear
+            
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-        glViewport(0, 0, w, h);
         
+            // start the program and setup
+            // the drawing matrixes
         
-        /*
-        
+        glUseProgram(programId);
 
-        
-        
-                this.core.perspectiveMatrix.setPerspectiveMatrix(this.camera.glFOV,(this.core.canvas.width/this.core.canvas.height),this.camera.glNearZ,this.camera.glFarZ);
+        try ( MemoryStack stack = stackPush()) {
+            cameraPoint.setFromValues(0.0f,0.0f,0.0f);
 
-            // the eye point is -this.camera.glNearZ behind
-            // the player
+            eyePoint.setFromValues(0,0,-RAG_NEAR_Z);
+            eyeRotMatrix.setTranslationFromPoint(cameraPoint);
+            eyeRotMatrix2.setRotationFromYAngle(cameraAngle.y);
+            eyeRotMatrix.multiply(eyeRotMatrix2);
+            eyeRotMatrix2.setRotationFromXAngle(cameraAngle.x);
+            eyeRotMatrix.multiply(eyeRotMatrix2);
+            this.eyePoint.matrixMultiply(eyeRotMatrix);
 
-        this.eyePos.setFromValues(0,0,-this.camera.glNearZ);
-        this.eyeRotMatrix.setTranslationFromPoint(this.camera.position);
-        this.eyeRotMatrix2.setRotationFromYAngle(this.camera.angle.y);
-        this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
-        this.eyeRotMatrix2.setRotationFromXAngle(this.camera.angle.x);
-        this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
-        this.eyePos.matrixMultiply(this.eyeRotMatrix);
-        
-        this.runCameraShake();
+            perspectiveMatrix.setPerspectiveMatrix(55.0f,aspectRatio,RAG_NEAR_Z,RAG_FAR_Z);
+            viewMatrix.setLookAtMatrix(eyePoint,cameraPoint,lookAtUpVector);
 
-            // setup the look at
+            FloatBuffer perspectiveBuffer = stack.mallocFloat(16);
+            perspectiveBuffer.put(perspectiveMatrix.data).flip();
+            glUniformMatrix4fv(perspectiveUniformId, false, perspectiveBuffer);
 
-        this.core.viewMatrix.setLookAtMatrix(this.eyePos,this.camera.position,this.lookAtUpVector);
+            FloatBuffer viewBuffer = stack.mallocFloat(16);
+            viewBuffer.put(viewMatrix.data).flip();
+            glUniformMatrix4fv(viewUniformId, false, viewBuffer);
+        }
 
-        */
-        
-        
-        
-        
-    glUseProgram(programId);
-
-    try ( MemoryStack stack = stackPush()) {
-        RagMatrix4f m=new RagMatrix4f();
-        m.setOrthoMatrix(w, h, 0.0f, 100.0f);
-
-        FloatBuffer orthoBuffer = stack.mallocFloat(16);
-        orthoBuffer.put(m.getData()).flip();
-        glUniformMatrix4fv(orthoUniformId, false, orthoBuffer);
-        
-        eyePoint.setFromValues(0.0f, 0.0f, -500.0f);
-        cameraPoint.setFromValues(0.0f,0.0f,0.0f);
-        
-        perspectiveMatrix.setPerspectiveMatrix(55.0f,((float)w/(float)h),500.0f,500000.0f);
-        viewMatrix.setLookAtMatrix(eyePoint,cameraPoint,lookAtUpVector);
-        
-        FloatBuffer perspectiveBuffer = stack.mallocFloat(16);
-        perspectiveBuffer.put(perspectiveMatrix.getData()).flip();
-        glUniformMatrix4fv(perspectiveUniformId, false, perspectiveBuffer);
-        
-        FloatBuffer viewBuffer = stack.mallocFloat(16);
-        viewBuffer.put(viewMatrix.getData()).flip();
-        glUniformMatrix4fv(viewUniformId, false, viewBuffer);
-    }
-
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D,textureId);
-
-
+        cameraAngle.y+=0.01f;
+        if (cameraAngle.y>=360.0f) cameraAngle.y=0.0f;
     
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBOId);
-    glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
-    glEnableVertexAttribArray(vertexPositionAttribute);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexVBOId);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, uvVBOId);
-    glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, false, 0, 0);
-    glEnableVertexAttribArray(vertexUVAttribute);
+            // draw all the meshes
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,textureId);
+        
+        
+        
+        
+        nMesh=meshList.count();
+        
+        for (n=0;n!=nMesh;n++) {
+            mesh=meshList.get(n);
 
 
-    glDrawArrays(GL_TRIANGLES, 0, 12);
 
-    
-    glBindTexture(GL_TEXTURE_2D,0);
-    
-    glBindBuffer(GL_ARRAY_BUFFER,0);
 
-    glUseProgram(0);      
+            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
+            glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
+            
+
+            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboUVId);
+            glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, false, 0, 0);
+            
+
+            glDrawElements(GL_TRIANGLES, mesh.indexBuf);
+        }
         
 
+            // shutdown drawing
+            
+        glBindBuffer(GL_ARRAY_BUFFER,0);
+        glBindTexture(GL_TEXTURE_2D,0);
+        glUseProgram(0);      
+        
+            // swap the buffers
+            
         swapBuffers();
     }
 
