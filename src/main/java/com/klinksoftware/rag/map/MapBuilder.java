@@ -11,14 +11,19 @@ import java.util.*;
 
 public class MapBuilder
 {
-    public static final int         ROOM_RANDOM_LOCATION_DISTANCE=100;
-    public static final float       SEGMENT_SIZE=10.0f;
-    public static final float       FLOOR_HEIGHT=1.0f;
+    public static final int ROOM_RANDOM_LOCATION_DISTANCE=100;
+    public static final float SEGMENT_SIZE=10.0f;
+    public static final float FLOOR_HEIGHT=1.0f;
     
-    private MeshList                meshList;
-    private Skeleton                skeleton;
-    private BitmapGenerator         mapBitmapList;
-    private MapPieceList            mapPieceList;
+    private String mapName;
+    private MeshList meshList;
+    private Skeleton skeleton;
+    private BitmapGenerator mapBitmapList;
+    private MapPieceList mapPieceList;
+    
+    public MapBuilder(String mapName) {
+        this.mapName=mapName;
+    }
 
         //
         // deleting shared walls, floors, and ceilings
@@ -160,7 +165,7 @@ public class MapBuilder
             // some decorations can't work in some rooms
             
         while (true) {
-            decorationType=GeneratorMain.random.nextInt(6);
+            decorationType=AppWindow.random.nextInt(6);
             
                 // stories only in rooms with more than one story
                 
@@ -243,10 +248,10 @@ public class MapBuilder
             max=(int)touchRange.max;
 
             doAll=((max-min)<=2);
-            noSkipX=min+GeneratorMain.random.nextInt((max+1)-min);
+            noSkipX=min+AppWindow.random.nextInt((max+1)-min);
             
             for (x=min;x<=max;x++) {
-                if ((GeneratorMain.random.nextBoolean()) || (x==noSkipX) || (doAll)) {
+                if ((AppWindow.random.nextBoolean()) || (x==noSkipX) || (doAll)) {
                     mapStory.addStairs(x,1,MeshMapUtility.STAIR_DIR_NEG_Z,0);
                 }
             }
@@ -258,10 +263,10 @@ public class MapBuilder
             max=(int)touchRange.max;
             
             doAll=((max-min)<=2);
-            noSkipX=min+GeneratorMain.random.nextInt((max+1)-min);
+            noSkipX=min+AppWindow.random.nextInt((max+1)-min);
             
             for (x=min;x<=max;x++) {
-                if ((GeneratorMain.random.nextBoolean()) || (x==noSkipX) || (doAll)) {
+                if ((AppWindow.random.nextBoolean()) || (x==noSkipX) || (doAll)) {
                     mapStory.addStairs(x,(room.piece.size.z-2),MeshMapUtility.STAIR_DIR_POS_Z,0);
                 }
             }
@@ -273,10 +278,10 @@ public class MapBuilder
             max=(int)touchRange.max;
             
             doAll=((max-min)<=2);
-            noSkipZ=min+GeneratorMain.random.nextInt((max+1)-min);
+            noSkipZ=min+AppWindow.random.nextInt((max+1)-min);
             
             for (z=min;z<=max;z++) {
-                if ((GeneratorMain.random.nextBoolean()) || (z==noSkipZ) || (doAll)) {
+                if ((AppWindow.random.nextBoolean()) || (z==noSkipZ) || (doAll)) {
                     mapStory.addStairs(1,z,MeshMapUtility.STAIR_DIR_NEG_X,0);
                 }
             }
@@ -288,10 +293,10 @@ public class MapBuilder
             max=(int)touchRange.max;
             
             doAll=((max-min)<=2);
-            noSkipZ=min+GeneratorMain.random.nextInt((max+1)-min);
+            noSkipZ=min+AppWindow.random.nextInt((max+1)-min);
             
             for (z=min;z<=max;z++) {
-                if ((GeneratorMain.random.nextBoolean()) || (z==noSkipZ) || (doAll)) {
+                if ((AppWindow.random.nextBoolean()) || (z==noSkipZ) || (doAll)) {
                     mapStory.addStairs((room.piece.size.x-2),z,MeshMapUtility.STAIR_DIR_POS_X,0);
                 }
             }
@@ -338,8 +343,8 @@ public class MapBuilder
                 placeCount=10;
 
                 while (placeCount>0) {
-                    room.x=startX+GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE;
-                    room.z=startZ+GeneratorMain.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE;
+                    room.x=startX+AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE;
+                    room.z=startZ+AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE;
                     if (!room.collides(rooms)) break;
 
                     placeCount--;
@@ -425,7 +430,7 @@ public class MapBuilder
             failCount=25;
             
             while (failCount>0) {
-                connectRoom=rooms.get(firstRoomIdx+GeneratorMain.random.nextInt(endRoomIdx-firstRoomIdx));
+                connectRoom=rooms.get(firstRoomIdx+AppWindow.random.nextInt(endRoomIdx-firstRoomIdx));
                 
                 room.x=connectRoom.x-room.piece.sizeX;
                 room.z=connectRoom.z;     // on left
@@ -470,7 +475,7 @@ public class MapBuilder
             // finally return a room to start the next
             // story on
             
-        return(firstRoomIdx+GeneratorMain.random.nextInt(endRoomIdx-firstRoomIdx));
+        return(firstRoomIdx+AppWindow.random.nextInt(endRoomIdx-firstRoomIdx));
     }
 
         //
@@ -482,19 +487,17 @@ public class MapBuilder
         int                 n,x,z,k,roomCount,roomExtensionCount,
                             storyCount,nextStoryRoomIdx;
         boolean             ceilings,decorations;
-        String              mapName;
         RagPoint            centerPnt;
         MapRoom             room;
         ArrayList<MapRoom>  rooms;
         
             // some generator classes
         
-        mapBitmapList=new BitmapGenerator();
+        mapBitmapList=new BitmapGenerator(mapName);
         mapPieceList=new MapPieceList();
         
             // some settings
          
-        mapName=GeneratorMain.name;
         storyCount=3;
         ceilings=true;
         decorations=false;
@@ -507,8 +510,8 @@ public class MapBuilder
         x=0;
         z=0;
         
-        roomCount=10+GeneratorMain.random.nextInt(15);
-        roomExtensionCount=GeneratorMain.random.nextInt(5);
+        roomCount=10+AppWindow.random.nextInt(15);
+        roomExtensionCount=AppWindow.random.nextInt(5);
         
         for (n=0;n!=storyCount;n++) {
             
@@ -524,8 +527,8 @@ public class MapBuilder
                 // next story start
                 
             room=rooms.get(nextStoryRoomIdx);
-            x=room.x+GeneratorMain.random.nextInt(4)-2;
-            z=room.z+GeneratorMain.random.nextInt(4)-2;
+            x=room.x+AppWindow.random.nextInt(4)-2;
+            z=room.z+AppWindow.random.nextInt(4)-2;
         }
 
             // eliminate all combined walls
@@ -580,11 +583,15 @@ public class MapBuilder
             // write out the model
         
         try {
-            (new Export()).export(skeleton,meshList,GeneratorMain.basePath,mapName);
+            (new Export()).export(skeleton,meshList,mapName);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+        
+            // and set the walk view
+            
+        AppWindow.walkView.setIncommingMeshList(meshList,skeleton);
     }
 }

@@ -4,6 +4,7 @@ import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.mesh.*;
+import com.klinksoftware.rag.skeleton.Skeleton;
 import java.nio.*;
 import java.nio.charset.*;
 import java.nio.file.*;
@@ -19,20 +20,24 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class WalkView extends AWTGLCanvas {
 
-    private static final float RAG_NEAR_Z=500.0f;
-    private static final float RAG_FAR_Z=500000.0f;
+    private static final float RAG_NEAR_Z=1.0f;
+    private static final float RAG_FAR_Z=500.0f;
+    private static final float RAG_FOV=55.0f;
+    private static final float RAG_MOVE_SPEED=0.01f;
     private static final long RAG_PAINT_TICK=33;
     
-    private int wid, high;
+    private int wid, high, lastMouseX, lastMouseY;
     private int vertexShaderId, fragmentShaderId, programId;
     private int vertexPositionAttribute,vertexUVAttribute;
     private int perspectiveUniformId,viewUniformId;
     private int textureId;
     private long nextPaintTick;
     private float aspectRatio;
-    private MeshList meshList;
-    private RagPoint eyePoint,cameraPoint,cameraAngle,lookAtUpVector;
-    private RagMatrix4f perspectiveMatrix, viewMatrix, eyeRotMatrix, eyeRotMatrix2;
+    private float moveX,moveY,moveZ;
+    private MeshList meshList, incommingMeshList;
+    private Skeleton incommingSkeleton;
+    private RagPoint eyePoint,cameraPoint,cameraAngle,lookAtUpVector, movePoint;
+    private RagMatrix4f perspectiveMatrix, viewMatrix, rotMatrix, rotMatrix2;
 
     public WalkView(GLData glData) {
         super(glData);
@@ -59,12 +64,23 @@ public class WalkView extends AWTGLCanvas {
         
         perspectiveMatrix=new RagMatrix4f();
         viewMatrix=new RagMatrix4f();
-        eyeRotMatrix=new RagMatrix4f();
-        eyeRotMatrix2=new RagMatrix4f();
+        rotMatrix=new RagMatrix4f();
+        rotMatrix2=new RagMatrix4f();
         
             // no mesh loaded
             
         meshList=null;
+        incommingMeshList=null;
+        incommingSkeleton=null;
+        
+            // no dragging
+            
+        lastMouseX=-1;
+        lastMouseY=-1;
+        moveX=0;
+        moveY=0;
+        moveZ=0;
+        movePoint=new RagPoint(0.0f,0.0f,0.0f);
         
             // start opengl
         
@@ -134,10 +150,12 @@ public class WalkView extends AWTGLCanvas {
         vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
         vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
         
+        
+        
             // testing!  load up a texture
             
             BitmapBase bitmapBase;
-            GeneratorMain.random=new Random(Calendar.getInstance().getTimeInMillis()); // hack!
+            AppWindow.random=new Random(Calendar.getInstance().getTimeInMillis()); // hack!
             
             bitmapBase=new BitmapBrick();
         bitmapBase.generate(BitmapBrick.VARIATION_NONE,null,"brick");
@@ -163,51 +181,8 @@ public class WalkView extends AWTGLCanvas {
         MemoryUtil.memFree(buffer);
         
         
-                float[] vertices = new float[]{
-     -50.0f,  -50.0f, 2000.0f,
-    -50.0f, 50.0f, 2000.0f,
-     50.0f, 50.0f, 2000.0f,
-     
-     -50.0f,  -50.0f, 2000.0f,
-    50.0f, -50.0f, 2000.0f,
-     50.0f, 50.0f, 2000.0f,
 
-     -1000.0f,  -1000.0f, 2500.0f,
-    -1000.0f, 1000.0f, 2500.0f,
-     1000.0f, 1000.0f, 2500.0f,
-     
-     -1000.0f,  -1000.0f, 2500.0f,
-    1000.0f, -1000.0f, 2500.0f,
-     1000.0f, 1000.0f, 2500.0f
-};
 
-                
-    float[] uvs=new float[] {
-        0.0f, 0.0f,
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        0.0f, 0.0f,
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f
-    };
-    
-    int[] indexes=new int[] {0,1,2,3,4,5,6,7,8,9,10,11};
-    
-        Mesh mesh=new Mesh("test","bitmap",vertices,null,uvs,indexes);
-        meshList=new MeshList();
-        meshList.add(mesh);
-
-        for (n=0;n!=meshList.count();n++) {
-            stageMesh(meshList.get(n));
-        }
-
-    
     
         // enable everything we need to draw
         glUseProgram(programId);
@@ -220,12 +195,20 @@ public class WalkView extends AWTGLCanvas {
         nextPaintTick=System.currentTimeMillis();
     }
     
-    private void stageMesh(Mesh mesh) {
+    private void stageMesh(Mesh mesh,RagPoint bonePoint) {
+        int n;
         FloatBuffer buf;
         
         // vertexes
         buf = MemoryUtil.memAllocFloat(mesh.vertexes.length);
-        buf.put(mesh.vertexes).flip();
+        
+        for (n=0;n!=mesh.vertexes.length;n+=3) {
+            buf.put(mesh.vertexes[n]+bonePoint.x);
+            buf.put(mesh.vertexes[n+1]+bonePoint.y);
+            buf.put(mesh.vertexes[n+2]+bonePoint.z);
+        }
+        
+        buf.flip();
 
         mesh.vboVertexId = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
@@ -249,6 +232,63 @@ public class WalkView extends AWTGLCanvas {
     }
     
     private void releaseMesh(Mesh mesh) {
+        glDeleteBuffers(mesh.vboVertexId);
+        glDeleteBuffers(mesh.vboUVId);
+        
+        memFree(mesh.indexBuf);
+    }
+    
+    public void setIncommingMeshList(MeshList incommingMeshList,Skeleton incommingSkeleton) {
+        // we have to setup an incomming list so we can load
+        // the new list on a draw call so the opengl context is set
+        this.incommingMeshList=incommingMeshList;
+        this.incommingSkeleton=incommingSkeleton;
+    }
+    
+    private void stageMeshList() {
+        int n,nMesh,boneIdx;
+        Mesh mesh;
+        RagPoint tempPnt;
+        
+        if (incommingMeshList==null) return;
+        
+            // remove old mesh list
+        
+        if (meshList!=null) {
+            nMesh=meshList.count();
+
+            for (n=0;n!=nMesh;n++) {
+                releaseMesh(meshList.get(n));
+            }
+        }
+        
+            // setup the new mesh
+            
+        tempPnt=new RagPoint(0.0f,0.0f,0.0f);
+            
+        nMesh=incommingMeshList.count();
+
+        for (n=0;n!=nMesh;n++) {
+            mesh=incommingMeshList.get(n);
+            boneIdx=incommingSkeleton.findBoneIndex(mesh.name);
+            if (boneIdx==-1) {
+                stageMesh(mesh,tempPnt);
+            }
+            else {
+                stageMesh(mesh,incommingSkeleton.bones.get(boneIdx).pnt);
+            }
+        }
+        
+            // switch to new mesh list
+            // and clear incomming
+            
+        this.meshList=incommingMeshList;
+        incommingMeshList=null;
+        incommingSkeleton=null;
+        
+            // recenter camera
+            
+        cameraPoint.setFromValues(0.0f,0.0f,0.0f);
     }
     
     public void shutdown()
@@ -264,6 +304,12 @@ public class WalkView extends AWTGLCanvas {
         long tick;
         Mesh mesh;
         
+        // do we have an incomming meshlist?
+        stageMeshList();
+        
+        // no meshes
+        if (meshList==null) return;
+        
         // redraw timing
         tick=System.currentTimeMillis();
         if (nextPaintTick>tick) return;
@@ -271,6 +317,20 @@ public class WalkView extends AWTGLCanvas {
         while (nextPaintTick>tick) {
             nextPaintTick+=RAG_PAINT_TICK;
         }
+        
+            // movement
+            
+        if ((moveX!=0.0f) || (moveZ!=0.0f)) {
+            movePoint.setFromValues(moveX,0,moveZ);
+            rotMatrix.setRotationFromYAngle(cameraAngle.y);
+            rotMatrix2.setRotationFromXAngle(cameraAngle.x);
+            rotMatrix.multiply(rotMatrix2);
+            movePoint.matrixMultiply(rotMatrix);
+            
+            cameraPoint.addPoint(movePoint);
+        }
+        
+        if (moveY!=0.0f) cameraPoint.y+=moveY;
         
             // clear
             
@@ -282,17 +342,15 @@ public class WalkView extends AWTGLCanvas {
         glUseProgram(programId);
 
         try ( MemoryStack stack = stackPush()) {
-            cameraPoint.setFromValues(0.0f,0.0f,0.0f);
-
             eyePoint.setFromValues(0,0,-RAG_NEAR_Z);
-            eyeRotMatrix.setTranslationFromPoint(cameraPoint);
-            eyeRotMatrix2.setRotationFromYAngle(cameraAngle.y);
-            eyeRotMatrix.multiply(eyeRotMatrix2);
-            eyeRotMatrix2.setRotationFromXAngle(cameraAngle.x);
-            eyeRotMatrix.multiply(eyeRotMatrix2);
-            this.eyePoint.matrixMultiply(eyeRotMatrix);
+            rotMatrix.setTranslationFromPoint(cameraPoint);
+            rotMatrix2.setRotationFromYAngle(cameraAngle.y);
+            rotMatrix.multiply(rotMatrix2);
+            rotMatrix2.setRotationFromXAngle(cameraAngle.x);
+            rotMatrix.multiply(rotMatrix2);
+            eyePoint.matrixMultiply(rotMatrix);
 
-            perspectiveMatrix.setPerspectiveMatrix(55.0f,aspectRatio,RAG_NEAR_Z,RAG_FAR_Z);
+            perspectiveMatrix.setPerspectiveMatrix(RAG_FOV,aspectRatio,RAG_NEAR_Z,RAG_FAR_Z);
             viewMatrix.setLookAtMatrix(eyePoint,cameraPoint,lookAtUpVector);
 
             FloatBuffer perspectiveBuffer = stack.mallocFloat(16);
@@ -303,33 +361,22 @@ public class WalkView extends AWTGLCanvas {
             viewBuffer.put(viewMatrix.data).flip();
             glUniformMatrix4fv(viewUniformId, false, viewBuffer);
         }
-
-        cameraAngle.y+=0.01f;
-        if (cameraAngle.y>=360.0f) cameraAngle.y=0.0f;
-    
+        
             // draw all the meshes
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,textureId);
-        
-        
-        
         
         nMesh=meshList.count();
         
         for (n=0;n!=nMesh;n++) {
             mesh=meshList.get(n);
 
-
-
-
             glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
             glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
-            
 
             glBindBuffer(GL_ARRAY_BUFFER, mesh.vboUVId);
             glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, false, 0, 0);
-            
 
             glDrawElements(GL_TRIANGLES, mesh.indexBuf);
         }
@@ -345,5 +392,47 @@ public class WalkView extends AWTGLCanvas {
             
         swapBuffers();
     }
-
+    
+    //
+    // events
+    //
+    
+    public void mousePressed(int button,int x,int y) {
+        lastMouseX=x;
+        lastMouseY=y;
+    }
+    
+    public void mouseRelease(int button) {
+    }
+    
+    public void mouseDrag(int x,int y) {
+        if (lastMouseX!=x) {
+            cameraAngle.y+=((float)(x-lastMouseX)*0.5f);
+            if (cameraAngle.y<0) cameraAngle.y=360.0f+cameraAngle.y;
+            if (cameraAngle.y>=360) cameraAngle.y=cameraAngle.y-360.0f;
+            lastMouseX=x;
+        }
+        
+        if (lastMouseY!=y) {
+            cameraAngle.x+=((float)(y-lastMouseY)*0.2f);
+            if (cameraAngle.x<-89.0f) cameraAngle.x=-89.0f;
+            if (cameraAngle.x>89.0f) cameraAngle.x=89.0f;
+            lastMouseY=y;
+        }
+    }
+    
+    public void keyPress(char key) {
+        if (key=='w') moveZ=RAG_MOVE_SPEED;
+        if (key=='s') moveZ=-RAG_MOVE_SPEED;
+        if (key=='a') moveX=RAG_MOVE_SPEED;
+        if (key=='d') moveX=-RAG_MOVE_SPEED;
+        if (key=='q') moveY=RAG_MOVE_SPEED;
+        if (key=='e') moveY=-RAG_MOVE_SPEED;
+    }
+    
+    public void keyRelease(char key) {
+        if ((key=='w') || (key=='s')) moveZ=0.0f;
+        if ((key=='a') || (key=='d')) moveX=0.0f;
+        if ((key=='q') || (key=='e')) moveY=0.0f;
+    }
 }

@@ -51,13 +51,13 @@ public class BitmapGround extends BitmapBase
             
                 // line half from top
                 
-            y=halfHigh+GeneratorMain.random.nextInt(halfHigh);
+            y=halfHigh+AppWindow.random.nextInt(halfHigh);
             drawRandomLine(x,0,x,(y+5),0,0,textureSize,textureSize,10,lineColor,false);
             drawLineNormal(x,0,x,(y+5),((x&0x1)==0x0)?NORMAL_BOTTOM_RIGHT_45:NORMAL_TOP_LEFT_45);
             
                 // line half from bottom
                 
-            y=textureSize-(halfHigh+GeneratorMain.random.nextInt(halfHigh));
+            y=textureSize-(halfHigh+AppWindow.random.nextInt(halfHigh));
             drawRandomLine(x,(y-5),x,textureSize,0,0,textureSize,textureSize,10,lineColor,false);
             drawLineNormal(x,0,x,(y+5),((x&0x1)==0x0)?NORMAL_TOP_LEFT_45:NORMAL_BOTTOM_RIGHT_45);
         }

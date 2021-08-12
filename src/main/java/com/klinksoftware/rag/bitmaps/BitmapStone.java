@@ -62,7 +62,7 @@ public class BitmapStone extends BitmapBase
         
             // draw the stones
             
-        yCount=4+GeneratorMain.random.nextInt(4);
+        yCount=4+AppWindow.random.nextInt(4);
         yAdd=textureSize/yCount;
         
         top=0;
@@ -74,7 +74,7 @@ public class BitmapStone extends BitmapBase
             lft=0;
             
             while (true) {
-                rgt=lft+(yAdd+(int)(GeneratorMain.random.nextFloat()*((float)yAdd*0.8f)));
+                rgt=lft+(yAdd+(int)(AppWindow.random.nextFloat()*((float)yAdd*0.8f)));
                 if (rgt>=textureSize) rgt=textureSize-1;
 
                     // special check if next stone would be too small,
@@ -84,15 +84,15 @@ public class BitmapStone extends BitmapBase
                 
                     // the stone itself
                     
-                drawStoneColor=adjustColorRandom(((GeneratorMain.random.nextFloat()<0.7f)?stoneColor:altStoneColor),0.7f,1.2f);
+                drawStoneColor=adjustColorRandom(((AppWindow.random.nextFloat()<0.7f)?stoneColor:altStoneColor),0.7f,1.2f);
 
-                xOff=(int)(GeneratorMain.random.nextFloat()*((float)textureSize*0.01f));
-                yOff=(int)(GeneratorMain.random.nextFloat()*((float)textureSize*0.01f));
+                xOff=(int)(AppWindow.random.nextFloat()*((float)textureSize*0.01f));
+                yOff=(int)(AppWindow.random.nextFloat()*((float)textureSize*0.01f));
 
-                edgeSize=(int)((GeneratorMain.random.nextFloat()*((float)textureSize*0.1f))+(GeneratorMain.random.nextFloat()*((float)textureSize*0.2f)));     // new edge size as stones aren't the same
-                xRoundFactor=0.02f+(GeneratorMain.random.nextFloat()*0.05f);
-                yRoundFactor=0.02f+(GeneratorMain.random.nextFloat()*0.05f);
-                normalZFactor=(GeneratorMain.random.nextFloat()*0.2f);           // different z depths
+                edgeSize=(int)((AppWindow.random.nextFloat()*((float)textureSize*0.1f))+(AppWindow.random.nextFloat()*((float)textureSize*0.2f)));     // new edge size as stones aren't the same
+                xRoundFactor=0.02f+(AppWindow.random.nextFloat()*0.05f);
+                yRoundFactor=0.02f+(AppWindow.random.nextFloat()*0.05f);
+                normalZFactor=(AppWindow.random.nextFloat()*0.2f);           // different z depths
                 
                     // draw on the background
                     

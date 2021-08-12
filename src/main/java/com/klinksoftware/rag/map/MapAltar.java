@@ -28,7 +28,7 @@ public class MapAltar
         float       y,xMin,xMax,zMin,zMax;
         Mesh        mesh,mesh2;
         
-        levelCount=5+GeneratorMain.random.nextInt(5);
+        levelCount=5+AppWindow.random.nextInt(5);
         
         mesh=null;
         y=this.room.offset.y;
@@ -63,7 +63,7 @@ public class MapAltar
             if ((dx<=1) || (dz<=1)) break;
             
             if (dx>dz) {
-                if (GeneratorMain.random.nextBoolean()) {
+                if (AppWindow.random.nextBoolean()) {
                     lx++;
                 }
                 else {
@@ -71,7 +71,7 @@ public class MapAltar
                 }
             }
             else {
-                if (GeneratorMain.random.nextBoolean()) {
+                if (AppWindow.random.nextBoolean()) {
                     tz++;
                 }
                 else {
@@ -105,7 +105,7 @@ public class MapAltar
             mx=room.piece.size.x/2;
             mz=room.piece.size.z/2;
             
-            switch (GeneratorMain.random.nextInt(3)) {
+            switch (AppWindow.random.nextInt(3)) {
                 case 0:
                     mesh=addAltar(2,(room.piece.size.x-2),2,(room.piece.size.z-2),stepHigh);
                     break;

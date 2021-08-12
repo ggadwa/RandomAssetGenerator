@@ -12,13 +12,6 @@ import javax.imageio.*;
 
 public class BitmapBase
 {
-    public static final int COLOR_SCHEME_RANDOM=0;
-    public static final int COLOR_SCHEME_DOOM=1;
-    public static final int COLOR_SCHEME_GRAY=2;
-    public static final int COLOR_SCHEME_PASTEL=3;
-    
-    public static final int COLOR_SCHEME_COUNT=4;
-
     public static final RagPoint NORMAL_CLEAR=new RagPoint(0.0f,0.0f,1.0f);
 
     public static final RagPoint NORMAL_LEFT_45=new RagPoint(-0.65f,0.02f,0.75f);
@@ -120,40 +113,26 @@ public class BitmapBase
         float           f,midPoint,darken;
         float[]         col;
         
-        switch (GeneratorMain.colorScheme) {
+            // every once and a while, return a gray
             
-                // random primary colors
-                
-            case COLOR_SCHEME_RANDOM:
-                idx=GeneratorMain.random.nextInt(COLOR_PRIMARY_LIST.length);
-                col=COLOR_PRIMARY_LIST[idx];
-                darken=0.1f-(GeneratorMain.random.nextFloat()*0.2f);
-                return(new RagColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
-                
-                // doom browns and green
-                
-            case COLOR_SCHEME_DOOM:
-                if (GeneratorMain.random.nextBoolean()) return(adjustColorRandom(new RagColor(0.6f,0.3f,0.0f),0.7f,1.0f));
-
-                f=GeneratorMain.random.nextFloat()*0.1f;
-                return(new RagColor(f,(0.4f+(GeneratorMain.random.nextFloat()*0.2f)),f));
+        if (AppWindow.random.nextFloat()<0.1) return(getRandomGray(0.3f,0.7f));
+        
+            // random color
             
-                // black and white
-                
-            case COLOR_SCHEME_GRAY:
-                return(getRandomGray(0.3f,0.7f));
-                
-                // pastel primary colors
-                
-            case COLOR_SCHEME_PASTEL:
-                idx=GeneratorMain.random.nextInt(COLOR_PRIMARY_LIST.length);
-                col=COLOR_PRIMARY_LIST[idx];
-                midPoint=(col[0]+col[1]+col[2])*0.33f;
-                return(new RagColor((col[0]+(midPoint-col[0])*0.8f),(col[1]+(midPoint-col[1])*0.8f),(col[2]+(midPoint-col[2])*0.8f)));
-                
+        idx=AppWindow.random.nextInt(COLOR_PRIMARY_LIST.length);
+        col=COLOR_PRIMARY_LIST[idx];
+        
+            // every once and a while, a pastel
+            
+        if (AppWindow.random.nextFloat()<0.2) {
+            midPoint=(col[0]+col[1]+col[2])*0.33f;
+            return(new RagColor((col[0]+(midPoint-col[0])*0.8f),(col[1]+(midPoint-col[1])*0.8f),(col[2]+(midPoint-col[2])*0.8f)));
         }
         
-        return(null);
+            // regular color
+            
+        darken=0.1f-(AppWindow.random.nextFloat()*0.2f);
+        return(new RagColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
     }
     
     protected RagColor getRandomColorDull(float dullFactor)
@@ -193,7 +172,7 @@ public class BitmapBase
     {
         float       col;
         
-        col=minFactor+(GeneratorMain.random.nextFloat()*(maxFactor-minFactor));
+        col=minFactor+(AppWindow.random.nextFloat()*(maxFactor-minFactor));
         return(new RagColor(col,col,col));
     }
 
@@ -206,7 +185,7 @@ public class BitmapBase
     {
         float       f;
         
-        f=minFactor+(GeneratorMain.random.nextFloat()*(maxFactor-minFactor));
+        f=minFactor+(AppWindow.random.nextFloat()*(maxFactor-minFactor));
         return(new RagColor((color.r*f),(color.g*f),(color.b*f)));
     }
     
@@ -369,7 +348,7 @@ public class BitmapBase
         for (y=0;y!=gridYSize;y++) {
             
             for (x=0;x!=gridXSize;x++) {
-                normal=new RagPoint(((GeneratorMain.random.nextFloat()*2.0f)-1.0f),((GeneratorMain.random.nextFloat()*2.0f)-1.0f),0.0f);
+                normal=new RagPoint(((AppWindow.random.nextFloat()*2.0f)-1.0f),((AppWindow.random.nextFloat()*2.0f)-1.0f),0.0f);
                 normal.normalize2D();
                 vectors[x][y]=normal;
             }
@@ -483,7 +462,7 @@ public class BitmapBase
                 
                     // the static random color factor
                     
-                colFactor=colorFactorMin+(GeneratorMain.random.nextFloat()*colorFactorAdd);
+                colFactor=colorFactorMin+(AppWindow.random.nextFloat()*colorFactorAdd);
 
                 idx=((y*textureSize)+x)*4;
                 
@@ -591,9 +570,9 @@ public class BitmapBase
         
             // random settings
             
-        lineSize=2+GeneratorMain.random.nextInt(3);
-        startArc=GeneratorMain.random.nextInt(36);
-        endArc=startArc+GeneratorMain.random.nextInt(36);
+        lineSize=2+AppWindow.random.nextInt(3);
+        startArc=AppWindow.random.nextInt(36);
+        endArc=startArc+AppWindow.random.nextInt(36);
         
         mx=(lft+rgt)/2;
         my=(top+bot)/2;
@@ -607,8 +586,8 @@ public class BitmapBase
         ry=new int[36];
         
         for (n=0;n!=36;n++) {
-            rx[n]=GeneratorMain.random.nextInt(20)-10;
-            ry[n]=GeneratorMain.random.nextInt(20)-10;
+            rx[n]=AppWindow.random.nextInt(20)-10;
+            ry[n]=AppWindow.random.nextInt(20)-10;
         }
 
             // build the polygon/oval
@@ -676,12 +655,12 @@ public class BitmapBase
         nCount=(int)(((float)textureSize*0.5f)*density);
         
         for (n=0;n!=nCount;n++) {
-            x=GeneratorMain.random.nextInt(textureSize-1);
-            y=GeneratorMain.random.nextInt(textureSize-1);
-            wid=20+GeneratorMain.random.nextInt(40);
-            high=20+GeneratorMain.random.nextInt(40);
+            x=AppWindow.random.nextInt(textureSize-1);
+            y=AppWindow.random.nextInt(textureSize-1);
+            wid=20+AppWindow.random.nextInt(40);
+            high=20+AppWindow.random.nextInt(40);
             
-            createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,GeneratorMain.random.nextBoolean());
+            createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,AppWindow.random.nextBoolean());
         }
         
             // blur to fix any missing pixels and make the
@@ -729,21 +708,21 @@ public class BitmapBase
 
                 // find a gravity point on an edge
 
-            switch (GeneratorMain.random.nextInt(4)) {
+            switch (AppWindow.random.nextInt(4)) {
                 case 0:
                     gx=lft+distortSize;
-                    gy=top+GeneratorMain.random.nextInt(bot-top);
+                    gy=top+AppWindow.random.nextInt(bot-top);
                     break;
                 case 1:
                     gx=rgt-distortSize;
-                    gy=top+GeneratorMain.random.nextInt(bot-top);
+                    gy=top+AppWindow.random.nextInt(bot-top);
                     break;
                 case 2:
-                    gx=lft+GeneratorMain.random.nextInt(rgt-lft);
+                    gx=lft+AppWindow.random.nextInt(rgt-lft);
                     gy=top+distortSize;
                     break;
                 default:
-                    gx=lft+GeneratorMain.random.nextInt(rgt-lft);
+                    gx=lft+AppWindow.random.nextInt(rgt-lft);
                     gy=bot-distortSize;
                     break;
             }
@@ -1394,7 +1373,7 @@ public class BitmapBase
             
             for (y=top;y!=bot;y++) {
                 
-                if (GeneratorMain.random.nextFloat()<density) {
+                if (AppWindow.random.nextFloat()<density) {
                     if ((lx>=0) && (lx<textureSize)) {
                         idx=((y*textureSize)+lx)*4;
                         colorData[idx]=baseColor.r;
@@ -1403,7 +1382,7 @@ public class BitmapBase
                     }
                 }
                 
-                if (GeneratorMain.random.nextFloat()<density) {
+                if (AppWindow.random.nextFloat()<density) {
                     if ((rx>=0) && (rx<textureSize)) {
                         idx=((y*textureSize)+rx)*4;
                         colorData[idx]=baseColor.r;
@@ -1427,17 +1406,17 @@ public class BitmapBase
         wid=rgt-lft;
         
         while (true) {
-            shineWid=(int)(((float)wid*0.035f)+(GeneratorMain.random.nextFloat()*((float)wid*0.15)));
+            shineWid=(int)(((float)wid*0.035f)+(AppWindow.random.nextFloat()*((float)wid*0.15)));
             if ((x+shineWid)>rgt) shineWid=rgt-x;
             
                 // small % are no lines
                 
-            if (GeneratorMain.random.nextFloat()<0.9f) {
+            if (AppWindow.random.nextFloat()<0.9f) {
                 shineColor=adjustColorRandom(metalColor,0.7f,1.3f);
                 drawMetalShineLine(x,top,bot,shineWid,shineColor);
             }
             
-            x+=(shineWid+(int)(((float)wid*0.03f)+(GeneratorMain.random.nextFloat()*((float)wid*0.05))));
+            x+=(shineWid+(int)(((float)wid*0.03f)+(AppWindow.random.nextFloat()*((float)wid*0.05))));
             if (x>=rgt) break;
         }
         
@@ -1460,7 +1439,7 @@ public class BitmapBase
         
             // random shrink
             
-        xAdd=GeneratorMain.random.nextFloat()*minXReduce;
+        xAdd=AppWindow.random.nextFloat()*minXReduce;
         
             // draw the dirt
             
@@ -1475,7 +1454,7 @@ public class BitmapBase
             if (lx>=rx) break;
             
             for (x=lx;x!=rx;x++) {
-                factor2=factor*(minMix+(GeneratorMain.random.nextFloat()*addMix));
+                factor2=factor*(minMix+(AppWindow.random.nextFloat()*addMix));
 
                 idx=((y*textureSize)+x)*4;
                 colorData[idx]=((1.0f-factor2)*colorData[idx])+(color.r*factor2);
@@ -1504,8 +1483,8 @@ public class BitmapBase
         minWid=(int)((float)(rgt-lft)*0.1f);
         
         for (n=0;n!=additionalStreakCount;n++) {
-            sx=lft+GeneratorMain.random.nextInt((rgt-minWid)-lft);
-            ex=(sx+minWid)+GeneratorMain.random.nextInt(rgt-(sx+minWid));
+            sx=lft+AppWindow.random.nextInt((rgt-minWid)-lft);
+            ex=(sx+minWid)+AppWindow.random.nextInt(rgt-(sx+minWid));
             if (sx>=ex) continue;
             
             drawStreakDirtSingle(sx,top,ex,bot,minMix,addMix,color,0.1f);
@@ -1552,7 +1531,7 @@ public class BitmapBase
             halfHigh=(float)high*0.5f;
             
             for (n=0;n!=1000;n++) {
-                if (GeneratorMain.random.nextFloat()>curPercentage) continue;
+                if (AppWindow.random.nextFloat()>curPercentage) continue;
                 
                 rad=(float)(Math.PI*2.0)*((float)n*0.001f);
 
@@ -1658,9 +1637,9 @@ public class BitmapBase
 
             count--;
             if (count<=0) {
-                count=2+GeneratorMain.random.nextInt(4);
+                count=2+AppWindow.random.nextInt(4);
                 
-                f=1.0f+((1.0f-(GeneratorMain.random.nextFloat()*2.0f))*factor);
+                f=1.0f+((1.0f-(AppWindow.random.nextFloat()*2.0f))*factor);
                 
                 r=baseColor.r*f;
                 g=baseColor.g*f;
@@ -1712,9 +1691,9 @@ public class BitmapBase
             
             count--;
             if (count<=0) {
-                count=2+GeneratorMain.random.nextInt(4);
+                count=2+AppWindow.random.nextInt(4);
                 
-                f=1.0f+((1.0f-(GeneratorMain.random.nextFloat()*2.0f))*factor);
+                f=1.0f+((1.0f-(AppWindow.random.nextFloat()*2.0f))*factor);
                 
                 r=baseColor.r*f;
                 g=baseColor.g*f;
@@ -2088,7 +2067,7 @@ public class BitmapBase
         boolean     horizontal;
         RagColor    aliasColor;
         
-        segCount=2+GeneratorMain.random.nextInt(5);
+        segCount=2+AppWindow.random.nextInt(5);
         horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
         xAdd=(x2-x)/segCount;
@@ -2108,7 +2087,7 @@ public class BitmapBase
                 ey=sy+yAdd;
 
                 if ((n&0x1)==0) {      // straighten out line every other variation
-                    r=lineVariant-GeneratorMain.random.nextInt(lineVariant*2);
+                    r=lineVariant-AppWindow.random.nextInt(lineVariant*2);
 
                     if (horizontal) {
                         ey+=r;
@@ -2156,7 +2135,7 @@ public class BitmapBase
     {
         int     n,sx,sy,ex,ey,segCount,xAdd;
         
-        segCount=2+GeneratorMain.random.nextInt(5);
+        segCount=2+AppWindow.random.nextInt(5);
         xAdd=(x2-x)/segCount;
         
         sx=ex=x;
@@ -2168,7 +2147,7 @@ public class BitmapBase
                 ex=x2;
             }
             else {
-                ey=sy+(GeneratorMain.random.nextInt(lineVariant)*lineDir);
+                ey=sy+(AppWindow.random.nextInt(lineVariant)*lineDir);
                 ex=sx+xAdd;
             }
             
@@ -2184,7 +2163,7 @@ public class BitmapBase
             
             if ((ey==clipTop) || (ey==clipBot)) break;
             
-            if ((canSplit) && (GeneratorMain.random.nextBoolean())) {
+            if ((canSplit) && (AppWindow.random.nextBoolean())) {
                 if (lineDir>0) {
                     drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
                 }
@@ -2204,7 +2183,7 @@ public class BitmapBase
     {
         int     n,sx,sy,ex,ey,segCount,yAdd;
         
-        segCount=2+GeneratorMain.random.nextInt(5);
+        segCount=2+AppWindow.random.nextInt(5);
         yAdd=(y2-y)/segCount;
         
         sx=ex=x;
@@ -2216,7 +2195,7 @@ public class BitmapBase
                 ey=y2;
             }
             else {
-                ex=sx+(GeneratorMain.random.nextInt(lineVariant)*lineDir);
+                ex=sx+(AppWindow.random.nextInt(lineVariant)*lineDir);
                 ey=sy+yAdd;
             }
             
@@ -2232,7 +2211,7 @@ public class BitmapBase
             
             if ((ex==clipLft) || (ex==clipRgt)) break;
             
-            if ((canSplit) && (GeneratorMain.random.nextBoolean())) {
+            if ((canSplit) && (AppWindow.random.nextBoolean())) {
                 if (lineDir>0) {
                     drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,false);
                 }
@@ -2262,8 +2241,8 @@ public class BitmapBase
                 dy2=ey;
             }
             else {
-                dx2=(int)(sx+((float)((ex-sx)*(n+1))/(float)segCount))+(GeneratorMain.random.nextInt(Math.abs(lineXVarient))*(int)Math.signum(lineXVarient));
-                dy2=(int)(sy+((float)((ey-sy)*(n+1))/(float)segCount))+(GeneratorMain.random.nextInt(Math.abs(lineYVarient))*(int)Math.signum(lineYVarient));
+                dx2=(int)(sx+((float)((ex-sx)*(n+1))/(float)segCount))+(AppWindow.random.nextInt(Math.abs(lineXVarient))*(int)Math.signum(lineXVarient));
+                dy2=(int)(sy+((float)((ey-sy)*(n+1))/(float)segCount))+(AppWindow.random.nextInt(Math.abs(lineYVarient))*(int)Math.signum(lineYVarient));
             }
             
             drawLineColor(dx,dy,dx2,dy2,color);
@@ -2461,7 +2440,7 @@ public class BitmapBase
         drawRect(mid,mid,textureSize,textureSize,new RagColor(0.0f,0.0f,1.0f));
     }
 
-    public void generate(int variationMode,String basePath,String name)
+    public void generate(int variationMode,String buildName,String name)
     {
         int     imgSize;
         String  path;
@@ -2493,8 +2472,8 @@ public class BitmapBase
         
             // write out the bitmaps
         
-        if (basePath!=null) {
-            path=basePath+File.separator+"textures"+File.separator+name;
+        if (buildName!=null) {
+            path="output"+File.separator+buildName+File.separator+"textures"+File.separator+name;
 
             writeImageData(colorData,(path+"_color.png"));
             if (hasNormal) writeImageData(normalData,(path+"_normal.png"));

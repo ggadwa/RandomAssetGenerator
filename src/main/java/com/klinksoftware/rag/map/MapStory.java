@@ -156,7 +156,7 @@ public class MapStory
 
                 // next random direction
                 
-            dir=GeneratorMain.random.nextInt(4);
+            dir=AppWindow.random.nextInt(4);
             orgDir=dir;
             
                 // find open direction
@@ -214,7 +214,7 @@ public class MapStory
             
         if (storyIdx==1) {
             for (x=1;x<(room.piece.size.x-1);x++) {
-                if (GeneratorMain.random.nextFloat()<0.2f) {
+                if (AppWindow.random.nextFloat()<0.2f) {
                     for (z=1;z<(room.piece.size.z-1);z++) {
                         if (room.getGrid(storyIdx,x,z)==FLAG_PLATFORM) room.setGrid(storyIdx,x,z,FLAG_WALL);
                     }
@@ -222,7 +222,7 @@ public class MapStory
             }
 
             for (z=1;z<(room.piece.size.z-1);z++) {
-                if (GeneratorMain.random.nextFloat()<0.2f) {
+                if (AppWindow.random.nextFloat()<0.2f) {
                     for (x=1;x<(room.piece.size.x-1);x++) {
                         if (room.getGrid(storyIdx,x,z)==FLAG_PLATFORM) room.setGrid(storyIdx,x,z,FLAG_WALL);
                     }
@@ -336,10 +336,10 @@ public class MapStory
         
         x=room.piece.size.x/2;
         z=room.piece.size.z/2;
-        dir=GeneratorMain.random.nextInt(4);
+        dir=AppWindow.random.nextInt(4);
         
-        x=2+GeneratorMain.random.nextInt(room.piece.size.x-4);
-        z=2+GeneratorMain.random.nextInt(room.piece.size.z-4);
+        x=2+AppWindow.random.nextInt(room.piece.size.x-4);
+        z=2+AppWindow.random.nextInt(room.piece.size.z-4);
         
         addStairs(x,z,dir,0);
         

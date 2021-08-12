@@ -11,14 +11,13 @@ import java.util.*;
 
 public class ModelBuilder
 {
-    private String                  basePath;
-    private Skeleton                skeleton;
-    private MeshList                meshList;
-    private BitmapGenerator         mapBitmapList;
+    private String name;
+    private Skeleton skeleton;
+    private MeshList meshList;
+    private BitmapGenerator mapBitmapList;
     
-    public ModelBuilder(String basePath)
-    {
-        this.basePath=basePath;
+    public ModelBuilder(String name) {
+        this.name=name;
     }
     
         //
@@ -59,18 +58,12 @@ public class ModelBuilder
         
     public void build()
     {
-        String              modelName;
-        
             // always use a single body bitmap
         
-        mapBitmapList=new BitmapGenerator();
+        mapBitmapList=new BitmapGenerator(name);
         mapBitmapList.generateBody();
         mapBitmapList.generateLimb();
         mapBitmapList.generateHead();
-        
-            // some settings
-         
-        modelName=GeneratorMain.name;
         
             // build the skeleton
             
@@ -90,12 +83,15 @@ public class ModelBuilder
             // write out the model
         
         try {
-            (new Export()).export(skeleton,meshList,basePath,modelName);
+            (new Export()).export(skeleton,meshList,name);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-
+        
+            // and set the walk view
+            
+        AppWindow.walkView.setIncommingMeshList(meshList,skeleton);
     }
 }

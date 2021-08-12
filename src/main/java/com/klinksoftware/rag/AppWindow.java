@@ -1,9 +1,11 @@
 package com.klinksoftware.rag;
 
-import com.klinksoftware.rag.walkview.WalkView;
+import com.klinksoftware.rag.tool.*;
+import com.klinksoftware.rag.walkview.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
+import java.util.Random;
 import javax.swing.*;
 import org.lwjgl.opengl.awt.*;
 
@@ -14,21 +16,21 @@ public class AppWindow implements WindowListener {
     public static final int TOOLBAR_HEIGHT = 38;
     public static final int HEADER_HEIGHT = 22;
 
-    private static final int TOOL_BUTTON_RUN = 0;
+    private static final int TOOL_BUTTON_MAP = 0;
+    private static final int TOOL_BUTTON_MODEL = 1;
+    private static final int TOOL_BUTTON_BITMAP = 2;
 
     public static final int UI_TYPE_MAP = 0;
     public static final int UI_TYPE_MODEL = 1;
     public static final int UI_TYPE_BITMAPS = 2;
 
     private JFrame frame;
-    private JPanel settingsPanel, spacerPanel;
     private JToolBar toolBar;
-    private JButton runButton;
-    private JLabel typeLabel, nameLabel;
-    private JTextField nameField;
-    private JComboBox typeComboBox;
-    private GradientLabel settingsLabel, walkLabel;
-    private WalkView walkView;
+    private JButton buildMapButton, buildModelButton, buildBitmapButton;
+    private GradientLabel walkLabel;
+    
+    public static Random random;
+    public static WalkView walkView;
 
     //
     // window events
@@ -63,28 +65,23 @@ public class AppWindow implements WindowListener {
     public void windowDeactivated(WindowEvent e) {
     }
 
-    //
-    // getters
-    //
-    public int getSelectedType() {
-        return (typeComboBox.getSelectedIndex());
+    // toolbars
+    public void enableButtons(boolean enabled) {
+        buildMapButton.setEnabled(enabled);
+        buildModelButton.setEnabled(enabled);
+        buildBitmapButton.setEnabled(enabled);
     }
 
-    public String getName() {
-        return (nameField.getText());
-    }
-
-    public void enableRunButton(boolean enabled) {
-        runButton.setEnabled(enabled);
-    }
-
-    //
-    // toolbar
-    //
     private void toolBarClick(int buttonId) {
         switch (buttonId) {
-            case TOOL_BUTTON_RUN:
-                (new GeneratorRun(this)).execute();
+            case TOOL_BUTTON_MAP:
+                (new MapBuildWorker(this)).execute();
+                break;
+            case TOOL_BUTTON_MODEL:
+                (new ModelBuildWorker(this)).execute();
+                break;
+            case TOOL_BUTTON_BITMAP:
+                (new BitmapBuildWorker(this)).execute();
                 break;
         }
     }
@@ -106,7 +103,7 @@ public class AppWindow implements WindowListener {
 
         return (button);
     }
-
+    
     //
     // start and stop main window
     //
@@ -150,53 +147,88 @@ public class AppWindow implements WindowListener {
         toolBar.setFloatable(false);
         toolBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, TOOLBAR_HEIGHT));
 
-        toolBar.add(Box.createHorizontalGlue());
-        runButton = addToolButton("tool_run", TOOL_BUTTON_RUN, "Run");
-        frame.add(toolBar, new GridBagConstraints(0, 0, 3, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-
-        // the settings
-        settingsLabel = new GradientLabel("Settings", new Color(196, 196, 255), new Color(128, 128, 255), false);
-        frame.add(settingsLabel, new GridBagConstraints(0, 1, 1, 1, 0.2, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-
-        settingsPanel = new JPanel(new GridBagLayout());
-        settingsPanel.setBackground(Color.WHITE);
-        frame.add(settingsPanel, new GridBagConstraints(0, 2, 1, 1, 0.2, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-
-        typeLabel = new JLabel("Type:");
-        typeLabel.setHorizontalAlignment(JLabel.RIGHT);
-        settingsPanel.add(typeLabel, new GridBagConstraints(0, 0, 1, 1, 0.2, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
-
-        typeComboBox = new JComboBox(new String[]{"Map", "Model", "Bitmaps"});
-        settingsPanel.add(typeComboBox, new GridBagConstraints(1, 0, 1, 1, 0.8, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
-
-        nameLabel = new JLabel("Name:");
-        nameLabel.setHorizontalAlignment(JLabel.RIGHT);
-        settingsPanel.add(nameLabel, new GridBagConstraints(0, 1, 1, 1, 0.2, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
-
-        nameField = new JTextField("test");
-        settingsPanel.add(nameField, new GridBagConstraints(1, 1, 1, 1, 0.8, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 0, 0));
-
-        spacerPanel = new JPanel();
-        spacerPanel.setBackground(Color.WHITE);
-        settingsPanel.add(spacerPanel, new GridBagConstraints(0, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+        buildMapButton = addToolButton("tool_map", TOOL_BUTTON_MAP, "Build Map");
+        buildModelButton = addToolButton("tool_model", TOOL_BUTTON_MODEL, "Build Model");
+        buildBitmapButton = addToolButton("tool_bitmap", TOOL_BUTTON_BITMAP, "Build Bitmaps");
+        frame.add(toolBar, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
         // walk view
         walkLabel = new GradientLabel("Walk Through", new Color(196, 196, 255), new Color(128, 128, 255), true);
-        frame.add(walkLabel, new GridBagConstraints(2, 1, 1, 1, 0.8, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+        frame.add(walkLabel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
         glData = new GLData();
         glData.samples = 4;
         glData.swapInterval = 0;
         walkView = new WalkView(glData);
+        walkView.setFocusable(false);
 
-        frame.add(walkView, new GridBagConstraints(2, 2, 1, 2, 0.8, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+        frame.add(walkView, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
         // all the event listeners
         frame.addWindowListener(this);
+        
+        // events in canvas
+        walkView.addMouseMotionListener(
+            new MouseMotionListener() {
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                }
+                
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    walkView.mouseDrag(e.getX(),e.getY());
+                }
+            });
+        
+        walkView.addMouseListener(
+            new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                }
 
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    walkView.mousePressed(e.getButton(),e.getX(),e.getY());
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    walkView.mouseRelease(e.getButton());
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                }
+            });
+        
+        frame.addKeyListener(
+            new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                }
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    walkView.keyPress(e.getKeyChar());
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    walkView.keyRelease(e.getKeyChar());
+                }  
+            });
+        
         // show the window
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        
+        // create the random
+        // this will be seeded when we start a build
+        random=new Random(0);
 
         // a loop to constantly render the walk view
         glLoop = new Runnable() {
@@ -213,8 +245,6 @@ public class AppWindow implements WindowListener {
     }
 
     public void stop() {
-        // dispose window
-
         frame.dispose();
     }
 }

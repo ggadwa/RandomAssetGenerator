@@ -232,7 +232,7 @@ public class Export
         // main export
         //
     
-    public void export(Skeleton skeleton,MeshList meshList,String basePath,String name) throws Exception
+    public void export(Skeleton skeleton,MeshList meshList,String name) throws Exception
     {
         int                             n,meshCount,materialIdx;
         byte[]                          binBytes;
@@ -381,7 +381,7 @@ public class Export
         
             // save the json
                
-        path=basePath+File.separator+name+".gltf";
+        path="output"+File.separator+name+File.separator+name+".gltf";
         
         objMapper=new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
@@ -395,7 +395,7 @@ public class Export
         
             // and write the bin
             
-        path=basePath+File.separator+name+".bin";
+        path="output"+File.separator+name+File.separator+name+".bin";
         
         try(FileOutputStream binFile=new FileOutputStream(path)) {
             binFile.write(binBytes);

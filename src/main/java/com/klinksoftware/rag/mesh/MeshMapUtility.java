@@ -322,7 +322,7 @@ public class MeshMapUtility
     public static void buildRoomWalls(MeshList meshList,MapRoom room,RagPoint centerPnt,String name)
     {
         int                 k,k2,vertexCount,trigIdx;
-        float               y,y2;
+        float               y;
         ArrayList<Float>    vertexArray;
         ArrayList<Integer>  indexArray;
         int[]               indexes;
@@ -339,7 +339,6 @@ public class MeshMapUtility
 
         trigIdx=0;
         y=room.story*(MapBuilder.SEGMENT_SIZE+MapBuilder.FLOOR_HEIGHT);
-        y2=y+MapBuilder.SEGMENT_SIZE;
         
         for (k=0;k!=vertexCount;k++) {
 
@@ -725,17 +724,17 @@ public class MeshMapUtility
         int         n,segCount;
         float[]     segments;
         
-        segCount=segmentCount+GeneratorMain.random.nextInt(segmentExtra);
+        segCount=segmentCount+AppWindow.random.nextInt(segmentExtra);
         segments=new float[segCount+2];
         
         segments[0]=1.0f;       // top always biggest
         
         for (n=0;n!=segCount;n++) {
-            if (GeneratorMain.random.nextFloat()<segmentRoundPercentage) {
+            if (AppWindow.random.nextFloat()<segmentRoundPercentage) {
                 segments[n+1]=segments[n];
             }
             else {
-                segments[n+1]=0.8f+(GeneratorMain.random.nextFloat()*0.2f);
+                segments[n+1]=0.8f+(AppWindow.random.nextFloat()*0.2f);
             }
         }
         

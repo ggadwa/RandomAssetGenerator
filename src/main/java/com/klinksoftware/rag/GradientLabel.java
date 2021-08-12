@@ -16,6 +16,7 @@ public class GradientLabel extends JLabel
         
         super.setFont(new Font("Arial",Font.BOLD,14));
         super.setBorder(BorderFactory.createMatteBorder(0,(leftBorder?1:0),1,0,botColor));
+        super.setHorizontalAlignment(JLabel.CENTER);
         super.setVerticalTextPosition(JLabel.CENTER);
         super.setMaximumSize(new Dimension(Integer.MAX_VALUE,AppWindow.HEADER_HEIGHT));
     }

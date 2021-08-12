@@ -40,7 +40,7 @@ public class MapStorage
         
             // stacks of boxes
             
-        stackCount=1+GeneratorMain.random.nextInt(3);
+        stackCount=1+AppWindow.random.nextInt(3);
             
             // the stacks
             
@@ -48,7 +48,7 @@ public class MapStorage
         y=room.offset.y;
             
         for (stackLevel=0;stackLevel!=stackCount;stackLevel++) {
-            rotAngle.setFromValues(0.0f,(-10.0f+(GeneratorMain.random.nextFloat()*20.0f)),0.0f);
+            rotAngle.setFromValues(0.0f,(-10.0f+(AppWindow.random.nextFloat()*20.0f)),0.0f);
             mesh2=MeshMapUtility.createCubeRotated(room,(name+"_"+Integer.toString(storageCount)),"box",(x-boxHalfSize),(x+boxHalfSize),y,(y+boxSize),(z-boxHalfSize),(z+boxHalfSize),rotAngle,true,true,true,true,true,(stackLevel!=0),false,MeshMapUtility.UV_WHOLE);
             
             if (mesh==null) {
@@ -87,7 +87,7 @@ public class MapStorage
 
             // height and width
 
-        stackCount=1+GeneratorMain.random.nextInt(3);
+        stackCount=1+AppWindow.random.nextInt(3);
         
             // some preset bounds
             
@@ -139,13 +139,13 @@ public class MapStorage
                  
             for (z2=gz;z2<(gz+zSize);z2++) {
                 for (x2=gx;x2<(gx+xSize);x2++) {
-                    if (GeneratorMain.random.nextBoolean()) continue;
+                    if (AppWindow.random.nextBoolean()) continue;
                     
-                    boxSize=(shelfHigh*0.5f)+(GeneratorMain.random.nextFloat()*(shelfHigh*0.25f));
+                    boxSize=(shelfHigh*0.5f)+(AppWindow.random.nextFloat()*(shelfHigh*0.25f));
                     bx=(room.offset.x+((float)x2*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
                     bz=(room.offset.z+((float)z2*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
 
-                    rotAngle.setFromValues(0.0f,(-10.0f+(GeneratorMain.random.nextFloat()*20.0f)),0.0f);
+                    rotAngle.setFromValues(0.0f,(-10.0f+(AppWindow.random.nextFloat()*20.0f)),0.0f);
                     mesh2=MeshMapUtility.createCubeRotated(room,(name+"_shelf_box_"+Integer.toString(storageCount)+"_"+Integer.toString(boxCount)),"box",(bx-boxSize),(bx+boxSize),((y+shelfHigh)+floorDepth),(((y+shelfHigh)+floorDepth)+boxSize),(bz-boxSize),(bz+boxSize),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_WHOLE);
                     if (boxMesh==null) {
                         boxMesh=mesh2;
@@ -205,12 +205,12 @@ public class MapStorage
             
         storageCount=0;
         
-        boxSize=(MapBuilder.SEGMENT_SIZE*0.4f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.4f));
+        boxSize=(MapBuilder.SEGMENT_SIZE*0.4f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.4f));
         
-        shelfHigh=(MapBuilder.SEGMENT_SIZE*0.35f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.35f));
-        shelfLegWid=(MapBuilder.SEGMENT_SIZE*0.03f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.05f));
-        xShelfMargin=(MapBuilder.SEGMENT_SIZE*0.025f)+GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.05f);
-        zShelfMargin=(MapBuilder.SEGMENT_SIZE*0.025f)+GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.05f);
+        shelfHigh=(MapBuilder.SEGMENT_SIZE*0.35f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.35f));
+        shelfLegWid=(MapBuilder.SEGMENT_SIZE*0.03f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.05f));
+        xShelfMargin=(MapBuilder.SEGMENT_SIZE*0.025f)+AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.05f);
+        zShelfMargin=(MapBuilder.SEGMENT_SIZE*0.025f)+AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.05f);
         
         for (z=tz;z<bz;z++) {
             for (x=lx;x<rx;x++) {
@@ -222,7 +222,7 @@ public class MapStorage
                 
                     // add item to segment
                     
-                switch (GeneratorMain.random.nextInt(3)) {
+                switch (AppWindow.random.nextInt(3)) {
                     
                         // stack of boxes
                     
@@ -237,7 +237,7 @@ public class MapStorage
                     case 1:
                         xSize=zSize=1;
                         
-                        if (GeneratorMain.random.nextBoolean()) {           // shelfs have random sizes
+                        if (AppWindow.random.nextBoolean()) {           // shelfs have random sizes
                             xSize=2;
                             if ((x+xSize)>=rx) {
                                 xSize=1;

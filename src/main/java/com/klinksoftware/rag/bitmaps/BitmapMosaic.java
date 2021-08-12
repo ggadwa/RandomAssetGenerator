@@ -32,7 +32,7 @@ public class BitmapMosaic extends BitmapBase
         
             // some random values
 
-        splitCount=15+GeneratorMain.random.nextInt(10);
+        splitCount=15+AppWindow.random.nextInt(10);
         
         groutColor=getRandomGray(0.4f,0.6f);
         mosaicColor=getRandomColor();
@@ -68,10 +68,10 @@ public class BitmapMosaic extends BitmapBase
                 
                     // slightly random position
                     
-                lft=(x*tileWid)+GeneratorMain.random.nextInt(3);
-                rgt=((x*tileWid)+tileWid)-GeneratorMain.random.nextInt(3);
-                top=(y*tileHigh)+GeneratorMain.random.nextInt(3);
-                bot=((y*tileHigh)+tileHigh)-GeneratorMain.random.nextInt(3);
+                lft=(x*tileWid)+AppWindow.random.nextInt(3);
+                rgt=((x*tileWid)+tileWid)-AppWindow.random.nextInt(3);
+                top=(y*tileHigh)+AppWindow.random.nextInt(3);
+                bot=((y*tileHigh)+tileHigh)-AppWindow.random.nextInt(3);
                 
                     // the color
 

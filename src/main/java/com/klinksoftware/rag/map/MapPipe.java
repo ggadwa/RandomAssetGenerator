@@ -537,9 +537,9 @@ public class MapPipe
             // through the equipment
         
         skipX=-1;
-        if ((rx-lx)>2) skipX=(lx+1)+GeneratorMain.random.nextInt((rx-lx)-2);
+        if ((rx-lx)>2) skipX=(lx+1)+AppWindow.random.nextInt((rx-lx)-2);
         skipZ=-1;
-        if ((bz-tz)>2) skipZ=(tz+1)+GeneratorMain.random.nextInt((bz-tz)-2);
+        if ((bz-tz)>2) skipZ=(tz+1)+AppWindow.random.nextInt((bz-tz)-2);
         
             // the pieces
           
@@ -551,7 +551,7 @@ public class MapPipe
             for (x=lx;x<rx;x++) {
                 if (x==skipX) continue;
                 
-                if (GeneratorMain.random.nextBoolean()) {
+                if (AppWindow.random.nextBoolean()) {
                     //addPipeSet(room,x,z);
                 }
                 

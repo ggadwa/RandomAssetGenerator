@@ -67,7 +67,7 @@ public class BitmapComputer extends BitmapBase
             if (lineVar<4) lineVar=4;
             
             for (n=0;n!=nLine;n++) {
-                y=top+GeneratorMain.random.nextInt(bot-top);
+                y=top+AppWindow.random.nextInt(bot-top);
                 
                 lineColor=getRandomColor();
                 drawRandomLine(lft,y,rgt,y,lft,top,rgt,bot,lineVar,lineColor,true);
@@ -81,7 +81,7 @@ public class BitmapComputer extends BitmapBase
             if (lineVar<4) lineVar=4;
             
             for (n=0;n!=nLine;n++) {
-                x=lft+GeneratorMain.random.nextInt(rgt-lft);
+                x=lft+AppWindow.random.nextInt(rgt-lft);
                 
                 lineColor=getRandomColor();
                 drawRandomLine(x,top,x,bot,lft,top,rgt,bot,lineVar,lineColor,true);
@@ -103,7 +103,7 @@ public class BitmapComputer extends BitmapBase
         shutterEdgeColor=adjustColor(shutterColor,0.9f);
         
         sz=(int)((float)Math.max((rgt-lft),(bot-top))*0.1f);
-        shutterCount=sz+GeneratorMain.random.nextInt(sz);
+        shutterCount=sz+AppWindow.random.nextInt(sz);
         
         drawMetalShine(lft,top,rgt,bot,shutterColor);
         
@@ -126,7 +126,7 @@ public class BitmapComputer extends BitmapBase
         top+=edgeSize;
         bot-=edgeSize;
         
-        sz=12+GeneratorMain.random.nextInt(5);
+        sz=12+AppWindow.random.nextInt(5);
         
         xCount=(rgt-lft)/sz;
         yCount=(bot-top)/sz;
@@ -146,12 +146,12 @@ public class BitmapComputer extends BitmapBase
                     // the light
                     
                 color=getRandomColor();
-                if (GeneratorMain.random.nextBoolean()) color=adjustColor(color,0.8f);
+                if (AppWindow.random.nextBoolean()) color=adjustColor(color,0.8f);
                 drawOval((dx+1),(dy+1),(dx+(sz-1)),(dy+(sz-1)),0.0f,1.0f,0.0f,0.0f,sz,0.8f,color,null,0.5f,false,false,1.0f,0.0f);
                 
                     // the possible emissive
                     
-                if (GeneratorMain.random.nextBoolean()) drawOvalEmissive(dx,dy,(dx+sz),(dy+sz),adjustColor(color,0.7f));
+                if (AppWindow.random.nextBoolean()) drawOvalEmissive(dx,dy,(dx+sz),(dy+sz),adjustColor(color,0.7f));
             }
         }
     }
@@ -167,7 +167,7 @@ public class BitmapComputer extends BitmapBase
         top+=edgeSize;
         bot-=edgeSize;
         
-        sz=10+GeneratorMain.random.nextInt(15);
+        sz=10+AppWindow.random.nextInt(15);
         
         xCount=(rgt-lft)/sz;
         yCount=(bot-top)/sz;
@@ -194,7 +194,7 @@ public class BitmapComputer extends BitmapBase
                 
                     // the possible emissive
                     
-                if (GeneratorMain.random.nextBoolean()) drawRectEmissive(dx,dy,(dx+sz),(dy+sz),color);
+                if (AppWindow.random.nextBoolean()) drawRectEmissive(dx,dy,(dx+sz),(dy+sz),color);
             }
         }
     }
@@ -218,7 +218,7 @@ public class BitmapComputer extends BitmapBase
             // the drive sizes
             // pick randomly, but make sure they fill entire size
         
-        high=15+GeneratorMain.random.nextInt(15);
+        high=15+AppWindow.random.nextInt(15);
         wid=high*2;
         
         ledWid=(int)((float)high*0.1f);
@@ -250,7 +250,7 @@ public class BitmapComputer extends BitmapBase
                 
                     // the emissive indicator
                 
-                ledColor=LED_COLORS[GeneratorMain.random.nextInt(3)];
+                ledColor=LED_COLORS[AppWindow.random.nextInt(3)];
                 
                 bx=(dx+wid)-(ledWid+5);
                 by=(dy+high)-(ledHigh+5);
@@ -299,11 +299,11 @@ public class BitmapComputer extends BitmapBase
             
             dx=lft+10;
             
-            colCount2=(colCount/2)+GeneratorMain.random.nextInt(colCount/2);
+            colCount2=(colCount/2)+AppWindow.random.nextInt(colCount/2);
             
             for (x=0;x<colCount2;x++) {
                 
-                switch (GeneratorMain.random.nextInt(5)) {
+                switch (AppWindow.random.nextInt(5)) {
                     case 0:
                         drawRect(dx,dy,(dx+5),(dy+8),charColor);
                         drawRectEmissive(dx,dy,(dx+5),(dy+8),emissiveCharColor);
@@ -358,11 +358,11 @@ public class BitmapComputer extends BitmapBase
             
             lx=mx;
             ty=my;
-            sz=minPanelSize+GeneratorMain.random.nextInt(extraPanelSize);
+            sz=minPanelSize+AppWindow.random.nextInt(extraPanelSize);
             
                 // vertical stack
                 
-            if (GeneratorMain.random.nextBoolean()) {
+            if (AppWindow.random.nextBoolean()) {
                 rx=lx+sz;
                 if (rx>=(rgt-(skipPanelSize+edgeSize))) rx=rgt-edgeSize;
                 by=bot-edgeSize;
@@ -384,7 +384,7 @@ public class BitmapComputer extends BitmapBase
                 // be randonly in or out
                 
             drawRect(lx,ty,rx,by,panelColor);
-            draw3DFrameRect(lx,ty,rx,by,edgeSize,panelColor,(GeneratorMain.random.nextBoolean()));
+            draw3DFrameRect(lx,ty,rx,by,edgeSize,panelColor,(AppWindow.random.nextBoolean()));
             
                 // draw the components
                 // we only allow one blank, wires, or shutter
@@ -392,7 +392,7 @@ public class BitmapComputer extends BitmapBase
             rndTry=0;
             
             while (rndTry<25) {
-                componentType=GeneratorMain.random.nextInt(7);
+                componentType=AppWindow.random.nextInt(7);
                 
                 rndSuccess=false;
 
@@ -466,8 +466,8 @@ public class BitmapComputer extends BitmapBase
         RagColor    panelColor,panelInsideColor;
         
         offset=textureSize/2;
-        panelEdgeSize=2+GeneratorMain.random.nextInt(4);
-        panelInsideEdgeSize=2+GeneratorMain.random.nextInt(3);
+        panelEdgeSize=2+AppWindow.random.nextInt(4);
+        panelInsideEdgeSize=2+AppWindow.random.nextInt(3);
         
         panelColor=getRandomGray(0.6f,0.8f);
         panelInsideColor=adjustColor(panelColor,1.1f);

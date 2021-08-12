@@ -34,10 +34,10 @@ public class BitmapTile extends BitmapBase
 
             // tile style
 
-        tileStyle=GeneratorMain.random.nextInt(3);
-        tileContent=GeneratorMain.random.nextInt(4);
-        tileDirty=(GeneratorMain.random.nextFloat()<0.2f);
-        edgeSize=(int)(((float)textureSize*0.005f)+(GeneratorMain.random.nextFloat()*((float)textureSize*0.01f)));
+        tileStyle=AppWindow.random.nextInt(3);
+        tileContent=AppWindow.random.nextInt(4);
+        tileDirty=(AppWindow.random.nextFloat()<0.2f);
+        edgeSize=(int)(((float)textureSize*0.005f)+(AppWindow.random.nextFloat()*((float)textureSize*0.01f)));
 
             // splits
 
@@ -61,8 +61,8 @@ public class BitmapTile extends BitmapBase
                     // sometimes a tile piece is a recursion to
                     // another tile set
 
-                if ((complex) && (GeneratorMain.random.nextFloat()<0.25f)) {
-                    tileStyle=GeneratorMain.random.nextInt(3);
+                if ((complex) && (AppWindow.random.nextFloat()<0.25f)) {
+                    tileStyle=AppWindow.random.nextInt(3);
                     generateTilePiece(dLft,dTop,dRgt,dBot,tileColor,designColor,2,false);
                     continue;
                 }
@@ -97,7 +97,7 @@ public class BitmapTile extends BitmapBase
 
                 if (complex) {
                     col=adjustColorRandom(col,0.75f,0.85f);
-                    padding=(edgeSize*2)+GeneratorMain.random.nextInt(10);
+                    padding=(edgeSize*2)+AppWindow.random.nextInt(10);
                     
                     switch (tileContent) {
                         case 0:
@@ -124,43 +124,43 @@ public class BitmapTile extends BitmapBase
                 
                     // possible crack
 
-                if ((GeneratorMain.random.nextFloat()<0.2f) && (!complex)) {
-                    switch (GeneratorMain.random.nextInt(4)) {
+                if ((AppWindow.random.nextFloat()<0.2f) && (!complex)) {
+                    switch (AppWindow.random.nextInt(4)) {
                         case 0:
                             sy=dTop+edgeSize;
-                            ey=(dTop+edgeSize)+GeneratorMain.random.nextInt((dBot-dTop)/2);
-                            sx=(dLft+edgeSize)+GeneratorMain.random.nextInt((dRgt-dLft)/2);
+                            ey=(dTop+edgeSize)+AppWindow.random.nextInt((dBot-dTop)/2);
+                            sx=(dLft+edgeSize)+AppWindow.random.nextInt((dRgt-dLft)/2);
                             ex=dLft+edgeSize;
                             crackXVarient=5;
                             crackYVarient=5;
                             break;
                         case 1:
                             sy=dTop+edgeSize;
-                            ey=(dTop+edgeSize)+GeneratorMain.random.nextInt((dBot-dTop)/2);
-                            sx=((dLft+dRgt)/2)+GeneratorMain.random.nextInt((dRgt-dLft)/2);
+                            ey=(dTop+edgeSize)+AppWindow.random.nextInt((dBot-dTop)/2);
+                            sx=((dLft+dRgt)/2)+AppWindow.random.nextInt((dRgt-dLft)/2);
                             ex=dRgt-edgeSize;
                             crackXVarient=-5;
                             crackYVarient=5;
                             break;
                         case 2:
                             sy=dBot-edgeSize;
-                            ey=((dTop+dBot)/2)+GeneratorMain.random.nextInt((dBot-dTop)/2);
-                            sx=(dLft+edgeSize)+GeneratorMain.random.nextInt((dRgt-dLft)/2);
+                            ey=((dTop+dBot)/2)+AppWindow.random.nextInt((dBot-dTop)/2);
+                            sx=(dLft+edgeSize)+AppWindow.random.nextInt((dRgt-dLft)/2);
                             ex=dLft+edgeSize;
                             crackXVarient=-5;
                             crackYVarient=5;
                             break;
                         default:
                             sy=dBot-edgeSize;
-                            ey=((dTop+dBot)/2)+GeneratorMain.random.nextInt((dBot-dTop)/2);
-                            sx=((dLft+dRgt)/2)+GeneratorMain.random.nextInt((dRgt-dLft)/2);
+                            ey=((dTop+dBot)/2)+AppWindow.random.nextInt((dBot-dTop)/2);
+                            sx=((dLft+dRgt)/2)+AppWindow.random.nextInt((dRgt-dLft)/2);
                             ex=dRgt-edgeSize;
                             crackXVarient=-5;
                             crackYVarient=-5;
                             break;
                     }
 
-                    crackSegCount=2+GeneratorMain.random.nextInt(2);
+                    crackSegCount=2+AppWindow.random.nextInt(2);
                     drawSimpleCrack(sx,sy,ex,ey,crackSegCount,crackXVarient,crackYVarient,frameCol);
                 }
             }
@@ -177,16 +177,16 @@ public class BitmapTile extends BitmapBase
         
             // get splits
             
-        complex=(GeneratorMain.random.nextBoolean());
+        complex=(AppWindow.random.nextBoolean());
         
         small=false;
-        if (!complex) small=(GeneratorMain.random.nextBoolean());
+        if (!complex) small=(AppWindow.random.nextBoolean());
 
         if (!small) {
-            splitCount=2+GeneratorMain.random.nextInt(2);
+            splitCount=2+AppWindow.random.nextInt(2);
         }
         else {
-            splitCount=6+GeneratorMain.random.nextInt(4);
+            splitCount=6+AppWindow.random.nextInt(4);
         }
         
             // colors

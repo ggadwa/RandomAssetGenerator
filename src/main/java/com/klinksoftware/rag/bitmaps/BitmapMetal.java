@@ -50,14 +50,14 @@ public class BitmapMetal extends BitmapBase
         
         metalCorrColor=adjustColorRandom(metalColor,0.6f,0.7f);
 
-        corrCount=(int)(((float)wid*0.06f)+(GeneratorMain.random.nextFloat()*((float)wid*0.03f)));
+        corrCount=(int)(((float)wid*0.06f)+(AppWindow.random.nextFloat()*((float)wid*0.03f)));
         corrWid=wid/corrCount;
         corrHigh=high/corrCount;
 
         lineWid=(float)(corrWid-4);
         lineHigh=(float)(corrHigh-4);
 
-        lineStyle=GeneratorMain.random.nextInt(CORRUGATION_LINES.length);
+        lineStyle=AppWindow.random.nextInt(CORRUGATION_LINES.length);
 
             // corrugations
 
@@ -111,7 +111,7 @@ public class BitmapMetal extends BitmapBase
         
             // corners
             
-        if (GeneratorMain.random.nextFloat()<0.33f) {
+        if (AppWindow.random.nextFloat()<0.33f) {
             generateMetalSingleScrew(lft,top,screwColor,outlineColor,screwSize,edgeSize);
             generateMetalSingleScrew((rgt-screwSize),top,screwColor,outlineColor,screwSize,edgeSize);
             generateMetalSingleScrew((rgt-screwSize),(bot-screwSize),screwColor,outlineColor,screwSize,edgeSize);
@@ -120,7 +120,7 @@ public class BitmapMetal extends BitmapBase
         
             // middles
             
-        if (GeneratorMain.random.nextFloat()<0.33) {
+        if (AppWindow.random.nextFloat()<0.33) {
             mx=((lft+rgt)/2)-(screwSize/2);
             my=((top+bot)/2)-(screwSize/2);
             generateMetalSingleScrew(mx,top,screwColor,outlineColor,screwSize,edgeSize);
@@ -139,9 +139,9 @@ public class BitmapMetal extends BitmapBase
         
         frameColor=adjustColorRandom(color,0.75f,0.85f);
         sz=(int)((float)Math.max((rgt-lft),(bot-top))*0.045f);
-        waveCount=sz+GeneratorMain.random.nextInt(sz);
+        waveCount=sz+AppWindow.random.nextInt(sz);
         
-        if (GeneratorMain.random.nextBoolean()) {
+        if (AppWindow.random.nextBoolean()) {
             drawNormalWaveHorizontal(lft,top,rgt,bot,color,frameColor,waveCount);
         }
         else {
@@ -157,7 +157,7 @@ public class BitmapMetal extends BitmapBase
         
             // colors
             
-        if (GeneratorMain.random.nextBoolean()) {
+        if (AppWindow.random.nextBoolean()) {
             color=metalColor;
             screwColor=altMetalColor;
         }
@@ -179,14 +179,14 @@ public class BitmapMetal extends BitmapBase
         
             // variations
             
-        panelType=(variationMode==VARIATION_BOX)?0:GeneratorMain.random.nextInt(4);
+        panelType=(variationMode==VARIATION_BOX)?0:AppWindow.random.nextInt(4);
             
         switch (panelType) {
             
                 // internal box
                 
             case 0:
-                sz=((edgeSize+screwSize)*2)+(GeneratorMain.random.nextInt(edgeSize*3));
+                sz=((edgeSize+screwSize)*2)+(AppWindow.random.nextInt(edgeSize*3));
                 lft2=lft+sz;
                 rgt2=rgt-sz;
                 top2=top+sz;
@@ -230,7 +230,7 @@ public class BitmapMetal extends BitmapBase
         mx=textureSize/2;
         my=textureSize/2;
         
-        panelCount=GeneratorMain.random.nextInt(3);
+        panelCount=AppWindow.random.nextInt(3);
             
         switch (panelCount) {
             case 0:
@@ -266,7 +266,7 @@ public class BitmapMetal extends BitmapBase
         
             // run seam
             
-        if (GeneratorMain.random.nextBoolean()) {
+        if (AppWindow.random.nextBoolean()) {
             lineColor=adjustColor(metalColor,0.8f);
             
             drawLineColor(1,0,1,textureSize,lineColor);
@@ -279,7 +279,7 @@ public class BitmapMetal extends BitmapBase
             
         yOff=0;
         
-        if (GeneratorMain.random.nextBoolean()) {
+        if (AppWindow.random.nextBoolean()) {
             lineColor=adjustColor(metalColor,0.8f);
             
             drawLineColor(0,2,textureSize,2,lineColor);
@@ -307,8 +307,8 @@ public class BitmapMetal extends BitmapBase
         
             // screws
             
-        if (GeneratorMain.random.nextBoolean()) {
-            screwCount=5+GeneratorMain.random.nextInt(5);
+        if (AppWindow.random.nextBoolean()) {
+            screwCount=5+AppWindow.random.nextInt(5);
             
             yAdd=(textureSize-yOff)/screwCount;
             x=screwSize;
@@ -331,8 +331,8 @@ public class BitmapMetal extends BitmapBase
         
             // sizing
         
-        xCount=2+(2*GeneratorMain.random.nextInt(2));
-        yCount=2+(2*GeneratorMain.random.nextInt(5));
+        xCount=2+(2*AppWindow.random.nextInt(2));
+        yCount=2+(2*AppWindow.random.nextInt(5));
         
         xSize=textureSize/xCount;
         ySize=textureSize/yCount;
@@ -381,8 +381,8 @@ public class BitmapMetal extends BitmapBase
         
         metalColor=getRandomColor();
         altMetalColor=getRandomColor();
-        edgeSize=(int)(((float)textureSize*0.005)+(GeneratorMain.random.nextFloat()*((float)textureSize*0.005)));
-        screwSize=(int)(((float)textureSize*0.03)+(GeneratorMain.random.nextFloat()*((float)textureSize*0.05)));
+        edgeSize=(int)(((float)textureSize*0.005)+(AppWindow.random.nextFloat()*((float)textureSize*0.005)));
+        screwSize=(int)(((float)textureSize*0.03)+(AppWindow.random.nextFloat()*((float)textureSize*0.05)));
         
         switch (variationMode) {
             case VARIATION_PLATE:

@@ -43,6 +43,6 @@ public class Limb
     
     public int getRandomBoneIndex()
     {
-        return(boneIndexes[GeneratorMain.random.nextInt(boneIndexes.length)]);
+        return(boneIndexes[AppWindow.random.nextInt(boneIndexes.length)]);
     }
 }

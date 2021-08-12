@@ -86,12 +86,12 @@ public class MapEquipment
         standHalfWid=standWid*0.5f;
         standHigh=high*0.1f;
         
-        rotAngle=new RagPoint(0.0f,(GeneratorMain.random.nextBoolean()?0.0f:90.0f),0.0f);
+        rotAngle=new RagPoint(0.0f,(AppWindow.random.nextBoolean()?0.0f:90.0f),0.0f);
         mesh=MeshMapUtility.createCube(room,(name+"_monitor_box_"+pieceCount),"accessory",(x-deskHalfWid),(x+deskHalfWid),y,(y+high),(z-deskShortHalfWid),(z+deskShortHalfWid),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP);
         
         y+=high;
 
-        rotAngle.setFromValues(0.0f,(GeneratorMain.random.nextFloat()*360.0f),0.0f);
+        rotAngle.setFromValues(0.0f,(AppWindow.random.nextFloat()*360.0f),0.0f);
         mesh.combine(MeshMapUtility.createCubeRotated(room,(name+"_monitor_stand_"+pieceCount),"accessory",(x-standHalfWid),(x+standHalfWid),y,(y+standHigh),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,false,false,false,MeshMapUtility.UV_MAP));
         
         meshList.add(mesh);
@@ -125,13 +125,13 @@ public class MapEquipment
             
         juncHalfWid=juncWid*0.5f;
         
-        rotAngle=new RagPoint(0.0f,(GeneratorMain.random.nextBoolean()?0.0f:90.0f),0.0f);
+        rotAngle=new RagPoint(0.0f,(AppWindow.random.nextBoolean()?0.0f:90.0f),0.0f);
         meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_panel_"+pieceCount),"panel",(x-juncHalfWid),(x+juncHalfWid),(y+pipeHigh),((y+pipeHigh)+juncWid),(z-pipeRadius),(z+pipeRadius),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX));
         
             // the pipes
             
-        upperPipe=GeneratorMain.random.nextBoolean();
-        lowerPipe=((GeneratorMain.random.nextBoolean())||(!upperPipe));
+        upperPipe=AppWindow.random.nextBoolean();
+        lowerPipe=((AppWindow.random.nextBoolean())||(!upperPipe));
         
         mesh=null;
         centerPnt=new RagPoint(x,y,z);
@@ -195,7 +195,7 @@ public class MapEquipment
         
             // the liquid in the tube
         
-        y=yBotCapTy+(GeneratorMain.random.nextFloat()*(yTopCapBy-yBotCapTy));    
+        y=yBotCapTy+(AppWindow.random.nextFloat()*(yTopCapBy-yBotCapTy));    
         meshList.add(MeshMapUtility.createMeshCylinderSimple(room,(name+"_liquid"),"liquid",centerPnt,y,yBotCapTy,(tubeRadius*0.98f),true,false));
 */
     }
@@ -254,21 +254,21 @@ public class MapEquipment
             
         roomHigh=(float)room.storyCount*MapBuilder.SEGMENT_SIZE;
         
-        bankWid=(MapBuilder.SEGMENT_SIZE*0.5f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
-        bankHigh=bankWid*(1.0f+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.15f)));
+        bankWid=(MapBuilder.SEGMENT_SIZE*0.5f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
+        bankHigh=bankWid*(1.0f+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.15f)));
         
-        terminalWid=(MapBuilder.SEGMENT_SIZE*0.5f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
-        terminalHigh=(MapBuilder.SEGMENT_SIZE*0.2f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
+        terminalWid=(MapBuilder.SEGMENT_SIZE*0.5f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
+        terminalHigh=(MapBuilder.SEGMENT_SIZE*0.2f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
         
-        juncWid=(MapBuilder.SEGMENT_SIZE*0.4f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.2f));
-        pipeHigh=(MapBuilder.SEGMENT_SIZE*0.2f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.2f));
-        pipeRadius=(MapBuilder.SEGMENT_SIZE*0.05f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.1f));
+        juncWid=(MapBuilder.SEGMENT_SIZE*0.4f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.2f));
+        pipeHigh=(MapBuilder.SEGMENT_SIZE*0.2f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.2f));
+        pipeRadius=(MapBuilder.SEGMENT_SIZE*0.05f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.1f));
         
-        tubeRadius=(MapBuilder.SEGMENT_SIZE*0.2f)+(GeneratorMain.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.15f));
-        tubeHigh=(roomHigh*0.2f)+(GeneratorMain.random.nextFloat()*(roomHigh*0.3f));
-        tubeCapRadius=tubeRadius*(1.0f+(GeneratorMain.random.nextFloat()*0.15f));
-        tubeTopCapHigh=(roomHigh*0.05f)+(GeneratorMain.random.nextFloat()*(roomHigh*0.1f));
-        tubeBotCapHigh=(roomHigh*0.05f)+(GeneratorMain.random.nextFloat()*(roomHigh*0.1f));
+        tubeRadius=(MapBuilder.SEGMENT_SIZE*0.2f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.15f));
+        tubeHigh=(roomHigh*0.2f)+(AppWindow.random.nextFloat()*(roomHigh*0.3f));
+        tubeCapRadius=tubeRadius*(1.0f+(AppWindow.random.nextFloat()*0.15f));
+        tubeTopCapHigh=(roomHigh*0.05f)+(AppWindow.random.nextFloat()*(roomHigh*0.1f));
+        tubeBotCapHigh=(roomHigh*0.05f)+(AppWindow.random.nextFloat()*(roomHigh*0.1f));
 
         floorDepth=MapBuilder.SEGMENT_SIZE*0.1f;
         
@@ -276,9 +276,9 @@ public class MapEquipment
             // through the equipment
         
         skipX=-1;
-        if ((rx-lx)>2) skipX=(lx+1)+GeneratorMain.random.nextInt((rx-lx)-2);
+        if ((rx-lx)>2) skipX=(lx+1)+AppWindow.random.nextInt((rx-lx)-2);
         skipZ=-1;
-        if ((bz-tz)>2) skipZ=(tz+1)+GeneratorMain.random.nextInt((bz-tz)-2);
+        if ((bz-tz)>2) skipZ=(tz+1)+AppWindow.random.nextInt((bz-tz)-2);
         
             // the pieces
           
@@ -292,7 +292,7 @@ public class MapEquipment
                 
                     // only terminals on edges
                     
-                pieceType=GeneratorMain.random.nextInt(4);
+                pieceType=AppWindow.random.nextInt(4);
                 if ((pieceType==1) && ((z!=tz) && (z!=(bz-1)) && (x!=lx) && (x!=(rx-1)))) pieceType=0;
                 
                 switch (pieceType) {

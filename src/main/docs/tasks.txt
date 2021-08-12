@@ -1,6 +1,6 @@
 
-- make three toolbar buttons, map/model/bitmap
-- always save with same name, single window for walkthrough
+
+
 
 
 - need extra trigs for pieces

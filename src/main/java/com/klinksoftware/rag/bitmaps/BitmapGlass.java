@@ -39,15 +39,15 @@ public class BitmapGlass extends BitmapBase
         
             // reflection lines
             
-        lineCount=5+GeneratorMain.random.nextInt(20);
+        lineCount=5+AppWindow.random.nextInt(20);
         
         startWid=(int)((float)textureSize*0.4f);
         
         for (n=0;n!=lineCount;n++) {
             color=getRandomGray(0.7f,0.9f);
-            x=GeneratorMain.random.nextInt(startWid);
-            x2=(x+1)+GeneratorMain.random.nextInt(textureSize-x);
-            y=textureSize-GeneratorMain.random.nextInt(textureSize-(x2-x));
+            x=AppWindow.random.nextInt(startWid);
+            x2=(x+1)+AppWindow.random.nextInt(textureSize-x);
+            y=textureSize-AppWindow.random.nextInt(textureSize-(x2-x));
             y2=y-((x2-x)/2);
             
             drawLineColor(x,y,x2,y2,color);

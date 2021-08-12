@@ -30,13 +30,13 @@ public class BitmapSkin extends BitmapBase
         
         spotMin=(int)((float)textureSize*0.1f);
         spotAdd=spotMin/2;
-        spotCount=10+GeneratorMain.random.nextInt(10);
+        spotCount=10+AppWindow.random.nextInt(10);
         
         for (n=0;n!=spotCount;n++) {
-            spotSize=spotMin+GeneratorMain.random.nextInt(spotAdd);
-            x=GeneratorMain.random.nextInt(textureSize-spotSize)-1;
-            y=GeneratorMain.random.nextInt(textureSize-spotSize)-1;
-            drawOvalDarken(x,y,(x+spotSize),(y+spotSize),(0.9f+(GeneratorMain.random.nextFloat()*0.1f)));
+            spotSize=spotMin+AppWindow.random.nextInt(spotAdd);
+            x=AppWindow.random.nextInt(textureSize-spotSize)-1;
+            y=AppWindow.random.nextInt(textureSize-spotSize)-1;
+            drawOvalDarken(x,y,(x+spotSize),(y+spotSize),(0.9f+(AppWindow.random.nextFloat()*0.1f)));
         }
     }
     
@@ -46,17 +46,17 @@ public class BitmapSkin extends BitmapBase
                     stainCount,stainSize,
                     xSize,ySize,markCount;
         
-        stainCount=GeneratorMain.random.nextInt(5);
+        stainCount=AppWindow.random.nextInt(5);
         stainSize=(int)((float)textureSize*0.1f);
         
         for (n=0;n!=stainCount;n++) {
-            lft=GeneratorMain.random.nextInt(textureSize);
-            xSize=stainSize+GeneratorMain.random.nextInt(stainSize);
+            lft=AppWindow.random.nextInt(textureSize);
+            xSize=stainSize+AppWindow.random.nextInt(stainSize);
             
-            top=GeneratorMain.random.nextInt(textureSize);
-            ySize=stainSize+GeneratorMain.random.nextInt(stainSize);
+            top=AppWindow.random.nextInt(textureSize);
+            ySize=stainSize+AppWindow.random.nextInt(stainSize);
             
-            markCount=2+GeneratorMain.random.nextInt(4);
+            markCount=2+AppWindow.random.nextInt(4);
             
             for (k=0;k!=markCount;k++) {
                 rgt=lft+xSize;
@@ -66,8 +66,8 @@ public class BitmapSkin extends BitmapBase
                 
                 drawOvalStain(lft,top,rgt,bot,0.01f,0.15f,0.85f);
                 
-                lft+=(GeneratorMain.random.nextBoolean())?(-(xSize/3)):(xSize/3);
-                top+=(GeneratorMain.random.nextBoolean())?(-(ySize/3)):(ySize/3);
+                lft+=(AppWindow.random.nextBoolean())?(-(xSize/3)):(xSize/3);
+                top+=(AppWindow.random.nextBoolean())?(-(ySize/3)):(ySize/3);
                 xSize=(int)((float)xSize*0.8f);
                 ySize=(int)((float)ySize*0.8f);
             }
@@ -101,18 +101,18 @@ public class BitmapSkin extends BitmapBase
             
                 // hair half from top
                 
-            y=halfHigh+GeneratorMain.random.nextInt(halfHigh);
+            y=halfHigh+AppWindow.random.nextInt(halfHigh);
             drawRandomLine(x,-5,x,(y+5),0,0,textureSize,textureSize,10,lineColor,false);
             
                 // hair half from bottom
                 
-            y=textureSize-(halfHigh+GeneratorMain.random.nextInt(halfHigh));
+            y=textureSize-(halfHigh+AppWindow.random.nextInt(halfHigh));
             drawRandomLine(x,(y-5),x,(textureSize+5),0,0,textureSize,textureSize,10,lineColor,false);
         }
         
             // any spots
             
-        if (GeneratorMain.random.nextBoolean()) generateSpotsOverlay();
+        if (AppWindow.random.nextBoolean()) generateSpotsOverlay();
         
         createMetallicRoughnessMap(0.5f,0.5f);
     }
@@ -138,23 +138,23 @@ public class BitmapSkin extends BitmapBase
  
             // lines
             
-        lineCount=30+GeneratorMain.random.nextInt(30);
+        lineCount=30+AppWindow.random.nextInt(30);
             
         for (n=0;n!=lineCount;n++) {
-            x=GeneratorMain.random.nextInt(textureSize);
-            y=GeneratorMain.random.nextInt(textureSize);
-            y2=GeneratorMain.random.nextInt(textureSize);
+            x=AppWindow.random.nextInt(textureSize);
+            y=AppWindow.random.nextInt(textureSize);
+            y2=AppWindow.random.nextInt(textureSize);
             
             lineColor=this.adjustColorRandom(clothColor,0.6f,0.25f);
             drawRandomLine(x,y,x,y2,0,0,textureSize,textureSize,30,lineColor,false);
         }
         
-        lineCount=30+GeneratorMain.random.nextInt(30);
+        lineCount=30+AppWindow.random.nextInt(30);
             
         for (n=0;n!=lineCount;n++) {
-            x=GeneratorMain.random.nextInt(textureSize);
-            x2=GeneratorMain.random.nextInt(textureSize);
-            y=GeneratorMain.random.nextInt(textureSize);
+            x=AppWindow.random.nextInt(textureSize);
+            x2=AppWindow.random.nextInt(textureSize);
+            y=AppWindow.random.nextInt(textureSize);
             
             lineColor=this.adjustColorRandom(clothColor,0.6f,0.25f);
             drawRandomLine(x,y,x2,y,0,0,textureSize,textureSize,30,lineColor,false);
@@ -162,7 +162,7 @@ public class BitmapSkin extends BitmapBase
         
             // any stains
             
-        if (GeneratorMain.random.nextBoolean()) generateStainsOverlay();
+        if (AppWindow.random.nextBoolean()) generateStainsOverlay();
         
         blur(colorData,0,0,textureSize,textureSize,25,false);
         
@@ -179,7 +179,7 @@ public class BitmapSkin extends BitmapBase
                         xCount,scaleCount,sWid,sHigh;
         RagColor        scaleColor,borderColor,col;
         
-        scaleCount=12+GeneratorMain.random.nextInt(20);
+        scaleCount=12+AppWindow.random.nextInt(20);
         
         sWid=textureSize/scaleCount;
         sHigh=textureSize/scaleCount;
@@ -220,15 +220,15 @@ public class BitmapSkin extends BitmapBase
                 col=scaleColor;
                 
                 if ((y!=0) && (y!=scaleCount) && (x!=0) && (x!=(xCount-1))) {
-                    if (GeneratorMain.random.nextFloat()<0.2f) {
-                        col=adjustColor(scaleColor,(0.6f+(GeneratorMain.random.nextFloat()*0.3f)));
+                    if (AppWindow.random.nextFloat()<0.2f) {
+                        col=adjustColor(scaleColor,(0.6f+(AppWindow.random.nextFloat()*0.3f)));
                     }
                 }
                 
                     // some slight offsets
                     
-                sx=dx+(GeneratorMain.random.nextInt(10)-5);
-                sy=dy+(GeneratorMain.random.nextInt(10)-5);
+                sx=dx+(AppWindow.random.nextInt(10)-5);
+                sy=dy+(AppWindow.random.nextInt(10)-5);
                 sx2=dx+sWid;
                 sy2=dy+(sHigh*2);
                 
@@ -246,7 +246,7 @@ public class BitmapSkin extends BitmapBase
         
             // any spots
             
-        if (GeneratorMain.random.nextBoolean()) generateSpotsOverlay();
+        if (AppWindow.random.nextBoolean()) generateSpotsOverlay();
         
         createMetallicRoughnessMap(0.5f,0.5f);
     }
@@ -270,7 +270,7 @@ public class BitmapSkin extends BitmapBase
         
             // any stains
             
-        if (GeneratorMain.random.nextBoolean()) {
+        if (AppWindow.random.nextBoolean()) {
             generateStainsOverlay();
             blur(colorData,0,0,textureSize,textureSize,2,false);
         }
@@ -294,7 +294,7 @@ public class BitmapSkin extends BitmapBase
     
     private void generateSkinBody()
     {
-        switch (GeneratorMain.random.nextInt(2)) {
+        switch (AppWindow.random.nextInt(2)) {
             
             case 0:
                 generateClothChunk();
@@ -311,7 +311,7 @@ public class BitmapSkin extends BitmapBase
     {
             // base texture
         
-        switch (GeneratorMain.random.nextInt(3)) {
+        switch (AppWindow.random.nextInt(3)) {
             
             case 0:
                 generateFurChunk();

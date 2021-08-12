@@ -63,9 +63,9 @@ public class BitmapWood extends BitmapBase
         
             // some random values
 
-        boardCount=4+GeneratorMain.random.nextInt(12);
+        boardCount=4+AppWindow.random.nextInt(12);
         boardSize=textureSize/boardCount;
-        edgeSize=(int)(((float)textureSize*0.005f)+(GeneratorMain.random.nextFloat()*((float)textureSize*0.005f)));
+        edgeSize=(int)(((float)textureSize*0.005f)+(AppWindow.random.nextFloat()*((float)textureSize*0.005f)));
         woodColor=getRandomColor();
         
             // perlin noise
@@ -84,7 +84,7 @@ public class BitmapWood extends BitmapBase
             rgt=lft+boardSize;
             if (n==(boardCount-1)) rgt=textureSize;
             
-            boardType=(variationMode==VARIATION_BOX)?0:GeneratorMain.random.nextInt(5);
+            boardType=(variationMode==VARIATION_BOX)?0:AppWindow.random.nextInt(5);
             
             switch (boardType) {
                 case 0:

@@ -57,9 +57,9 @@ public class MapPillar
             
         pattern=new byte[rx-lx][bz-tz];
         
-        b1=(byte)(GeneratorMain.random.nextBoolean()?0x0:0x1);
-        b2=(byte)(GeneratorMain.random.nextBoolean()?0x0:0x1);
-        b3=(byte)(GeneratorMain.random.nextBoolean()?0x0:0x1);
+        b1=(byte)(AppWindow.random.nextBoolean()?0x0:0x1);
+        b2=(byte)(AppWindow.random.nextBoolean()?0x0:0x1);
+        b3=(byte)(AppWindow.random.nextBoolean()?0x0:0x1);
         
         gz=(bz-tz)/2;
         
@@ -69,9 +69,9 @@ public class MapPillar
             pattern[gx-lx][gz]=b3;
         }
         
-        b1=(byte)(GeneratorMain.random.nextBoolean()?0x0:0x1);
-        b2=(byte)(GeneratorMain.random.nextBoolean()?0x0:0x1);
-        b3=(byte)(GeneratorMain.random.nextBoolean()?0x0:0x1);
+        b1=(byte)(AppWindow.random.nextBoolean()?0x0:0x1);
+        b2=(byte)(AppWindow.random.nextBoolean()?0x0:0x1);
+        b3=(byte)(AppWindow.random.nextBoolean()?0x0:0x1);
         
         gx=(rx-lx)/2;
         
@@ -83,7 +83,7 @@ public class MapPillar
         
             // the y bounds
          
-        baseHigh=MapBuilder.SEGMENT_SIZE*(0.1f+(GeneratorMain.random.nextFloat()*0.2f));
+        baseHigh=MapBuilder.SEGMENT_SIZE*(0.1f+(AppWindow.random.nextFloat()*0.2f));
         by=this.room.offset.y;
         ty=(this.room.offset.y+(this.room.storyCount*MapBuilder.SEGMENT_SIZE));
         pillarBy=by+baseHigh;
@@ -92,13 +92,13 @@ public class MapPillar
             // build the pillars
             
         offset=MapBuilder.SEGMENT_SIZE*0.5f;
-        radius=MapBuilder.SEGMENT_SIZE*(0.1f+(GeneratorMain.random.nextFloat()*0.2f));
-        baseRadius=radius*(1.3f+(GeneratorMain.random.nextFloat()*0.2f));
+        radius=MapBuilder.SEGMENT_SIZE*(0.1f+(AppWindow.random.nextFloat()*0.2f));
+        baseRadius=radius*(1.3f+(AppWindow.random.nextFloat()*0.2f));
         
         cylinderSegments=MeshMapUtility.createCylinderSegmentList(5,3,0.2f);
         centerPnt=new RagPoint(0.0f,0.0f,0.0f);
         
-        squareBase=GeneratorMain.random.nextBoolean();
+        squareBase=AppWindow.random.nextBoolean();
         
         for (gz=tz;gz<bz;gz++) {
             for (gx=lx;gx<rx;gx++) {
