@@ -36,8 +36,10 @@ public class WalkView extends AWTGLCanvas {
     private float moveX,moveY,moveZ;
     private MeshList meshList, incommingMeshList;
     private Skeleton incommingSkeleton;
+    private BitmapGenerator incommingBitmapGenerator;
     private RagPoint eyePoint,cameraPoint,cameraAngle,lookAtUpVector, movePoint;
     private RagMatrix4f perspectiveMatrix, viewMatrix, rotMatrix, rotMatrix2;
+    private HashMap<String,Integer> bitmaps;
 
     public WalkView(GLData glData) {
         super(glData);
@@ -72,6 +74,8 @@ public class WalkView extends AWTGLCanvas {
         meshList=null;
         incommingMeshList=null;
         incommingSkeleton=null;
+        incommingBitmapGenerator=null;
+        bitmaps=null;
         
             // no dragging
             
@@ -202,7 +206,7 @@ public class WalkView extends AWTGLCanvas {
         // vertexes
         buf = MemoryUtil.memAllocFloat(mesh.vertexes.length);
         
-        for (n=0;n!=mesh.vertexes.length;n+=3) {
+        for (n=0;n<mesh.vertexes.length;n+=3) {
             buf.put(mesh.vertexes[n]+bonePoint.x);
             buf.put(mesh.vertexes[n+1]+bonePoint.y);
             buf.put(mesh.vertexes[n+2]+bonePoint.z);
@@ -238,17 +242,22 @@ public class WalkView extends AWTGLCanvas {
         memFree(mesh.indexBuf);
     }
     
-    public void setIncommingMeshList(MeshList incommingMeshList,Skeleton incommingSkeleton) {
+    public void setIncommingMeshList(MeshList incommingMeshList,Skeleton incommingSkeleton,BitmapGenerator incommingBitmapGenerator) {
         // we have to setup an incomming list so we can load
         // the new list on a draw call so the opengl context is set
         this.incommingMeshList=incommingMeshList;
         this.incommingSkeleton=incommingSkeleton;
+        this.incommingBitmapGenerator=incommingBitmapGenerator;
     }
     
     private void stageMeshList() {
-        int n,nMesh,boneIdx;
+        int n,nMesh,boneIdx,textureSize,textureId;
+        boolean hasAlpha;
+        String bitmapName;
         Mesh mesh;
+        BitmapBase bitmapBase;
         RagPoint tempPnt;
+        ByteBuffer bitmapBuf;
         
         if (incommingMeshList==null) return;
         
@@ -262,13 +271,25 @@ public class WalkView extends AWTGLCanvas {
             }
         }
         
+            // remove old bitmaps
+            
+        if (bitmaps!=null) {
+            for (int id:bitmaps.values()) {
+                glDeleteBuffers(id);
+            }
+        }
+        
             // setup the new mesh
             
         tempPnt=new RagPoint(0.0f,0.0f,0.0f);
+        bitmaps=new HashMap<>();
             
         nMesh=incommingMeshList.count();
 
         for (n=0;n!=nMesh;n++) {
+            
+                // the mesh
+                
             mesh=incommingMeshList.get(n);
             boneIdx=incommingSkeleton.findBoneIndex(mesh.name);
             if (boneIdx==-1) {
@@ -277,7 +298,37 @@ public class WalkView extends AWTGLCanvas {
             else {
                 stageMesh(mesh,incommingSkeleton.bones.get(boneIdx).pnt);
             }
+            
+                // the bitmap
+                
+            bitmapName=mesh.bitmapName;
+            
+            if (!bitmaps.containsKey(bitmapName)) {
+                bitmapBase=incommingBitmapGenerator.bitmaps.get(bitmapName);
+            
+                textureSize=bitmapBase.getTextureSize();
+                hasAlpha=bitmapBase.hasAlpha();
+
+                bitmapBuf = MemoryUtil.memAlloc((textureSize*(hasAlpha?4:3))* textureSize);
+                bitmapBuf.put(bitmapBase.getColorDataAsBytes()).flip();
+
+                textureId = glGenTextures();
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, textureId);
+                glTexImage2D(GL_TEXTURE_2D, 0, (hasAlpha?GL_RGBA:GL_RGB), textureSize, textureSize, 0, (hasAlpha?GL_RGBA:GL_RGB), GL_UNSIGNED_BYTE, bitmapBuf);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                glGenerateMipmap(GL_TEXTURE_2D);
+
+                MemoryUtil.memFree(bitmapBuf);
+                
+                bitmaps.put(bitmapName, textureId);
+            }
         }
+
+            // unbind any textures
+            
+        glBindTexture(GL_TEXTURE_2D, 0);
         
             // switch to new mesh list
             // and clear incomming
@@ -285,6 +336,7 @@ public class WalkView extends AWTGLCanvas {
         this.meshList=incommingMeshList;
         incommingMeshList=null;
         incommingSkeleton=null;
+        incommingBitmapGenerator=null;
         
             // recenter camera
             
@@ -300,7 +352,7 @@ public class WalkView extends AWTGLCanvas {
 
     @Override
     public void paintGL() {
-        int n,nMesh;
+        int n,nMesh,curTextureId,textureId;
         long tick;
         Mesh mesh;
         
@@ -364,14 +416,25 @@ public class WalkView extends AWTGLCanvas {
         
             // draw all the meshes
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,textureId);
+        curTextureId=-1;
         
         nMesh=meshList.count();
         
         for (n=0;n!=nMesh;n++) {
             mesh=meshList.get(n);
+            
+                // new texture?
+                
+            textureId=bitmaps.get(mesh.bitmapName);
+            if (textureId!=curTextureId) {
+                curTextureId=textureId;
+                
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D,textureId);
+            }
 
+                // draw the mesh
+                
             glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
             glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
 
@@ -380,7 +443,6 @@ public class WalkView extends AWTGLCanvas {
 
             glDrawElements(GL_TRIANGLES, mesh.indexBuf);
         }
-        
 
             // shutdown drawing
             
@@ -407,7 +469,7 @@ public class WalkView extends AWTGLCanvas {
     
     public void mouseDrag(int x,int y) {
         if (lastMouseX!=x) {
-            cameraAngle.y+=((float)(x-lastMouseX)*0.5f);
+            cameraAngle.y-=((float)(x-lastMouseX)*0.5f);
             if (cameraAngle.y<0) cameraAngle.y=360.0f+cameraAngle.y;
             if (cameraAngle.y>=360) cameraAngle.y=cameraAngle.y-360.0f;
             lastMouseX=x;

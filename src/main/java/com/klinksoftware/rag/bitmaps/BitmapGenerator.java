@@ -7,41 +7,19 @@ import java.util.*;
 
 public class BitmapGenerator
 {
-    private boolean     hasWallBitmap,hasFloorBitmap,hasCeilingBitmap,hasStepBitmap,
-                        hasPlatformBitmap,hasPillarBitmap,hasBoxBitmap,hasComputerBitmap,
-                        hasPanelBitmap,hasMonitorBitmap,hasPipeBitmap,hasLiquidBitmap,
-                        hasGlassBitmap,hasAccessoryBitmap,hasBodyBitmap,hasLimbBitmap,hasHeadBitmap;
-    private String      basePath;
+    private String basePath;
+    public HashMap<String,BitmapBase> bitmaps;
     
-    public BitmapGenerator(String basePath)
-    {
-        hasWallBitmap=false;
-        hasFloorBitmap=false;
-        hasCeilingBitmap=false;
-        hasPlatformBitmap=false;
-        hasStepBitmap=false;
-        hasPillarBitmap=false;
-        hasBoxBitmap=false;
-        hasComputerBitmap=false;
-        hasPanelBitmap=false;
-        hasMonitorBitmap=false;
-        hasPipeBitmap=false;
-        hasLiquidBitmap=false;
-        hasGlassBitmap=false;
-        hasAccessoryBitmap=false;
-        hasBodyBitmap=false;
-        hasLimbBitmap=false;
-        hasHeadBitmap=false;
-        
+    public BitmapGenerator(String basePath) {
         this.basePath=basePath;
+        bitmaps=new HashMap<>();
     }
 
-    public void generateWall()
-    {
+    public void generateWall() {
         int         variationMode;
         BitmapBase  bitmapBase;
         
-        if (hasWallBitmap) return;
+        if (bitmaps.containsKey("wall")) return;
         
         switch (AppWindow.random.nextInt(4)) {
             case 0:
@@ -63,16 +41,14 @@ public class BitmapGenerator
         }
 
         bitmapBase.generate(variationMode,basePath,"wall");
-        
-        hasWallBitmap=true;
+        bitmaps.put("wall", bitmapBase);
     }
     
-    public void generateFloor()
-    {
+    public void generateFloor() {
         int         variationMode;
         BitmapBase  bitmapBase;
         
-        if (hasFloorBitmap) return;
+        if (bitmaps.containsKey("floor")) return;
         
         switch(AppWindow.random.nextInt(7)) {
             case 0:
@@ -106,8 +82,7 @@ public class BitmapGenerator
         }
         
         bitmapBase.generate(variationMode,basePath,"floor");
-        
-        hasFloorBitmap=true;
+        bitmaps.put("floor", bitmapBase);
     }
     
     public void generateCeiling()
@@ -115,7 +90,7 @@ public class BitmapGenerator
         int         variationMode;
         BitmapBase  bitmapBase;
         
-        if (hasCeilingBitmap) return;
+        if (bitmaps.containsKey("ceiling")) return;
         
         switch(AppWindow.random.nextInt(4)) {
             case 0:
@@ -137,8 +112,7 @@ public class BitmapGenerator
         }
         
         bitmapBase.generate(variationMode,basePath,"ceiling");
-        
-        hasCeilingBitmap=true;
+        bitmaps.put("ceiling", bitmapBase);
     }
     
     public void generatePlatform()
@@ -146,7 +120,7 @@ public class BitmapGenerator
         int         variationMode;
         BitmapBase  bitmapBase;
         
-        if (hasPlatformBitmap) return;
+        if (bitmaps.containsKey("platform")) return;
         
         switch (AppWindow.random.nextInt(4)) {
             case 0:
@@ -168,8 +142,7 @@ public class BitmapGenerator
         }
         
         bitmapBase.generate(variationMode,basePath,"platform");
-
-        hasPlatformBitmap=true;
+        bitmaps.put("platform", bitmapBase);
     }
     
     public void generateStep()
@@ -177,7 +150,7 @@ public class BitmapGenerator
         int         variationMode;
         BitmapBase  bitmapBase;
         
-        if (hasStepBitmap) return;
+        if (bitmaps.containsKey("step")) return;
         
         switch (AppWindow.random.nextInt(3)) {
             case 0:
@@ -195,8 +168,7 @@ public class BitmapGenerator
         }
         
         bitmapBase.generate(variationMode,basePath,"step");
-
-        hasStepBitmap=true;
+        bitmaps.put("step", bitmapBase);
     }
     
     public void generatePillar()
@@ -204,7 +176,7 @@ public class BitmapGenerator
         int         variationMode;
         BitmapBase  bitmapBase;
         
-        if (hasPillarBitmap) return;
+        if (bitmaps.containsKey("pillar")) return;
         
         switch (AppWindow.random.nextInt(4)) {
             case 0:
@@ -226,8 +198,7 @@ public class BitmapGenerator
         }
         
         bitmapBase.generate(variationMode,basePath,"pillar");
-
-        hasPillarBitmap=true;
+        bitmaps.put("pillar", bitmapBase);
     }
     
     public void generateBox()
@@ -235,7 +206,7 @@ public class BitmapGenerator
         int         variationMode;
         BitmapBase  bitmapBase;
         
-        if (hasBoxBitmap) return;
+        if (bitmaps.containsKey("box")) return;
         
         switch (AppWindow.random.nextInt(2)) {
             case 0:
@@ -249,98 +220,117 @@ public class BitmapGenerator
         }
         
         bitmapBase.generate(variationMode,basePath,"box");
-
-        hasBoxBitmap=true;
+        bitmaps.put("box", bitmapBase);
     }
     
     public void generateComputer()
     {
-        if (hasComputerBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapComputer()).generate(BitmapComputer.VARIATION_COMPUTER_BANK,basePath,"computer");
+        if (bitmaps.containsKey("computer")) return;
         
-        hasComputerBitmap=true;
+        bitmapBase=new BitmapComputer();
+        bitmapBase.generate(BitmapComputer.VARIATION_COMPUTER_BANK,basePath,"computer");
+        bitmaps.put("computer", bitmapBase);
     }
     
     public void generatePanel()
     {
-        if (hasPanelBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapComputer()).generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"panel");
+        if (bitmaps.containsKey("panel")) return;
         
-        hasPanelBitmap=true;
+        bitmapBase=new BitmapComputer();
+        bitmapBase.generate(BitmapComputer.VARIATION_CONTROL_PANEL,basePath,"panel");
+        bitmaps.put("panel", bitmapBase);
     }
     
     public void generateMonitor()
     {
-        if (hasMonitorBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapComputer()).generate(BitmapComputer.VARIATION_MONITOR,basePath,"monitor");
+        if (bitmaps.containsKey("monitor")) return;
         
-        hasMonitorBitmap=true;
+        bitmapBase=new BitmapComputer();
+        bitmapBase.generate(BitmapComputer.VARIATION_MONITOR,basePath,"monitor");
+        bitmaps.put("monitor", bitmapBase);
     }
     
     public void generatePipe()
     {
-        if (hasPipeBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapMetal()).generate(BitmapMetal.VARIATION_PIPE,basePath,"pipe");
+        if (bitmaps.containsKey("pipe")) return;
         
-        hasPipeBitmap=true;
+        bitmapBase=new BitmapMetal();
+        bitmapBase.generate(BitmapMetal.VARIATION_PIPE,basePath,"pipe");
+        bitmaps.put("pipe", bitmapBase);
     }
     
     public void generateLiquid()
     {
-        if (hasLiquidBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapLiquid()).generate(BitmapLiquid.VARIATION_NONE,basePath,"liquid");
+        if (bitmaps.containsKey("liquid")) return;
         
-        hasLiquidBitmap=true;
+        bitmapBase=new BitmapLiquid();
+        bitmapBase.generate(BitmapLiquid.VARIATION_NONE,basePath,"liquid");
+        bitmaps.put("liquid", bitmapBase);
     }
     
     public void generateGlass()
     {
-        if (hasGlassBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapGlass()).generate(BitmapGlass.VARIATION_NONE,basePath,"glass");
+        if (bitmaps.containsKey("glass")) return;
         
-        hasGlassBitmap=true;
+        bitmapBase=new BitmapGlass();
+        bitmapBase.generate(BitmapGlass.VARIATION_NONE,basePath,"glass");
+        bitmaps.put("glass", bitmapBase);
     }
     
     public void generateAccessory()
     {
-        if (hasAccessoryBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapMetal()).generate(BitmapMetal.VARIATION_SHEET,basePath,"accessory");
+        if (bitmaps.containsKey("accessory")) return;
         
-        hasAccessoryBitmap=true;
+        bitmapBase=new BitmapMetal();
+        bitmapBase.generate(BitmapMetal.VARIATION_SHEET,basePath,"accessory");
+        bitmaps.put("accessory", bitmapBase);
     }
     
     public void generateBody()
     {
-        if (hasBodyBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapSkin()).generate(BitmapSkin.VARIATION_BODY,basePath,"body");
+        if (bitmaps.containsKey("body")) return;
         
-        hasBodyBitmap=true;
+        bitmapBase=new BitmapSkin();
+        bitmapBase.generate(BitmapSkin.VARIATION_BODY,basePath,"body");
+        bitmaps.put("body", bitmapBase);
     }
     
     public void generateLimb()
     {
-        if (hasLimbBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapSkin()).generate(BitmapSkin.VARIATION_LIMB,basePath,"limb");
+        if (bitmaps.containsKey("limb")) return;
         
-        hasLimbBitmap=true;
+        bitmapBase=new BitmapSkin();
+        bitmapBase.generate(BitmapSkin.VARIATION_LIMB,basePath,"limb");
+        bitmaps.put("limb", bitmapBase);
     }
     
     public void generateHead()
     {
-        if (hasHeadBitmap) return;
+        BitmapBase  bitmapBase;
         
-        (new BitmapSkin()).generate(BitmapSkin.VARIATION_HEAD,basePath,"head");
+        if (bitmaps.containsKey("head")) return;
         
-        hasHeadBitmap=true;
+        bitmapBase=new BitmapSkin();
+        bitmapBase.generate(BitmapSkin.VARIATION_HEAD,basePath,"head");
+        bitmaps.put("head", bitmapBase);
     }
     
         // this is a little hacky but it's a way to tell what

@@ -262,6 +262,12 @@ public class MeshMapUtility
         return(arr);
     }
     
+    public static int addTrigToIndexes(ArrayList<Integer> indexArray,int trigIdx)
+    {
+        indexArray.addAll(Arrays.asList(trigIdx,(trigIdx+1),(trigIdx+2)));
+        return(trigIdx+3);
+    }
+    
     public static int addQuadToIndexes(ArrayList<Integer> indexArray,int trigIdx)
     {
         indexArray.addAll(Arrays.asList(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3)));
@@ -287,6 +293,7 @@ public class MeshMapUtility
         py=room.story*(MapBuilder.SEGMENT_SIZE+MapBuilder.FLOOR_HEIGHT);
         if (!floor) py+=MapBuilder.SEGMENT_SIZE;
         
+        // from grid
         grid=floor?room.floorGrid:room.ceilingGrid;
         
         vertexArray=new ArrayList<>();
@@ -308,7 +315,7 @@ public class MeshMapUtility
                 trigIdx=addQuadToIndexes(indexArray,trigIdx);
             }
         }
-        
+
         if (trigIdx==0) return;
         
         vertexes=floatArrayListToFloat(vertexArray);

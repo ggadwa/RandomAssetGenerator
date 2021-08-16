@@ -14,7 +14,7 @@ public class ModelBuilder
     private String name;
     private Skeleton skeleton;
     private MeshList meshList;
-    private BitmapGenerator mapBitmapList;
+    private BitmapGenerator bitmapGenerator;
     
     public ModelBuilder(String name) {
         this.name=name;
@@ -60,10 +60,10 @@ public class ModelBuilder
     {
             // always use a single body bitmap
         
-        mapBitmapList=new BitmapGenerator(name);
-        mapBitmapList.generateBody();
-        mapBitmapList.generateLimb();
-        mapBitmapList.generateHead();
+        bitmapGenerator=new BitmapGenerator(name);
+        bitmapGenerator.generateBody();
+        bitmapGenerator.generateLimb();
+        bitmapGenerator.generateHead();
         
             // build the skeleton
             
@@ -92,6 +92,6 @@ public class ModelBuilder
         
             // and set the walk view
             
-        AppWindow.walkView.setIncommingMeshList(meshList,skeleton);
+        AppWindow.walkView.setIncommingMeshList(meshList,skeleton,bitmapGenerator);
     }
 }

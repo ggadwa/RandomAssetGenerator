@@ -18,7 +18,7 @@ public class MapBuilder
     private String mapName;
     private MeshList meshList;
     private Skeleton skeleton;
-    private BitmapGenerator mapBitmapList;
+    private BitmapGenerator bitmapGenerator;
     private MapPieceList mapPieceList;
     
     public MapBuilder(String mapName) {
@@ -141,7 +141,11 @@ public class MapBuilder
                         kz=(z+room.z)-room2.z;
 
                         if ((kx<0) || (kz<0) || (kx>=piece2.sizeX) || (kz>=piece2.sizeZ)) continue;
-                        if (room2.floorGrid[(kz*piece2.sizeX)+kx]==0) continue;
+                        if (room2.ceilingGrid[(kz*piece2.sizeX)+kx]==0) continue;
+                        
+                            // only eliminate if both are inside
+                            
+                        if ((room.floorGrid[(z*piece.sizeX)+x]!=1) || (room2.ceilingGrid[(kz*piece2.sizeX)+kx]!=1)) continue;
                         
                             // eliminate this floor and ceiling
 
@@ -188,34 +192,34 @@ public class MapBuilder
             
         switch (decorationType) {
             case 0:
-                mapBitmapList.generatePlatform();
+                bitmapGenerator.generatePlatform();
                 (new MapStory(meshList,room,("story_"+Integer.toString(roomIdx)))).build();
                 break;
             case 1:
-                mapBitmapList.generatePillar();
+                bitmapGenerator.generatePillar();
                 (new MapPillar(meshList,room,("pillar_"+Integer.toString(roomIdx)))).build();
                 break;
             case 2:
-                mapBitmapList.generateBox();
-                mapBitmapList.generateAccessory();
+                bitmapGenerator.generateBox();
+                bitmapGenerator.generateAccessory();
                 (new MapStorage(meshList,room,("storage_"+Integer.toString(roomIdx)))).build();
                 break;
             case 3:
-                mapBitmapList.generateComputer();
-                mapBitmapList.generatePanel();
-                mapBitmapList.generateMonitor();
-                mapBitmapList.generatePlatform();
-                mapBitmapList.generatePipe();
-                mapBitmapList.generateLiquid();
-                mapBitmapList.generateGlass();
+                bitmapGenerator.generateComputer();
+                bitmapGenerator.generatePanel();
+                bitmapGenerator.generateMonitor();
+                bitmapGenerator.generatePlatform();
+                bitmapGenerator.generatePipe();
+                bitmapGenerator.generateLiquid();
+                bitmapGenerator.generateGlass();
                 (new MapEquipment(meshList,room,("computer_"+Integer.toString(roomIdx)))).build();
                 break;
             case 4:
-                mapBitmapList.generatePipe();
+                bitmapGenerator.generatePipe();
                 (new MapPipe(meshList,room,("pipe_"+Integer.toString(roomIdx)))).build();
                 break;
             case 5:
-                mapBitmapList.generatePlatform();
+                bitmapGenerator.generatePlatform();
                 (new MapAltar(meshList,room,("alter_"+Integer.toString(roomIdx)))).build();
                 break;
         }
@@ -236,7 +240,7 @@ public class MapBuilder
         
             // force step bitmap
             
-        mapBitmapList.generateStep();
+        bitmapGenerator.generateStep();
 
             // step meshes
             
@@ -493,7 +497,7 @@ public class MapBuilder
         
             // some generator classes
         
-        mapBitmapList=new BitmapGenerator(mapName);
+        bitmapGenerator=new BitmapGenerator(mapName);
         mapPieceList=new MapPieceList();
         
             // some settings
@@ -542,9 +546,9 @@ public class MapBuilder
 
             // maps always need walls, floors and ceilings
             
-        mapBitmapList.generateWall();
-        mapBitmapList.generateFloor();
-        mapBitmapList.generateCeiling();
+        bitmapGenerator.generateWall();
+        bitmapGenerator.generateFloor();
+        bitmapGenerator.generateCeiling();
         
             // now create the meshes
             
@@ -592,6 +596,6 @@ public class MapBuilder
         
             // and set the walk view
             
-        AppWindow.walkView.setIncommingMeshList(meshList,skeleton);
+        AppWindow.walkView.setIncommingMeshList(meshList,skeleton,bitmapGenerator);
     }
 }

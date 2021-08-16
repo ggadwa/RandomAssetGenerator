@@ -2,16 +2,15 @@ package com.klinksoftware.rag.map;
 
 public class MapPiece
 {
-    public int              sizeX,sizeZ;
-    public int[]            floorGrid;
-    public float[][]        vertexes;
-    public boolean          decorate;
-    public String           name;
+    public int sizeX,sizeZ;
+    public int[] floorGrid;
+    public float[][] vertexes;
+    public boolean decorate;
+    public String name;
     
-    public MapPiece clone()
-    {
-        int             n;
-        MapPiece        piece;
+    public MapPiece clone() {
+        int n;
+        MapPiece piece;
         
         piece=new MapPiece();
         piece.name=name;
