@@ -304,8 +304,10 @@ public class MeshMapUtility
         for (z=0;z!=piece.sizeZ;z++) {
             pz=(room.z+z)*MapBuilder.SEGMENT_SIZE;
             for (x=0;x!=piece.sizeX;x++) {
-                if (grid[(z*piece.sizeX)+x]==0) continue;
+                if (grid[(z*piece.sizeX)+x]==MapBuilder.FC_MARK_EMPTY) continue;
                 
+                    // add the quad
+                    
                 px=(room.x+x)*MapBuilder.SEGMENT_SIZE;
                 vertexArray.addAll(Arrays.asList(px,py,pz));
                 vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,pz));
@@ -313,6 +315,43 @@ public class MeshMapUtility
                 vertexArray.addAll(Arrays.asList(px,py,(pz+MapBuilder.SEGMENT_SIZE)));
                 
                 trigIdx=addQuadToIndexes(indexArray,trigIdx);
+                
+                    // add any platform walls
+                    
+                if (grid[(z*piece.sizeX)+x]==MapBuilder.FC_MARK_FILL_PLATFORM) {
+                    if ((z>0) && (grid[((z-1)*piece.sizeX)+x]==MapBuilder.FC_MARK_EMPTY)) {
+                        vertexArray.addAll(Arrays.asList(px,py,pz));
+                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,pz));
+                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),(py-MapBuilder.FLOOR_HEIGHT),pz));
+                        vertexArray.addAll(Arrays.asList(px,(py-MapBuilder.FLOOR_HEIGHT),pz));
+
+                        trigIdx=addQuadToIndexes(indexArray,trigIdx);
+                    }
+                    if ((z<(piece.sizeZ-1)) && (grid[((z+1)*piece.sizeX)+x]==MapBuilder.FC_MARK_EMPTY)) {
+                        vertexArray.addAll(Arrays.asList(px,py,(pz+MapBuilder.SEGMENT_SIZE)));
+                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,(pz+MapBuilder.SEGMENT_SIZE)));
+                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),(py-MapBuilder.FLOOR_HEIGHT),(pz+MapBuilder.SEGMENT_SIZE)));
+                        vertexArray.addAll(Arrays.asList(px,(py-MapBuilder.FLOOR_HEIGHT),(pz+MapBuilder.SEGMENT_SIZE)));
+
+                        trigIdx=addQuadToIndexes(indexArray,trigIdx);
+                    }
+                    if ((x>0) && (grid[(z*piece.sizeX)+(x-1)]==MapBuilder.FC_MARK_EMPTY)) {
+                        vertexArray.addAll(Arrays.asList(px,py,pz));
+                        vertexArray.addAll(Arrays.asList(px,py,(pz+MapBuilder.SEGMENT_SIZE)));
+                        vertexArray.addAll(Arrays.asList(px,(py-MapBuilder.FLOOR_HEIGHT),(pz+MapBuilder.SEGMENT_SIZE)));
+                        vertexArray.addAll(Arrays.asList(px,(py-MapBuilder.FLOOR_HEIGHT),pz));
+
+                        trigIdx=addQuadToIndexes(indexArray,trigIdx);
+                    }
+                    if ((x<(piece.sizeX-1)) && (grid[(z*piece.sizeX)+(x+1)]==MapBuilder.FC_MARK_EMPTY)) {
+                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,pz));
+                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,(pz+MapBuilder.SEGMENT_SIZE)));
+                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),(py-MapBuilder.FLOOR_HEIGHT),(pz+MapBuilder.SEGMENT_SIZE)));
+                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),(py-MapBuilder.FLOOR_HEIGHT),pz));
+
+                        trigIdx=addQuadToIndexes(indexArray,trigIdx);
+                    }
+                }
             }
         }
 
@@ -360,6 +399,15 @@ public class MeshMapUtility
             vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]+room.x)*MapBuilder.SEGMENT_SIZE),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k2][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
             vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]+room.x)*MapBuilder.SEGMENT_SIZE),y,((piece.vertexes[k2][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
             vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]+room.x)*MapBuilder.SEGMENT_SIZE),y,((piece.vertexes[k][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
+
+            trigIdx=addQuadToIndexes(indexArray,trigIdx);
+            
+                // the floor height
+                
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]+room.x)*MapBuilder.SEGMENT_SIZE),((y+MapBuilder.SEGMENT_SIZE)+MapBuilder.FLOOR_HEIGHT),((piece.vertexes[k][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]+room.x)*MapBuilder.SEGMENT_SIZE),((y+MapBuilder.SEGMENT_SIZE)+MapBuilder.FLOOR_HEIGHT),((piece.vertexes[k2][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k2][0]+room.x)*MapBuilder.SEGMENT_SIZE),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k2][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[k][0]+room.x)*MapBuilder.SEGMENT_SIZE),(y+MapBuilder.SEGMENT_SIZE),((piece.vertexes[k][1]+room.z)*MapBuilder.SEGMENT_SIZE)));
 
             trigIdx=addQuadToIndexes(indexArray,trigIdx);
         }

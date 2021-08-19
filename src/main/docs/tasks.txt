@@ -1,6 +1,5 @@
 
 
-- add sides to platforms
 - make thing that adds additional horz/vert platforms to rooms
 
 - figure out stairs later

@@ -15,6 +15,11 @@ public class MapBuilder
     public static final float SEGMENT_SIZE=10.0f;
     public static final float FLOOR_HEIGHT=1.0f;
     
+    public static final int FC_MARK_EMPTY=0;
+    public static final int FC_MARK_FILL_INSIDE=1;
+    public static final int FC_MARK_FILL_OUTSIDE=2;
+    public static final int FC_MARK_FILL_PLATFORM=3;
+    
     private String mapName;
     private MeshList meshList;
     private Skeleton skeleton;
@@ -131,7 +136,7 @@ public class MapBuilder
             
                 for (z=0;z!=piece.sizeZ;z++) {
                     for (x=0;x!=piece.sizeX;x++) {
-                        if (room.floorGrid[(z*piece.sizeX)+x]==0) continue;
+                        if (room.floorGrid[(z*piece.sizeX)+x]==FC_MARK_EMPTY) continue;
 
                             // find grid spot in room2
                             // if that grid spot doesn't exist or
@@ -141,16 +146,21 @@ public class MapBuilder
                         kz=(z+room.z)-room2.z;
 
                         if ((kx<0) || (kz<0) || (kx>=piece2.sizeX) || (kz>=piece2.sizeZ)) continue;
-                        if (room2.ceilingGrid[(kz*piece2.sizeX)+kx]==0) continue;
+                        if (room2.ceilingGrid[(kz*piece2.sizeX)+kx]==FC_MARK_EMPTY) continue;
                         
                             // only eliminate if both are inside
+                            // if one is inside, then make sure we mark
+                            // it as a platform
                             
-                        if ((room.floorGrid[(z*piece.sizeX)+x]!=1) || (room2.ceilingGrid[(kz*piece2.sizeX)+kx]!=1)) continue;
+                        if ((room.floorGrid[(z*piece.sizeX)+x]!=FC_MARK_FILL_INSIDE) || (room2.ceilingGrid[(kz*piece2.sizeX)+kx]!=FC_MARK_FILL_INSIDE)) {
+                            room.floorGrid[(z*piece.sizeX)+x]=FC_MARK_FILL_PLATFORM;
+                            continue;
+                        }
                         
                             // eliminate this floor and ceiling
 
-                        room.floorGrid[(z*piece.sizeX)+x]=0;
-                        room2.ceilingGrid[(kz*piece2.sizeX)+kx]=0;
+                        room.floorGrid[(z*piece.sizeX)+x]=FC_MARK_EMPTY;
+                        room2.ceilingGrid[(kz*piece2.sizeX)+kx]=FC_MARK_EMPTY;
                     }
                 }
             }

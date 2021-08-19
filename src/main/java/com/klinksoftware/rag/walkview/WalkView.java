@@ -3,6 +3,7 @@ package com.klinksoftware.rag.walkview;
 import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.*;
+import com.klinksoftware.rag.map.MapBuilder;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.Skeleton;
 import java.nio.*;
@@ -30,7 +31,6 @@ public class WalkView extends AWTGLCanvas {
     private int vertexShaderId, fragmentShaderId, programId;
     private int vertexPositionAttribute,vertexUVAttribute;
     private int perspectiveUniformId,viewUniformId;
-    private int textureId;
     private long nextPaintTick;
     private float aspectRatio;
     private float moveX,moveY,moveZ;
@@ -153,40 +153,6 @@ public class WalkView extends AWTGLCanvas {
 
         vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
         vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
-        
-        
-        
-            // testing!  load up a texture
-            
-            BitmapBase bitmapBase;
-            AppWindow.random=new Random(Calendar.getInstance().getTimeInMillis()); // hack!
-            
-            bitmapBase=new BitmapBrick();
-        bitmapBase.generate(BitmapBrick.VARIATION_NONE,null,"brick");
-        int textureSize=bitmapBase.getTextureSize();
-        boolean hasAlpha=bitmapBase.hasAlpha();
-        
-        
-
-        ByteBuffer buffer = MemoryUtil.memAlloc((textureSize*(hasAlpha?4:3))* textureSize);
-        buffer.put(bitmapBase.getColorDataAsBytes()).flip();
-
-
-	textureId = glGenTextures(); //Generate texture ID
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureId); //Bind texture ID
-        glTexImage2D(GL_TEXTURE_2D, 0, (hasAlpha?GL_RGBA:GL_RGB), textureSize, textureSize, 0, (hasAlpha?GL_RGBA:GL_RGB), GL_UNSIGNED_BYTE, buffer);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-        
-        MemoryUtil.memFree(buffer);
-        
-        
-
-
     
         // enable everything we need to draw
         glUseProgram(programId);
@@ -340,7 +306,7 @@ public class WalkView extends AWTGLCanvas {
         
             // recenter camera
             
-        cameraPoint.setFromValues(0.0f,0.0f,0.0f);
+        cameraPoint.setFromValues(0.0f,(MapBuilder.SEGMENT_SIZE*0.5f),0.0f);
     }
     
     public void shutdown()
