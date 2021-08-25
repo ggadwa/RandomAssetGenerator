@@ -3,6 +3,7 @@ package com.klinksoftware.rag.model;
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.export.*;
+import static com.klinksoftware.rag.map.MapBuilder.SEGMENT_SIZE;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
@@ -92,6 +93,7 @@ public class ModelBuilder
         
             // and set the walk view
             
+        AppWindow.walkView.setCameraPoint(0.0f,0.5f,-1.5f);
         AppWindow.walkView.setIncommingMeshList(meshList,skeleton,bitmapGenerator);
     }
 }

@@ -216,6 +216,10 @@ public class WalkView extends AWTGLCanvas {
         this.incommingBitmapGenerator=incommingBitmapGenerator;
     }
     
+    public void setCameraPoint(float x,float y,float z) {
+        cameraPoint.setFromValues(x,y,z);
+    }
+    
     private void stageMeshList() {
         int n,nMesh,boneIdx,textureSize,textureId;
         boolean hasAlpha;
@@ -303,10 +307,6 @@ public class WalkView extends AWTGLCanvas {
         incommingMeshList=null;
         incommingSkeleton=null;
         incommingBitmapGenerator=null;
-        
-            // recenter camera
-            
-        cameraPoint.setFromValues(0.0f,(MapBuilder.SEGMENT_SIZE*0.5f),0.0f);
     }
     
     public void shutdown()

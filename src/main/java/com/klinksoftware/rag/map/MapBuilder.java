@@ -328,7 +328,7 @@ public class MapBuilder
         int         n,placeCount,moveCount,failCount,
                     touchIdx,firstRoomIdx,endRoomIdx;
         float       origX,origZ,xAdd,zAdd;
-        MapRoom     room,connectRoom;
+        MapRoom     room,lastRoom,connectRoom;
         
             // first room is alone so it
             // always can be laid down
@@ -341,6 +341,8 @@ public class MapBuilder
         
         roomCount--;
         if (roomCount<=0) return(rooms.size()-1);
+        
+        lastRoom=room;
         
             // other rooms start outside around the first room
             // room and gravity brings them in until they connect
@@ -369,10 +371,10 @@ public class MapBuilder
                     continue;
                 }
 
-                    // migrate it in to center of map
+                    // migrate it towards the last room
 
-                xAdd=-Math.signum(room.x);
-                zAdd=-Math.signum(room.z);
+                xAdd=lastRoom.x-Math.signum(room.x);
+                zAdd=lastRoom.z-Math.signum(room.z);
 
                 moveCount=ROOM_RANDOM_LOCATION_DISTANCE;
 
@@ -395,6 +397,7 @@ public class MapBuilder
                         if (touchIdx!=-1) {
                             if (room.hasSharedWalls(rooms.get(touchIdx))) {
                                 rooms.add(room);
+                                lastRoom=room;
                                 break;
                             }
                         }
@@ -409,6 +412,7 @@ public class MapBuilder
                         if (touchIdx!=-1) {
                             if (room.hasSharedWalls(rooms.get(touchIdx))) {
                                 rooms.add(room);
+                                lastRoom=room;
                                 break;
                             }
                         }
@@ -500,7 +504,7 @@ public class MapBuilder
     {
         int                 n,x,z,k,roomCount,roomExtensionCount,
                             storyCount,nextStoryRoomIdx;
-        boolean             ceilings,decorations;
+        boolean             ceilings,platform,decorations;
         RagPoint            centerPnt;
         MapRoom             room;
         ArrayList<MapRoom>  rooms;
@@ -559,6 +563,7 @@ public class MapBuilder
         bitmapGenerator.generateWall();
         bitmapGenerator.generateFloor();
         bitmapGenerator.generateCeiling();
+        bitmapGenerator.generatePlatform();
         
             // now create the meshes
             
@@ -570,10 +575,14 @@ public class MapBuilder
             centerPnt=new RagPoint(((room.x+room.piece.sizeX)*0.5f),((room.story*(SEGMENT_SIZE+this.FLOOR_HEIGHT))+(SEGMENT_SIZE*0.5f)),((room.z+room.piece.sizeZ)*0.5f));
                 
                 // meshes
-
+                
             MeshMapUtility.buildRoomWalls(meshList,room,centerPnt,("wall_"+Integer.toString(n)));
-            MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("floor_"+Integer.toString(n)),"floor",true);
-            if (ceilings) MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("ceiling_"+Integer.toString(n)),"ceiling",false);
+            
+            platform=(room.story>0);
+            MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("floor_"+Integer.toString(n)),(platform?"platform":"floor"),true);
+            
+            platform=(room.story<(storyCount-1));
+            if (ceilings) MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("ceiling_"+Integer.toString(n)),(platform?"platform":"ceiling"),false);
             
                 // decorations
 
@@ -606,6 +615,8 @@ public class MapBuilder
         
             // and set the walk view
             
+        room=rooms.get(0);
+        AppWindow.walkView.setCameraPoint(((float)(room.piece.sizeX/2)*SEGMENT_SIZE),(SEGMENT_SIZE*0.5f),((float)(room.piece.sizeZ/2)*SEGMENT_SIZE));
         AppWindow.walkView.setIncommingMeshList(meshList,skeleton,bitmapGenerator);
     }
 }
