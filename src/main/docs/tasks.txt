@@ -1,8 +1,10 @@
 
-- models need spin walkview
-- ceiling texture if NO room above also
+
+- ceiling/floor texture if NO room above/below
 - collisions between room and platform sides
 - make thing that adds additional horz/vert platforms to rooms
+- need lighting etc
+- need to generate tangents
 
 - figure out stairs later
 

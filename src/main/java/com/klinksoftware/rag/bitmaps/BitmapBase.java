@@ -2424,6 +2424,19 @@ public class BitmapBase
         return(imageDataToBytes(colorData));
     }
     
+    public byte[] getNormalDataAsBytes() {
+        return(imageDataToBytes(normalData));
+    }
+    
+    public byte[] getMetallicRoughnessDataAsBytes() {
+        return(imageDataToBytes(metallicRoughnessData));
+    }
+    
+    public byte[] getEmissiveDataAsBytes() {
+        if (!hasEmissive) return(null);
+        return(imageDataToBytes(emissiveData));
+    }
+    
         //
         // generate mainline
         //

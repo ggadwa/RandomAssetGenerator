@@ -40,6 +40,17 @@ public class Skeleton
         return(-1);
     }
     
+    public int findBoneIndexforMeshIndex(int meshIdx)
+    {
+        int         n;
+        
+        for (n=0;n!=bones.size();n++) {
+            if (bones.get(n).meshIdx==meshIdx) return(n);
+        }
+        
+        return(-1);
+    }
+    
     private void addBoneAbsolutePointRecurse(int boneIdx,RagPoint pnt)
     {
         int         n;
@@ -51,7 +62,7 @@ public class Skeleton
             
             if (bones.get(n).children.contains(boneIdx)) {
                 addBoneAbsolutePointRecurse(n,pnt);
-                break;
+                return;
             }
         }
     }

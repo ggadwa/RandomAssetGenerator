@@ -616,7 +616,7 @@ public class MapBuilder
             // and set the walk view
             
         room=rooms.get(0);
-        AppWindow.walkView.setCameraPoint(((float)(room.piece.sizeX/2)*SEGMENT_SIZE),(SEGMENT_SIZE*0.5f),((float)(room.piece.sizeZ/2)*SEGMENT_SIZE));
+        AppWindow.walkView.setCameraWalkView(((float)(room.piece.sizeX/2)*SEGMENT_SIZE),(SEGMENT_SIZE*0.5f),((float)(room.piece.sizeZ/2)*SEGMENT_SIZE));
         AppWindow.walkView.setIncommingMeshList(meshList,skeleton,bitmapGenerator);
     }
 }

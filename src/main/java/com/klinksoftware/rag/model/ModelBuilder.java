@@ -93,7 +93,7 @@ public class ModelBuilder
         
             // and set the walk view
             
-        AppWindow.walkView.setCameraPoint(0.0f,0.5f,-1.5f);
+        AppWindow.walkView.setCameraCenterRotate(8.0f,3.5f);
         AppWindow.walkView.setIncommingMeshList(meshList,skeleton,bitmapGenerator);
     }
 }
