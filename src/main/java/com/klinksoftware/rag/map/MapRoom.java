@@ -88,6 +88,46 @@ public class MapRoom
         return(-1);
     }
     
+    public boolean hasRoomAbove(ArrayList<MapRoom> rooms)
+    {
+        int         n;
+        MapRoom     checkRoom;
+        
+        for (n=0;n!=rooms.size();n++) {
+            checkRoom=rooms.get(n);
+            if (checkRoom.story!=(story+1)) continue;
+            
+            if (x>=(checkRoom.x+checkRoom.piece.sizeX)) continue;
+            if ((x+piece.sizeX)<=checkRoom.x) continue;
+            if (z>=(checkRoom.z+checkRoom.piece.sizeZ)) continue;
+            if ((z+piece.sizeZ)<=checkRoom.z) continue;
+            
+            return(true);
+        }
+        
+        return(false);
+    }
+    
+    public boolean hasRoomBelow(ArrayList<MapRoom> rooms)
+    {
+        int         n;
+        MapRoom     checkRoom;
+        
+        for (n=0;n!=rooms.size();n++) {
+            checkRoom=rooms.get(n);
+            if (checkRoom.story!=(story-1)) continue;
+            
+            if (x>=(checkRoom.x+checkRoom.piece.sizeX)) continue;
+            if ((x+piece.sizeX)<=checkRoom.x) continue;
+            if (z>=(checkRoom.z+checkRoom.piece.sizeZ)) continue;
+            if ((z+piece.sizeZ)<=checkRoom.z) continue;
+            
+            return(true);
+        }
+        
+        return(false);
+    }
+    
         //
         // shared/touching walls
         //

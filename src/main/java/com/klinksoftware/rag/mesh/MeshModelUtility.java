@@ -67,7 +67,7 @@ public class MeshModelUtility
         ArrayList<Float>    vertexArray,uvArray;
         ArrayList<Integer>  indexArray;
         int[]               indexes;
-        float[]             vertexes,normals,uvs;
+        float[]             vertexes,normals,tangents,uvs;
         
             // allocate proper buffers
             
@@ -181,8 +181,9 @@ public class MeshModelUtility
         uvs=floatArrayListToFloat(uvArray);
         indexes=intArrayListToInt(indexArray);
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        tangents=MeshMapUtility.buildTangents(vertexes,uvs,indexes);
         
-        return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
+        return(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes));
     }
     
     private static Mesh buildGlobeAroundSkeletonY(String name,String bitmapName,int acrossSurfaceCount,int aroundSurfaceCount,RagPoint centerPnt,float acrossRadius,float aroundRadius)
@@ -195,7 +196,7 @@ public class MeshModelUtility
         ArrayList<Float>    vertexArray,uvArray;
         ArrayList<Integer>  indexArray;
         int[]               indexes;
-        float[]             vertexes,normals,uvs;
+        float[]             vertexes,normals,tangents,uvs;
         
             // allocate proper buffers
             
@@ -309,8 +310,9 @@ public class MeshModelUtility
         uvs=floatArrayListToFloat(uvArray);
         indexes=intArrayListToInt(indexArray);
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        tangents=MeshMapUtility.buildTangents(vertexes,uvs,indexes);
         
-        return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
+        return(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes));
     }
     
     private static Mesh buildGlobeAroundSkeletonZ(String name,String bitmapName,int acrossSurfaceCount,int aroundSurfaceCount,RagPoint centerPnt,float acrossRadius,float aroundRadius)
@@ -323,7 +325,7 @@ public class MeshModelUtility
         ArrayList<Float>    vertexArray,uvArray;
         ArrayList<Integer>  indexArray;
         int[]               indexes;
-        float[]             vertexes,normals,uvs;
+        float[]             vertexes,normals,tangents,uvs;
         
             // allocate proper buffers
             
@@ -437,8 +439,9 @@ public class MeshModelUtility
         uvs=floatArrayListToFloat(uvArray);
         indexes=intArrayListToInt(indexArray);
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        tangents=MeshMapUtility.buildTangents(vertexes,uvs,indexes);
         
-        return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
+        return(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes));
     }
 
         //

@@ -120,7 +120,6 @@ public class MeshMapUtility
         
     public static float[] buildNormals(float[] vertexes,int[] indexes,RagPoint meshCenter,boolean normalsIn)
     {
-
         int             n,nTrig,trigIdx,offset;
         float[]         normals;
         boolean         flip;
@@ -226,6 +225,122 @@ public class MeshMapUtility
         return(normals);
     }
     
+    public static float[] buildNormalsSimple(float[] vertexes,float x,float y,float z)
+    {
+        int             n,nVertex;
+        float[]         normals;
+
+        normals=new float[vertexes.length];
+
+        nVertex=vertexes.length;
+
+        for (n=0;n<nVertex;n+=3) {
+            normals[n]=x;
+            normals[n+1]=y;
+            normals[n+2]=z;
+        }
+        
+        return(normals);
+    }
+    
+        //
+        // build tangents
+        //
+    
+    public static float[] buildTangents(float[] vertexes,float[] uvs,int[] indexes) {
+        int n,nTrig,trigIdx,vIdx,uvIdx;
+        float u10,u20,v10,v20,denom;
+        float[] tangents;
+        RagPoint v0,v1,v2,uv0,uv1,uv2,p10,p20,vLeft,vRight,vNum,tangent;
+        
+        tangents=new float[vertexes.length];
+
+            // generate tangents by the trigs
+            // sometimes we will end up overwriting
+            // but it depends on the mesh to have
+            // constant shared vertexes against
+            // triangle tangents
+
+        v0=new RagPoint(0.0f,0.0f,0.0f);
+        v1=new RagPoint(0.0f,0.0f,0.0f);
+        v2=new RagPoint(0.0f,0.0f,0.0f);
+        uv0=new RagPoint(0.0f,0.0f,0.0f);
+        uv1=new RagPoint(0.0f,0.0f,0.0f);
+        uv2=new RagPoint(0.0f,0.0f,0.0f);
+        p10=new RagPoint(0.0f,0.0f,0.0f);
+        p20=new RagPoint(0.0f,0.0f,0.0f);
+        vLeft=new RagPoint(0.0f,0.0f,0.0f);
+        vRight=new RagPoint(0.0f,0.0f,0.0f);
+        vNum=new RagPoint(0.0f,0.0f,0.0f);
+        tangent=new RagPoint(0.0f,0.0f,0.0f);
+        
+        nTrig=indexes.length/3;
+
+        for (n=0;n!=nTrig;n++) {
+
+                // get the vertex indexes and
+                // the vertexes for the trig
+
+            trigIdx=n*3;
+
+            vIdx=indexes[trigIdx]*3;
+            v0.setFromValues(vertexes[vIdx],vertexes[vIdx+1],vertexes[vIdx+2]);
+            vIdx=indexes[trigIdx+1]*3;
+            v1.setFromValues(vertexes[vIdx],vertexes[vIdx+1],vertexes[vIdx+2]);
+            vIdx=indexes[trigIdx+2]*3;
+            v2.setFromValues(vertexes[vIdx],vertexes[vIdx+1],vertexes[vIdx+2]);
+            
+            uvIdx=indexes[trigIdx]*2;
+            uv0.setFromValues(uvs[uvIdx],uvs[uvIdx+1],0.0f);
+            uvIdx=indexes[trigIdx+1]*2;
+            uv1.setFromValues(uvs[uvIdx],uvs[uvIdx+1],0.0f);
+            uvIdx=indexes[trigIdx+2]*2;
+            uv2.setFromValues(uvs[uvIdx],uvs[uvIdx+1],0.0f);
+
+                // create vectors
+
+            p10.setFromSubPoint(v1,v0);
+            p20.setFromSubPoint(v2,v0);
+
+                // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
+
+            u10=uv1.x-uv0.x;        // x component
+            u20=uv2.x-uv0.x;
+            v10=uv1.y-uv0.y;        // y component
+            v20=uv2.y-uv0.y;
+
+                // calculate the tangent
+                // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
+
+            vLeft.setFromScale(p10,v20);
+            vRight.setFromScale(p20,v10);
+            vNum.setFromSubPoint(vLeft,vRight);
+
+            denom=(u10*v20)-(v10*u20);
+            if (denom!=0.0f) denom=1.0f/denom;
+            tangent.setFromScale(vNum,denom);
+            tangent.normalize();
+
+                // and set the mesh tangent
+                // to all vertexes in this trig
+
+            vIdx=indexes[trigIdx]*3;
+            tangents[vIdx]=tangent.x;
+            tangents[vIdx+1]=tangent.y;
+            tangents[vIdx+2]=tangent.z;
+            vIdx=indexes[trigIdx+1]*3;
+            tangents[vIdx]=tangent.x;
+            tangents[vIdx+1]=tangent.y;
+            tangents[vIdx+2]=tangent.z;
+            vIdx=indexes[trigIdx+2]*3;
+            tangents[vIdx]=tangent.x;
+            tangents[vIdx+1]=tangent.y;
+            tangents[vIdx+2]=tangent.z;
+        }
+        
+        return(tangents);
+    }
+    
         //
         // mesh utilities
         //
@@ -281,11 +396,11 @@ public class MeshMapUtility
     public static void buildRoomFloorCeiling(MeshList meshList,MapRoom room,RagPoint centerPnt,String name,String bitmapName,boolean floor)
     {
         int                 x,z,trigIdx;
-        float               px,py,pz;
+        float               px,py,pz,ny;
         ArrayList<Float>    vertexArray;
         ArrayList<Integer>  indexArray;
         int[]               indexes,grid;
-        float[]             vertexes,normals,uvs;
+        float[]             vertexes,normals,tangents,uvs;
         MapPiece            piece;
         
         piece=room.piece;
@@ -359,10 +474,11 @@ public class MeshMapUtility
         
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
-        normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        normals=MeshMapUtility.buildNormalsSimple(vertexes,0.0f,(floor?1.0f:-1.0f),0.0f);
         uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
+        tangents=MeshMapUtility.buildTangents(vertexes,uvs,indexes);
         
-        meshList.add(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
+        meshList.add(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes));
     }
        
     public static void buildRoomWalls(MeshList meshList,MapRoom room,RagPoint centerPnt,String name)
@@ -372,7 +488,7 @@ public class MeshMapUtility
         ArrayList<Float>    vertexArray;
         ArrayList<Integer>  indexArray;
         int[]               indexes;
-        float[]             vertexes,normals,uvs;
+        float[]             vertexes,normals,tangents,uvs;
         MapPiece            piece;
         
         piece=room.piece;
@@ -414,10 +530,11 @@ public class MeshMapUtility
 
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
-        normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,true);
         uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
+        tangents=MeshMapUtility.buildTangents(vertexes,uvs,indexes);
         
-        meshList.add(new Mesh(name,"wall",vertexes,normals,uvs,indexes));
+        meshList.add(new Mesh(name,"wall",vertexes,normals,tangents,uvs,indexes));
     }
   
         //
@@ -577,6 +694,7 @@ public class MeshMapUtility
         indexes=intArrayListToInt(indexArray);
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
         uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
+        MeshMapUtility.buildTangents(vertexes,uvs,indexes);
         
         meshList.add(new Mesh(name,"step",vertexes,normals,uvs,indexes));
 */
@@ -592,7 +710,7 @@ public class MeshMapUtility
         ArrayList<Float>    vertexArray,uvArray;
         ArrayList<Integer>  indexArray;
         int[]               indexes;
-        float[]             vertexes,normals,uvs;
+        float[]             vertexes,normals,tangents,uvs;
         RagPoint            centerPnt,rotPnt;
         
             // allocate proper buffers
@@ -761,8 +879,9 @@ public class MeshMapUtility
         else {
             uvs=floatArrayListToFloat(uvArray);
         }
+        tangents=MeshMapUtility.buildTangents(vertexes,uvs,indexes);
         
-        return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
+        return(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes));
     }
     
     public static Mesh createCube(MapRoom room,String name,String bitmapName,float xMin,float xMax,float yMin,float yMax,float zMin,float zMax,boolean left,boolean right,boolean front,boolean back,boolean top,boolean bottom,boolean normalsIn,int uvMode)
@@ -807,7 +926,7 @@ public class MeshMapUtility
         ArrayList<Float>    vertexArray,normalArray,uvArray;
         ArrayList<Integer>  indexArray;
         int[]               indexes;
-        float[]             vertexes,normals,uvs;
+        float[]             vertexes,normals,tangents,uvs;
         RagPoint            normal;
         
             // allocate arrays
@@ -987,8 +1106,9 @@ public class MeshMapUtility
         normals=floatArrayListToFloat(normalArray);
         uvs=floatArrayListToFloat(uvArray);
         indexes=intArrayListToInt(indexArray);
+        tangents=MeshMapUtility.buildTangents(vertexes,uvs,indexes);
         
-        return(new Mesh(name,bitmapName,vertexes,normals,uvs,indexes));
+        return(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes));
     }
     
     public static Mesh createMeshCylinderSimple(MapRoom room,String name,String bitmapName,RagPoint centerPnt,float ty,float by,float radius,boolean addTop,boolean addBot)

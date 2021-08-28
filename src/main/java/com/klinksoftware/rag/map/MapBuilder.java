@@ -504,7 +504,7 @@ public class MapBuilder
     {
         int                 n,x,z,k,roomCount,roomExtensionCount,
                             storyCount,nextStoryRoomIdx;
-        boolean             ceilings,platform,decorations;
+        boolean             ceilings,decorations;
         RagPoint            centerPnt;
         MapRoom             room;
         ArrayList<MapRoom>  rooms;
@@ -572,17 +572,13 @@ public class MapBuilder
         for (n=0;n!=roomCount;n++) {
             room=rooms.get(n);
             
-            centerPnt=new RagPoint(((room.x+room.piece.sizeX)*0.5f),((room.story*(SEGMENT_SIZE+this.FLOOR_HEIGHT))+(SEGMENT_SIZE*0.5f)),((room.z+room.piece.sizeZ)*0.5f));
+            centerPnt=new RagPoint((((room.x*SEGMENT_SIZE)+(room.piece.sizeX*SEGMENT_SIZE))*0.5f),((room.story*(SEGMENT_SIZE+this.FLOOR_HEIGHT))+(SEGMENT_SIZE*0.5f)),(((room.z*SEGMENT_SIZE)+(room.piece.sizeZ*SEGMENT_SIZE))*0.5f));
                 
                 // meshes
                 
             MeshMapUtility.buildRoomWalls(meshList,room,centerPnt,("wall_"+Integer.toString(n)));
-            
-            platform=(room.story>0);
-            MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("floor_"+Integer.toString(n)),(platform?"platform":"floor"),true);
-            
-            platform=(room.story<(storyCount-1));
-            if (ceilings) MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("ceiling_"+Integer.toString(n)),(platform?"platform":"ceiling"),false);
+            MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("floor_"+Integer.toString(n)),(room.hasRoomBelow(rooms)?"platform":"floor"),true);
+            if (ceilings) MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("ceiling_"+Integer.toString(n)),(room.hasRoomAbove(rooms)?"platform":"ceiling"),false);
             
                 // decorations
 

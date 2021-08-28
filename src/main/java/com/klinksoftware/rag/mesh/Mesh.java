@@ -8,17 +8,18 @@ public class Mesh
     public boolean hasEmissive;
     public String name,bitmapName;
     public int[] indexes;
-    public float[] vertexes,normals,uvs;
+    public float[] vertexes,normals,tangents,uvs;
     
     public int vboVertexId,vboNormalId,vboTangentId,vboUVId;
     public IntBuffer indexBuf;
 
-    public Mesh(String name,String bitmapName,float[] vertexes,float[] normals,float[] uvs,int[] indexes)
+    public Mesh(String name,String bitmapName,float[] vertexes,float[] normals,float[] tangents,float[] uvs,int[] indexes)
     {
         this.name=name;
         this.bitmapName=bitmapName;
         this.vertexes=vertexes;
         this.normals=normals;
+        this.tangents=tangents;
         this.uvs=uvs;
         this.indexes=indexes;
     }

@@ -24,11 +24,12 @@ public class WalkView extends AWTGLCanvas {
     private static final float RAG_FOV=55.0f;
     private static final float RAG_MOVE_SPEED=0.01f;
     private static final long RAG_PAINT_TICK=33;
+    private static final float RAG_LIGHT_INTENSITY=500.0f;
     
-    private int wid, high, lastMouseX, lastMouseY;
-    private int vertexShaderId, fragmentShaderId, programId;
-    private int vertexPositionAttribute,vertexUVAttribute;
-    private int perspectiveUniformId,viewUniformId;
+    private int wid,high,lastMouseX,lastMouseY;
+    private int vertexShaderId,fragmentShaderId,programId;
+    private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
+    private int perspectiveMatrixUniformId,viewMatrixUniformId,normalMatrixUniformId,lightPositionIntensityUniformId;
     private long nextPaintTick;
     private float aspectRatio;
     private float moveX,moveY,moveZ;
@@ -37,8 +38,9 @@ public class WalkView extends AWTGLCanvas {
     private MeshList meshList, incommingMeshList;
     private Skeleton incommingSkeleton;
     private BitmapGenerator incommingBitmapGenerator;
-    private RagPoint eyePoint,cameraPoint,cameraAngle,lookAtUpVector, movePoint;
-    private RagMatrix4f perspectiveMatrix, viewMatrix, rotMatrix, rotMatrix2;
+    private RagPoint eyePoint,cameraPoint,cameraAngle,lightEyePoint,lookAtUpVector,movePoint;
+    private RagMatrix4f perspectiveMatrix,viewMatrix,rotMatrix,rotMatrix2;
+    private RagMatrix3f normalMatrix;
     private HashMap<String,WalkViewTexture> bitmaps;
 
     public WalkView(GLData glData) {
@@ -62,10 +64,12 @@ public class WalkView extends AWTGLCanvas {
         eyePoint=new RagPoint(0.0f,0.0f,0.0f);
         cameraPoint=new RagPoint(0.0f,0.0f,0.0f);
         cameraAngle=new RagPoint(0.0f,0.0f,0.0f);
+        lightEyePoint=new RagPoint(0.0f,0.0f,0.0f);
         lookAtUpVector=new RagPoint(0.0f,-1.0f,0.0f);
         
         perspectiveMatrix=new RagMatrix4f();
         viewMatrix=new RagMatrix4f();
+        normalMatrix=new RagMatrix3f();
         rotMatrix=new RagMatrix4f();
         rotMatrix2=new RagMatrix4f();
         
@@ -106,8 +110,8 @@ public class WalkView extends AWTGLCanvas {
             // get the shader sources
         
         try {
-            vertexSource=Files.readString(Paths.get(getClass().getClassLoader().getResource("shaders/interface.vert").toURI()), StandardCharsets.US_ASCII);
-            fragmentSource=Files.readString(Paths.get(getClass().getClassLoader().getResource("shaders/interface.frag").toURI()), StandardCharsets.US_ASCII);
+            vertexSource=Files.readString(Paths.get(getClass().getClassLoader().getResource("shaders/view.vert").toURI()), StandardCharsets.US_ASCII);
+            fragmentSource=Files.readString(Paths.get(getClass().getClassLoader().getResource("shaders/view.frag").toURI()), StandardCharsets.US_ASCII);
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -152,11 +156,16 @@ public class WalkView extends AWTGLCanvas {
         }
         
         // get locations of uniforms and attributes
-        perspectiveUniformId=glGetUniformLocation(programId,"perspectiveMatrix");
-        viewUniformId=glGetUniformLocation(programId,"viewMatrix");
+        perspectiveMatrixUniformId=glGetUniformLocation(programId,"perspectiveMatrix");
+        viewMatrixUniformId=glGetUniformLocation(programId,"viewMatrix");
+        normalMatrixUniformId=glGetUniformLocation(programId,"normalMatrix");
+        
+        lightPositionIntensityUniformId=glGetUniformLocation(programId,"lightPositionIntensity");
 
         vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
         vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
+        vertexNormalAttribute=glGetAttribLocation(programId,"vertexNormal");
+        vertexTangentAttribute=glGetAttribLocation(programId,"vertexTangent");
     
         // enable everything we need to draw
         glUseProgram(programId);
@@ -165,6 +174,8 @@ public class WalkView extends AWTGLCanvas {
         glUniform1i(glGetUniformLocation(programId,"metallicRoughnessTex"),2);   // this is always texture slot 2
         glEnableVertexAttribArray(vertexPositionAttribute);
         glEnableVertexAttribArray(vertexUVAttribute);
+        glEnableVertexAttribArray(vertexNormalAttribute);
+        glEnableVertexAttribArray(vertexTangentAttribute);
         glUseProgram(0);
 
         // redraw timing
@@ -204,6 +215,24 @@ public class WalkView extends AWTGLCanvas {
         glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
         memFree(buf);
         
+        // normals
+        buf = MemoryUtil.memAllocFloat(mesh.normals.length);
+        buf.put(mesh.normals).flip();
+
+        mesh.vboNormalId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboNormalId);
+        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+        memFree(buf);
+        
+        // tangents
+        buf = MemoryUtil.memAllocFloat(mesh.tangents.length);
+        buf.put(mesh.tangents).flip();
+
+        mesh.vboTangentId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboTangentId);
+        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+        memFree(buf);
+        
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         
         // indexes
@@ -214,6 +243,8 @@ public class WalkView extends AWTGLCanvas {
     private void releaseMesh(Mesh mesh) {
         glDeleteBuffers(mesh.vboVertexId);
         glDeleteBuffers(mesh.vboUVId);
+        glDeleteBuffers(mesh.vboNormalId);
+        glDeleteBuffers(mesh.vboTangentId);
         
         memFree(mesh.indexBuf);
     }
@@ -417,6 +448,17 @@ public class WalkView extends AWTGLCanvas {
     }
     
     //
+    // convert point to eye cordinates
+    //
+    
+    private void convertToEyeCoordinates(RagPoint pnt,RagPoint eyePnt)
+    {
+        eyePnt.x=(pnt.x*viewMatrix.data[0])+(pnt.y*viewMatrix.data[4])+(pnt.z*viewMatrix.data[8])+viewMatrix.data[12];
+        eyePnt.y=(pnt.x*viewMatrix.data[1])+(pnt.y*viewMatrix.data[5])+(pnt.z*viewMatrix.data[9])+viewMatrix.data[13];
+        eyePnt.z=(pnt.x*viewMatrix.data[2])+(pnt.y*viewMatrix.data[6])+(pnt.z*viewMatrix.data[10])+viewMatrix.data[14];
+    }
+    
+    //
     // draw the scene
     //
 
@@ -424,6 +466,7 @@ public class WalkView extends AWTGLCanvas {
     public void paintGL() {
         int n,nMesh;
         long tick;
+        FloatBuffer buf;
         Mesh mesh;
         WalkViewTexture texture,curTexture;
         
@@ -462,14 +505,24 @@ public class WalkView extends AWTGLCanvas {
         try (MemoryStack stack = stackPush()) {
             perspectiveMatrix.setPerspectiveMatrix(RAG_FOV,aspectRatio,RAG_NEAR_Z,RAG_FAR_Z);
             viewMatrix.setLookAtMatrix(eyePoint,cameraPoint,lookAtUpVector);
+            normalMatrix.setInvertTransposeFromMat4(viewMatrix);
+            
+            buf=stack.mallocFloat(16);
+            buf.put(perspectiveMatrix.data).flip();
+            glUniformMatrix4fv(perspectiveMatrixUniformId,false,buf);
 
-            FloatBuffer perspectiveBuffer = stack.mallocFloat(16);
-            perspectiveBuffer.put(perspectiveMatrix.data).flip();
-            glUniformMatrix4fv(perspectiveUniformId, false, perspectiveBuffer);
-
-            FloatBuffer viewBuffer = stack.mallocFloat(16);
-            viewBuffer.put(viewMatrix.data).flip();
-            glUniformMatrix4fv(viewUniformId, false, viewBuffer);
+            buf=stack.mallocFloat(16);
+            buf.put(viewMatrix.data).flip();
+            glUniformMatrix4fv(viewMatrixUniformId,false,buf);
+            
+            buf=stack.mallocFloat(12);
+            buf.put(normalMatrix.data).flip();
+            glUniformMatrix3fv(normalMatrixUniformId,false,buf);
+            
+            convertToEyeCoordinates(cameraPoint,lightEyePoint); // lights need to be in eye coordinates
+            buf=stack.mallocFloat(4);
+            buf.put(lightEyePoint.x).put(lightEyePoint.y).put(lightEyePoint.z).put(RAG_LIGHT_INTENSITY).flip();
+            glUniform4fv(lightPositionIntensityUniformId,buf);
         }
         
             // draw all the meshes
@@ -502,6 +555,12 @@ public class WalkView extends AWTGLCanvas {
 
             glBindBuffer(GL_ARRAY_BUFFER, mesh.vboUVId);
             glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, false, 0, 0);
+            
+            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboNormalId);
+            glVertexAttribPointer(vertexNormalAttribute, 3, GL_FLOAT, false, 0, 0);
+            
+            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboTangentId);
+            glVertexAttribPointer(vertexTangentAttribute, 3, GL_FLOAT, false, 0, 0);
 
             glDrawElements(GL_TRIANGLES, mesh.indexBuf);
         }

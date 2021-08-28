@@ -32,6 +32,13 @@ public class RagPoint
         this.z=p1.z-p2.z;
     }
     
+    public void setFromScale(RagPoint p,float f)
+    {
+        this.x=p.x*f;
+        this.y=p.y*f;
+        this.z=p.z*f;
+    }
+    
     public void addPoint(RagPoint p)
     {
         this.x+=p.x;

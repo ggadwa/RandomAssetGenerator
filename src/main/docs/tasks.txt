@@ -1,10 +1,10 @@
 
-
-- ceiling/floor texture if NO room above/below
-- collisions between room and platform sides
+- make lighting by player position
+- collisions between room small walls and platform sides
 - make thing that adds additional horz/vert platforms to rooms
 - need lighting etc
-- need to generate tangents
+
+- need to export tangents
 
 - figure out stairs later
 
