@@ -25,7 +25,7 @@ public class WalkView extends AWTGLCanvas {
     private static final float RAG_MOVE_SPEED=0.01f;
     private static final long RAG_PAINT_TICK=33;
     private static final float RAG_LIGHT_INTENSITY=500.0f;
-    
+
     private int wid,high,lastMouseX,lastMouseY;
     private int vertexShaderId,fragmentShaderId,programId;
     private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
@@ -52,63 +52,63 @@ public class WalkView extends AWTGLCanvas {
         int n;
         String vertexSource, fragmentSource;
         String errorStr;
-        
+
             // screen sizes
-            
+
         wid=getWidth();
         high=getHeight();
         aspectRatio=(float)wid/(float)high;
-        
+
             // some pre-allocates
-            
+
         eyePoint=new RagPoint(0.0f,0.0f,0.0f);
         cameraPoint=new RagPoint(0.0f,0.0f,0.0f);
         cameraAngle=new RagPoint(0.0f,0.0f,0.0f);
         lightEyePoint=new RagPoint(0.0f,0.0f,0.0f);
         lookAtUpVector=new RagPoint(0.0f,-1.0f,0.0f);
-        
+
         perspectiveMatrix=new RagMatrix4f();
         viewMatrix=new RagMatrix4f();
         normalMatrix=new RagMatrix3f();
         rotMatrix=new RagMatrix4f();
         rotMatrix2=new RagMatrix4f();
-        
+
             // no mesh loaded
-            
+
         meshList=null;
         incommingMeshList=null;
         incommingSkeleton=null;
         incommingBitmapGenerator=null;
         bitmaps=null;
-        
+
             // no dragging
-            
+
         lastMouseX=-1;
         lastMouseY=-1;
         moveX=0;
         moveY=0;
         moveZ=0;
         movePoint=new RagPoint(0.0f,0.0f,0.0f);
-        
+
         cameraCenterRotate=false;
         cameraRotateDistance=0.0f;
         cameraRotateOffsetY=0.0f;
-        
+
             // start opengl
-        
+
         createCapabilities();
         glViewport(0,0,wid,high);
         glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
         glEnable(GL_DEPTH_TEST);
-        
+
             // no shader yet
-            
+
         vertexShaderId=-1;
         fragmentShaderId=-1;
         programId=-1;
 
             // get the shader sources
-        
+
         try {
             vertexSource=Files.readString(Paths.get(getClass().getClassLoader().getResource("shaders/view.vert").toURI()), StandardCharsets.US_ASCII);
             fragmentSource=Files.readString(Paths.get(getClass().getClassLoader().getResource("shaders/view.frag").toURI()), StandardCharsets.US_ASCII);
@@ -116,9 +116,9 @@ public class WalkView extends AWTGLCanvas {
             e.printStackTrace();
             return;
         }
-        
+
             // compile the shader
-        
+
         try {
             vertexShaderId=glCreateShader(GL_VERTEX_SHADER);
             glShaderSource(vertexShaderId, vertexSource);
@@ -128,7 +128,7 @@ public class WalkView extends AWTGLCanvas {
                 glDeleteShader(vertexShaderId);
                 throw new Exception("vertex shader compile failed: "+errorStr);
             }
-        
+
             fragmentShaderId=glCreateShader(GL_FRAGMENT_SHADER);
             glShaderSource(fragmentShaderId, fragmentSource);
             glCompileShader(fragmentShaderId);
@@ -138,7 +138,7 @@ public class WalkView extends AWTGLCanvas {
                 glDeleteShader(fragmentShaderId);
                 throw new Exception("fragment shader compile failed: "+errorStr);
             }
-            
+
             programId = glCreateProgram();
             glAttachShader(programId, vertexShaderId);
             glAttachShader(programId, fragmentShaderId);
@@ -154,19 +154,19 @@ public class WalkView extends AWTGLCanvas {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         // get locations of uniforms and attributes
         perspectiveMatrixUniformId=glGetUniformLocation(programId,"perspectiveMatrix");
         viewMatrixUniformId=glGetUniformLocation(programId,"viewMatrix");
         normalMatrixUniformId=glGetUniformLocation(programId,"normalMatrix");
-        
+
         lightPositionIntensityUniformId=glGetUniformLocation(programId,"lightPositionIntensity");
 
         vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
         vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
         vertexNormalAttribute=glGetAttribLocation(programId,"vertexNormal");
         vertexTangentAttribute=glGetAttribLocation(programId,"vertexTangent");
-    
+
         // enable everything we need to draw
         glUseProgram(programId);
         glUniform1i(glGetUniformLocation(programId,"baseTex"),0);   // this is always texture slot 0
@@ -181,24 +181,24 @@ public class WalkView extends AWTGLCanvas {
         // redraw timing
         nextPaintTick=System.currentTimeMillis();
     }
-    
+
     //
     // add and remove meshes from view
     //
-    
+
     private void stageMesh(Mesh mesh,RagPoint bonePoint) {
         int n;
         FloatBuffer buf;
-        
+
         // vertexes
         buf = MemoryUtil.memAllocFloat(mesh.vertexes.length);
-        
+
         for (n=0;n<mesh.vertexes.length;n+=3) {
             buf.put(mesh.vertexes[n]+bonePoint.x);
             buf.put(mesh.vertexes[n+1]+bonePoint.y);
             buf.put(mesh.vertexes[n+2]+bonePoint.z);
         }
-        
+
         buf.flip();
 
         mesh.vboVertexId = glGenBuffers();
@@ -214,7 +214,7 @@ public class WalkView extends AWTGLCanvas {
         glBindBuffer(GL_ARRAY_BUFFER, mesh.vboUVId);
         glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
         memFree(buf);
-        
+
         // normals
         buf = MemoryUtil.memAllocFloat(mesh.normals.length);
         buf.put(mesh.normals).flip();
@@ -223,7 +223,7 @@ public class WalkView extends AWTGLCanvas {
         glBindBuffer(GL_ARRAY_BUFFER, mesh.vboNormalId);
         glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
         memFree(buf);
-        
+
         // tangents
         buf = MemoryUtil.memAllocFloat(mesh.tangents.length);
         buf.put(mesh.tangents).flip();
@@ -232,61 +232,61 @@ public class WalkView extends AWTGLCanvas {
         glBindBuffer(GL_ARRAY_BUFFER, mesh.vboTangentId);
         glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
         memFree(buf);
-        
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        
+
         // indexes
         mesh.indexBuf=MemoryUtil.memAllocInt(mesh.indexes.length);
         mesh.indexBuf.put(mesh.indexes).flip();
     }
-    
+
     private void releaseMesh(Mesh mesh) {
         glDeleteBuffers(mesh.vboVertexId);
         glDeleteBuffers(mesh.vboUVId);
         glDeleteBuffers(mesh.vboNormalId);
         glDeleteBuffers(mesh.vboTangentId);
-        
+
         memFree(mesh.indexBuf);
     }
-    
+
     //
     // setup meshes in view
     // we do this as an incomming list so we can actually
     // have the correct context as this gets triggered during a draw
     //
-    
+
     public void setIncommingMeshList(MeshList incommingMeshList,Skeleton incommingSkeleton,BitmapGenerator incommingBitmapGenerator) {
         this.incommingMeshList=incommingMeshList;
         this.incommingSkeleton=incommingSkeleton;
         this.incommingBitmapGenerator=incommingBitmapGenerator;
     }
-    
+
     //
     // set the view cameras
     //
-    
+
     public void setCameraWalkView(float x,float y,float z) {
         cameraPoint.setFromValues(x,y,z);
         cameraCenterRotate=false;
     }
-    
+
     public void setCameraCenterRotate(float dist,float offsetY){
         cameraRotateDistance=dist;
         cameraRotateOffsetY=offsetY;
         cameraCenterRotate=true;
     }
-    
+
     //
     // textures
     //
-    
+
     private int loadTexture(int textureSize,boolean hasAlpha,byte[] textureData)
     {
         int textureId;
         ByteBuffer bitmapBuf;
-        
+
         if (textureData==null) return(-1);
-        
+
         bitmapBuf = MemoryUtil.memAlloc((textureSize*(hasAlpha?4:3))* textureSize);
         bitmapBuf.put(textureData).flip();
 
@@ -299,16 +299,16 @@ public class WalkView extends AWTGLCanvas {
         glGenerateMipmap(GL_TEXTURE_2D);
 
         MemoryUtil.memFree(bitmapBuf);
-        
+
         return(textureId);
     }
-    
+
     //
     // stage the mesh list
     // this gets triggered during a draw operation when an incomming mesh
     // list has been set
     //
-    
+
     private void stageMeshList() {
         int n,nMesh,boneIdx,textureSize,textureId;
         boolean hasAlpha;
@@ -318,11 +318,11 @@ public class WalkView extends AWTGLCanvas {
         RagPoint tempPnt;
         ByteBuffer bitmapBuf;
         WalkViewTexture texture;
-        
+
         if (incommingMeshList==null) return;
-        
+
             // remove old mesh list
-        
+
         if (meshList!=null) {
             nMesh=meshList.count();
 
@@ -330,9 +330,9 @@ public class WalkView extends AWTGLCanvas {
                 releaseMesh(meshList.get(n));
             }
         }
-        
+
             // remove old bitmaps
-            
+
         if (bitmaps!=null) {
             for (WalkViewTexture texture2:bitmaps.values()) {
                 if (texture2.colorTextureId!=-1) glDeleteBuffers(texture2.colorTextureId);
@@ -340,18 +340,18 @@ public class WalkView extends AWTGLCanvas {
                 if (texture2.metallicRoughnessTextureId!=-1) glDeleteBuffers(texture2.metallicRoughnessTextureId);
             }
         }
-        
+
             // setup the new mesh
-            
+
         tempPnt=new RagPoint(0.0f,0.0f,0.0f);
         bitmaps=new HashMap<>();
-            
+
         nMesh=incommingMeshList.count();
 
         for (n=0;n!=nMesh;n++) {
-            
+
                 // the mesh
-                
+
             mesh=incommingMeshList.get(n);
             boneIdx=incommingSkeleton.findBoneIndexforMeshIndex(n);
             if (boneIdx==-1) {
@@ -360,65 +360,65 @@ public class WalkView extends AWTGLCanvas {
             else {
                 stageMesh(mesh,incommingSkeleton.getBoneAbsolutePoint(boneIdx));
             }
-            
+
                 // the bitmap
-                
+
             bitmapName=mesh.bitmapName;
-            
+
             if (!bitmaps.containsKey(bitmapName)) {
                 texture=new WalkViewTexture();
                 bitmapBase=incommingBitmapGenerator.bitmaps.get(bitmapName);
-                
+
                 texture.colorTextureId=loadTexture(bitmapBase.getTextureSize(),bitmapBase.hasAlpha(),bitmapBase.getColorDataAsBytes());
                 texture.normalTextureId=loadTexture(bitmapBase.getTextureSize(),false,bitmapBase.getNormalDataAsBytes());
                 texture.metallicRoughnessTextureId=loadTexture(bitmapBase.getTextureSize(),false,bitmapBase.getMetallicRoughnessDataAsBytes());
-                
+
                 bitmaps.put(bitmapName,texture);
             }
         }
 
             // unbind any textures
-            
+
         glBindTexture(GL_TEXTURE_2D, 0);
-        
+
             // switch to new mesh list
             // and clear incomming
-            
+
         this.meshList=incommingMeshList;
         incommingMeshList=null;
         incommingSkeleton=null;
         incommingBitmapGenerator=null;
     }
-    
+
     public void shutdown()
     {
         if (vertexShaderId!=-1) glDeleteShader(vertexShaderId);
         if (fragmentShaderId!=-1) glDeleteShader(fragmentShaderId);
         if (programId!=-1) glDeleteProgram(programId);
     }
-    
+
     //
     // drawing camera/eye setup
     //
-    
+
     private void setupCameraWalkView()
     {
             // any movement
-            
+
         if ((moveX!=0.0f) || (moveZ!=0.0f)) {
             movePoint.setFromValues(moveX,0,moveZ);
             rotMatrix.setRotationFromYAngle(cameraAngle.y);
             rotMatrix2.setRotationFromXAngle(cameraAngle.x);
             rotMatrix.multiply(rotMatrix2);
             movePoint.matrixMultiply(rotMatrix);
-            
+
             cameraPoint.addPoint(movePoint);
         }
-        
+
         if (moveY!=0.0f) cameraPoint.y+=moveY;
 
             // setup the eye point
-            
+
         eyePoint.setFromValues(0,0,-RAG_NEAR_Z);
         rotMatrix.setTranslationFromPoint(cameraPoint);
         rotMatrix2.setRotationFromYAngle(cameraAngle.y);
@@ -427,15 +427,15 @@ public class WalkView extends AWTGLCanvas {
         rotMatrix.multiply(rotMatrix2);
         eyePoint.matrixMultiply(rotMatrix);
     }
-    
+
     private void setupCameraCenterRotate()
     {
             // any movement
-            
+
        cameraRotateDistance-=moveZ;
 
             // camera at center
-        
+
         cameraPoint.setFromValues(0.0f,cameraRotateOffsetY,0.0f);
 
         eyePoint.setFromValues(0,0,cameraRotateDistance);
@@ -446,18 +446,53 @@ public class WalkView extends AWTGLCanvas {
         rotMatrix.multiply(rotMatrix2);
         eyePoint.matrixMultiply(rotMatrix);
     }
-    
+
     //
     // convert point to eye cordinates
     //
-    
+
     private void convertToEyeCoordinates(RagPoint pnt,RagPoint eyePnt)
     {
         eyePnt.x=(pnt.x*viewMatrix.data[0])+(pnt.y*viewMatrix.data[4])+(pnt.z*viewMatrix.data[8])+viewMatrix.data[12];
         eyePnt.y=(pnt.x*viewMatrix.data[1])+(pnt.y*viewMatrix.data[5])+(pnt.z*viewMatrix.data[9])+viewMatrix.data[13];
         eyePnt.z=(pnt.x*viewMatrix.data[2])+(pnt.y*viewMatrix.data[6])+(pnt.z*viewMatrix.data[10])+viewMatrix.data[14];
     }
-    
+
+    //
+    // no data drawing
+    //
+    public void drawNoDataColors() {
+        int tick;
+        float f;
+
+        tick = ((int) (System.currentTimeMillis() % 30000L)) / 10;
+
+
+        System.out.println(tick);
+        f = 0.0f;
+
+        switch (tick / 3000) {
+            case 0:
+                f = ((float) tick) / 1000.0f;
+                glClearColor((1.0f - f), f, 0.0f, 1.0f);
+                break;
+            case 1:
+                f = ((float) (tick - 1000)) / 1000.0f;
+                glClearColor(0.0f, (1.0f - f), f, 1.0f);
+                break;
+            case 2:
+                f = ((float) (tick - 2000)) / 1000.0f;
+                glClearColor(f, 0.0f, (1.0f - f), 1.0f);
+                break;
+        }
+
+        System.out.println(f);
+
+        //glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        swapBuffers();
+    }
+
     //
     // draw the scene
     //
@@ -469,44 +504,47 @@ public class WalkView extends AWTGLCanvas {
         FloatBuffer buf;
         Mesh mesh;
         WalkViewTexture texture,curTexture;
-        
+
         // do we have an incomming meshlist?
         stageMeshList();
-        
-        // no meshes
-        if (meshList==null) return;
-        
+
         // redraw timing
         tick=System.currentTimeMillis();
         if (nextPaintTick>tick) return;
-        
+
         while (nextPaintTick>tick) {
             nextPaintTick+=RAG_PAINT_TICK;
         }
-        
+
+        // no meshes, so just rotate colors
+        if (meshList == null) {
+            drawNoDataColors();
+            return;
+        }
+
             // set the camera
-            
+
         if (!cameraCenterRotate) {
             setupCameraWalkView();
         }
         else {
             setupCameraCenterRotate();
         }
-        
+
             // clear
-            
+
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-        
+
             // start the program and setup
             // the drawing matrixes
-        
+
         glUseProgram(programId);
 
         try (MemoryStack stack = stackPush()) {
             perspectiveMatrix.setPerspectiveMatrix(RAG_FOV,aspectRatio,RAG_NEAR_Z,RAG_FAR_Z);
             viewMatrix.setLookAtMatrix(eyePoint,cameraPoint,lookAtUpVector);
             normalMatrix.setInvertTransposeFromMat4(viewMatrix);
-            
+
             buf=stack.mallocFloat(16);
             buf.put(perspectiveMatrix.data).flip();
             glUniformMatrix4fv(perspectiveMatrixUniformId,false,buf);
@@ -514,32 +552,32 @@ public class WalkView extends AWTGLCanvas {
             buf=stack.mallocFloat(16);
             buf.put(viewMatrix.data).flip();
             glUniformMatrix4fv(viewMatrixUniformId,false,buf);
-            
+
             buf=stack.mallocFloat(12);
             buf.put(normalMatrix.data).flip();
             glUniformMatrix3fv(normalMatrixUniformId,false,buf);
-            
+
             convertToEyeCoordinates(cameraPoint,lightEyePoint); // lights need to be in eye coordinates
             buf=stack.mallocFloat(4);
             buf.put(lightEyePoint.x).put(lightEyePoint.y).put(lightEyePoint.z).put(RAG_LIGHT_INTENSITY).flip();
             glUniform4fv(lightPositionIntensityUniformId,buf);
         }
-        
+
             // draw all the meshes
 
         curTexture=null;
-        
+
         nMesh=meshList.count();
-        
+
         for (n=0;n!=nMesh;n++) {
             mesh=meshList.get(n);
-            
+
                 // new texture?
-                
+
             texture=bitmaps.get(mesh.bitmapName);
             if (texture!=curTexture) {
                 curTexture=texture;
-                
+
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D,texture.colorTextureId);
                 glActiveTexture(GL_TEXTURE1);
@@ -549,16 +587,16 @@ public class WalkView extends AWTGLCanvas {
             }
 
                 // draw the mesh
-                
+
             glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
             glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
 
             glBindBuffer(GL_ARRAY_BUFFER, mesh.vboUVId);
             glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, false, 0, 0);
-            
+
             glBindBuffer(GL_ARRAY_BUFFER, mesh.vboNormalId);
             glVertexAttribPointer(vertexNormalAttribute, 3, GL_FLOAT, false, 0, 0);
-            
+
             glBindBuffer(GL_ARRAY_BUFFER, mesh.vboTangentId);
             glVertexAttribPointer(vertexTangentAttribute, 3, GL_FLOAT, false, 0, 0);
 
@@ -566,28 +604,28 @@ public class WalkView extends AWTGLCanvas {
         }
 
             // shutdown drawing
-            
+
         glBindBuffer(GL_ARRAY_BUFFER,0);
         glBindTexture(GL_TEXTURE_2D,0);
-        glUseProgram(0);      
-        
+        glUseProgram(0);
+
             // swap the buffers
-            
+
         swapBuffers();
     }
-    
+
     //
     // events
     //
-    
+
     public void mousePressed(int button,int x,int y) {
         lastMouseX=x;
         lastMouseY=y;
     }
-    
+
     public void mouseRelease(int button) {
     }
-    
+
     public void mouseDrag(int x,int y) {
         if (lastMouseX!=x) {
             cameraAngle.y-=((float)(x-lastMouseX)*0.5f);
@@ -595,7 +633,7 @@ public class WalkView extends AWTGLCanvas {
             if (cameraAngle.y>=360) cameraAngle.y=cameraAngle.y-360.0f;
             lastMouseX=x;
         }
-        
+
         if (lastMouseY!=y) {
             cameraAngle.x+=((float)(y-lastMouseY)*0.2f);
             if (cameraAngle.x<-89.0f) cameraAngle.x=-89.0f;
@@ -603,19 +641,37 @@ public class WalkView extends AWTGLCanvas {
             lastMouseY=y;
         }
     }
-    
+
     public void keyPress(char key) {
-        if (key=='w') moveZ=RAG_MOVE_SPEED;
-        if (key=='s') moveZ=-RAG_MOVE_SPEED;
-        if (key=='a') moveX=RAG_MOVE_SPEED;
-        if (key=='d') moveX=-RAG_MOVE_SPEED;
-        if (key=='q') moveY=RAG_MOVE_SPEED;
-        if (key=='e') moveY=-RAG_MOVE_SPEED;
+        if ((key == 'w') || (key == 'W')) {
+            moveZ = RAG_MOVE_SPEED;
+        }
+        if ((key == 's') || (key == 'S')) {
+            moveZ = -RAG_MOVE_SPEED;
+        }
+        if ((key == 'a') || (key == 'A')) {
+            moveX = RAG_MOVE_SPEED;
+        }
+        if ((key == 'd') || (key == 'D')) {
+            moveX = -RAG_MOVE_SPEED;
+        }
+        if ((key == 'q') || (key == 'Q')) {
+            moveY = RAG_MOVE_SPEED;
+        }
+        if ((key == 'e') || (key == 'E')) {
+            moveY = -RAG_MOVE_SPEED;
+        }
     }
-    
+
     public void keyRelease(char key) {
-        if ((key=='w') || (key=='s')) moveZ=0.0f;
-        if ((key=='a') || (key=='d')) moveX=0.0f;
-        if ((key=='q') || (key=='e')) moveY=0.0f;
+        if ((key == 'w') || (key == 'W') || (key == 's') || (key == 'S')) {
+            moveZ = 0.0f;
+        }
+        if ((key == 'a') || (key == 'A') || (key == 'd') || (key == 'D')) {
+            moveX = 0.0f;
+        }
+        if ((key == 'q') || (key == 'Q') || (key == 'e') || (key == 'E')) {
+            moveY = 0.0f;
+        }
     }
 }

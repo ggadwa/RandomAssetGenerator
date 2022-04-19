@@ -1,8 +1,23 @@
 
-- make lighting by player position
+- don't make specular too bright on textures
+- look for flipped normals
+
+
+- have cube background when no data
+- use cube background for textures
+
+
+add upper and lower story
+each happens by extending two random rooms and connecting them by walking towards each x/z
+
+
+
+
+
+
+
 - collisions between room small walls and platform sides
 - make thing that adds additional horz/vert platforms to rooms
-- need lighting etc
 
 - need to export tangents
 

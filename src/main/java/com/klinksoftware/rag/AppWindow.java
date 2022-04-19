@@ -11,10 +11,11 @@ import org.lwjgl.opengl.awt.*;
 
 public class AppWindow implements WindowListener {
 
-    public static final int WINDOW_WIDTH = 1000;
+    public static final int WINDOW_WIDTH = 1250;
     public static final int WINDOW_HEIGHT = 600;
     public static final int TOOLBAR_HEIGHT = 38;
     public static final int HEADER_HEIGHT = 22;
+    public static final int SETTING_WIDTH = 250;
 
     private static final int TOOL_BUTTON_MAP = 0;
     private static final int TOOL_BUTTON_MODEL = 1;
@@ -27,10 +28,15 @@ public class AppWindow implements WindowListener {
     private JFrame frame;
     private JToolBar toolBar;
     private JButton buildMapButton, buildModelButton, buildBitmapButton;
-    private GradientLabel walkLabel;
-    
+    private GradientLabel walkLabel, settingsLabel;
+    private JTabbedPane settingsTab;
+
     public static Random random;
     public static WalkView walkView;
+    public static SettingsMap settingsMap;
+    public static SettingsModel settingsModel;
+    public static SettingsTexture settingsTexture;
+    public static SettingsSound settingsSound;
 
     //
     // window events
@@ -103,7 +109,7 @@ public class AppWindow implements WindowListener {
 
         return (button);
     }
-    
+
     //
     // start and stop main window
     //
@@ -153,7 +159,7 @@ public class AppWindow implements WindowListener {
         frame.add(toolBar, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
         // walk view
-        walkLabel = new GradientLabel("Walk Through", new Color(196, 196, 255), new Color(128, 128, 255), true);
+        walkLabel = new GradientLabel("Walk Through", new Color(196, 196, 255), new Color(128, 128, 255), false);
         frame.add(walkLabel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
         glData = new GLData();
@@ -164,22 +170,46 @@ public class AppWindow implements WindowListener {
 
         frame.add(walkView, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
+        // settings tabs
+        settingsLabel = new GradientLabel("Settings", new Color(196, 196, 255), new Color(128, 128, 255), true);
+        frame.add(settingsLabel, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+
+        settingsTab = new JTabbedPane();
+        settingsTab.setPreferredSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
+        settingsTab.setMinimumSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
+        settingsTab.setMaximumSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
+        settingsTab.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.black));
+        frame.add(settingsTab, new GridBagConstraints(1, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+
+        // map pane
+        settingsMap = new SettingsMap();
+        settingsTab.addTab("Map", settingsMap);
+
+        settingsModel = new SettingsModel();
+        settingsTab.addTab("Model", settingsModel);
+
+        settingsTexture = new SettingsTexture();
+        settingsTab.addTab("Texture", settingsTexture);
+
+        settingsSound = new SettingsSound();
+        settingsTab.addTab("Sound", settingsSound);
+
         // all the event listeners
         frame.addWindowListener(this);
-        
+
         // events in canvas
         walkView.addMouseMotionListener(
             new MouseMotionListener() {
                 @Override
                 public void mouseMoved(MouseEvent e) {
                 }
-                
+
                 @Override
                 public void mouseDragged(MouseEvent e) {
                     walkView.mouseDrag(e.getX(),e.getY());
                 }
             });
-        
+
         walkView.addMouseListener(
             new MouseListener() {
                 @Override
@@ -204,7 +234,7 @@ public class AppWindow implements WindowListener {
                 public void mouseExited(MouseEvent e) {
                 }
             });
-        
+
         frame.addKeyListener(
             new KeyListener() {
                 @Override
@@ -219,13 +249,13 @@ public class AppWindow implements WindowListener {
                 @Override
                 public void keyReleased(KeyEvent e) {
                     walkView.keyRelease(e.getKeyChar());
-                }  
+                }
             });
-        
+
         // show the window
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-        
+
         // create the random
         // this will be seeded when we start a build
         random=new Random(0);
