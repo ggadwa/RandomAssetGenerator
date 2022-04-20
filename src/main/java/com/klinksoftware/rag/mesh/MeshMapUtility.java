@@ -756,7 +756,7 @@ public class MeshMapUtility
 
             switch (uvMode) {
                 case MeshMapUtility.UV_WHOLE:
-                    uvArray.addAll(Arrays.asList(0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,1.0f,1.0f));
+                    uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
                     break;
                 case MeshMapUtility.UV_BOX:
                     uvArray.addAll(Arrays.asList(0.0f,0.499f,0.0f,0.0f,0.499f,0.0f,0.499f,0.499f));
@@ -819,7 +819,7 @@ public class MeshMapUtility
 
             switch (uvMode) {
                 case MeshMapUtility.UV_WHOLE:
-                    uvArray.addAll(Arrays.asList(0.0f,0.0f,0.0f,1.0f,1.0f,1.0f,1.0f,0.0f));
+                    uvArray.addAll(Arrays.asList(0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f));
                     break;
                 case MeshMapUtility.UV_BOX:
                     uvArray.addAll(Arrays.asList(0.0f,0.499f,0.0f,1.0f,0.499f,1.0f,0.499f,0.499f));
@@ -874,7 +874,7 @@ public class MeshMapUtility
 
             // create the mesh
 
-        normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
+        normals = MeshMapUtility.buildNormals(vertexes, indexes, centerPnt, normalsIn);
         if (uvMode==MeshMapUtility.UV_MAP) {
             uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
         }

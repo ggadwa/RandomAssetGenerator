@@ -2,6 +2,8 @@ package com.klinksoftware.rag.tool;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.bitmaps.*;
+import com.klinksoftware.rag.mesh.MeshList;
+import com.klinksoftware.rag.skeleton.Skeleton;
 import java.io.*;
 import java.util.*;
 import javax.swing.*;
@@ -9,31 +11,45 @@ import javax.swing.*;
 public class BitmapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
-    
+
     public BitmapBuildWorker(AppWindow appWindow) {
         this.appWindow=appWindow;
     }
-    
+
     @Override
     protected Integer doInBackground() throws Exception {
         long seed;
         String buildName,basePath;
         File file;
-        
+
         appWindow.enableButtons(false);
-        
+
             // set the seed and base path for bitmaps
             // and make directories if necessary
-            
+
         seed=Calendar.getInstance().getTimeInMillis();
         AppWindow.random.setSeed(seed);
-        
+
+        BitmapBase bitmap = new BitmapBase();
+        bitmap.generate(BitmapBrick.VARIATION_NONE, null, "bitmap");
+        HashMap<String, BitmapBase> bitmaps = new HashMap<>();
+        bitmaps.put("bitmap", bitmap);
+
+        MeshList meshList = new MeshList();
+        meshList.makeListSimpleCube("bitmap");
+
+        Skeleton skeleton = meshList.rebuildMapMeshesWithSkeleton();
+
+        AppWindow.walkView.setCameraCenterRotate(4.0f, 0.0f);
+        AppWindow.walkView.setIncommingMeshList(meshList, skeleton, bitmaps);
+
+        /*
         buildName="bitmap_"+Long.toHexString(seed);
         basePath="output"+File.separator+buildName;
-        
+
         file=new File(basePath+File.separator+"textures");  // will make root directory also
         if (!file.exists()) file.mkdirs();
-        
+
         try {
             (new BitmapBrick()).generate(BitmapBrick.VARIATION_NONE,buildName,"brick");
             (new BitmapStone()).generate(BitmapStone.VARIATION_NONE,buildName,"stone");
@@ -61,12 +77,12 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         {
             e.printStackTrace();
         }
-        
+        */
         return(0);
     }
-    
+
     @Override
     protected void done() {
         appWindow.enableButtons(true);
-    }    
+    }
 }

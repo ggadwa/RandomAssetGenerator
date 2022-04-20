@@ -11,9 +11,10 @@ public class SettingsMap extends SettingsBase {
 
     private static final int BUTTON_GENERATE_MAP = 0;
     private static final int BUTTON_REGENERATE_TEXTURES = 1;
+    private static final int BUTTON_SAVE_MAP = 2;
 
     private JButton generateMapButton, regenerateTexturesButton;
-    private JCheckBox upperFloorCheckBox, lowerFloorCheckBox;
+    private JCheckBox upperFloorCheckBox, lowerFloorCheckBox, decorationsCheckBox;
 
     public SettingsMap() {
         int y;
@@ -28,11 +29,16 @@ public class SettingsMap extends SettingsBase {
         regenerateTexturesButton = addButton(y, "Regenerate Textures", BUTTON_REGENERATE_TEXTURES);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        upperFloorCheckBox = addCheckBox(y, "Upper Floor", false);
+        upperFloorCheckBox = addCheckBox(y, "Upper Floor", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
         lowerFloorCheckBox = addCheckBox(y, "Lower Floor", true);
         y += (ROW_HEIGHT + ROW_GAP);
+
+        decorationsCheckBox = addCheckBox(y, "Decorations", false);
+        y += (ROW_HEIGHT + ROW_GAP);
+
+        generateMapButton = addButton(y, "Save Map", BUTTON_SAVE_MAP);
     }
 
     @Override

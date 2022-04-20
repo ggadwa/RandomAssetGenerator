@@ -37,11 +37,11 @@ public class WalkView extends AWTGLCanvas {
     private boolean cameraCenterRotate;
     private MeshList meshList, incommingMeshList;
     private Skeleton incommingSkeleton;
-    private BitmapGenerator incommingBitmapGenerator;
+    private HashMap<String, BitmapBase> incommingBitmaps;
     private RagPoint eyePoint,cameraPoint,cameraAngle,lightEyePoint,lookAtUpVector,movePoint;
     private RagMatrix4f perspectiveMatrix,viewMatrix,rotMatrix,rotMatrix2;
     private RagMatrix3f normalMatrix;
-    private HashMap<String,WalkViewTexture> bitmaps;
+    private HashMap<String, WalkViewTexture> textures;
 
     public WalkView(GLData glData) {
         super(glData);
@@ -75,11 +75,12 @@ public class WalkView extends AWTGLCanvas {
 
             // no mesh loaded
 
-        meshList=null;
+        meshList = null;
+        textures = null;
+
         incommingMeshList=null;
         incommingSkeleton=null;
-        incommingBitmapGenerator=null;
-        bitmaps=null;
+        incommingBitmaps = null;
 
             // no dragging
 
@@ -255,10 +256,10 @@ public class WalkView extends AWTGLCanvas {
     // have the correct context as this gets triggered during a draw
     //
 
-    public void setIncommingMeshList(MeshList incommingMeshList,Skeleton incommingSkeleton,BitmapGenerator incommingBitmapGenerator) {
+    public void setIncommingMeshList(MeshList incommingMeshList, Skeleton incommingSkeleton, HashMap<String, BitmapBase> incommingBitmaps) {
         this.incommingMeshList=incommingMeshList;
         this.incommingSkeleton=incommingSkeleton;
-        this.incommingBitmapGenerator=incommingBitmapGenerator;
+        this.incommingBitmaps = incommingBitmaps;
     }
 
     //
@@ -331,10 +332,10 @@ public class WalkView extends AWTGLCanvas {
             }
         }
 
-            // remove old bitmaps
+        // remove old textures
 
-        if (bitmaps!=null) {
-            for (WalkViewTexture texture2:bitmaps.values()) {
+        if (textures != null) {
+            for (WalkViewTexture texture2 : textures.values()) {
                 if (texture2.colorTextureId!=-1) glDeleteBuffers(texture2.colorTextureId);
                 if (texture2.normalTextureId!=-1) glDeleteBuffers(texture2.normalTextureId);
                 if (texture2.metallicRoughnessTextureId!=-1) glDeleteBuffers(texture2.metallicRoughnessTextureId);
@@ -344,7 +345,7 @@ public class WalkView extends AWTGLCanvas {
             // setup the new mesh
 
         tempPnt=new RagPoint(0.0f,0.0f,0.0f);
-        bitmaps=new HashMap<>();
+        textures = new HashMap<>();
 
         nMesh=incommingMeshList.count();
 
@@ -365,15 +366,15 @@ public class WalkView extends AWTGLCanvas {
 
             bitmapName=mesh.bitmapName;
 
-            if (!bitmaps.containsKey(bitmapName)) {
-                texture=new WalkViewTexture();
-                bitmapBase=incommingBitmapGenerator.bitmaps.get(bitmapName);
+            if (!textures.containsKey(bitmapName)) {
+                bitmapBase = incommingBitmaps.get(bitmapName);
 
+                texture = new WalkViewTexture();
                 texture.colorTextureId=loadTexture(bitmapBase.getTextureSize(),bitmapBase.hasAlpha(),bitmapBase.getColorDataAsBytes());
                 texture.normalTextureId=loadTexture(bitmapBase.getTextureSize(),false,bitmapBase.getNormalDataAsBytes());
                 texture.metallicRoughnessTextureId=loadTexture(bitmapBase.getTextureSize(),false,bitmapBase.getMetallicRoughnessDataAsBytes());
 
-                bitmaps.put(bitmapName,texture);
+                textures.put(bitmapName, texture);
             }
         }
 
@@ -387,7 +388,7 @@ public class WalkView extends AWTGLCanvas {
         this.meshList=incommingMeshList;
         incommingMeshList=null;
         incommingSkeleton=null;
-        incommingBitmapGenerator=null;
+        incommingBitmaps = null;
     }
 
     public void shutdown()
@@ -459,41 +460,6 @@ public class WalkView extends AWTGLCanvas {
     }
 
     //
-    // no data drawing
-    //
-    public void drawNoDataColors() {
-        int tick;
-        float f;
-
-        tick = ((int) (System.currentTimeMillis() % 30000L)) / 10;
-
-
-        System.out.println(tick);
-        f = 0.0f;
-
-        switch (tick / 3000) {
-            case 0:
-                f = ((float) tick) / 1000.0f;
-                glClearColor((1.0f - f), f, 0.0f, 1.0f);
-                break;
-            case 1:
-                f = ((float) (tick - 1000)) / 1000.0f;
-                glClearColor(0.0f, (1.0f - f), f, 1.0f);
-                break;
-            case 2:
-                f = ((float) (tick - 2000)) / 1000.0f;
-                glClearColor(f, 0.0f, (1.0f - f), 1.0f);
-                break;
-        }
-
-        System.out.println(f);
-
-        //glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        swapBuffers();
-    }
-
-    //
     // draw the scene
     //
 
@@ -516,9 +482,11 @@ public class WalkView extends AWTGLCanvas {
             nextPaintTick+=RAG_PAINT_TICK;
         }
 
-        // no meshes, so just rotate colors
+        // no meshes, just black
         if (meshList == null) {
-            drawNoDataColors();
+            glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+            swapBuffers();
             return;
         }
 
@@ -574,7 +542,7 @@ public class WalkView extends AWTGLCanvas {
 
                 // new texture?
 
-            texture=bitmaps.get(mesh.bitmapName);
+            texture = textures.get(mesh.bitmapName);
             if (texture!=curTexture) {
                 curTexture=texture;
 

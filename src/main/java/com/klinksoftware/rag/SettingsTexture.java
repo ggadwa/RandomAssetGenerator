@@ -6,6 +6,7 @@ import javax.swing.JComboBox;
 public class SettingsTexture extends SettingsBase {
 
     private static final int BUTTON_GENERATE_TEXTURE = 0;
+    private static final int BUTTON_SAVE_TEXTURE = 1;
     private static final String[] TEXTURE_ITEMS = {"Brick", "Computer", "Concrete", "Glass", "Ground", "Liquid", "Metal", "Mosaic", "Skin", "Stone", "Tile", "Wood"};
 
     private JButton generateTextureButton;
@@ -22,6 +23,9 @@ public class SettingsTexture extends SettingsBase {
         y += (ROW_HEIGHT + ROW_GAP);
 
         textureTypeCombo = addComboBox(y, "Texture Type", TEXTURE_ITEMS, 0);
+        y += (ROW_HEIGHT + ROW_GAP);
+
+        generateTextureButton = addButton(y, "Save Texture", BUTTON_SAVE_TEXTURE);
     }
 
     @Override

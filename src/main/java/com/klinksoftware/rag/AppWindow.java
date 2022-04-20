@@ -166,7 +166,7 @@ public class AppWindow implements WindowListener {
         glData.samples = 4;
         glData.swapInterval = 0;
         walkView = new WalkView(glData);
-        walkView.setFocusable(false);
+        walkView.setFocusable(true);
 
         frame.add(walkView, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
@@ -235,8 +235,8 @@ public class AppWindow implements WindowListener {
                 }
             });
 
-        frame.addKeyListener(
-            new KeyListener() {
+        walkView.addKeyListener(
+                new KeyListener() {
                 @Override
                 public void keyTyped(KeyEvent e) {
                 }

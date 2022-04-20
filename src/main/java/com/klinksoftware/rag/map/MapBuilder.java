@@ -23,7 +23,7 @@ public class MapBuilder
     private String mapName;
     private MeshList meshList;
     private Skeleton skeleton;
-    private BitmapGenerator bitmapGenerator;
+    private HashMap<String, BitmapBase> bitmaps;
     private MapPieceList mapPieceList;
 
     public MapBuilder(String mapName) {
@@ -94,74 +94,6 @@ public class MapBuilder
                     }
 
                     vIdx++;
-                }
-            }
-        }
-    }
-
-    private void removeSharedFloorCeilings(ArrayList<MapRoom> rooms)
-    {
-        int         n,k,roomCount,x,z,
-                    kx,kz;
-        MapRoom     room,room2;
-        MapPiece    piece,piece2;
-
-            // run through ever room against every other room
-            // and pull any floors that are the same as
-            // a ceiling below it
-
-        roomCount=rooms.size();
-
-        for (n=0;n!=roomCount;n++) {
-            room=rooms.get(n);
-            piece=room.piece;
-
-                // room has to be below, and
-                // intersect
-
-            for (k=0;k!=roomCount;k++) {
-                room2=rooms.get(k);
-                if ((room2.story+1)!=room.story) continue;
-
-                if (room.x>(room2.x+room2.piece.sizeX)) continue;
-                if ((room.x+room.piece.sizeX)<room2.x) continue;
-                if (room.z>(room2.z+room2.piece.sizeZ)) continue;
-                if ((room.z+room.piece.sizeZ)<room2.z) continue;
-
-                    // get grid offsets
-
-                piece2=room2.piece;
-
-                    // knock out any shared segments
-
-                for (z=0;z!=piece.sizeZ;z++) {
-                    for (x=0;x!=piece.sizeX;x++) {
-                        if (room.floorGrid[(z*piece.sizeX)+x]==FC_MARK_EMPTY) continue;
-
-                            // find grid spot in room2
-                            // if that grid spot doesn't exist or
-                            // is not filled, then leave floor
-
-                        kx=(x+room.x)-room2.x;
-                        kz=(z+room.z)-room2.z;
-
-                        if ((kx<0) || (kz<0) || (kx>=piece2.sizeX) || (kz>=piece2.sizeZ)) continue;
-                        if (room2.ceilingGrid[(kz*piece2.sizeX)+kx]==FC_MARK_EMPTY) continue;
-
-                            // only eliminate if both are inside
-                            // if one is inside, then make sure we mark
-                            // it as a platform
-
-                        if ((room.floorGrid[(z*piece.sizeX)+x]!=FC_MARK_FILL_INSIDE) || (room2.ceilingGrid[(kz*piece2.sizeX)+kx]!=FC_MARK_FILL_INSIDE)) {
-                            room.floorGrid[(z*piece.sizeX)+x]=FC_MARK_FILL_PLATFORM;
-                            continue;
-                        }
-
-                            // eliminate this floor and ceiling
-
-                        room.floorGrid[(z*piece.sizeX)+x]=FC_MARK_EMPTY;
-                        room2.ceilingGrid[(kz*piece2.sizeX)+kx]=FC_MARK_EMPTY;
-                    }
                 }
             }
         }
@@ -496,6 +428,118 @@ public class MapBuilder
         return(firstRoomIdx+AppWindow.random.nextInt(endRoomIdx-firstRoomIdx));
     }
 
+    //
+    // required bitmaps
+    //
+    public void buildRequiredBitmaps() {
+        int variationMode;
+        BitmapBase bitmapBase;
+
+        // wall
+        switch (AppWindow.random.nextInt(4)) {
+            case 0:
+                bitmapBase = new BitmapBrick();
+                variationMode = BitmapBrick.VARIATION_NONE;
+                break;
+            case 1:
+                bitmapBase = new BitmapStone();
+                variationMode = BitmapStone.VARIATION_NONE;
+                break;
+            case 2:
+                bitmapBase = new BitmapWood();
+                variationMode = BitmapWood.VARIATION_BOARDS;
+                break;
+            default:
+                bitmapBase = new BitmapMetal();
+                variationMode = BitmapMetal.VARIATION_PLATE;
+                break;
+        }
+
+        bitmapBase.generate(variationMode, null, "wall");
+        bitmaps.put("wall", bitmapBase);
+
+        // floor
+        switch (AppWindow.random.nextInt(7)) {
+            case 0:
+                bitmapBase = new BitmapWood();
+                variationMode = BitmapWood.VARIATION_BOARDS;
+                break;
+            case 1:
+                bitmapBase = new BitmapConcrete();
+                variationMode = BitmapConcrete.VARIATION_NONE;
+                break;
+            case 2:
+                bitmapBase = new BitmapTile();
+                variationMode = BitmapTile.VARIATION_NONE;
+                break;
+            case 3:
+                bitmapBase = new BitmapMosaic();
+                variationMode = BitmapMosaic.VARIATION_NONE;
+                break;
+            case 4:
+                bitmapBase = new BitmapGround();
+                variationMode = BitmapGround.VARIATION_NONE;
+                break;
+            case 5:
+                bitmapBase = new BitmapMetal();
+                variationMode = BitmapMetal.VARIATION_HEXAGON;
+                break;
+            default:
+                bitmapBase = new BitmapMetal();
+                variationMode = BitmapMetal.VARIATION_PLATE;
+                break;
+        }
+
+        bitmapBase.generate(variationMode, null, "floor");
+        bitmaps.put("floor", bitmapBase);
+
+        // ceiling
+        switch (AppWindow.random.nextInt(4)) {
+            case 0:
+                bitmapBase = new BitmapWood();
+                variationMode = BitmapWood.VARIATION_BOARDS;
+                break;
+            case 1:
+                bitmapBase = new BitmapConcrete();
+                variationMode = BitmapConcrete.VARIATION_NONE;
+                break;
+            case 2:
+                bitmapBase = new BitmapMetal();
+                variationMode = BitmapMetal.VARIATION_HEXAGON;
+                break;
+            default:
+                bitmapBase = new BitmapMetal();
+                variationMode = BitmapMetal.VARIATION_PLATE;
+                break;
+        }
+
+        bitmapBase.generate(variationMode, null, "ceiling");
+        bitmaps.put("ceiling", bitmapBase);
+
+        // platform
+        switch (AppWindow.random.nextInt(4)) {
+            case 0:
+                bitmapBase = new BitmapBrick();
+                variationMode = BitmapBrick.VARIATION_NONE;
+                break;
+            case 1:
+                bitmapBase = new BitmapWood();
+                variationMode = BitmapWood.VARIATION_BOARDS;
+                break;
+            case 2:
+                bitmapBase = new BitmapMetal();
+                variationMode = BitmapMetal.VARIATION_HEXAGON;
+                break;
+            default:
+                bitmapBase = new BitmapMetal();
+                variationMode = BitmapMetal.VARIATION_PLATE;
+                break;
+        }
+
+        bitmapBase.generate(variationMode, null, "platform");
+        bitmaps.put("platform", bitmapBase);
+    }
+
         //
         // build a map
         //
@@ -511,7 +555,7 @@ public class MapBuilder
 
             // some generator classes
 
-        bitmapGenerator=new BitmapGenerator(mapName);
+        bitmaps = new HashMap<>();
         mapPieceList=new MapPieceList();
 
             // some settings
@@ -553,17 +597,9 @@ public class MapBuilder
 
         removeSharedWalls(rooms);
 
-            // and mark off floors/ceilings that
-            // are over each other
-
-        //removeSharedFloorCeilings(rooms);
-
             // maps always need walls, floors and ceilings
 
-        bitmapGenerator.generateWall();
-        bitmapGenerator.generateFloor();
-        bitmapGenerator.generateCeiling();
-        bitmapGenerator.generatePlatform();
+        buildRequiredBitmaps();
 
             // now create the meshes
 
@@ -613,6 +649,6 @@ public class MapBuilder
 
         room=rooms.get(0);
         AppWindow.walkView.setCameraWalkView(((float)(room.piece.sizeX/2)*SEGMENT_SIZE),(SEGMENT_SIZE*0.5f),((float)(room.piece.sizeZ/2)*SEGMENT_SIZE));
-        AppWindow.walkView.setIncommingMeshList(meshList,skeleton,bitmapGenerator);
+        AppWindow.walkView.setIncommingMeshList(meshList, skeleton, bitmaps);
     }
 }

@@ -2,9 +2,9 @@
 - don't make specular too bright on textures
 - look for flipped normals
 
-
-- have cube background when no data
-- use cube background for textures
+- do buttons on tabs, remove toolbar
+- get ride of bitmap generator
+- only save on button
 
 
 add upper and lower story
