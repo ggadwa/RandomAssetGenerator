@@ -4,6 +4,7 @@
  */
 package com.klinksoftware.rag;
 
+import com.klinksoftware.rag.uiworker.MapBuildWorker;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 
@@ -16,7 +17,9 @@ public class SettingsMap extends SettingsBase {
     private JButton generateMapButton, regenerateTexturesButton;
     private JCheckBox upperFloorCheckBox, lowerFloorCheckBox, decorationsCheckBox;
 
-    public SettingsMap() {
+    public SettingsMap(AppWindow appWindow) {
+        super(appWindow);
+
         int y;
 
         setLayout(null);
@@ -38,11 +41,15 @@ public class SettingsMap extends SettingsBase {
         decorationsCheckBox = addCheckBox(y, "Decorations", false);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        generateMapButton = addButton(y, "Save Map", BUTTON_SAVE_MAP);
+        generateMapButton = addButton(y, "Export Map", BUTTON_SAVE_MAP);
     }
 
     @Override
     public void buttonClick(int id) {
-        System.out.println(id);
+        switch (id) {
+            case BUTTON_GENERATE_MAP:
+                (new MapBuildWorker(appWindow)).execute();
+                return;
+        }
     }
 }

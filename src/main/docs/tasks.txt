@@ -1,13 +1,12 @@
 
-- don't make specular too bright on textures
-- look for flipped normals
 
-- do buttons on tabs, remove toolbar
-- get ride of bitmap generator
+
+
+- get rid of variations
 - only save on button
 
 
-add upper and lower story
+add upper and lower story (different textures!)
 each happens by extending two random rooms and connecting them by walking towards each x/z
 
 

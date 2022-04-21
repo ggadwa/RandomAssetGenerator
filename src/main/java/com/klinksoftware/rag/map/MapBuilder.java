@@ -2,7 +2,6 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.*;
-import com.klinksoftware.rag.export.*;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
@@ -455,7 +454,7 @@ public class MapBuilder
                 break;
         }
 
-        bitmapBase.generate(variationMode, null, "wall");
+        bitmapBase.generate();
         bitmaps.put("wall", bitmapBase);
 
         // floor
@@ -490,7 +489,7 @@ public class MapBuilder
                 break;
         }
 
-        bitmapBase.generate(variationMode, null, "floor");
+        bitmapBase.generate();
         bitmaps.put("floor", bitmapBase);
 
         // ceiling
@@ -513,7 +512,7 @@ public class MapBuilder
                 break;
         }
 
-        bitmapBase.generate(variationMode, null, "ceiling");
+        bitmapBase.generate();
         bitmaps.put("ceiling", bitmapBase);
 
         // platform
@@ -536,7 +535,7 @@ public class MapBuilder
                 break;
         }
 
-        bitmapBase.generate(variationMode, null, "platform");
+        bitmapBase.generate();
         bitmaps.put("platform", bitmapBase);
     }
 
@@ -638,7 +637,7 @@ public class MapBuilder
             // write out the model
 
         try {
-            (new Export()).export(skeleton,meshList,mapName);
+            //    (new Export()).export(meshList, skeleton, bitmaps, mapName);
         }
         catch (Exception e)
         {

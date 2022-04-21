@@ -44,52 +44,44 @@ void main(void)
 
     lowp vec3 lightCol=vec3(0,0,0);
 
-    //for (int n=0;n!=24;n++) {
+        // this is a simple frag with one light
 
-            // if intensity = 0.0, then light is off
+    intensity=lightPositionIntensity.w;
 
-        intensity=lightPositionIntensity.w;
-        //if (intensity==0.0) continue;
+        // get vector for light
 
-            // get vector for light
+    lightVector=lightPositionIntensity.xyz-eyePosition;
 
-        lightVector=lightPositionIntensity.xyz-eyePosition;
+    dist=length(lightVector);
+    if (dist<intensity) {
 
-        dist=length(lightVector);
-        if (dist<intensity) {
+            // the lighting attenuation
 
-                // the lighting attenuation
+        att=1.0-(dist/intensity);
+        att+=pow(att,5.0);
+        lightCol+=(vec3(1,1,1)*att);
 
+            // lights in tangent space
 
-            att=1.0-(dist/intensity);
-            att+=pow(att,5.0);
-            lightCol+=(vec3(1,1,1)*att);
+        lightVertexVector.x=dot(lightVector,tangentSpaceTangent);
+        lightVertexVector.y=dot(lightVector,tangentSpaceBinormal);
+        lightVertexVector.z=dot(lightVector,tangentSpaceNormal);
 
+            // per-light bump
 
+        bumpLightVertexVector=normalize(lightVertexVector);
+        bump+=(dot(bumpLightVertexVector,bumpMap)*att);
 
-                // lights in tangent space
+            // per-light metallic
 
-            lightVertexVector.x=dot(lightVector,tangentSpaceTangent);
-            lightVertexVector.y=dot(lightVector,tangentSpaceBinormal);
-            lightVertexVector.z=dot(lightVector,tangentSpaceNormal);
-
-                // per-light bump
-
-            bumpLightVertexVector=normalize(lightVertexVector);
-            bump+=(dot(bumpLightVertexVector,bumpMap)*att);
-
-                // per-light metallic
-
-                metallicHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
-                metallic+=((metallicRoughnessMap.b*pow(max(dot(bumpMap,metallicHalfVector),0.0),5.0))*att);
-
-        //}
+        metallicHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
+        metallic+=((metallicRoughnessMap.b*pow(max(dot(bumpMap,metallicHalfVector),0.0),5.0))*att);
     }
 
         // calculate the final lighting
 
-lightCol*=bump;
-    //lightCol=clamp(lightCol,0.2,1.0);
+    lightCol*=bump;
+    lightCol=clamp(lightCol,0.2,1.0);
 
         // finally create the pixel
 

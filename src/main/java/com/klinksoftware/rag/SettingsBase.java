@@ -1,6 +1,7 @@
 package com.klinksoftware.rag;
 
 import java.awt.Color;
+import java.awt.Component;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -12,6 +13,12 @@ public class SettingsBase extends JPanel {
     protected static final int PANEL_MIDPOINT = AppWindow.SETTING_WIDTH / 2;
     protected static final int ROW_HEIGHT = 25;
     protected static final int ROW_GAP = 2;
+
+    protected final AppWindow appWindow;
+
+    public SettingsBase(AppWindow appWindow) {
+        this.appWindow = appWindow;
+    }
 
     protected JButton addButton(int y, String title, int buttonId) {
         JButton button;
@@ -56,6 +63,12 @@ public class SettingsBase extends JPanel {
         comboxBox.setBounds(PANEL_MIDPOINT, (y + 5), (PANEL_MIDPOINT - 10), ROW_HEIGHT);
 
         return (comboxBox);
+    }
+
+    public void enableAll(boolean enable) {
+        for (Component component : getComponents()) {
+            component.setEnabled(enable);
+        }
     }
 
     public void buttonClick(int id) {

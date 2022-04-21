@@ -2,7 +2,6 @@ package com.klinksoftware.rag.model;
 
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.*;
-import com.klinksoftware.rag.export.*;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
@@ -60,17 +59,17 @@ public class ModelBuilder
 
         // body
         bitmapBase = new BitmapSkin();
-        bitmapBase.generate(BitmapSkin.VARIATION_BODY, null, "body");
+        bitmapBase.generate();
         bitmaps.put("body", bitmapBase);
 
         // limbs
         bitmapBase = new BitmapSkin();
-        bitmapBase.generate(BitmapSkin.VARIATION_LIMB, null, "limb");
+        bitmapBase.generate();
         bitmaps.put("limb", bitmapBase);
 
         // head
         bitmapBase = new BitmapSkin();
-        bitmapBase.generate(BitmapSkin.VARIATION_HEAD, null, "head");
+        bitmapBase.generate();
         bitmaps.put("head", bitmapBase);
     }
 
@@ -104,7 +103,7 @@ public class ModelBuilder
             // write out the model
 
         try {
-            (new Export()).export(skeleton,meshList,name);
+            //    (new Export()).export(meshList, skeleton, bitmaps, name);
         }
         catch (Exception e)
         {

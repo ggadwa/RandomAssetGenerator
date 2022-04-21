@@ -1,5 +1,6 @@
 package com.klinksoftware.rag;
 
+import com.klinksoftware.rag.uiworker.SoundBuildWorker;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 
@@ -12,7 +13,9 @@ public class SettingsSound extends SettingsBase {
     private JButton generateSoundButton;
     private JComboBox soundTypeCombo;
 
-    public SettingsSound() {
+    public SettingsSound(AppWindow appWindow) {
+        super(appWindow);
+
         int y;
 
         setLayout(null);
@@ -25,11 +28,15 @@ public class SettingsSound extends SettingsBase {
         soundTypeCombo = addComboBox(y, "Sound Type", SOUND_ITEMS, 0);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        generateSoundButton = addButton(y, "Save Sound", BUTTON_SAVE_SOUND);
+        generateSoundButton = addButton(y, "Export Sound", BUTTON_SAVE_SOUND);
     }
 
     @Override
     public void buttonClick(int id) {
-        System.out.println(id);
+        switch (id) {
+            case BUTTON_GENERATE_SOUND:
+                (new SoundBuildWorker(appWindow)).execute();
+                return;
+        }
     }
 }
