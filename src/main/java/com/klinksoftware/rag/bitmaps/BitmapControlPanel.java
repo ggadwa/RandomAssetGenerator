@@ -16,7 +16,7 @@ public class BitmapControlPanel extends BitmapComputer {
     }
 
     @Override
-    public void generateInternal(int variationMode) {
+    public void generateInternal() {
         int offset, panelEdgeSize, panelInsideEdgeSize;
         RagColor panelColor, panelInsideColor;
 

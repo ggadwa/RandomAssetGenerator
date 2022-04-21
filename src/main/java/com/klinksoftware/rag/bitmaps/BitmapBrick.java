@@ -3,22 +3,17 @@ package com.klinksoftware.rag.bitmaps;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
-import java.util.*;
-
 public class BitmapBrick extends BitmapBase
 {
-    public final static int VARIATION_NONE=0;
-    
-    public BitmapBrick()
-    {
+    public BitmapBrick()    {
         super();
-        
+
         hasNormal=true;
         hasMetallicRoughness=true;
         hasEmissive=false;
         hasAlpha=false;
     }
-   
+
         //
         // brick bitmaps
         //
@@ -90,35 +85,34 @@ public class BitmapBrick extends BitmapBase
             }
         }
     }
-    
+
     @Override
-    public void generateInternal(int variationMode)
-    {
+    public void generateInternal()    {
         int                 x,y,xCount,xAdd,yCount,yAdd,
                             halfWid,lft,top,edgeSize,paddingSize;
         boolean             halfBrick;
         RagColor            brickColor,altBrickColor,groutColor;
-        
+
         brickColor=getRandomColor();
         altBrickColor=getRandomColor();
         groutColor=getRandomGray(0.4f,0.6f);
-        
+
         edgeSize=(int)(((float)textureSize*0.005f)+(AppWindow.random.nextFloat()*((float)textureSize*0.0125f)));
         paddingSize=(int)(((float)textureSize*0.005f)+(AppWindow.random.nextFloat()*((float)textureSize*0.0125f)));
-        
+
             // create noise data
-        
+
         createPerlinNoiseData(32,32);
         createNormalNoiseData(1.5f,0.5f);
-        
+
             // grout is a static noise color
-            
+
         drawRect(0,0,textureSize,textureSize,groutColor);
         drawStaticNoiseRect(0,0,textureSize,textureSize,1.0f,1.4f);
         blur(colorData,0,0,textureSize,textureSize,1,false);
-        
+
             // draw the bricks
-            
+
         xCount=4+AppWindow.random.nextInt(4);
         xAdd=textureSize/xCount;
         halfWid=xAdd/2;
@@ -132,14 +126,14 @@ public class BitmapBrick extends BitmapBase
         for (y=0;y!=yCount;y++) {
 
                 // special lines (full line or double bricks)
-                
+
             if (AppWindow.random.nextFloat()<0.2f) {
                 if (AppWindow.random.nextBoolean()) {
                     generateSingleBrick(0,top,(textureSize-1),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,false,true);
                 }
                 else {
                     lft=0;
-                    
+
                     for (x=0;x!=xCount;x++) {
                         generateSingleBrick(lft,top,(lft+halfWid),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
                         generateSingleBrick((lft+halfWid),top,((x==(xCount-1))?(textureSize-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
@@ -147,9 +141,9 @@ public class BitmapBrick extends BitmapBase
                     }
                 }
             }
-            
+
                 // regular lines
-                
+
             else {
                 if (halfBrick) {
                     lft=-halfWid;
@@ -168,7 +162,7 @@ public class BitmapBrick extends BitmapBase
                     }
                 }
             }
-            
+
             top+=yAdd;
             halfBrick=!halfBrick;
         }

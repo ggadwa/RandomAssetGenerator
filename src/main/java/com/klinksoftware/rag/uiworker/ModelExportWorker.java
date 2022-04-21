@@ -4,11 +4,11 @@ import com.klinksoftware.rag.AppWindow;
 import java.io.*;
 import javax.swing.*;
 
-public class BitmapExportWorker extends SwingWorker<Integer, Void> {
+public class ModelExportWorker extends SwingWorker<Integer, Void> {
 
     private AppWindow appWindow;
 
-    public BitmapExportWorker(AppWindow appWindow) {
+    public ModelExportWorker(AppWindow appWindow) {
         this.appWindow = appWindow;
     }
 
@@ -18,8 +18,8 @@ public class BitmapExportWorker extends SwingWorker<Integer, Void> {
         JFileChooser fileChooser;
 
         // skip if nothing generated
-        if (BitmapBuildWorker.generatedBitmap == null) {
-            JOptionPane.showMessageDialog(appWindow.frame, "Generate a texture first.");
+        if (ModelBuildWorker.generatedModel == null) {
+            JOptionPane.showMessageDialog(appWindow.frame, "Generate a model first.");
             return (0);
         }
 
@@ -30,7 +30,7 @@ public class BitmapExportWorker extends SwingWorker<Integer, Void> {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         if (fileChooser.showSaveDialog(appWindow.frame) == JFileChooser.APPROVE_OPTION) {
             file = fileChooser.getSelectedFile();
-            BitmapBuildWorker.generatedBitmap.writeToFile(file.getAbsolutePath(), null);
+            ModelBuildWorker.generatedModel.writeToFile(file.getAbsolutePath());
         }
 
         return (0);

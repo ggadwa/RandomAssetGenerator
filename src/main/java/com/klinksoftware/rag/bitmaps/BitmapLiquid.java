@@ -5,38 +5,31 @@ import com.klinksoftware.rag.utility.*;
 
 public class BitmapLiquid extends BitmapBase
 {
-    public final static int VARIATION_NONE=0;
-    
-    public BitmapLiquid()
-    {
+    public BitmapLiquid()    {
         super();
-        
+
         hasNormal=true;
         hasMetallicRoughness=true;
         hasEmissive=false;
         hasAlpha=false;
     }
-    
-        //
-        // glass bitmaps
-        //
 
     @Override
-    public void generateInternal(int variationMode)
-    {
-        int         n,x,y,halfHigh;
-        RagColor    waterColor,waterAltColor;
-          
-        waterColor=getRandomColor();
-        drawRect(0,0,textureSize,textureSize,waterColor);
-        
+    public void generateInternal()    {
+        RagColor liquidColor;
+
+        liquidColor = getRandomColor();
+        drawRect(0, 0, textureSize, textureSize, liquidColor);
+
         createPerlinNoiseData(16,16);
-        waterColor=getRandomColor();
-        drawPerlinNoiseColorRect(0,0,textureSize,textureSize,waterColor,0.5f);
-        
+        liquidColor = getRandomColor();
+        drawPerlinNoiseColorRect(0, 0, textureSize, textureSize, liquidColor, 0.5f);
+
         createPerlinNoiseData(32,32);
-        waterColor=getRandomColor();
-        drawPerlinNoiseColorRect(0,0,textureSize,textureSize,waterColor,0.7f);
+        liquidColor = getRandomColor();
+        drawPerlinNoiseColorRect(0, 0, textureSize, textureSize, liquidColor, 0.7f);
+
+        createMetallicRoughnessMap((0.2f + AppWindow.random.nextFloat(0.5f)), 0.6f);
     }
-    
+
 }

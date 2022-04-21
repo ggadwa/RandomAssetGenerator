@@ -231,12 +231,12 @@ public class Export
         // main export
         //
 
-    public void export(MeshList meshList, Skeleton skeleton, HashMap<String, BitmapBase> bitmaps, String name) throws Exception    {
+    public void export(MeshList meshList, Skeleton skeleton, HashMap<String, BitmapBase> bitmaps, String path, String name) throws Exception {
         int                             n,meshCount,materialIdx;
         byte[]                          binBytes;
-        float[]                         translation,rotation,scale;
-        ByteArrayOutputStream           bin;
-        String                          path;
+        float[] translation, rotation, scale;
+        String path2;
+        ByteArrayOutputStream bin;
         Mesh                            mesh;
         Bone                            bone;
         ArrayList<Object>               arrList,nodesArr,meshesArr,
@@ -375,16 +375,16 @@ public class Export
         bufferObj.put("uri",(name+".bin"));
         bufferArr=new ArrayList<>();
         bufferArr.add(bufferObj);
-        json.put("buffers",bufferArr);
+        json.put("buffers", bufferArr);
 
-            // save the json
+        // save the json
 
-        path="output"+File.separator+name+File.separator+name+".gltf";
+        path2 = path + File.separator + name + ".gltf";
 
         objMapper=new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
 
-            objMapper.writeValue(new File(path),json);
+            objMapper.writeValue(new File(path2), json);
         }
         catch (IOException e)
         {
@@ -393,14 +393,22 @@ public class Export
 
             // and write the bin
 
-        path="output"+File.separator+name+File.separator+name+".bin";
+        path2 = path + File.separator + name + ".bin";
 
-        try(FileOutputStream binFile=new FileOutputStream(path)) {
+        try ( FileOutputStream binFile = new FileOutputStream(path2)) {
             binFile.write(binBytes);
         }
         catch (IOException e)
         {
             e.printStackTrace();
+        }
+
+        // and write the textures
+        path2 = path + File.separator + "textures";
+        (new File(path2)).mkdir();
+
+        for (String bitmapName : bitmaps.keySet()) {
+            bitmaps.get(bitmapName).writeToFile(path2, bitmapName);
         }
     }
 }

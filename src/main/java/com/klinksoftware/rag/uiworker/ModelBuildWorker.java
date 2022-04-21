@@ -2,13 +2,14 @@ package com.klinksoftware.rag.uiworker;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.model.*;
-import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
 public class ModelBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
+
+    public static ModelBuilder generatedModel = null;
 
     public ModelBuildWorker(AppWindow appWindow) {
         this.appWindow=appWindow;
@@ -17,8 +18,6 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
     @Override
     protected Integer doInBackground() throws Exception {
         long seed;
-        String mapName,basePath;
-        File file;
         ModelBuilder modelBuilder;
 
         appWindow.enableSettings(false);
@@ -29,22 +28,23 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
         seed=Calendar.getInstance().getTimeInMillis();
         AppWindow.random.setSeed(seed);
 
-        mapName="model_"+Long.toHexString(seed);
-        basePath="output"+File.separator+mapName;
-
-        file=new File(basePath+File.separator+"textures");  // will make root directory also
-        if (!file.exists()) file.mkdirs();
-
             // run the model builder
 
         try {
-            modelBuilder=new ModelBuilder(mapName);
+            modelBuilder = new ModelBuilder();
             modelBuilder.build();
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            return (0);
         }
+
+        generatedModel = modelBuilder;
+
+        // and set the walk view
+        AppWindow.walkView.setCameraCenterRotate(8.0f, 0.0f, 3.5f, 2.0f);
+        AppWindow.walkView.setIncommingMeshList(modelBuilder.meshList, modelBuilder.skeleton, modelBuilder.bitmaps);
 
         return(0);
     }

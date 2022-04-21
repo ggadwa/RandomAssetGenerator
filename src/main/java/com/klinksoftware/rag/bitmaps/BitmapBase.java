@@ -453,6 +453,36 @@ public class BitmapBase
         }
     }
 
+    protected void drawPerlinNoiseReplaceColorRect(int lft, int top, int rgt, int bot, RagColor color, float replaceValue) {
+        int x, y, idx;
+        float noiseValue;
+        RagPoint normal;
+
+        normal = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        for (y = top; y != bot; y++) {
+            for (x = lft; x != rgt; x++) {
+
+                noiseValue = perlinNoiseColorFactor[(y * textureSize) + x];
+
+                if (noiseValue > replaceValue) {
+                    idx = ((y * textureSize) + x) * 4;
+
+                    colorData[idx] = color.r;
+                    colorData[idx + 1] = color.g;
+                    colorData[idx + 2] = color.b;
+
+                    normal.setFromValues((1.0f - noiseValue), 0.0f, noiseValue);
+                    normal.normalize();
+
+                    normalData[idx] = (normal.x + 1.0f) * 0.5f;           // normals are -1...1 packed into a byte
+                    normalData[idx + 1] = (normal.y + 1.0f) * 0.5f;
+                    normalData[idx + 2] = (normal.z + 1.0f) * 0.5f;
+                }
+            }
+        }
+    }
+
     protected void drawStaticNoiseRect(int lft,int top,int rgt,int bot,float colorFactorMin,float colorFactorMax)
     {
         int         x,y,idx;
@@ -2258,6 +2288,13 @@ public class BitmapBase
         }
     }
 
+    //
+    // misc
+    //
+    public void drawScrew(int x, int y, RagColor screwColor, RagColor outlineColor, int screwSize, int edgeSize) {
+        drawOval(x, y, (x + screwSize), (y + screwSize), 0.0f, 1.0f, 0.0f, 0.0f, edgeSize, 0.8f, screwColor, outlineColor, 0.5f, false, false, 1.0f, 0.0f);
+    }
+
         //
         // metallic-roughness routines
         //
@@ -2361,13 +2398,13 @@ public class BitmapBase
         }
     }
 
-    private byte[] imageDataToBytes(float[] imgData) {
+    private byte[] imageDataToBytes(float[] imgData, boolean includeAlpha) {
         int n,idx;
         byte[] imgDataByte;
 
         // image data if 4 floats per pixel, so covert to bytes
 
-        if (hasAlpha) {
+        if (includeAlpha) {
             imgDataByte=new byte[imgData.length];
 
             for (n=0;n!=imgData.length;n++) {
@@ -2388,7 +2425,7 @@ public class BitmapBase
         return(imgDataByte);
     }
 
-    private void writeImageData(float[] imgData,String path) {
+    private void writeImageData(float[] imgData, boolean includeAlpha, String path) {
         int channelCount;
         int[] channelOffsets;
         byte[] imgDataByte;
@@ -2397,7 +2434,7 @@ public class BitmapBase
         ColorModel colorModel;
         BufferedImage bufImage;
 
-        imgDataByte=imageDataToBytes(imgData);
+        imgDataByte = imageDataToBytes(imgData, includeAlpha);
 
         if (hasAlpha) {
             channelCount=4;
@@ -2424,28 +2461,27 @@ public class BitmapBase
     }
 
     public byte[] getColorDataAsBytes() {
-        return(imageDataToBytes(colorData));
+        return (imageDataToBytes(colorData, hasAlpha));
     }
 
     public byte[] getNormalDataAsBytes() {
-        return(imageDataToBytes(normalData));
+        return (imageDataToBytes(normalData, false));
     }
 
     public byte[] getMetallicRoughnessDataAsBytes() {
-        return(imageDataToBytes(metallicRoughnessData));
+        return (imageDataToBytes(metallicRoughnessData, false));
     }
 
     public byte[] getEmissiveDataAsBytes() {
         if (!hasEmissive) return(null);
-        return(imageDataToBytes(emissiveData));
+        return (imageDataToBytes(emissiveData, false));
     }
 
         //
         // generate mainline
         //
 
-    protected void generateInternal(int variationMode)
-    {
+    protected void generateInternal()    {
         int         mid;
 
         mid=textureSize/2;
@@ -2457,8 +2493,7 @@ public class BitmapBase
     }
 
     public void generate() {
-        int     imgSize;
-        String  path;
+        int imgSize;
 
             // setup all the bitmaps for drawing
 
@@ -2476,7 +2511,7 @@ public class BitmapBase
 
             // run the internal generator
 
-        generateInternal(0);
+        generateInternal();
 
             // clamp the floats
 
@@ -2486,20 +2521,20 @@ public class BitmapBase
         clampImageData(emissiveData);
     }
 
-    public void writeToFile(String path) {
-        String name;
+    public void writeToFile(String path, String name) {
+        if (name == null) {
+            name = this.getClass().getSimpleName().substring(6).toLowerCase();
+        }
 
-        name = this.getClass().getSimpleName().substring(6).toLowerCase();
-
-        writeImageData(colorData, (path + File.separator + name + "_color.png"));
+        writeImageData(colorData, hasAlpha, (path + File.separator + name + "_color.png"));
         if (hasNormal) {
-            writeImageData(normalData, (path + File.separator + name + "_normal.png"));
+            writeImageData(normalData, false, (path + File.separator + name + "_normal.png"));
         }
         if (hasMetallicRoughness) {
-            writeImageData(metallicRoughnessData, (path + File.separator + name + "_metallic_roughness.png"));
+            writeImageData(metallicRoughnessData, false, (path + File.separator + name + "_metallic_roughness.png"));
         }
         if (hasEmissive) {
-            writeImageData(emissiveData, (path + File.separator + name + "_emissive.png"));
+            writeImageData(emissiveData, false, (path + File.separator + name + "_emissive.png"));
         }
     }
 

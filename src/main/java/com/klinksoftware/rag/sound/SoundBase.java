@@ -1,6 +1,126 @@
 package com.klinksoftware.rag.sound;
 
-public class SoundBuilder {
+import java.io.*;
+import java.nio.*;
+import javax.sound.sampled.*;
+
+public class SoundBase {
+
+    public static final float SAMPLE_RATE = 44100.0f;
+
+    protected int waveMillis;
+    protected float[] waveData;
+
+    public SoundBase() {
+        // will be reset in children classes
+
+        waveMillis = 500;
+
+        waveData = null;
+    }
+
+    protected void createSineWave(float[] data, int frameStart, int frameEnd, float hzFrequency) {
+        int n;
+        float rd, rdAdd;
+
+        rd = 0.0f;
+        rdAdd = (((float) Math.PI) * (hzFrequency * 2.0f)) / SAMPLE_RATE;
+
+        for (n = frameStart; n < frameEnd; n++) {
+            data[n] = (float) Math.sin(rd);
+            rd += rdAdd;
+        }
+    }
+
+    public AudioInputStream createAudioStream() {
+        int n, waveSize;
+        float f;
+        byte[] byteBuf;
+        short[] shortBuf;
+        AudioFormat format;
+        AudioInputStream stream;
+
+        waveSize = waveData.length;
+
+        // conver to shorts
+        shortBuf = new short[waveSize];
+
+        for (n = 0; n != waveSize; n++) {
+            f = waveData[n];
+            if (f < -1.0f) {
+                f = -1.0f;
+            }
+            if (f > 1.0f) {
+                f = 1.0f;
+            }
+            shortBuf[n] = (short) (f * Short.MAX_VALUE);
+        }
+
+        // convert to bytes
+        byteBuf = new byte[waveSize * 2];
+        ByteBuffer.wrap(byteBuf).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().put(shortBuf);
+
+        // to audio stream
+        format = new AudioFormat(SAMPLE_RATE, 16, 1, true, false);
+        return (new AudioInputStream(new ByteArrayInputStream(byteBuf), format, waveSize));
+    }
+
+    public void play() {
+        Clip clip;
+        AudioInputStream stream;
+
+        stream = createAudioStream();
+
+        try {
+            clip = AudioSystem.getClip();
+            clip.open(stream);
+            clip.start();
+
+            stream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                stream.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    protected void generateInternal() {
+        createSineWave(waveData, 0, waveData.length, 440.0f);
+    }
+
+    public void generate() {
+        int byteSize;
+
+        // setup the wave
+        byteSize = (int) (SAMPLE_RATE * (((float) waveMillis) / 1000.0f));
+        waveData = new float[byteSize];
+
+        // run the internal generator
+        generateInternal();
+
+        // play the sound
+        play();
+    }
+
+    public void writeToFile(String path) {
+        String name;
+        File file;
+        AudioInputStream stream;
+
+        name = this.getClass().getSimpleName().substring(5).toLowerCase();
+        file = new File(path + File.separator + name + ".wav");
+
+        try {
+            stream = createAudioStream();
+            AudioSystem.write(stream, AudioFileFormat.Type.WAVE, new FileOutputStream(file));
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
 

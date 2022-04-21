@@ -27,15 +27,16 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
 
         appWindow.enableSettings(false);
 
-            // set the seed and base path for bitmaps
-            // and make directories if necessary
-
+        // get a random seed and generate the bitmap
         seed=Calendar.getInstance().getTimeInMillis();
         AppWindow.random.setSeed(seed);
 
         switch (bitmapName) {
             case "Brick":
                 bitmap = new BitmapBrick();
+                break;
+            case "Clothes":
+                bitmap = new BitmapClothes();
                 break;
             case "Computer":
                 bitmap = new BitmapComputer();
@@ -46,11 +47,17 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
             case "Control Panel":
                 bitmap = new BitmapControlPanel();
                 break;
+            case "Geometric":
+                bitmap = new BitmapGeometric();
+                break;
             case "Glass":
                 bitmap = new BitmapGlass();
                 break;
             case "Ground":
                 bitmap = new BitmapGround();
+                break;
+            case "Head":
+                bitmap = new BitmapHead();
                 break;
             case "Liquid":
                 bitmap = new BitmapLiquid();
@@ -58,11 +65,20 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
             case "Metal":
                 bitmap = new BitmapMetal();
                 break;
+            case "Metal Box":
+                bitmap = new BitmapMetalBox();
+                break;
             case "Monitor":
                 bitmap = new BitmapMonitor();
                 break;
             case "Mosaic":
                 bitmap = new BitmapMosaic();
+                break;
+            case "Organic":
+                bitmap = new BitmapOrganic();
+                break;
+            case "Pipe":
+                bitmap = new BitmapPipe();
                 break;
             case "Skin":
                 bitmap = new BitmapSkin();
@@ -75,6 +91,9 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
                 break;
             case "Wood":
                 bitmap = new BitmapWood();
+                break;
+            case "Wood Box":
+                bitmap = new BitmapWoodBox();
                 break;
             default:
                 bitmap = new BitmapBase();
@@ -92,7 +111,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
 
         Skeleton skeleton = meshList.rebuildMapMeshesWithSkeleton();
 
-        AppWindow.walkView.setCameraCenterRotate(4.0f, 0.0f);
+        AppWindow.walkView.setCameraCenterRotate(4.0f, 135.0f, 0.0f, -2.0f);
         AppWindow.walkView.setIncommingMeshList(meshList, skeleton, bitmaps);
 
         return (0);

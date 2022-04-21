@@ -38,7 +38,7 @@ public class WalkView extends AWTGLCanvas {
     private MeshList meshList, incommingMeshList;
     private Skeleton incommingSkeleton;
     private HashMap<String, BitmapBase> incommingBitmaps;
-    private RagPoint eyePoint,cameraPoint,cameraAngle,lightEyePoint,lookAtUpVector,movePoint;
+    private RagPoint eyePoint, cameraPoint, cameraAngle, lightEyePoint, lookAtUpVector, movePoint, fixedLightPoint;
     private RagMatrix4f perspectiveMatrix,viewMatrix,rotMatrix,rotMatrix2;
     private RagMatrix3f normalMatrix;
     private HashMap<String, WalkViewTexture> textures;
@@ -64,7 +64,7 @@ public class WalkView extends AWTGLCanvas {
         eyePoint=new RagPoint(0.0f,0.0f,0.0f);
         cameraPoint=new RagPoint(0.0f,0.0f,0.0f);
         cameraAngle=new RagPoint(0.0f,0.0f,0.0f);
-        lightEyePoint=new RagPoint(0.0f,0.0f,0.0f);
+        lightEyePoint = new RagPoint(0.0f, 0.0f, 0.0f);
         lookAtUpVector=new RagPoint(0.0f,-1.0f,0.0f);
 
         perspectiveMatrix=new RagMatrix4f();
@@ -93,7 +93,8 @@ public class WalkView extends AWTGLCanvas {
 
         cameraCenterRotate=false;
         cameraRotateDistance=0.0f;
-        cameraRotateOffsetY=0.0f;
+        cameraRotateOffsetY = 0.0f;
+        fixedLightPoint = null;
 
             // start opengl
 
@@ -268,13 +269,16 @@ public class WalkView extends AWTGLCanvas {
 
     public void setCameraWalkView(float x,float y,float z) {
         cameraPoint.setFromValues(x,y,z);
-        cameraCenterRotate=false;
+        cameraCenterRotate = false;
+        fixedLightPoint = null;
     }
 
-    public void setCameraCenterRotate(float dist,float offsetY){
+    public void setCameraCenterRotate(float dist, float rotateY, float offsetY, float lightDistance) {
         cameraRotateDistance=dist;
-        cameraRotateOffsetY=offsetY;
-        cameraCenterRotate=true;
+        cameraRotateOffsetY = offsetY;
+        cameraAngle.setFromValues(0.0f, rotateY, 0.0f);
+        cameraCenterRotate = true;
+        fixedLightPoint = new RagPoint(-1.5f, offsetY, lightDistance);
     }
 
     //
@@ -288,7 +292,7 @@ public class WalkView extends AWTGLCanvas {
 
         if (textureData==null) return(-1);
 
-        bitmapBuf = MemoryUtil.memAlloc((textureSize*(hasAlpha?4:3))* textureSize);
+        bitmapBuf = MemoryUtil.memAlloc((textureSize * (hasAlpha ? 4 : 3)) * textureSize);
         bitmapBuf.put(textureData).flip();
 
         textureId=glGenTextures();
@@ -525,7 +529,11 @@ public class WalkView extends AWTGLCanvas {
             buf.put(normalMatrix.data).flip();
             glUniformMatrix3fv(normalMatrixUniformId,false,buf);
 
-            convertToEyeCoordinates(cameraPoint,lightEyePoint); // lights need to be in eye coordinates
+            if (fixedLightPoint != null) {   // lights need to be in eye coordinates
+                convertToEyeCoordinates(fixedLightPoint, lightEyePoint);
+            } else {
+                convertToEyeCoordinates(cameraPoint, lightEyePoint);
+            }
             buf=stack.mallocFloat(4);
             buf.put(lightEyePoint.x).put(lightEyePoint.y).put(lightEyePoint.z).put(RAG_LIGHT_INTENSITY).flip();
             glUniform4fv(lightPositionIntensityUniformId,buf);

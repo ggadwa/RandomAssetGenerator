@@ -5,14 +5,14 @@
 package com.klinksoftware.rag;
 
 import com.klinksoftware.rag.uiworker.MapBuildWorker;
+import com.klinksoftware.rag.uiworker.MapExportWorker;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 
 public class SettingsMap extends SettingsBase {
 
     private static final int BUTTON_GENERATE_MAP = 0;
-    private static final int BUTTON_REGENERATE_TEXTURES = 1;
-    private static final int BUTTON_SAVE_MAP = 2;
+    private static final int BUTTON_EXPORT_MAP = 1;
 
     private JButton generateMapButton, regenerateTexturesButton;
     private JCheckBox upperFloorCheckBox, lowerFloorCheckBox, decorationsCheckBox;
@@ -29,9 +29,6 @@ public class SettingsMap extends SettingsBase {
         generateMapButton = addButton(y, "Generate Map", BUTTON_GENERATE_MAP);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        regenerateTexturesButton = addButton(y, "Regenerate Textures", BUTTON_REGENERATE_TEXTURES);
-        y += (ROW_HEIGHT + ROW_GAP);
-
         upperFloorCheckBox = addCheckBox(y, "Upper Floor", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
@@ -41,7 +38,7 @@ public class SettingsMap extends SettingsBase {
         decorationsCheckBox = addCheckBox(y, "Decorations", false);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        generateMapButton = addButton(y, "Export Map", BUTTON_SAVE_MAP);
+        generateMapButton = addButton(y, "Export Map", BUTTON_EXPORT_MAP);
     }
 
     @Override
@@ -49,6 +46,9 @@ public class SettingsMap extends SettingsBase {
         switch (id) {
             case BUTTON_GENERATE_MAP:
                 (new MapBuildWorker(appWindow)).execute();
+                return;
+            case BUTTON_EXPORT_MAP:
+                (new MapExportWorker(appWindow)).execute();
                 return;
         }
     }

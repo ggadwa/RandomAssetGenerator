@@ -1,12 +1,13 @@
 package com.klinksoftware.rag;
 
 import com.klinksoftware.rag.uiworker.ModelBuildWorker;
+import com.klinksoftware.rag.uiworker.ModelExportWorker;
 import javax.swing.JButton;
 
 public class SettingsModel extends SettingsBase {
 
     private static final int BUTTON_GENERATE_MODEL = 0;
-    private static final int BUTTON_SAVE_MODEL = 1;
+    private static final int BUTTON_EXPORT_MODEL = 1;
 
     private JButton generateModelButton;
 
@@ -22,7 +23,7 @@ public class SettingsModel extends SettingsBase {
         generateModelButton = addButton(y, "Generate Model", BUTTON_GENERATE_MODEL);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        generateModelButton = addButton(y, "Export Model", BUTTON_SAVE_MODEL);
+        generateModelButton = addButton(y, "Export Model", BUTTON_EXPORT_MODEL);
         y += (ROW_HEIGHT + ROW_GAP);
     }
 
@@ -31,6 +32,9 @@ public class SettingsModel extends SettingsBase {
         switch (id) {
             case BUTTON_GENERATE_MODEL:
                 (new ModelBuildWorker(appWindow)).execute();
+                return;
+            case BUTTON_EXPORT_MODEL:
+                (new ModelExportWorker(appWindow)).execute();
                 return;
         }
     }

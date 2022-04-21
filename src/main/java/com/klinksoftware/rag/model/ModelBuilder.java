@@ -1,7 +1,7 @@
 package com.klinksoftware.rag.model;
 
 import com.klinksoftware.rag.bitmaps.*;
-import com.klinksoftware.rag.*;
+import com.klinksoftware.rag.export.Export;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
@@ -10,13 +10,11 @@ import java.util.*;
 
 public class ModelBuilder
 {
-    private String name;
-    private Skeleton skeleton;
-    private MeshList meshList;
-    private HashMap<String, BitmapBase> bitmaps;
+    public Skeleton skeleton;
+    public MeshList meshList;
+    public HashMap<String, BitmapBase> bitmaps;
 
-    public ModelBuilder(String name) {
-        this.name=name;
+    public ModelBuilder() {
     }
 
         //
@@ -99,20 +97,13 @@ public class ModelBuilder
             // saving the model
 
         meshList.rebuildModelMeshWithSkeleton(skeleton);
+    }
 
-            // write out the model
-
+    public void writeToFile(String path) {
         try {
-            //    (new Export()).export(meshList, skeleton, bitmaps, name);
-        }
-        catch (Exception e)
-        {
+            (new Export()).export(meshList, skeleton, bitmaps, path, "model");
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-            // and set the walk view
-
-        AppWindow.walkView.setCameraCenterRotate(8.0f,3.5f);
-        AppWindow.walkView.setIncommingMeshList(meshList, skeleton, bitmaps);
     }
 }

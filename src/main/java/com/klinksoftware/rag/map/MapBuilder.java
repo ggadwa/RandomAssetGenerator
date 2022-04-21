@@ -2,6 +2,7 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.*;
+import com.klinksoftware.rag.export.Export;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
@@ -19,14 +20,13 @@ public class MapBuilder
     public static final int FC_MARK_FILL_OUTSIDE=2;
     public static final int FC_MARK_FILL_PLATFORM=3;
 
-    private String mapName;
-    private MeshList meshList;
-    private Skeleton skeleton;
-    private HashMap<String, BitmapBase> bitmaps;
+    public MeshList meshList;
+    public Skeleton skeleton;
+    public HashMap<String, BitmapBase> bitmaps;
+    public RagPoint viewCenterPoint;
     private MapPieceList mapPieceList;
 
-    public MapBuilder(String mapName) {
-        this.mapName=mapName;
+    public MapBuilder() {
     }
 
         //
@@ -431,26 +431,24 @@ public class MapBuilder
     // required bitmaps
     //
     public void buildRequiredBitmaps() {
-        int variationMode;
         BitmapBase bitmapBase;
 
         // wall
-        switch (AppWindow.random.nextInt(4)) {
+        switch (AppWindow.random.nextInt(5)) {
             case 0:
                 bitmapBase = new BitmapBrick();
-                variationMode = BitmapBrick.VARIATION_NONE;
                 break;
             case 1:
                 bitmapBase = new BitmapStone();
-                variationMode = BitmapStone.VARIATION_NONE;
                 break;
             case 2:
                 bitmapBase = new BitmapWood();
-                variationMode = BitmapWood.VARIATION_BOARDS;
+                break;
+            case 3:
+                bitmapBase = new BitmapTile();
                 break;
             default:
                 bitmapBase = new BitmapMetal();
-                variationMode = BitmapMetal.VARIATION_PLATE;
                 break;
         }
 
@@ -460,32 +458,25 @@ public class MapBuilder
         // floor
         switch (AppWindow.random.nextInt(7)) {
             case 0:
-                bitmapBase = new BitmapWood();
-                variationMode = BitmapWood.VARIATION_BOARDS;
+                bitmapBase = new BitmapBrick();
                 break;
             case 1:
-                bitmapBase = new BitmapConcrete();
-                variationMode = BitmapConcrete.VARIATION_NONE;
+                bitmapBase = new BitmapWood();
                 break;
             case 2:
-                bitmapBase = new BitmapTile();
-                variationMode = BitmapTile.VARIATION_NONE;
+                bitmapBase = new BitmapConcrete();
                 break;
             case 3:
-                bitmapBase = new BitmapMosaic();
-                variationMode = BitmapMosaic.VARIATION_NONE;
+                bitmapBase = new BitmapTile();
                 break;
             case 4:
-                bitmapBase = new BitmapGround();
-                variationMode = BitmapGround.VARIATION_NONE;
+                bitmapBase = new BitmapMosaic();
                 break;
             case 5:
-                bitmapBase = new BitmapMetal();
-                variationMode = BitmapMetal.VARIATION_HEXAGON;
+                bitmapBase = new BitmapGround();
                 break;
             default:
                 bitmapBase = new BitmapMetal();
-                variationMode = BitmapMetal.VARIATION_PLATE;
                 break;
         }
 
@@ -495,20 +486,16 @@ public class MapBuilder
         // ceiling
         switch (AppWindow.random.nextInt(4)) {
             case 0:
-                bitmapBase = new BitmapWood();
-                variationMode = BitmapWood.VARIATION_BOARDS;
+                bitmapBase = new BitmapBrick();
                 break;
             case 1:
-                bitmapBase = new BitmapConcrete();
-                variationMode = BitmapConcrete.VARIATION_NONE;
+                bitmapBase = new BitmapWood();
                 break;
             case 2:
-                bitmapBase = new BitmapMetal();
-                variationMode = BitmapMetal.VARIATION_HEXAGON;
+                bitmapBase = new BitmapConcrete();
                 break;
             default:
                 bitmapBase = new BitmapMetal();
-                variationMode = BitmapMetal.VARIATION_PLATE;
                 break;
         }
 
@@ -519,19 +506,15 @@ public class MapBuilder
         switch (AppWindow.random.nextInt(4)) {
             case 0:
                 bitmapBase = new BitmapBrick();
-                variationMode = BitmapBrick.VARIATION_NONE;
                 break;
             case 1:
                 bitmapBase = new BitmapWood();
-                variationMode = BitmapWood.VARIATION_BOARDS;
                 break;
             case 2:
-                bitmapBase = new BitmapMetal();
-                variationMode = BitmapMetal.VARIATION_HEXAGON;
+                bitmapBase = new BitmapConcrete();
                 break;
             default:
                 bitmapBase = new BitmapMetal();
-                variationMode = BitmapMetal.VARIATION_PLATE;
                 break;
         }
 
@@ -634,20 +617,16 @@ public class MapBuilder
 
         skeleton=meshList.rebuildMapMeshesWithSkeleton();
 
-            // write out the model
+        // setup the view center point
+        room = rooms.get(0);
+        viewCenterPoint = new RagPoint(((float) (room.piece.sizeX / 2) * SEGMENT_SIZE), (SEGMENT_SIZE * 0.5f), ((float) (room.piece.sizeZ / 2) * SEGMENT_SIZE));
+    }
 
+    public void writeToFile(String path) {
         try {
-            //    (new Export()).export(meshList, skeleton, bitmaps, mapName);
-        }
-        catch (Exception e)
-        {
+            (new Export()).export(meshList, skeleton, bitmaps, path, "map");
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-            // and set the walk view
-
-        room=rooms.get(0);
-        AppWindow.walkView.setCameraWalkView(((float)(room.piece.sizeX/2)*SEGMENT_SIZE),(SEGMENT_SIZE*0.5f),((float)(room.piece.sizeZ/2)*SEGMENT_SIZE));
-        AppWindow.walkView.setIncommingMeshList(meshList, skeleton, bitmaps);
     }
 }

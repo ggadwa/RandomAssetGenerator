@@ -5,10 +5,7 @@ import com.klinksoftware.rag.utility.*;
 
 public class BitmapStone extends BitmapBase
 {
-    public final static int VARIATION_NONE=0;
-
-    public BitmapStone()
-    {
+    public BitmapStone()    {
         super();
 
         hasNormal=true;
@@ -22,8 +19,7 @@ public class BitmapStone extends BitmapBase
         //
 
     @Override
-    public void generateInternal(int variationMode)
-    {
+    public void generateInternal()    {
         int             y,yCount,yAdd,xOff,yOff,edgeSize,
                         lft,rgt,top,bot;
         float           xRoundFactor,yRoundFactor,normalZFactor;

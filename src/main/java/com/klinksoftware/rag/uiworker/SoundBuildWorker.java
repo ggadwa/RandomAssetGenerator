@@ -1,46 +1,42 @@
 package com.klinksoftware.rag.uiworker;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.bitmaps.*;
-import com.klinksoftware.rag.mesh.MeshList;
-import com.klinksoftware.rag.skeleton.Skeleton;
-import java.io.*;
+import com.klinksoftware.rag.sound.SoundBase;
 import java.util.*;
 import javax.swing.*;
 
 public class SoundBuildWorker extends SwingWorker<Integer, Void> {
 
     private AppWindow appWindow;
+    private String soundName;
 
-    public SoundBuildWorker(AppWindow appWindow) {
+    public static SoundBase generatedSound = null;
+
+    public SoundBuildWorker(AppWindow appWindow, String soundName) {
         this.appWindow = appWindow;
+        this.soundName = soundName;
     }
 
     @Override
     protected Integer doInBackground() throws Exception {
         long seed;
         String buildName, basePath;
-        File file;
+        SoundBase sound;
 
         appWindow.enableSettings(false);
 
-        // set the seed and base path for bitmaps
-        // and make directories if necessary
+        // get a random seed and generate the bitmap
         seed = Calendar.getInstance().getTimeInMillis();
         AppWindow.random.setSeed(seed);
 
-        BitmapBase bitmap = new BitmapBase();
-        bitmap.generate();
-        HashMap<String, BitmapBase> bitmaps = new HashMap<>();
-        bitmaps.put("bitmap", bitmap);
+        switch (soundName) {
+            default:
+                sound = new SoundBase();
+                break;
+        }
 
-        MeshList meshList = new MeshList();
-        meshList.makeListSimpleCube("bitmap");
-
-        Skeleton skeleton = meshList.rebuildMapMeshesWithSkeleton();
-
-        AppWindow.walkView.setCameraCenterRotate(4.0f, 0.0f);
-        AppWindow.walkView.setIncommingMeshList(meshList, skeleton, bitmaps);
+        sound.generate();
+        generatedSound = sound;
 
         return (0);
     }

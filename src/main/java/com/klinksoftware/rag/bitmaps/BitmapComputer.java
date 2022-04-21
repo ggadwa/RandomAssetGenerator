@@ -5,10 +5,11 @@ import com.klinksoftware.rag.utility.*;
 
 public class BitmapComputer extends BitmapBase
 {
-    public final static RagColor[] LED_COLORS = {                                new RagColor(0.0f,1.0f,0.0f),
-                                new RagColor(1.0f,1.0f,0.0f),
-                                new RagColor(1.0f,0.0f,0.0f)
-                            };
+    public final static RagColor[] LED_COLORS = {
+        new RagColor(0.0f, 1.0f, 0.0f),
+        new RagColor(1.0f, 1.0f, 0.0f),
+        new RagColor(1.0f, 0.0f, 0.0f)
+    };
 
     public BitmapComputer()
     {
@@ -455,8 +456,7 @@ public class BitmapComputer extends BitmapBase
         //
 
     @Override
-    public void generateInternal(int variationMode)
-    {
+    public void generateInternal()    {
         int         offset,panelEdgeSize,panelInsideEdgeSize;
         RagColor    panelColor,panelInsideColor;
 

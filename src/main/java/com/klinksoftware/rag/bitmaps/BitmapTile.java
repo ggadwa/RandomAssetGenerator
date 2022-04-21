@@ -3,22 +3,17 @@ package com.klinksoftware.rag.bitmaps;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
-import java.util.*;
-
 public class BitmapTile extends BitmapBase
 {
-    public final static int VARIATION_NONE=0;
-    
-    public BitmapTile()
-    {
+    public BitmapTile()    {
         super();
-        
+
         hasNormal=true;
         hasMetallicRoughness=true;
         hasEmissive=false;
         hasAlpha=false;
     }
-    
+
         //
         // tile bitmaps
         //
@@ -53,7 +48,7 @@ public class BitmapTile extends BitmapBase
             dLft=lft;
 
             for (x=0;x!=splitCount;x++) {
-                
+
                 dLft=lft+(tileWid*x);
                 dRgt=dLft+tileWid;
                 if (x==(splitCount-1)) dRgt=rgt;
@@ -86,9 +81,9 @@ public class BitmapTile extends BitmapBase
                         break;
 
                 }
-                
+
                 frameCol=adjustColorRandom(col,0.85f,0.95f);
-                
+
                 drawRect(dLft,dTop,dRgt,dBot,col);
                 draw3DFrameRect(dLft,dTop,dRgt,dBot,edgeSize,frameCol,true);
 
@@ -98,7 +93,7 @@ public class BitmapTile extends BitmapBase
                 if (complex) {
                     col=adjustColorRandom(col,0.75f,0.85f);
                     padding=(edgeSize*2)+AppWindow.random.nextInt(10);
-                    
+
                     switch (tileContent) {
                         case 0:
                             drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,designColor,null,0.5f,false,false,1.0f,0.0f);
@@ -112,16 +107,16 @@ public class BitmapTile extends BitmapBase
                             break;
                     }
                 }
-                
+
                 drawPerlinNoiseRect((dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.8f,1.1f);
 
                     // possible dirt
-                    
+
                 if (tileDirty) {
                     drawStaticNoiseRect((dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.8f,1.2f);
                     blur(colorData,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),5,false);
                 }
-                
+
                     // possible crack
 
                 if ((AppWindow.random.nextFloat()<0.2f) && (!complex)) {
@@ -168,17 +163,16 @@ public class BitmapTile extends BitmapBase
     }
 
     @Override
-    public void generateInternal(int variationMode)
-    {
+    public void generateInternal()    {
         int             splitCount;
         boolean         complex,small;
         RagColor[]      tileColor;
         RagColor        designColor;
-        
+
             // get splits
-            
+
         complex=(AppWindow.random.nextBoolean());
-        
+
         small=false;
         if (!complex) small=(AppWindow.random.nextBoolean());
 
@@ -188,14 +182,14 @@ public class BitmapTile extends BitmapBase
         else {
             splitCount=6+AppWindow.random.nextInt(4);
         }
-        
+
             // colors
-            
+
         tileColor=new RagColor[2];
         tileColor[0]=getRandomColor();
         tileColor[1]=getRandomColor();
         designColor=getRandomColor();
-        
+
         createPerlinNoiseData(16,16);
 
             // original splits
