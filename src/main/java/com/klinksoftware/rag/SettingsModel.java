@@ -9,7 +9,7 @@ public class SettingsModel extends SettingsBase {
     private static final int BUTTON_GENERATE_MODEL = 0;
     private static final int BUTTON_EXPORT_MODEL = 1;
 
-    private JButton generateModelButton;
+    private JButton generateModelButton, exportModelButton;
 
     public SettingsModel(AppWindow appWindow) {
         super(appWindow);
@@ -23,7 +23,7 @@ public class SettingsModel extends SettingsBase {
         generateModelButton = addButton(y, "Generate Model", BUTTON_GENERATE_MODEL);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        generateModelButton = addButton(y, "Export Model", BUTTON_EXPORT_MODEL);
+        exportModelButton = addButton(y, "Export Model", BUTTON_EXPORT_MODEL);
         y += (ROW_HEIGHT + ROW_GAP);
     }
 

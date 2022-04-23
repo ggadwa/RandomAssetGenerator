@@ -14,7 +14,7 @@ public class SettingsMap extends SettingsBase {
     private static final int BUTTON_GENERATE_MAP = 0;
     private static final int BUTTON_EXPORT_MAP = 1;
 
-    private JButton generateMapButton, regenerateTexturesButton;
+    private JButton generateMapButton, exportMapButton;
     private JCheckBox upperFloorCheckBox, lowerFloorCheckBox, decorationsCheckBox;
 
     public SettingsMap(AppWindow appWindow) {
@@ -38,7 +38,7 @@ public class SettingsMap extends SettingsBase {
         decorationsCheckBox = addCheckBox(y, "Decorations", false);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        generateMapButton = addButton(y, "Export Map", BUTTON_EXPORT_MAP);
+        exportMapButton = addButton(y, "Export Map", BUTTON_EXPORT_MAP);
     }
 
     @Override

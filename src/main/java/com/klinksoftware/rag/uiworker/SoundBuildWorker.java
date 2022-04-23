@@ -2,6 +2,9 @@ package com.klinksoftware.rag.uiworker;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.sound.SoundBase;
+import com.klinksoftware.rag.sound.SoundExplosion;
+import com.klinksoftware.rag.sound.SoundGunFire;
+import com.klinksoftware.rag.sound.SoundMonster;
 import java.util.*;
 import javax.swing.*;
 
@@ -20,16 +23,24 @@ public class SoundBuildWorker extends SwingWorker<Integer, Void> {
     @Override
     protected Integer doInBackground() throws Exception {
         long seed;
-        String buildName, basePath;
         SoundBase sound;
 
         appWindow.enableSettings(false);
 
-        // get a random seed and generate the bitmap
+        // get a random seed and generate the sound
         seed = Calendar.getInstance().getTimeInMillis();
         AppWindow.random.setSeed(seed);
 
         switch (soundName) {
+            case "Gun Fire":
+                sound = new SoundGunFire();
+                break;
+            case "Explosion":
+                sound = new SoundExplosion();
+                break;
+            case "Monster":
+                sound = new SoundMonster();
+                break;
             default:
                 sound = new SoundBase();
                 break;

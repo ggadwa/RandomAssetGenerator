@@ -16,7 +16,7 @@ public class SettingsTexture extends SettingsBase {
         "Metal Box", "Monitor", "Mosaic", "Organic", "Pipe",
         "Skin", "Stone", "Tile", "Wood", "Wood Box"};
 
-    private JButton generateTextureButton;
+    private JButton generateTextureButton, exportTextureButton;
     private JComboBox textureTypeCombo;
 
     public SettingsTexture(AppWindow appWindow) {
@@ -34,7 +34,7 @@ public class SettingsTexture extends SettingsBase {
         textureTypeCombo = addComboBox(y, "Texture Type", TEXTURE_ITEMS, 0);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        generateTextureButton = addButton(y, "Export Texture", BUTTON_EXPORT_TEXTURE);
+        exportTextureButton = addButton(y, "Export Texture", BUTTON_EXPORT_TEXTURE);
     }
 
     @Override
