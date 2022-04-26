@@ -273,10 +273,10 @@ public class WalkView extends AWTGLCanvas {
         fixedLightPoint = null;
     }
 
-    public void setCameraCenterRotate(float dist, float rotateY, float offsetY, float lightDistance) {
+    public void setCameraCenterRotate(float dist, float rotateX, float rotateY, float offsetY, float lightDistance) {
         cameraRotateDistance=dist;
         cameraRotateOffsetY = offsetY;
-        cameraAngle.setFromValues(0.0f, rotateY, 0.0f);
+        cameraAngle.setFromValues(rotateX, rotateY, 0.0f);
         cameraCenterRotate = true;
         fixedLightPoint = new RagPoint(-1.5f, offsetY, lightDistance);
     }

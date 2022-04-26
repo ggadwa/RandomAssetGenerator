@@ -2,7 +2,9 @@
 
 
 
-- do sounds
+bang
+  square wave around 200
+  randomize the peaks (have a white noise version that operates at a certain area)
 
 
 add upper and lower story (different textures!)

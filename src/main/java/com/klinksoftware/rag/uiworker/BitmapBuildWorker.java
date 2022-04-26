@@ -111,7 +111,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
 
         Skeleton skeleton = meshList.rebuildMapMeshesWithSkeleton();
 
-        AppWindow.walkView.setCameraCenterRotate(4.0f, 135.0f, 0.0f, -2.0f);
+        AppWindow.walkView.setCameraCenterRotate(4.0f, -35.0f, 135.0f, 0.0f, -2.0f);
         AppWindow.walkView.setIncommingMeshList(meshList, skeleton, bitmaps);
 
         return (0);

@@ -7,7 +7,7 @@ public class SoundExplosion extends SoundBase {
     public SoundExplosion() {
         super();
 
-        waveMillis = 500;
+        waveMillis = 2000 + AppWindow.random.nextInt(2000);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class SoundExplosion extends SoundBase {
         createSineWave(waveData, 0, frameCount, 30);
         createSineWave(mixData, 0, frameCount, 55);
         mixWave(waveData, mixData, 0.5f, 0, frameCount);
-        mixWhiteNoise(waveData, 0, frameCount, 0.25f);
+        mixWhiteNoise(waveData, 0, frameCount, 0.0f, 1.0f, 0.25f);
         lowPassFilter(waveData, 0, frameCount, 0.15f);
 
             // this part of the clip is the 'bang'

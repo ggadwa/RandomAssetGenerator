@@ -1,9 +1,10 @@
 package com.klinksoftware.rag.uiworker;
 
 import com.klinksoftware.rag.AppWindow;
+import com.klinksoftware.rag.sound.SoundAlien;
 import com.klinksoftware.rag.sound.SoundBase;
 import com.klinksoftware.rag.sound.SoundExplosion;
-import com.klinksoftware.rag.sound.SoundGunFire;
+import com.klinksoftware.rag.sound.SoundBang;
 import com.klinksoftware.rag.sound.SoundMonster;
 import java.util.*;
 import javax.swing.*;
@@ -32,8 +33,11 @@ public class SoundBuildWorker extends SwingWorker<Integer, Void> {
         AppWindow.random.setSeed(seed);
 
         switch (soundName) {
-            case "Gun Fire":
-                sound = new SoundGunFire();
+            case "Alien":
+                sound = new SoundAlien();
+                break;
+            case "Bang":
+                sound = new SoundBang();
                 break;
             case "Explosion":
                 sound = new SoundExplosion();

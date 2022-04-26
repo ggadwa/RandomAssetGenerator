@@ -119,12 +119,14 @@ public class SoundBase {
     // effects
     //
 
-    protected void mixWhiteNoise(float[] data, int frameStart, int frameEnd, float range) {
+    protected void mixWhiteNoise(float[] data, int frameStart, int frameEnd, float minAmp, float maxAmp, float range) {
         int n;
         float doubleRange = range * 2.0f;
 
         for (n = frameStart; n < frameEnd; n++) {
-            data[n] += (AppWindow.random.nextFloat() * doubleRange) - range;
+            if ((data[n] >= minAmp) && (data[n] <= maxAmp)) {
+                data[n] += (AppWindow.random.nextFloat() * doubleRange) - range;
+            }
         }
     }
 
@@ -194,7 +196,7 @@ public class SoundBase {
     }
 
     protected void normalize(float[] data)    {
-        int n, k;
+        int n;
         float f, max;
         int frameCount;
 
@@ -225,28 +227,29 @@ public class SoundBase {
     }
 
     protected void fade(float[] data, float fadeIn, float fadeOut)    {
-        int n, fadeLen, fadeStart, frameCount;
+        int n, fadeStart, frameCount;
+        float fadeLen;
 
         frameCount = getFrameCount();
 
             // fade in
 
         if (fadeIn != 0.0f) {
-            fadeLen = (int) ((float) frameCount * fadeIn);
+            fadeLen = (float) frameCount * fadeIn;
 
             for (n=0;n<fadeLen;n++) {
-                data[n]*=(n/fadeLen);
+                data[n] *= ((float) n / fadeLen);
             }
         }
 
             // fade out
 
         if (fadeOut != 0.0f) {
-            fadeLen = (int) ((float) frameCount * fadeOut);
-            fadeStart=frameCount-fadeLen;
+            fadeLen = (float) frameCount * fadeOut;
+            fadeStart = frameCount - (int) fadeLen;
 
             for (n=fadeStart;n<frameCount;n++) {
-                data[n] *= (1.0f - ((n - fadeStart) / fadeLen));
+                data[n] *= (1.0f - (((float) n - fadeStart) / fadeLen));
             }
         }
     }
