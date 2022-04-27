@@ -100,7 +100,13 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
                 break;
         }
 
-        bitmap.generate();
+        try {
+            bitmap.generate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return (0);
+        }
+
         bitmaps = new HashMap<>();
         bitmaps.put("bitmap", bitmap);
 

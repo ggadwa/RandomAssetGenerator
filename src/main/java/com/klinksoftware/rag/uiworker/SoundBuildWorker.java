@@ -50,7 +50,13 @@ public class SoundBuildWorker extends SwingWorker<Integer, Void> {
                 break;
         }
 
-        sound.generate();
+        try {
+            sound.generate();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return (0);
+        }
+
         generatedSound = sound;
 
         return (0);

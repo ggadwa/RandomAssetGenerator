@@ -1,13 +1,10 @@
 
 
 
-
-bang
-  square wave around 200
-  randomize the peaks (have a white noise version that operates at a certain area)
-
+- all sound stuff by %, not frame #
 
 add upper and lower story (different textures!)
+each has a simple/complex flag (only hallways or squares or anything)
 each happens by extending two random rooms and connecting them by walking towards each x/z
 
 

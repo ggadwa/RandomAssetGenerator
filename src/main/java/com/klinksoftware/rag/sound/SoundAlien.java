@@ -17,7 +17,7 @@ public class SoundAlien extends SoundBase {
         float dataPos, frequency, frequencyMin, frequencyMax;
         float rumbleFrequencyMin, rumbleFrequencyMax;
         float[] mixData;
-        ArrayList<SineWaveChunk> chunkList;
+        ArrayList<WaveChunk> chunkList;
 
         frameCount = getFrameCount();
         mixData = new float[frameCount];
@@ -42,7 +42,7 @@ public class SoundAlien extends SoundBase {
                     dataPos = 1.0f;
                 }
 
-                chunkList.add(new SineWaveChunk(dataPos, frequency));
+                chunkList.add(new WaveChunk(dataPos, frequency, 0.8f));
 
                 if (dataPos == 1.0f) {
                     break;
@@ -59,9 +59,9 @@ public class SoundAlien extends SoundBase {
             }
 
             if (n == 0) {
-                createSineMultipleWaves(waveData, chunkList);
+                createWave(waveData, WAVE_TYPE_SINE, chunkList);
             } else {
-                createSineMultipleWaves(mixData, chunkList);
+                createWave(mixData, WAVE_TYPE_SINE, chunkList);
                 mixWave(waveData, mixData, (0.4f + AppWindow.random.nextFloat(0.2f)), 0, frameCount);
             }
         }

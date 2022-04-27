@@ -10,6 +10,10 @@ public class SoundBase {
 
     public static final float SAMPLE_RATE = 44100.0f;
 
+    public static final int WAVE_TYPE_SINE = 0;
+    public static final int WAVE_TYPE_SQUARE = 1;
+    public static final int WAVE_TYPE_SAWTOOTH = 2;
+
     protected int waveMillis;
     protected float[] waveData;
 
@@ -27,24 +31,12 @@ public class SoundBase {
     //
     // waves
     //
-    protected void createSineWave(float[] data, int frameStart, int frameEnd, float hzFrequency) {
-        int n;
-        float rd, rdAdd;
-
-        rd = 0.0f;
-        rdAdd = ((float) Math.PI * (hzFrequency * 2.0f)) / SAMPLE_RATE;
-
-        for (n = frameStart; n < frameEnd; n++) {
-            data[n] = (float) Math.sin(rd);
-            rd += rdAdd;
-        }
-    }
-
-    protected void createSineMultipleWaves(float[] data, ArrayList<SineWaveChunk> chunkList)    {
+    protected void createWave(float[] data, int waveType, ArrayList<WaveChunk> chunkList) {
         int n, idx, chunkFrameLen;
         int chunkLen, frameCount;
-        float rd, chunkSineSize;
-        SineWaveChunk chunk;
+        float rd, period;
+        float chunkSineSize, chunkPeriodSize, chunkAmplitudeSize;
+        WaveChunk chunk;
 
         chunkLen = chunkList.size();
         frameCount = getFrameCount();
@@ -57,6 +49,7 @@ public class SoundBase {
             chunk = chunkList.get(n);
             chunk.frame = (int) (chunk.timePercentage * (float) frameCount);
             chunk.sineAdd = ((float) Math.PI * (chunk.frequency * 2.0f)) / SAMPLE_RATE;
+            chunk.period = SAMPLE_RATE / chunk.frequency;
         }
 
             // run through all the sin waves
@@ -66,71 +59,66 @@ public class SoundBase {
 
         chunkFrameLen = chunkList.get(1).frame - chunkList.get(0).frame;
         chunkSineSize = chunkList.get(1).sineAdd - chunkList.get(0).sineAdd;
+        chunkPeriodSize = chunkList.get(1).period - chunkList.get(0).period;
+        chunkAmplitudeSize = chunkList.get(1).amplitude - chunkList.get(0).amplitude;
 
         for (n = 0; n != frameCount; n++) {
-            data[n] = (float) Math.sin(rd);
+
+            // the wave
+            switch (waveType) {
+                case WAVE_TYPE_SINE:
+                    data[n] = (float) Math.sin(rd);
+                    break;
+                case WAVE_TYPE_SQUARE:
+                    data[n] = (float) Math.signum(Math.sin(rd));
+                    break;
+                case WAVE_TYPE_SAWTOOTH:
+                    period = (chunkList.get(idx).period + ((chunkPeriodSize * (float) (n - chunkList.get(idx).frame)) / (float) chunkFrameLen));
+                    data[n] = (((float) n / period) - (float) Math.floor(((float) n / period) + 0.5f)) * 2.0f;
+                    break;
+            }
+
+            // amplitude
+            data[n] *= (chunkList.get(idx).amplitude + ((chunkAmplitudeSize * (float) (n - chunkList.get(idx).frame)) / (float) chunkFrameLen));
 
             if ((n != 0) && (n == chunkList.get(idx + 1).frame)) {
                 if (idx<(chunkLen-2)) idx++;
                 chunkFrameLen = chunkList.get(idx + 1).frame - chunkList.get(idx).frame;
                 chunkSineSize = chunkList.get(idx + 1).sineAdd - chunkList.get(idx).sineAdd;
+                chunkPeriodSize = chunkList.get(idx + 1).period - chunkList.get(idx).period;
+                chunkAmplitudeSize = chunkList.get(idx + 1).amplitude - chunkList.get(idx).amplitude;
             }
 
             rd += (chunkList.get(idx).sineAdd + ((chunkSineSize * (float) (n - chunkList.get(idx).frame)) / (float) chunkFrameLen));
         }
     }
 
-    protected void createSquareWave(float[] data, int frameStart, int frameEnd, float hzFrequency)    {
-        int n;
-        float rd, rdAdd;
+    protected ArrayList<WaveChunk> createSimpleWaveChunks(float hzFrequency, float amplitude) {
+        ArrayList<WaveChunk> chunkList;
 
-        rd = 0.0f;
-        rdAdd = ((float) Math.PI * (hzFrequency * 2.0f)) / SAMPLE_RATE;
+        chunkList = new ArrayList<>();
+        chunkList.add(new WaveChunk(0.0f, hzFrequency, amplitude));
+        chunkList.add(new WaveChunk(1.0f, hzFrequency, amplitude));
 
-        for (n=frameStart;n<frameEnd;n++) {
-            data[n] = (float) Math.signum(Math.sin(rd));
-            rd+=rdAdd;
-        }
+        return (chunkList);
     }
 
-    protected void createTriangleWave(float[] data, int frameStart, int frameEnd, float hzFrequency)    {
-        int n;
-        float period;
+    protected void createWhiteNoise(float[] data, float range) {
+        int n, frameCount;
+        float doubleRange;
 
-        period = SAMPLE_RATE / hzFrequency;
+        doubleRange = range * 2.0f;
+        frameCount = getFrameCount();
 
-        for (n=frameStart;n<frameEnd;n++) {
-            data[n] = (Math.abs(((n / period) - (float) Math.floor(((float) n / period) + 0.5f)) * 2.0f) * 2.0f) - 1.0f;
-        }
-    }
-
-    protected void createSawToothWave(float[] data, int frameStart, int frameEnd, float hzFrequency)    {
-        int n;
-        float period;
-
-        period = SAMPLE_RATE / hzFrequency;
-
-        for (n=frameStart;n<frameEnd;n++) {
-            data[n] = (((float) n / period) - (float) Math.floor(((float) n / period) + 0.5f)) * 2.0f;
+        for (n = 0; n != frameCount; n++) {
+            data[n] = (AppWindow.random.nextFloat(doubleRange) - range);
         }
     }
 
     //
     // effects
     //
-
-    protected void mixWhiteNoise(float[] data, int frameStart, int frameEnd, float minAmp, float maxAmp, float range) {
-        int n;
-        float doubleRange = range * 2.0f;
-
-        for (n = frameStart; n < frameEnd; n++) {
-            if ((data[n] >= minAmp) && (data[n] <= maxAmp)) {
-                data[n] += (AppWindow.random.nextFloat() * doubleRange) - range;
-            }
-        }
-    }
-
-    protected void lowPassFilter(float[] data, int frameStart, int frameEnd, float factor)    {
+    protected void lowPassFilter(float[] data, int frameStart, int frameEnd, float factor) {
         int n;
         float inverseFactor;
 
@@ -139,11 +127,11 @@ public class SoundBase {
         if (frameStart<1) frameStart=1;
 
         for (n=frameStart;n<frameEnd;n++) {
-            data[n]+=(factor*data[n])+(inverseFactor*data[n-1]);
+            data[n] += (factor * data[n]) + (inverseFactor * data[n - 1]);
         }
     }
 
-    protected void delay(float[] data, int frameStart, int frameEnd, int delayOffset, float mix)    {
+    protected void delay(float[] data, int frameStart, int frameEnd, int delayOffset, float mix) {
         int n, frameCount, fadeFrameIndex, delayIdx;
         float fadeFactor, mixFactor;
 
@@ -175,7 +163,7 @@ public class SoundBase {
         }
     }
 
-    protected void clip(float[] data, int frameStart, int frameEnd, float min, float max)    {
+    protected void clip(float[] data, int frameStart, int frameEnd, float min, float max) {
         int n;
 
         for (n=frameStart;n<frameEnd;n++) {
@@ -187,7 +175,7 @@ public class SoundBase {
         }
     }
 
-    protected void scale(float[] data, int frameStart, int frameEnd, float factor)    {
+    protected void scale(float[] data, int frameStart, int frameEnd, float factor) {
         int n;
 
         for (n=frameStart;n<frameEnd;n++) {
@@ -195,7 +183,7 @@ public class SoundBase {
         }
     }
 
-    protected void normalize(float[] data)    {
+    protected void normalize(float[] data) {
         int n;
         float f, max;
         int frameCount;
@@ -226,7 +214,7 @@ public class SoundBase {
         }
     }
 
-    protected void fade(float[] data, float fadeIn, float fadeOut)    {
+    protected void fade(float[] data, float fadeIn, float fadeOut) {
         int n, fadeStart, frameCount;
         float fadeLen;
 
@@ -327,7 +315,7 @@ public class SoundBase {
     }
 
     protected void generateInternal() {
-        createSineWave(waveData, 0, waveData.length, 440.0f);
+        createWave(waveData, WAVE_TYPE_SINE, createSimpleWaveChunks(440.0f, 0.8f));
     }
 
     public void generate() {
