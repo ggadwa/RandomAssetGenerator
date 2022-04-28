@@ -115,12 +115,38 @@ public class SoundBase {
         }
     }
 
+    protected void createSquareWhiteNoise(float[] data, float hzFrequency, float range) {
+        int n, frameCount;
+        float rd, rdAdd, doubleRange;
+
+        doubleRange = range * 2.0f;
+        frameCount = getFrameCount();
+
+        rd = 0.0f;
+        rdAdd = ((float) Math.PI * (hzFrequency * 2.0f)) / SAMPLE_RATE;
+
+        for (n = 0; n != frameCount; n++) {
+            data[n] = ((float) Math.signum(Math.sin(rd)) * range) + (AppWindow.random.nextFloat(doubleRange) - range);
+            rd += rdAdd;
+        }
+    }
+
     //
     // effects
     //
-    protected void lowPassFilter(float[] data, int frameStart, int frameEnd, float factor) {
-        int n;
+    protected void lowPassFilter(float[] data, float startPos, float endPos, float factor) {
+        int n, frameStart, frameEnd, frameCount;
         float inverseFactor;
+
+        frameCount = getFrameCount();
+        frameStart = (int) ((float) frameCount * startPos);
+        if (frameStart < 0) {
+            frameStart = 0;
+        }
+        frameEnd = (int) ((float) frameCount * endPos);
+        if (frameEnd > frameCount) {
+            frameEnd = frameCount;
+        }
 
         inverseFactor = 1.0f - factor;
 
@@ -131,11 +157,20 @@ public class SoundBase {
         }
     }
 
-    protected void delay(float[] data, int frameStart, int frameEnd, int delayOffset, float mix) {
-        int n, frameCount, fadeFrameIndex, delayIdx;
+    protected void delay(float[] data, float startPos, float endPos, int delayOffset, float mix) {
+        int n, frameStart, frameEnd, frameCount, fadeFrameIndex, delayIdx;
         float fadeFactor, mixFactor;
 
         frameCount = getFrameCount();
+        frameStart = (int) ((float) frameCount * startPos);
+        if (frameStart < 0) {
+            frameStart = 0;
+        }
+        frameEnd = (int) ((float) frameCount * endPos);
+        if (frameEnd > frameCount) {
+            frameEnd = frameCount;
+        }
+
         fadeFrameIndex = frameStart + (int) ((float) (frameEnd - frameStart) * 0.1f);
         delayIdx = frameEnd + delayOffset;
 
@@ -163,8 +198,18 @@ public class SoundBase {
         }
     }
 
-    protected void clip(float[] data, int frameStart, int frameEnd, float min, float max) {
-        int n;
+    protected void clip(float[] data, float startPos, float endPos, float min, float max) {
+        int n, frameStart, frameEnd, frameCount;
+
+        frameCount = getFrameCount();
+        frameStart = (int) ((float) frameCount * startPos);
+        if (frameStart < 0) {
+            frameStart = 0;
+        }
+        frameEnd = (int) ((float) frameCount * endPos);
+        if (frameEnd > frameCount) {
+            frameEnd = frameCount;
+        }
 
         for (n=frameStart;n<frameEnd;n++) {
             if (data[n]<min) {
@@ -175,8 +220,18 @@ public class SoundBase {
         }
     }
 
-    protected void scale(float[] data, int frameStart, int frameEnd, float factor) {
-        int n;
+    protected void scale(float[] data, float startPos, float endPos, float factor) {
+        int n, frameStart, frameEnd, frameCount;
+
+        frameCount = getFrameCount();
+        frameStart = (int) ((float) frameCount * startPos);
+        if (frameStart < 0) {
+            frameStart = 0;
+        }
+        frameEnd = (int) ((float) frameCount * endPos);
+        if (frameEnd > frameCount) {
+            frameEnd = frameCount;
+        }
 
         for (n=frameStart;n<frameEnd;n++) {
             data[n]*=factor;
@@ -214,30 +269,35 @@ public class SoundBase {
         }
     }
 
-    protected void fade(float[] data, float fadeIn, float fadeOut) {
-        int n, fadeStart, frameCount;
-        float fadeLen;
+    protected void fade(float[] data, float fadeInPos, float fadeOutPos) {
+        int n, fadeStart, frameCount, fadeLen;
 
         frameCount = getFrameCount();
 
             // fade in
 
-        if (fadeIn != 0.0f) {
-            fadeLen = (float) frameCount * fadeIn;
+        if (fadeInPos != 0.0f) {
+            fadeLen = (int) ((float) frameCount * fadeInPos);
+            if (fadeLen > frameCount) {
+                fadeLen = frameCount;
+            }
 
             for (n=0;n<fadeLen;n++) {
-                data[n] *= ((float) n / fadeLen);
+                data[n] *= ((float) n / (float) fadeLen);
             }
         }
 
             // fade out
 
-        if (fadeOut != 0.0f) {
-            fadeLen = (float) frameCount * fadeOut;
-            fadeStart = frameCount - (int) fadeLen;
+        if (fadeOutPos != 0.0f) {
+            fadeLen = (int) ((float) frameCount * fadeOutPos);
+            if (fadeLen > frameCount) {
+                fadeLen = frameCount;
+            }
+            fadeStart = frameCount - fadeLen;
 
             for (n=fadeStart;n<frameCount;n++) {
-                data[n] *= (1.0f - (((float) n - fadeStart) / fadeLen));
+                data[n] *= (1.0f - (((float) (n - fadeStart)) / (float) fadeLen));
             }
         }
     }
@@ -246,9 +306,19 @@ public class SoundBase {
     // mixing
     //
 
-    protected void mixWave(float[] data, float[] mixData, float mixVolume, int frameStart, int frameEnd) {
-        int n;
+    protected void mixWave(float[] data, float[] mixData, float mixVolume, float startPos, float endPos) {
+        int n, frameStart, frameEnd, frameCount;
         float dataVolume;
+
+        frameCount = getFrameCount();
+        frameStart = (int) ((float) frameCount * startPos);
+        if (frameStart < 0) {
+            frameStart = 0;
+        }
+        frameEnd = (int) ((float) frameCount * endPos);
+        if (frameEnd > frameCount) {
+            frameEnd = frameCount;
+        }
 
         dataVolume = 1.0f - mixVolume;
 

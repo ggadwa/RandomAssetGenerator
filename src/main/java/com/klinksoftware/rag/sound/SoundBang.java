@@ -12,14 +12,11 @@ public class SoundBang extends SoundBase {
 
     @Override
     public void generateInternal() {
-        int frameCount;
-
-        frameCount = getFrameCount();
-
         createWhiteNoise(waveData, 0.8f);
-        lowPassFilter(waveData, 0, frameCount, 0.1f);
-        clip(waveData, 0, frameCount, -0.7f, 0.7f);
-        fade(waveData, 0.1f, 0.5f);
+        lowPassFilter(waveData, 0.0f, 1.0f, (0.05f + AppWindow.random.nextFloat(0.1f)));
+        clip(waveData, 0.0f, 1.0f, -(0.5f + AppWindow.random.nextFloat(0.2f)), (0.5f + AppWindow.random.nextFloat(0.2f)));
+        normalize(waveData);
+        fade(waveData, (0.05f + AppWindow.random.nextFloat(0.1f)), (0.4f + AppWindow.random.nextFloat(0.2f)));
     }
 
 }

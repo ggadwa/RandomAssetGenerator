@@ -29,15 +29,15 @@ public class SoundMonster extends SoundBase {
         // add in a saw wave to change the timber a bit
         createWave(waveData, WAVE_TYPE_SINE, createSimpleWaveChunks((frequencyMin + AppWindow.random.nextFloat(frequencyMax - frequencyMin)), 0.8f));
         createWave(mixData, WAVE_TYPE_SINE, createSimpleWaveChunks((frequencyMin + AppWindow.random.nextFloat(frequencyMax - frequencyMin)), 0.85f));
-        mixWave(waveData, mixData, 0.5f, 0, frameCount);
+        mixWave(waveData, mixData, 0.5f, 0.0f, 1.0f);
 
         createWave(mixData, WAVE_TYPE_SINE, createSimpleWaveChunks((rumbleFrequencyMin + AppWindow.random.nextFloat(rumbleFrequencyMax - rumbleFrequencyMin)), 0.8f));
-        mixWave(waveData, mixData, 0.5f, 0, frameCount);
+        mixWave(waveData, mixData, 0.5f, 0.0f, 1.0f);
 
             // normalize it, randomly clip, low pass, and delay it
 
         normalize(waveData);
-        lowPassFilter(waveData, 0, frameCount, AppWindow.random.nextFloat());
+        lowPassFilter(waveData, 0.0f, 1.0f, AppWindow.random.nextFloat());
 
         //delay(waveData, 0, frameCount, (int) (frameCount * 0.1f), (AppWindow.random.nextFloat(0.5f)));
 

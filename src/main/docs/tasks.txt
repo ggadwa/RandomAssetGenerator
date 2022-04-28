@@ -1,35 +1,30 @@
 
 
 
-- all sound stuff by %, not frame #
-
-add upper and lower story (different textures!)
-each has a simple/complex flag (only hallways or squares or anything)
-each happens by extending two random rooms and connecting them by walking towards each x/z
 
 
+- add upper and lower story (different textures!)
+- each has a simple/complex flag (only hallways or squares or anything)
+- each happens by extending two random rooms and connecting them by walking towards each x/z
 
 
-
+- mosiac can have border
+- monster sound effect is bad
+- more sound effects
 
 
 - collisions between room small walls and platform sides
 - make thing that adds additional horz/vert platforms to rooms
 
 - need to export tangents
-
 - figure out stairs later
-
 - need frames in doorways to make up for missing headers and no-space walls
-
 - equipment could have a desk?
 - need a chair room?
 
 
 - model
    - randomize legs (w/forceBilateral)
-
-
 
 - bitmaps
    - metal - screws get random rotated cross or straight line
