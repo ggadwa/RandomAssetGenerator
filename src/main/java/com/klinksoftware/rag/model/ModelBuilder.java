@@ -4,7 +4,6 @@ import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.export.Export;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.*;
-import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
 
@@ -23,20 +22,15 @@ public class ModelBuilder
 
     public void wrapLimbs()
     {
-        int         n,boneIdx,meshIdx;
-        Limb        limb;
-        Mesh        mesh;
-        RagPoint    bonePnt;
+        int n, meshIdx;
+        Limb limb;
+        Mesh mesh;
 
-            // wrap all the limbs
+        // wrap all the limbs
             // with meshes
 
         for (n=0;n!=skeleton.limbs.size();n++) {
             limb=skeleton.limbs.get(n);
-
-                // mesh roots to first bone in list
-
-            boneIdx=limb.boneIndexes[0];
 
                 // wrap the mesh
 
@@ -45,7 +39,7 @@ public class ModelBuilder
                 // add mesh and attach to bone
 
             meshIdx=meshList.add(mesh);
-            skeleton.setBoneMeshIndex(boneIdx,meshIdx);
+            skeleton.setBoneMeshIndex(limb.bone1Idx, meshIdx);
         }
     }
 
