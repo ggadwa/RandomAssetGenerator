@@ -2,13 +2,16 @@
 
 
 
+- need to move center pnt along line with making cylinders
+- model can merge meshes
+- single mesh on model for now
 
 - add upper and lower story (different textures!)
 - each has a simple/complex flag (only hallways or squares or anything)
 - each happens by extending two random rooms and connecting them by walking towards each x/z
 
-- need hip, waist, and torso mesh
-- model can merge meshes
+
+
 
 - mosiac can have border
 - clothes -> plaster

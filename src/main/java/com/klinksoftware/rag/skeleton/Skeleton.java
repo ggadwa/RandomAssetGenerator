@@ -82,11 +82,11 @@ public class Skeleton
         bones.get(boneIdx).meshIdx=meshIdx;
     }
 
-    public int addLimb(String name, String bitmapName, int meshType, int axis, int acrossSurfaceCount, int aroundSurfaceCount, RagPoint scale, int bone1Idx, int bone2Idx) {
+    public int addLimb(String name, String bitmapName, int meshType, int axis, RagPoint scale, int bone1Idx, int bone2Idx) {
         int         idx;
 
         idx = limbs.size();
-        limbs.add(new Limb(name, bitmapName, meshType, axis, acrossSurfaceCount, aroundSurfaceCount, scale, bone1Idx, bone2Idx));
+        limbs.add(new Limb(name, bitmapName, meshType, axis, scale, bone1Idx, bone2Idx));
 
         return(idx);
     }
