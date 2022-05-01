@@ -44,38 +44,18 @@ public class ModelBuilder
     }
 
     //
-    // required textures
-    //
-    private void buildRequiredTextures() {
-        BitmapBase bitmapBase;
-
-        // body
-        bitmapBase = new BitmapSkin();
-        bitmapBase.generate();
-        bitmaps.put("body", bitmapBase);
-
-        // limbs
-        bitmapBase = new BitmapSkin();
-        bitmapBase.generate();
-        bitmaps.put("limb", bitmapBase);
-
-        // head
-        bitmapBase = new BitmapSkin();
-        bitmapBase.generate();
-        bitmaps.put("head", bitmapBase);
-    }
-
-        //
         // build a model
         //
 
     public void build()
     {
+        BitmapBase bitmapBase;
+
+        // for now just the monster texture
         bitmaps = new HashMap<>();
-
-            // always use a single body bitmap
-
-        buildRequiredTextures();
+        bitmapBase = new BitmapMonster();
+        bitmapBase.generate();
+        bitmaps.put("bitmap", bitmapBase);
 
             // build the skeleton
 

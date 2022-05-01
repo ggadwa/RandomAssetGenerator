@@ -15,7 +15,7 @@ public class MeshModelUtility
         //
         // build a cylinder around a limb
         //
-    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int axis, RagPoint topPnt, float topRadius, RagPoint botPnt, float botRadius) {
+    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int axis, RagPoint meshScale, RagPoint topPnt, float topRadius, RagPoint botPnt, float botRadius) {
         int n, k, t, iIdx;
         float ang, ang2, angAdd, acrossTop, acrossBot, acrossAdd;
         float u1, u2, v1, v2;
@@ -101,44 +101,44 @@ public class MeshModelUtility
                 switch (axis) {
                     case Limb.LIMB_AXIS_X:
                         tx = acrossTop;
-                        ty = centerPntTop.y + ((topRad * (float) Math.sin(rd)) + (topRad * (float) Math.cos(rd)));
-                        tz = centerPntTop.z + ((topRad * (float) Math.cos(rd)) - (topRad * (float) Math.sin(rd)));
+                        ty = centerPntTop.y + (((topRad * (float) Math.sin(rd)) + (topRad * (float) Math.cos(rd))) * meshScale.y);
+                        tz = centerPntTop.z + (((topRad * (float) Math.cos(rd)) - (topRad * (float) Math.sin(rd))) * meshScale.z);
                         bx = acrossBot;
-                        by = centerPntBot.y + ((botRad * (float) Math.sin(rd)) + (botRad * (float) Math.cos(rd)));
-                        bz = centerPntBot.z + ((botRad * (float) Math.cos(rd)) - (botRad * (float) Math.sin(rd)));
+                        by = centerPntBot.y + (((botRad * (float) Math.sin(rd)) + (botRad * (float) Math.cos(rd))) * meshScale.y);
+                        bz = centerPntBot.z + (((botRad * (float) Math.cos(rd)) - (botRad * (float) Math.sin(rd))) * meshScale.z);
                         tx2 = acrossTop;
-                        ty2 = centerPntTop.y + ((topRad * (float) Math.sin(rd2)) + (topRad * (float) Math.cos(rd2)));
-                        tz2 = centerPntTop.z + ((topRad * (float) Math.cos(rd2)) - (topRad * (float) Math.sin(rd2)));
+                        ty2 = centerPntTop.y + (((topRad * (float) Math.sin(rd2)) + (topRad * (float) Math.cos(rd2))) * meshScale.y);
+                        tz2 = centerPntTop.z + (((topRad * (float) Math.cos(rd2)) - (topRad * (float) Math.sin(rd2))) * meshScale.z);
                         bx2 = acrossBot;
-                        by2 = centerPntBot.y + ((botRad * (float) Math.sin(rd2)) + (botRad * (float) Math.cos(rd2)));
-                        bz2 = centerPntBot.z + ((botRad * (float) Math.cos(rd2)) - (botRad * (float) Math.sin(rd2)));
+                        by2 = centerPntBot.y + (((botRad * (float) Math.sin(rd2)) + (botRad * (float) Math.cos(rd2))) * meshScale.y);
+                        bz2 = centerPntBot.z + (((botRad * (float) Math.cos(rd2)) - (botRad * (float) Math.sin(rd2))) * meshScale.z);
                         break;
                     case Limb.LIMB_AXIS_Y:
-                        tx = centerPntTop.x + ((topRad * (float) Math.sin(rd)) + (topRad * (float) Math.cos(rd)));
+                        tx = centerPntTop.x + (((topRad * (float) Math.sin(rd)) + (topRad * (float) Math.cos(rd))) * meshScale.x);
                         ty = acrossTop;
-                        tz = centerPntTop.z + ((topRad * (float) Math.cos(rd)) - (topRad * (float) Math.sin(rd)));
-                        bx = centerPntBot.x + ((botRad * (float) Math.sin(rd)) + (botRad * (float) Math.cos(rd)));
+                        tz = centerPntTop.z + (((topRad * (float) Math.cos(rd)) - (topRad * (float) Math.sin(rd))) * meshScale.z);
+                        bx = centerPntBot.x + (((botRad * (float) Math.sin(rd)) + (botRad * (float) Math.cos(rd))) * meshScale.x);
                         by = acrossBot;
-                        bz = centerPntBot.z + ((botRad * (float) Math.cos(rd)) - (botRad * (float) Math.sin(rd)));
-                        tx2 = centerPntTop.x + ((topRad * (float) Math.sin(rd2)) + (topRad * (float) Math.cos(rd2)));
+                        bz = centerPntBot.z + (((botRad * (float) Math.cos(rd)) - (botRad * (float) Math.sin(rd))) * meshScale.z);
+                        tx2 = centerPntTop.x + (((topRad * (float) Math.sin(rd2)) + (topRad * (float) Math.cos(rd2))) * meshScale.x);
                         ty2 = acrossTop;
-                        tz2 = centerPntTop.z + ((topRad * (float) Math.cos(rd2)) - (topRad * (float) Math.sin(rd2)));
-                        bx2 = centerPntBot.x + ((botRad * (float) Math.sin(rd2)) + (botRad * (float) Math.cos(rd2)));
+                        tz2 = centerPntTop.z + (((topRad * (float) Math.cos(rd2)) - (topRad * (float) Math.sin(rd2))) * meshScale.z);
+                        bx2 = centerPntBot.x + (((botRad * (float) Math.sin(rd2)) + (botRad * (float) Math.cos(rd2))) * meshScale.x);
                         by2 = acrossBot;
-                        bz2 = centerPntBot.z + ((botRad * (float) Math.cos(rd2)) - (botRad * (float) Math.sin(rd2)));
+                        bz2 = centerPntBot.z + (((botRad * (float) Math.cos(rd2)) - (botRad * (float) Math.sin(rd2))) * meshScale.z);
                         break;
                     default: // Z
-                        tx = centerPntTop.x + ((topRad * (float) Math.sin(rd)) + (topRad * (float) Math.cos(rd)));
-                        ty = centerPntTop.y + ((topRad * (float) Math.cos(rd)) - (topRad * (float) Math.sin(rd)));
+                        tx = centerPntTop.x + (((topRad * (float) Math.sin(rd)) + (topRad * (float) Math.cos(rd))) * meshScale.x);
+                        ty = centerPntTop.y + (((topRad * (float) Math.cos(rd)) - (topRad * (float) Math.sin(rd))) * meshScale.y);
                         tz = acrossTop;
-                        bx = centerPntBot.x + ((botRad * (float) Math.sin(rd)) + (botRad * (float) Math.cos(rd)));
-                        by = centerPntBot.y + ((botRad * (float) Math.cos(rd)) - (botRad * (float) Math.sin(rd)));
+                        bx = centerPntBot.x + (((botRad * (float) Math.sin(rd)) + (botRad * (float) Math.cos(rd))) * meshScale.x);
+                        by = centerPntBot.y + (((botRad * (float) Math.cos(rd)) - (botRad * (float) Math.sin(rd))) * meshScale.y);
                         bz = acrossBot;
-                        tx2 = centerPntTop.x + ((topRad * (float) Math.sin(rd2)) + (topRad * (float) Math.cos(rd2)));
-                        ty2 = centerPntTop.y + ((topRad * (float) Math.cos(rd2)) - (topRad * (float) Math.sin(rd2)));
+                        tx2 = centerPntTop.x + (((topRad * (float) Math.sin(rd2)) + (topRad * (float) Math.cos(rd2))) * meshScale.x);
+                        ty2 = centerPntTop.y + (((topRad * (float) Math.cos(rd2)) - (topRad * (float) Math.sin(rd2))) * meshScale.y);
                         tz2 = acrossTop;
-                        bx2 = centerPntBot.x + ((botRad * (float) Math.sin(rd2)) + (botRad * (float) Math.cos(rd2)));
-                        by2 = centerPntBot.y + ((botRad * (float) Math.cos(rd2)) - (botRad * (float) Math.sin(rd2)));
+                        bx2 = centerPntBot.x + (((botRad * (float) Math.sin(rd2)) + (botRad * (float) Math.cos(rd2))) * meshScale.x);
+                        by2 = centerPntBot.y + (((botRad * (float) Math.cos(rd2)) - (botRad * (float) Math.sin(rd2))) * meshScale.y);
                         bz2 = acrossBot;
                         break;
                 }
@@ -206,30 +206,7 @@ public class MeshModelUtility
         return (new Mesh(name, bitmapName, vertexes, normals, tangents, uvs, indexes));
     }
 
-        //
-        // scale all the vertexes along
-        // the line of the bones, to
-        // squish the model in a certain direction
-        //
-
-    private static void scaleVertexToBones(Mesh mesh, RagPoint topPnt, RagPoint botPnt, RagPoint scale)    {
-        int n, vIdx, nVertex;
-        RagPoint centerPnt;
-
-        centerPnt = new RagPoint(((topPnt.x + botPnt.x) * 0.5f), ((topPnt.y + botPnt.y) * 0.5f), ((topPnt.z + botPnt.z) * 0.5f));
-
-        nVertex=mesh.vertexes.length/3;
-
-        for (n=0;n!=nVertex;n++) {
-            vIdx=n*3;
-
-            mesh.vertexes[vIdx]=((mesh.vertexes[vIdx]-centerPnt.x)*scale.x)+centerPnt.x;
-            mesh.vertexes[vIdx+1]=((mesh.vertexes[vIdx+1]-centerPnt.y)*scale.y)+centerPnt.y;
-            mesh.vertexes[vIdx+2]=((mesh.vertexes[vIdx+2]-centerPnt.z)*scale.z)+centerPnt.z;
-        }
-    }
-
-        //
+    //
         // no vertexes can extend past floor, everything
         // there is flat
         //
@@ -295,10 +272,9 @@ public class MeshModelUtility
         bone2 = skeleton.bones.get(limb.bone2Idx);
 
         // build the cylinder around the bones
+        // todo -- different uv mapping here
+        mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius);
 
-        mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.axis, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius);
-
-        scaleVertexToBones(mesh, bone1.pnt, bone2.pnt, limb.scale);
         clipFloorVertexes(mesh);
         rebuildNormals(mesh, bone1, bone2);
 

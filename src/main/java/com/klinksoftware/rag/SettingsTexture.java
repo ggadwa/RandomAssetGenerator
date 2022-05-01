@@ -11,10 +11,10 @@ public class SettingsTexture extends SettingsBase {
     private static final int BUTTON_GENERATE_TEXTURE = 0;
     private static final int BUTTON_EXPORT_TEXTURE = 1;
     private static final String[] TEXTURE_ITEMS = {
-        "Brick", "Clothes", "Computer", "Concrete", "Control Panel",
-        "Geometric", "Glass", "Ground", "Head", "Liquid", "Metal",
-        "Metal Box", "Monitor", "Mosaic", "Organic", "Pipe",
-        "Skin", "Stone", "Tile", "Wood", "Wood Box"};
+        "Brick", "Computer", "Concrete", "Control Panel",
+        "Geometric", "Glass", "Ground", "Liquid", "Metal",
+        "Metal Box", "Monitor", "Monster", "Mosaic", "Organic",
+        "Pipe", "Plaster", "Stone", "Tile", "Wood", "Wood Box"};
 
     private JButton generateTextureButton, exportTextureButton;
     private JComboBox textureTypeCombo;

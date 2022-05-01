@@ -40,13 +40,13 @@ public class SkeletonBuilder
         heelBoneIdx = skeleton.addChildBone(ankleBoneIdx, ("heel_" + Integer.toString(limbIdx)), -1, legRadius, new RagPoint((pnt.x + (vct.x * 0.95f)), (pnt.y + (vct.y * 0.95f)), (pnt.z + (vct.z * 0.95f))));
 
         meshScale = new RagPoint(1.0f, 1.0f, scaleFactor);
-        skeleton.addLimb(("leg_top_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, hipBoneIdx, kneeBoneIdx);
-        skeleton.addLimb(("leg_bottom_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, kneeBoneIdx, ankleBoneIdx);
-        skeleton.addLimb(("ankle_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, ankleBoneIdx, heelBoneIdx);
+        skeleton.addLimb(("leg_top_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_LEG, Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, hipBoneIdx, kneeBoneIdx);
+        skeleton.addLimb(("leg_bottom_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_LEG, Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, kneeBoneIdx, ankleBoneIdx);
+        skeleton.addLimb(("ankle_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_LEG, Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, ankleBoneIdx, heelBoneIdx);
 
             // the foot bones
             // feet are always parallel to ground, towards front
-        footRadius=(legRadius*(1.2f+(AppWindow.random.nextFloat()*0.3f)));
+        footRadius = (legRadius * (0.7f + AppWindow.random.nextFloat(0.3f)));
 
         footVct=new RagPoint(0.0f,0.0f,footLength);
         footVct.rotateY(footRot);
@@ -57,13 +57,13 @@ public class SkeletonBuilder
 
         meshScale = new RagPoint(1.0f, (0.5f + AppWindow.random.nextFloat(0.2f)), scaleFactor);
         footBoneIdx = skeleton.addChildBone(heelBoneIdx, ("foot_" + Integer.toString(limbIdx)), -1, footRadius, footPnt);
-        skeleton.addLimb(("foot_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER_CLOSE_ALL, Limb.LIMB_AXIS_Z, meshScale, heelBoneIdx, footBoneIdx);
+        skeleton.addLimb(("foot_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_FOOT, Limb.MESH_TYPE_CYLINDER_CLOSE_ALL, Limb.LIMB_AXIS_Z, meshScale, heelBoneIdx, footBoneIdx);
 
             // toe limbs
 
         if (toeCount==0) return;
 
-        toeRadius=(footRadius*1.5f)/(float)toeCount;
+        toeRadius = footRadius / (float) toeCount;
 
         knuckleVct = new RagPoint(-(toeRadius * ((float) toeCount / 2.0f)), 0.0f, (footLength * 0.4f));
         knuckleVct.rotateY(footRot);
@@ -80,7 +80,8 @@ public class SkeletonBuilder
         for (n=0;n!=toeCount;n++) {
             knuckleBoneIdx=skeleton.addChildBone(heelBoneIdx,("toe_knuckle_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),-1,toeRadius,knucklePnt);
             toeBoneIdx=skeleton.addChildBone(knuckleBoneIdx,("toe_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),-1,toeRadius,toePnt);
-            skeleton.addLimb(("toe_" + Integer.toString(limbIdx) + "_" + Integer.toString(n)), "limb", Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, Limb.LIMB_AXIS_Z, meshScale, knuckleBoneIdx, toeBoneIdx);
+            skeleton.addLimb(("toe_" + Integer.toString(limbIdx) + "_" + Integer.toString(n)), Limb.UV_MAP_TYPE_FOOT, Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, Limb.LIMB_AXIS_Z, meshScale, footBoneIdx, knuckleBoneIdx);
+            skeleton.addLimb(("toe_tip_" + Integer.toString(limbIdx) + "_" + Integer.toString(n)), Limb.UV_MAP_TYPE_FOOT, Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, Limb.LIMB_AXIS_Z, meshScale, knuckleBoneIdx, toeBoneIdx);
 
             knucklePnt.addPoint(toeAdd);
             toePnt.addPoint(toeAdd);
@@ -124,22 +125,22 @@ public class SkeletonBuilder
         wristBoneIdx=skeleton.addChildBone(elbowBoneIdx,("wrist_"+Integer.toString(limbIdx)),-1,armRadius,new RagPoint((pnt.x+(vct.x*0.9f)),(pnt.y+(vct.y*0.9f)),(pnt.z+(vct.z*0.9f))));
 
         meshScale = new RagPoint((axis == Limb.LIMB_AXIS_Z ? scaleFactor : 1.0f), 1.0f, (axis == Limb.LIMB_AXIS_X ? scaleFactor : 1.0f));
-        skeleton.addLimb(("arm_top_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER, axis, meshScale, shoulderBoneIdx, elbowBoneIdx);
-        skeleton.addLimb(("arm_bottom_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER, axis, meshScale, elbowBoneIdx, wristBoneIdx);
+        skeleton.addLimb(("arm_top_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_ARM, Limb.MESH_TYPE_CYLINDER, axis, meshScale, shoulderBoneIdx, elbowBoneIdx);
+        skeleton.addLimb(("arm_bottom_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_ARM, Limb.MESH_TYPE_CYLINDER, axis, meshScale, elbowBoneIdx, wristBoneIdx);
 
             // hand limb
 
-        handRadius=armRadius*(1.1f+(AppWindow.random.nextFloat()*0.5f));
+        handRadius = armRadius * (0.7f + (AppWindow.random.nextFloat() * 0.3f));
         handPnt=new RagPoint((pnt.x+vct.x),(pnt.y+vct.y),(pnt.z+vct.z));
 
         handBoneIdx=skeleton.addChildBone(wristBoneIdx,("hand_"+Integer.toString(limbIdx)),-1,handRadius,handPnt);
-        skeleton.addLimb(("hand_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER_CLOSE_ALL, axis, meshScale, wristBoneIdx, handBoneIdx);
+        skeleton.addLimb(("hand_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_HAND, Limb.MESH_TYPE_CYLINDER_CLOSE_ALL, axis, meshScale, wristBoneIdx, handBoneIdx);
 
             // finger limbs
 
         if (fingerCount==0) return;
 
-        fingerRadius=(handRadius*1.5f)/(float)fingerCount;
+        fingerRadius = handRadius / (float) fingerCount;
 
         knuckleVct=vct.copy();
         knuckleVct.normalize();
@@ -157,7 +158,8 @@ public class SkeletonBuilder
             knuckleBoneIdx=skeleton.addChildBone(handBoneIdx,("finger_knuckle_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),-1,fingerRadius,new RagPoint(knucklePnt.x,fy,knucklePnt.z));
             fingerBoneIdx=skeleton.addChildBone(knuckleBoneIdx,("finger_"+Integer.toString(limbIdx)+"_"+Integer.toString(n)),-1,fingerRadius,new RagPoint(fingerPnt.x,fy,fingerPnt.z));
 
-            skeleton.addLimb(("finger_" + Integer.toString(limbIdx) + "_" + Integer.toString(n)), "limb", Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, axis, meshScale, knuckleBoneIdx, fingerBoneIdx);
+            skeleton.addLimb(("finger_" + Integer.toString(limbIdx) + "_" + Integer.toString(n)), Limb.UV_MAP_TYPE_HAND, Limb.MESH_TYPE_CYLINDER, axis, meshScale, handBoneIdx, knuckleBoneIdx);
+            skeleton.addLimb(("finger_tip_" + Integer.toString(limbIdx) + "_" + Integer.toString(n)), Limb.UV_MAP_TYPE_HAND, Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, axis, meshScale, knuckleBoneIdx, fingerBoneIdx);
 
             fy+=fingerRadius;
         }
@@ -205,9 +207,9 @@ public class SkeletonBuilder
             meshScale = new RagPoint(1.0f, 1.0f, scaleFactor);
         }
 
-        skeleton.addLimb(("whip_start_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER, axis, meshScale, whip0BoneIdx, whip1BoneIdx);
-        skeleton.addLimb(("whip_middle_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER, axis, meshScale, whip1BoneIdx, whip2BoneIdx);
-        skeleton.addLimb(("whip_end_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, axis, meshScale, whip2BoneIdx, whip3BoneIdx);
+        skeleton.addLimb(("whip_start_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_WHIP, Limb.MESH_TYPE_CYLINDER, axis, meshScale, whip0BoneIdx, whip1BoneIdx);
+        skeleton.addLimb(("whip_middle_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_WHIP, Limb.MESH_TYPE_CYLINDER, axis, meshScale, whip1BoneIdx, whip2BoneIdx);
+        skeleton.addLimb(("whip_end_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_WHIP, Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, axis, meshScale, whip2BoneIdx, whip3BoneIdx);
     }
 
         //
@@ -215,38 +217,39 @@ public class SkeletonBuilder
         //
 
     public void buildLimbHead(Skeleton skeleton, int limbIdx, int parentBoneIdx, float headRadius, float scaleFactor)    {
-        int neckBoneIdx, headBottomBoneIdx, headTopBoneIdx;
-        float parentOffsetY, neckRadius, neckLength, headLength;
+        int neckBotBoneIdx, neckTopBoneIdx, headBottomBoneIdx, headTopBoneIdx;
+        float neckRadius, neckLength, headLength;
         Bone parentBone;
         RagPoint pnt, vct, meshScale;
 
-        parentBone=skeleton.bones.get(parentBoneIdx);
-        parentOffsetY = (parentBone.radius * 0.5f);
+        parentBone = skeleton.bones.get(parentBoneIdx);
 
             // create the neck and head bones
 
         neckRadius=headRadius*(0.3f+(AppWindow.random.nextFloat()*0.5f));
-        neckLength=headRadius*(0.5f+(AppWindow.random.nextFloat()*0.5f));
+        neckLength = headRadius * (0.5f + (AppWindow.random.nextFloat() * 0.5f));
+
+        pnt = parentBone.pnt.copy();
+        neckBotBoneIdx = skeleton.addChildBone(parentBoneIdx, ("neck_bottom_" + Integer.toString(limbIdx)), -1, neckRadius, pnt);
 
         pnt=parentBone.pnt.copy();
-        vct=new RagPoint(0.0f,(parentOffsetY+neckLength),0.0f);
-        vct.rotateX(-(AppWindow.random.nextFloat()*15.0f));
+        vct = new RagPoint(0.0f, neckLength, 0.0f);
+        vct.rotateX(-AppWindow.random.nextFloat(15.0f));
         pnt.addPoint(vct);
-
-        neckBoneIdx=skeleton.addChildBone(parentBoneIdx,("neck_"+Integer.toString(limbIdx)),-1,neckRadius,pnt);
+        neckTopBoneIdx = skeleton.addChildBone(parentBoneIdx, ("neck_top_" + Integer.toString(limbIdx)), -1, neckRadius, pnt);
 
             // the head bones
 
         pnt=pnt.copy();
         pnt.y+=(neckLength*0.5f);
 
-        headBottomBoneIdx=skeleton.addChildBone(neckBoneIdx,("head_bottom_"+Integer.toString(limbIdx)),-1,headRadius,pnt);
+        headBottomBoneIdx = skeleton.addChildBone(neckTopBoneIdx, ("head_bottom_" + Integer.toString(limbIdx)), -1, headRadius, pnt);
 
-        headLength=headRadius*(0.9f+(AppWindow.random.nextFloat()*0.4f));
+        headLength = headRadius * (0.9f + (AppWindow.random.nextFloat(0.4f)));
 
         pnt=pnt.copy();
         vct=new RagPoint(0.0f,headLength,0.0f);
-        vct.rotateX(-(AppWindow.random.nextFloat()*25.0f));
+        vct.rotateX(-AppWindow.random.nextFloat(25.0f));
         pnt.addPoint(vct);
 
         headTopBoneIdx=skeleton.addChildBone(headBottomBoneIdx,("head_top_"+Integer.toString(limbIdx)),-1,headRadius,pnt);
@@ -254,8 +257,9 @@ public class SkeletonBuilder
             // the limb over the neck and head
 
         meshScale = new RagPoint(1.0f, 1.0f, scaleFactor);
-        skeleton.addLimb(("neck_" + Integer.toString(limbIdx)), "limb", Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, neckBoneIdx, headBottomBoneIdx);
-        skeleton.addLimb(("head_" + Integer.toString(limbIdx)), "head", Limb.MESH_TYPE_CYLINDER_CLOSE_ALL, Limb.LIMB_AXIS_Y, meshScale, headBottomBoneIdx, headTopBoneIdx);
+        skeleton.addLimb(("neck_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_NECK, Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, neckBotBoneIdx, neckTopBoneIdx);
+        skeleton.addLimb(("jaw_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_NECK, Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, neckTopBoneIdx, headBottomBoneIdx);
+        skeleton.addLimb(("head_" + Integer.toString(limbIdx)), Limb.UV_MAP_TYPE_HEAD, Limb.MESH_TYPE_CYLINDER_CLOSE_ALL, Limb.LIMB_AXIS_Y, meshScale, headBottomBoneIdx, headTopBoneIdx);
     }
 
         //
@@ -264,32 +268,31 @@ public class SkeletonBuilder
 
     public void buildBody(Skeleton skeleton, float hunchAng, boolean standing, float scaleFactor) {
         int hipBoneIdx, waistBoneIdx, torsoBottomBoneIdx, torsoShoulderBoneIdx, torsoTopBoneIdx;
-        float y, yAdd, radius;
+        float hipHigh, hipAdd, torsoAdd, radius;
         float minRadius, extraRadius;
         RagPoint hipPnt, waistPnt, torsoBottomPnt, torsoShoulderPnt, torsoTopPnt;
         RagPoint meshScale;
 
-        y = (standing ? 2.0f : 1.0f) + AppWindow.random.nextFloat(2.0f);
-        yAdd = 0.1f + AppWindow.random.nextFloat(0.2f);
-        minRadius = 0.5f + AppWindow.random.nextFloat(2.5f);
+        hipHigh = (standing ? 2.5f : 1.5f) + AppWindow.random.nextFloat(1.5f);
+        hipAdd = 0.5f + AppWindow.random.nextFloat(0.5f);
+        torsoAdd = 0.5f + AppWindow.random.nextFloat(0.4f);
+        minRadius = 0.4f + AppWindow.random.nextFloat(2.5f);
         extraRadius = minRadius * 0.2f;
 
             // the spine
 
-        hipPnt = new RagPoint(0, y, 0);
+        hipPnt = new RagPoint(0, hipHigh, 0);
         radius = minRadius + (AppWindow.random.nextFloat(extraRadius));
         hipBoneIdx = skeleton.addChildBone(0, "Hip", -1, radius, hipPnt);            // 0 is always the root bone
-        y += yAdd;
 
-        waistPnt = new RagPoint(0, y, 0);
+        waistPnt = new RagPoint(0, hipAdd, 0);
         if (hunchAng!=0.0f) waistPnt.rotateX(hunchAng-(0.5f+(AppWindow.random.nextFloat()*0.05f)));
         waistPnt.y+=hipPnt.y;
         waistPnt.z+=hipPnt.z;
         radius = minRadius;
         waistBoneIdx = skeleton.addChildBone(hipBoneIdx, "Waist", -1, radius, waistPnt);
-        y += yAdd;
 
-        torsoBottomPnt = new RagPoint(0, y, 0);
+        torsoBottomPnt = new RagPoint(0, torsoAdd, 0);
         if (hunchAng != 0.0f) {
             torsoBottomPnt.rotateX(hunchAng - (0.5f + (AppWindow.random.nextFloat() * 0.05f)));
         }
@@ -297,9 +300,8 @@ public class SkeletonBuilder
         torsoBottomPnt.z += waistPnt.z;
         radius = minRadius + (AppWindow.random.nextFloat(extraRadius));
         torsoBottomBoneIdx = skeleton.addChildBone(waistBoneIdx, "Torso_Bottom", -1, radius, torsoBottomPnt);
-        y += yAdd;
 
-        torsoShoulderPnt = new RagPoint(0, y, 0);
+        torsoShoulderPnt = new RagPoint(0, torsoAdd, 0);
         if (hunchAng != 0.0f) {
             torsoShoulderPnt.rotateX(hunchAng - (0.5f + (AppWindow.random.nextFloat() * 0.05f)));
         }
@@ -307,9 +309,8 @@ public class SkeletonBuilder
         torsoShoulderPnt.z += torsoBottomPnt.z;
         radius = minRadius + (AppWindow.random.nextFloat(extraRadius));
         torsoShoulderBoneIdx = skeleton.addChildBone(torsoBottomBoneIdx, "Torso_Shoulder", -1, radius, torsoShoulderPnt);
-        y += yAdd;
 
-        torsoTopPnt = new RagPoint(0, y, 0);
+        torsoTopPnt = new RagPoint(0, torsoAdd, 0);
         if (hunchAng != 0.0f) {
             torsoTopPnt.rotateX(hunchAng - (0.5f + (AppWindow.random.nextFloat() * 0.05f)));
         }
@@ -326,10 +327,10 @@ public class SkeletonBuilder
         }
 
         // body limbs
-        skeleton.addLimb("hip", "body", Limb.MESH_TYPE_CYLINDER_CLOSE_BOTTOM, (standing ? Limb.LIMB_AXIS_Y : Limb.LIMB_AXIS_Z), meshScale, hipBoneIdx, waistBoneIdx);
-        skeleton.addLimb("waist", "limb", Limb.MESH_TYPE_CYLINDER, (standing ? Limb.LIMB_AXIS_Y : Limb.LIMB_AXIS_Z), meshScale, waistBoneIdx, torsoBottomBoneIdx);
-        skeleton.addLimb("torso_shoulder", "body", Limb.MESH_TYPE_CYLINDER, (standing ? Limb.LIMB_AXIS_Y : Limb.LIMB_AXIS_Z), meshScale, torsoBottomBoneIdx, torsoShoulderBoneIdx);
-        skeleton.addLimb("torso_top", "head", Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, (standing ? Limb.LIMB_AXIS_Y : Limb.LIMB_AXIS_Z), meshScale, torsoShoulderBoneIdx, torsoTopBoneIdx);
+        skeleton.addLimb("hip", Limb.UV_MAP_TYPE_BODY, Limb.MESH_TYPE_CYLINDER_CLOSE_BOTTOM, (standing ? Limb.LIMB_AXIS_Y : Limb.LIMB_AXIS_Z), meshScale, hipBoneIdx, waistBoneIdx);
+        skeleton.addLimb("waist", Limb.UV_MAP_TYPE_BODY, Limb.MESH_TYPE_CYLINDER, (standing ? Limb.LIMB_AXIS_Y : Limb.LIMB_AXIS_Z), meshScale, waistBoneIdx, torsoBottomBoneIdx);
+        skeleton.addLimb("torso_shoulder", Limb.UV_MAP_TYPE_BODY, Limb.MESH_TYPE_CYLINDER, (standing ? Limb.LIMB_AXIS_Y : Limb.LIMB_AXIS_Z), meshScale, torsoBottomBoneIdx, torsoShoulderBoneIdx);
+        skeleton.addLimb("torso_top", Limb.UV_MAP_TYPE_BODY, Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, (standing ? Limb.LIMB_AXIS_Y : Limb.LIMB_AXIS_Z), meshScale, torsoShoulderBoneIdx, torsoTopBoneIdx);
     }
 
         //
@@ -451,7 +452,7 @@ public class SkeletonBuilder
 
         if (AppWindow.random.nextFloat()<0.7f) return;
 
-        limbRadius = 0.1f + AppWindow.random.nextFloat(0.1f);
+        limbRadius = 0.1f + AppWindow.random.nextFloat(0.2f);
         whipLength = 0.7f + AppWindow.random.nextFloat(1.0f);
 
         boneIdx=skeleton.findBoneIndex("Hip");
@@ -496,7 +497,7 @@ public class SkeletonBuilder
         }
 
         // skeleton scale factor
-        scaleFactor = thin ? (0.1f + (AppWindow.random.nextFloat(0.3f))) : (0.6f + (AppWindow.random.nextFloat(0.3f)));
+        scaleFactor = thin ? (0.3f + (AppWindow.random.nextFloat(0.5f))) : (0.6f + (AppWindow.random.nextFloat(0.3f)));
 
         // build the skeleton
         buildBody(skeleton, hunchAng, standing, scaleFactor);
@@ -504,6 +505,9 @@ public class SkeletonBuilder
         buildArms(skeleton, standing, forceBilateral, scaleFactor);
         buildTail(skeleton, standing, scaleFactor);
         buildHead(skeleton, scaleFactor);
+
+        // this is just so we can display it turned or not
+        skeleton.standing = standing;
 
         return(skeleton);
      }

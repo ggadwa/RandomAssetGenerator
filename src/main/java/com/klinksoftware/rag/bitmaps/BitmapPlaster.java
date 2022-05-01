@@ -3,9 +3,9 @@ package com.klinksoftware.rag.bitmaps;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
-public class BitmapClothes extends BitmapBase {
+public class BitmapPlaster extends BitmapBase {
 
-    public BitmapClothes() {
+    public BitmapPlaster() {
         super();
 
         hasNormal = true;
@@ -15,9 +15,9 @@ public class BitmapClothes extends BitmapBase {
     }
 
     private void generateStainsOverlay() {
-        int n, k, lft, top, rgt, bot,
-                stainCount, stainSize,
-                xSize, ySize, markCount;
+        int n, k, lft, top, rgt, bot;
+        int stainCount, stainSize;
+        int xSize, ySize, markCount;
 
         stainCount = AppWindow.random.nextInt(5);
         stainSize = (int) ((float) textureSize * 0.1f);
@@ -53,8 +53,7 @@ public class BitmapClothes extends BitmapBase {
 
     @Override
     public void generateInternal() {
-        int n, x, y, x2, y2,
-                lineCount;
+        int n, x, y, x2, y2, lineCount;
         RagColor clothColor, lineColor;
 
         clothColor = getRandomColor();

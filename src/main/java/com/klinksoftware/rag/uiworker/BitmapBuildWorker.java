@@ -35,9 +35,6 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
             case "Brick":
                 bitmap = new BitmapBrick();
                 break;
-            case "Clothes":
-                bitmap = new BitmapClothes();
-                break;
             case "Computer":
                 bitmap = new BitmapComputer();
                 break;
@@ -56,9 +53,6 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
             case "Ground":
                 bitmap = new BitmapGround();
                 break;
-            case "Head":
-                bitmap = new BitmapHead();
-                break;
             case "Liquid":
                 bitmap = new BitmapLiquid();
                 break;
@@ -71,6 +65,9 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
             case "Monitor":
                 bitmap = new BitmapMonitor();
                 break;
+            case "Monster":
+                bitmap = new BitmapMonster();
+                break;
             case "Mosaic":
                 bitmap = new BitmapMosaic();
                 break;
@@ -80,8 +77,8 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
             case "Pipe":
                 bitmap = new BitmapPipe();
                 break;
-            case "Skin":
-                bitmap = new BitmapSkin();
+            case "Plaster":
+                bitmap = new BitmapPlaster();
                 break;
             case "Stone":
                 bitmap = new BitmapStone();

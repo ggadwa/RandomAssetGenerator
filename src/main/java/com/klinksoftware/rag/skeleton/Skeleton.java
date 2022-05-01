@@ -6,15 +6,19 @@ import java.util.*;
 
 public class Skeleton
 {
-    public ArrayList<Bone>      bones;
-    public ArrayList<Limb>      limbs;
+
+    public boolean standing;
+    public ArrayList<Bone> bones;
+    public ArrayList<Limb> limbs;
 
     public Skeleton()
     {
         bones=new ArrayList<>();
         bones.add(new Bone("root",-1,1.0f,new RagPoint(0.0f,0.0f,0.0f)));     // first bone is always root
 
-        limbs=new ArrayList<>();
+        limbs = new ArrayList<>();
+
+        standing = false;
     }
 
     public int addChildBone(int toBoneIndex,String name,int meshIdx,float gravityLockDistance,RagPoint pnt)
@@ -82,11 +86,11 @@ public class Skeleton
         bones.get(boneIdx).meshIdx=meshIdx;
     }
 
-    public int addLimb(String name, String bitmapName, int meshType, int axis, RagPoint scale, int bone1Idx, int bone2Idx) {
+    public int addLimb(String name, int uvMapType, int meshType, int axis, RagPoint scale, int bone1Idx, int bone2Idx) {
         int         idx;
 
         idx = limbs.size();
-        limbs.add(new Limb(name, bitmapName, meshType, axis, scale, bone1Idx, bone2Idx));
+        limbs.add(new Limb(name, uvMapType, meshType, axis, scale, bone1Idx, bone2Idx));
 
         return(idx);
     }
