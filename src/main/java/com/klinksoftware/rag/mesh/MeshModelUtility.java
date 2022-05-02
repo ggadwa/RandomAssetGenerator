@@ -15,8 +15,8 @@ public class MeshModelUtility
         //
         // build a cylinder around a limb
         //
-    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int axis, RagPoint meshScale, RagPoint topPnt, float topRadius, RagPoint botPnt, float botRadius) {
-        int n, k, t, iIdx;
+    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint topPnt, float topRadius, RagPoint botPnt, float botRadius) {
+        int n, k, iIdx, vStartIdx, vIdx;
         float ang, ang2, angAdd, acrossTop, acrossBot, acrossAdd;
         float u1, u2, v1, v2;
         float tx, ty, tz, tx2, ty2, tz2, bx, by, bz, bx2, by2, bz2;
@@ -196,6 +196,118 @@ public class MeshModelUtility
             acrossTop = acrossBot + acrossAdd;
         }
 
+        // top close
+        if ((meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_ALL) || (meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_TOP)) {
+            vIdx = vertexArray.size() / 3;
+            vStartIdx = vIdx - (CYLINDER_AROUND_SURFACE_COUNT * 6);
+
+            // middle vertex
+            vertexArray.addAll(Arrays.asList(topPnt.x, topPnt.y, topPnt.z));
+            normal.setFromValues((topPnt.x - botPnt.x), (topPnt.y - botPnt.y), (topPnt.z - botPnt.z));
+            normal.normalize();
+            normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+            uvArray.addAll(Arrays.asList(0.5f, 0.5f));
+
+            for (n = 0; n != (CYLINDER_AROUND_SURFACE_COUNT - 2); n++) {
+                indexArray.add(vStartIdx);
+                indexArray.add(vStartIdx + 1);
+                indexArray.add(vIdx);
+
+                vStartIdx += 6;   // there's 6 vertexes to each two points on the edge
+            }
+
+            /*
+            vStartIdx = vertexArray.size() / 3;
+
+            ang = 0.0f;
+
+            for (n = 0; n != CYLINDER_AROUND_SURFACE_COUNT; n++) {
+                rd = ang * ((float) Math.PI / 180.0f);
+
+                u1 = ((float) Math.sin(rd) * 0.5f) + 0.5f;
+                u2 = ((float) Math.cos(rd) * 0.5f) + 0.5f;
+
+                switch (axis) {
+                    case Limb.LIMB_AXIS_X:
+                        tx = topPnt.x;
+                        ty = topPnt.x + ((topRad * (float) Math.sin(rd)) + (topRad * (float) Math.cos(rd)));
+                        tz = topPnt.z + ((topRad * (float) Math.cos(rd)) - (topRad * (float) Math.sin(rd)));
+                    case Limb.LIMB_AXIS_Y:
+                        tx = topPnt.x + ((topRad * (float) Math.sin(rd)) + (topRad * (float) Math.cos(rd)));
+                        ty = topPnt.y;
+                        tz = topPnt.z + ((topRad * (float) Math.cos(rd)) - (topRad * (float) Math.sin(rd)));
+                        break;
+                    default: // Z
+                        tx = topPnt.x + ((topRad * (float) Math.sin(rd)) + (topRad * (float) Math.cos(rd)));
+                        ty = topPnt.z + ((topRad * (float) Math.cos(rd)) - (topRad * (float) Math.sin(rd)));
+                        tz = topPnt.z;
+                        break;
+                }
+
+                // the points
+                vertexArray.addAll(Arrays.asList(tx, ty, tz));
+                normal.setFromValues((tx - topPnt.x), (ty - topPnt.y), (tz - topPnt.z));
+                normal.normalize();
+                normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+                uvArray.addAll(Arrays.asList(u1, u2));
+
+                ang += angAdd;
+            }
+
+            for (n = 0; n != (CYLINDER_AROUND_SURFACE_COUNT - 2); n++) {
+                indexArray.add(vStartIdx);
+                indexArray.add(vStartIdx + (n + 1));
+                indexArray.add(vStartIdx + (n + 2));
+            }
+             */
+        }
+
+        if ((meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_ALL) || (meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_BOTTOM)) {
+            /*
+            vStartIdx = vertexArray.size() / 3;
+
+            ang = 0.0f;
+
+            for (n = 0; n != CYLINDER_AROUND_SURFACE_COUNT; n++) {
+                rd = ang * ((float) Math.PI / 180.0f);
+
+                u1 = ((float) Math.sin(rd) * 0.5f) + 0.5f;
+                u2 = ((float) Math.cos(rd) * 0.5f) + 0.5f;
+
+                switch (axis) {
+                    case Limb.LIMB_AXIS_X:
+                        bx = botPnt.x;
+                        by = botPnt.x + ((botRad * (float) Math.sin(rd)) + (botRad * (float) Math.cos(rd)));
+                        bz = botPnt.z + ((botRad * (float) Math.cos(rd)) - (botRad * (float) Math.sin(rd)));
+                    case Limb.LIMB_AXIS_Y:
+                        bx = botPnt.x + ((botRad * (float) Math.sin(rd)) + (botRad * (float) Math.cos(rd)));
+                        by = botPnt.y;
+                        bz = botPnt.z + ((botRad * (float) Math.cos(rd)) - (botRad * (float) Math.sin(rd)));
+                    default: // Z
+                        bx = botPnt.x + ((botRad * (float) Math.sin(rd)) + (botRad * (float) Math.cos(rd)));
+                        by = botPnt.z + ((botRad * (float) Math.cos(rd)) - (botRad * (float) Math.sin(rd)));
+                        bz = botPnt.z;
+                        break;
+                }
+                // the points
+
+                vertexArray.addAll(Arrays.asList(bx, by, bz));
+                normal.setFromValues((bx - botPnt.x), (by - botPnt.y), (bz - botPnt.z));
+                normal.normalize();
+                normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+                uvArray.addAll(Arrays.asList(u1, u2));
+
+                ang += angAdd;
+            }
+
+            for (n = 0; n != (CYLINDER_AROUND_SURFACE_COUNT - 2); n++) {
+                indexArray.add(vStartIdx);
+                indexArray.add(vStartIdx + (n + 1));
+                indexArray.add(vStartIdx + (n + 2));
+            }
+             */
+        }
+
         // create the mesh
         vertexes = floatArrayListToFloat(vertexArray);
         normals = floatArrayListToFloat(normalArray);
@@ -273,7 +385,7 @@ public class MeshModelUtility
 
         // build the cylinder around the bones
         // todo -- different uv mapping here
-        mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius);
+        mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius);
 
         clipFloorVertexes(mesh);
         rebuildNormals(mesh, bone1, bone2);

@@ -231,6 +231,6 @@ public class BitmapMonster extends BitmapBase
                 break;
         }
 
-        generateAddFace();
+        //generateAddFace();
     }
 }

@@ -1,7 +1,7 @@
 
 
 
-
+- do close top/bottom
 - models merge meshes (connect connected vertexes)
 
 

@@ -107,7 +107,7 @@ public class SkeletonBuilder
 
         axis=(((rotOffset>315)||(rotOffset<45))||((rotOffset>135)&&(rotOffset<225)))?Limb.LIMB_AXIS_Z:Limb.LIMB_AXIS_X;
 
-        pushVct = new RagPoint(0.0f, 0.0f, (parentBone.radius - (armRadius * 0.5f)));
+        pushVct = new RagPoint(0.0f, 0.0f, parentBone.radius);
         pushVct.rotateY(rotOffset);
 
         pnt=parentBone.pnt.copy();
@@ -178,7 +178,7 @@ public class SkeletonBuilder
 
             // size and position around body
 
-        pushVct = new RagPoint(0.0f, 0.0f, (parentBone.radius - (whipRadius * 0.5f)));
+        pushVct = new RagPoint(0.0f, 0.0f, (whipRadius * 0.5f));
         pushVct.rotateY(rotOffset);
 
         pnt=parentBone.pnt.copy();
@@ -216,17 +216,15 @@ public class SkeletonBuilder
         // head limb
         //
 
-    public void buildLimbHead(Skeleton skeleton, int limbIdx, int parentBoneIdx, float headRadius, float scaleFactor)    {
+    public void buildLimbHead(Skeleton skeleton, int limbIdx, int parentBoneIdx, float neckRadius, float headRadius, float scaleFactor) {
         int neckBotBoneIdx, neckTopBoneIdx, headBottomBoneIdx, headTopBoneIdx;
-        float neckRadius, neckLength, headLength;
+        float neckLength, headLength;
         Bone parentBone;
         RagPoint pnt, vct, meshScale;
 
         parentBone = skeleton.bones.get(parentBoneIdx);
 
             // create the neck and head bones
-
-        neckRadius=headRadius*(0.3f+(AppWindow.random.nextFloat()*0.5f));
         neckLength = headRadius * (0.5f + (AppWindow.random.nextFloat() * 0.5f));
 
         pnt = parentBone.pnt.copy();
@@ -245,7 +243,7 @@ public class SkeletonBuilder
 
         headBottomBoneIdx = skeleton.addChildBone(neckTopBoneIdx, ("head_bottom_" + Integer.toString(limbIdx)), -1, headRadius, pnt);
 
-        headLength = headRadius * (0.9f + (AppWindow.random.nextFloat(0.4f)));
+        headLength = headRadius * (0.9f + (AppWindow.random.nextFloat(0.6f)));
 
         pnt=pnt.copy();
         vct=new RagPoint(0.0f,headLength,0.0f);
@@ -276,7 +274,7 @@ public class SkeletonBuilder
         hipHigh = (standing ? 2.5f : 1.5f) + AppWindow.random.nextFloat(1.5f);
         hipAdd = 0.5f + AppWindow.random.nextFloat(0.5f);
         torsoAdd = 0.5f + AppWindow.random.nextFloat(0.4f);
-        minRadius = 0.4f + AppWindow.random.nextFloat(2.5f);
+        minRadius = 0.4f + AppWindow.random.nextFloat(1.5f);
         extraRadius = minRadius * 0.2f;
 
             // the spine
@@ -364,14 +362,13 @@ public class SkeletonBuilder
         }
     }
 
-    private void buildArms(Skeleton skeleton, boolean standing, boolean forceBilateral, float scaleFactor) {
+    private void buildArms(Skeleton skeleton, boolean standing, boolean forceBilateral, float limbRadius, float scaleFactor) {
         int boneIdx, armCount, fingerCount;
-        float limbRadius, armLength;
+        float armLength;
         boolean topArms, midArms;
 
-            // some settings
-        limbRadius = 0.15f + AppWindow.random.nextFloat(0.2f);
-        armLength = 0.7f + AppWindow.random.nextFloat(1.0f);
+        // some settings
+        armLength = 1.0f + AppWindow.random.nextFloat(1.5f);
         armCount=1+AppWindow.random.nextInt(3);
         fingerCount=AppWindow.random.nextInt(5);
 
@@ -417,12 +414,11 @@ public class SkeletonBuilder
         // legs
         //
 
-    public void buildLegs(Skeleton skeleton, boolean standing, boolean forceBilateral, float scaleFactor) {
+    public void buildLegs(Skeleton skeleton, boolean standing, boolean forceBilateral, float limbRadius, float scaleFactor) {
         int boneIdx, toeCount;
-        float limbRadius, footRot, footLength;
+        float footRot, footLength;
 
-            // some settings
-        limbRadius = 0.2f + (AppWindow.random.nextFloat() * 0.2f);
+        // some settings
         footRot = AppWindow.random.nextFloat(15.0f);
         footLength = limbRadius + (AppWindow.random.nextFloat(limbRadius * 2.0f));
         toeCount=AppWindow.random.nextInt(5);
@@ -446,13 +442,12 @@ public class SkeletonBuilder
         // tails
         //
 
-    public void buildTail(Skeleton skeleton, boolean stranding, float scaleFactor) {
+    public void buildTail(Skeleton skeleton, boolean stranding, float limbRadius, float scaleFactor) {
         int boneIdx;
-        float limbRadius, whipLength;
+        float whipLength;
 
         if (AppWindow.random.nextFloat()<0.7f) return;
 
-        limbRadius = 0.1f + AppWindow.random.nextFloat(0.2f);
         whipLength = 0.7f + AppWindow.random.nextFloat(1.0f);
 
         boneIdx=skeleton.findBoneIndex("Hip");
@@ -463,14 +458,14 @@ public class SkeletonBuilder
         // heads
         //
 
-    public void buildHead(Skeleton skeleton, float scaleFactor) {
+    public void buildHead(Skeleton skeleton, float limbRadius, float scaleFactor) {
         int boneIdx;
         float headRadius;
 
-        headRadius = 0.3f + (AppWindow.random.nextFloat(0.5f));
+        headRadius = 0.4f + (AppWindow.random.nextFloat(0.6f));
 
         boneIdx=skeleton.findBoneIndex("Torso_Top");
-        buildLimbHead(skeleton, 0, boneIdx, headRadius, scaleFactor);
+        buildLimbHead(skeleton, 0, boneIdx, limbRadius, headRadius, scaleFactor);
     }
 
         //
@@ -478,7 +473,7 @@ public class SkeletonBuilder
         //
 
     public Skeleton build() {
-        float hunchAng, scaleFactor;
+        float hunchAng, scaleFactor, limbRadius;
         boolean standing, thin, forceBilateral;
         Skeleton skeleton;
 
@@ -496,15 +491,18 @@ public class SkeletonBuilder
             hunchAng = AppWindow.random.nextFloat(20.0f);
         }
 
+        // limb sizes
+        limbRadius = 0.2f + (AppWindow.random.nextFloat(0.2f));
+
         // skeleton scale factor
         scaleFactor = thin ? (0.3f + (AppWindow.random.nextFloat(0.5f))) : (0.6f + (AppWindow.random.nextFloat(0.3f)));
 
         // build the skeleton
         buildBody(skeleton, hunchAng, standing, scaleFactor);
-        buildLegs(skeleton, standing, ((!standing) || (forceBilateral)), scaleFactor);
-        buildArms(skeleton, standing, forceBilateral, scaleFactor);
-        buildTail(skeleton, standing, scaleFactor);
-        buildHead(skeleton, scaleFactor);
+        buildLegs(skeleton, standing, ((!standing) || (forceBilateral)), limbRadius, scaleFactor);
+        buildArms(skeleton, standing, forceBilateral, limbRadius, scaleFactor);
+        buildTail(skeleton, standing, limbRadius, scaleFactor);
+        buildHead(skeleton, limbRadius, scaleFactor);
 
         // this is just so we can display it turned or not
         skeleton.standing = standing;
