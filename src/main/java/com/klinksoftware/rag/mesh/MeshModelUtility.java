@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.mesh;
 
+import com.klinksoftware.rag.SettingsModel;
 import static com.klinksoftware.rag.mesh.MeshMapUtility.floatArrayListToFloat;
 import static com.klinksoftware.rag.mesh.MeshMapUtility.intArrayListToInt;
 import com.klinksoftware.rag.skeleton.*;
@@ -9,13 +10,15 @@ import java.util.*;
 
 public class MeshModelUtility
 {
-    private static final int CYLINDER_ACROSS_SURFACE_COUNT = 3;
-    private static final int CYLINDER_AROUND_SURFACE_COUNT = 24;
+    private static final int CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT = 3;
+    private static final int CYLINDER_ORGANIC_AROUND_SURFACE_COUNT = 24;
+    private static final int CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT = 1;
+    private static final int CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT = 5;
 
         //
         // build a cylinder around a limb
         //
-    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, RagPoint topPnt, float topRadius) {
+    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, RagPoint topPnt, float topRadius, int aroundCount, int acrossCount) {
         int n, k, rowIdx, row2Idx, rowStartIdx, row2StartIdx, vIdx, vStartIdx, vOrigStartIdx;
         float ang, angAdd, acrossPos, acrossAdd;
         float tx, ty, tz;
@@ -36,40 +39,40 @@ public class MeshModelUtility
         centerPnt = new RagPoint(0.0f, 0.0f, 0.0f);
 
         // cylinder setup
-        angAdd = 360.0f / (float) CYLINDER_AROUND_SURFACE_COUNT;
+        angAdd = 360.0f / (float) aroundCount;
 
         switch (axis) {
             case Limb.LIMB_AXIS_X:
-                acrossAdd = (topPnt.x - botPnt.x) / (float) CYLINDER_ACROSS_SURFACE_COUNT;
+                acrossAdd = (topPnt.x - botPnt.x) / (float) acrossCount;
                 acrossPos = botPnt.x;
                 break;
             case Limb.LIMB_AXIS_Y:
-                acrossAdd = (topPnt.y - botPnt.y) / (float) CYLINDER_ACROSS_SURFACE_COUNT;
+                acrossAdd = (topPnt.y - botPnt.y) / (float) acrossCount;
                 acrossPos = botPnt.y;
                 break;
             default: // Z
-                acrossAdd = (topPnt.z - botPnt.z) / (float) CYLINDER_ACROSS_SURFACE_COUNT;
+                acrossAdd = (topPnt.z - botPnt.z) / (float) acrossCount;
                 acrossPos = botPnt.z;
                 break;
         }
 
         rad = botRadius;
-        rAdd = (topRadius - botRadius) / (float) CYLINDER_ACROSS_SURFACE_COUNT;
+        rAdd = (topRadius - botRadius) / (float) acrossCount;
 
         // the cylinder vertexes
-        for (k = 0; k != (CYLINDER_ACROSS_SURFACE_COUNT + 1); k++) {
+        for (k = 0; k != (acrossCount + 1); k++) {
 
             // move center point along line
-            centerPnt.x = botPnt.x + (((topPnt.x - botPnt.x) * (float) k) / (float) CYLINDER_ACROSS_SURFACE_COUNT);
-            centerPnt.y = botPnt.y + (((topPnt.y - botPnt.y) * (float) k) / (float) CYLINDER_ACROSS_SURFACE_COUNT);
-            centerPnt.z = botPnt.z + (((topPnt.z - botPnt.z) * (float) k) / (float) CYLINDER_ACROSS_SURFACE_COUNT);
+            centerPnt.x = botPnt.x + (((topPnt.x - botPnt.x) * (float) k) / (float) acrossCount);
+            centerPnt.y = botPnt.y + (((topPnt.y - botPnt.y) * (float) k) / (float) acrossCount);
+            centerPnt.z = botPnt.z + (((topPnt.z - botPnt.z) * (float) k) / (float) acrossCount);
 
             ang = 0.0f;
 
-            for (n = 0; n != CYLINDER_AROUND_SURFACE_COUNT; n++) {
+            for (n = 0; n != aroundCount; n++) {
 
                 // force last segment to wrap
-                if (n == (CYLINDER_AROUND_SURFACE_COUNT - 1)) {
+                if (n == (aroundCount - 1)) {
                     ang = 0.0f;
                 }
 
@@ -97,7 +100,7 @@ public class MeshModelUtility
                 normal.setFromValues((tx - centerPnt.x), (ty - centerPnt.y), (tz - centerPnt.z));
                 normal.normalize();
                 normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-                uvArray.addAll(Arrays.asList((ang / 360.0f), ((float) k / (float) CYLINDER_ACROSS_SURFACE_COUNT)));
+                uvArray.addAll(Arrays.asList((ang / 360.0f), ((float) k / (float) acrossCount)));
 
                 ang += angAdd;
             }
@@ -107,14 +110,14 @@ public class MeshModelUtility
         }
 
         // the cylinder triangles
-        for (k = 0; k != CYLINDER_ACROSS_SURFACE_COUNT; k++) {
+        for (k = 0; k != acrossCount; k++) {
 
-            rowIdx = rowStartIdx = k * CYLINDER_AROUND_SURFACE_COUNT;
-            row2Idx = row2StartIdx = rowIdx + CYLINDER_AROUND_SURFACE_COUNT;
+            rowIdx = rowStartIdx = k * aroundCount;
+            row2Idx = row2StartIdx = rowIdx + aroundCount;
 
-            for (n = 0; n != CYLINDER_AROUND_SURFACE_COUNT; n++) {
+            for (n = 0; n != aroundCount; n++) {
 
-                if (n == (CYLINDER_AROUND_SURFACE_COUNT - 1)) {
+                if (n == (aroundCount - 1)) {
                     indexArray.add(rowIdx);
                     indexArray.add(rowStartIdx);
                     indexArray.add(row2Idx);
@@ -138,7 +141,7 @@ public class MeshModelUtility
         // top close
         if ((meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_ALL) || (meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_TOP)) {
             vIdx = vertexArray.size() / 3;
-            vStartIdx = vOrigStartIdx = CYLINDER_AROUND_SURFACE_COUNT * (CYLINDER_ACROSS_SURFACE_COUNT + 0);
+            vStartIdx = vOrigStartIdx = aroundCount * (acrossCount + 0);
 
             // middle vertex
             vertexArray.addAll(Arrays.asList(topPnt.x, topPnt.y, topPnt.z));
@@ -147,9 +150,9 @@ public class MeshModelUtility
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
             uvArray.addAll(Arrays.asList(0.5f, 0.5f));
 
-            for (n = 0; n != (CYLINDER_AROUND_SURFACE_COUNT - 1); n++) {
+            for (n = 0; n != (aroundCount - 1); n++) {
                 indexArray.add(vStartIdx);
-                indexArray.add((n == (CYLINDER_AROUND_SURFACE_COUNT - 2)) ? vOrigStartIdx : (vStartIdx + 1));
+                indexArray.add((n == (aroundCount - 2)) ? vOrigStartIdx : (vStartIdx + 1));
                 indexArray.add(vIdx);
 
                 vStartIdx++;
@@ -167,9 +170,9 @@ public class MeshModelUtility
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
             uvArray.addAll(Arrays.asList(0.5f, 0.5f));
 
-            for (n = 0; n != (CYLINDER_AROUND_SURFACE_COUNT - 1); n++) {
+            for (n = 0; n != (aroundCount - 1); n++) {
                 indexArray.add(vStartIdx);
-                indexArray.add((n == (CYLINDER_AROUND_SURFACE_COUNT - 2)) ? 0 : (vStartIdx + 1));
+                indexArray.add((n == (aroundCount - 2)) ? 0 : (vStartIdx + 1));
                 indexArray.add(vIdx);
 
                 vStartIdx++;
@@ -243,8 +246,7 @@ public class MeshModelUtility
         // build mesh around limb
         //
 
-    public static Mesh buildMeshAroundBoneLimb(Skeleton skeleton,Limb limb)
-    {
+    public static Mesh buildMeshAroundBoneLimb(Skeleton skeleton, int modelType, Limb limb)    {
         Bone bone1, bone2;
         Mesh mesh;
 
@@ -253,7 +255,12 @@ public class MeshModelUtility
 
         // build the cylinder around the bones
         // todo -- different uv mapping here
-        mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius);
+        if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
+            mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
+            // todo - randomize here
+        } else {
+            mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
+        }
 
         clipFloorVertexes(mesh);
         rebuildNormals(mesh, bone1, bone2);

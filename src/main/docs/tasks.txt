@@ -1,8 +1,7 @@
 
 
-
-- randomize [no neck] [no head] [no legs]
-- fix fingers and toes
+- hands are bad
+- randomize organic vertexes
 - models merge meshes (connect connected vertexes)
 
 

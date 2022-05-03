@@ -177,28 +177,6 @@ public class BitmapMonster extends BitmapBase
         createMetallicRoughnessMap(0.5f,0.5f);
     }
 
-    public void generateMetalChunk()    {
-        RagColor            metalColor;
-
-        metalColor=getRandomColor();
-
-            // the metal
-
-        createPerlinNoiseData(16,16);
-        drawRect(0,0,textureSize,textureSize,metalColor);
-        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.8f,1.0f);
-        drawMetalShine(0,0,textureSize,textureSize,metalColor);
-
-            // any stains
-
-        if (AppWindow.random.nextBoolean()) {
-            generateStainsOverlay();
-            blur(colorData,0,0,textureSize,textureSize,2,false);
-        }
-
-        createMetallicRoughnessMap(0.5f,0.6f);
-    }
-
     private void generateFaceChunkEye(int x, int y, RagColor eyeColor) {
         drawOval(x, y, (x + 40), (y + 15), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, this.COLOR_WHITE, this.COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
         drawOval((x + 15), (y + 1), (x + 25), (y + 14), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, eyeColor, null, 0.5f, false, false, 1.0f, 0.0f);
@@ -217,17 +195,13 @@ public class BitmapMonster extends BitmapBase
 
     @Override
     public void generateInternal()    {
-        switch (AppWindow.random.nextInt(3)) {
+        switch (AppWindow.random.nextInt(2)) {
             case 0:
                 generateFurChunk();
                 break;
 
             case 1:
                 generateScaleChunk();
-                break;
-
-            case 2:
-                generateMetalChunk();
                 break;
         }
 

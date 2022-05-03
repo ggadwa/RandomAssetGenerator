@@ -8,11 +8,16 @@ import javax.swing.*;
 public class ModelBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
+    private int modelType;
+    private boolean thin, bilaterial;
 
     public static ModelBuilder generatedModel = null;
 
-    public ModelBuildWorker(AppWindow appWindow) {
-        this.appWindow=appWindow;
+    public ModelBuildWorker(AppWindow appWindow, int modelType, boolean thin, boolean bilaterial) {
+        this.appWindow = appWindow;
+        this.modelType = modelType;
+        this.thin = thin;
+        this.bilaterial = bilaterial;
     }
 
     @Override
@@ -32,7 +37,7 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
 
         try {
             modelBuilder = new ModelBuilder();
-            modelBuilder.build();
+            modelBuilder.build(modelType, thin, bilaterial);
         }
         catch (Exception e)
         {

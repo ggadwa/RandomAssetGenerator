@@ -11,6 +11,7 @@ public class SettingsSound extends SettingsBase {
     private static final int BUTTON_GENERATE_SOUND = 0;
     private static final int BUTTON_PLAY_AGAIN = 1;
     private static final int BUTTON_EXPORT_SOUND = 2;
+
     private static final String[] SOUND_ITEMS = {"Alien", "Bang", "Explosion", "Monster"};
 
     private JButton generateSoundButton, playAgainButton, exportSoundButton;
