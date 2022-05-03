@@ -1,7 +1,8 @@
 
 
 
-- do close top/bottom
+- randomize [no neck] [no head] [no legs]
+- fix fingers and toes
 - models merge meshes (connect connected vertexes)
 
 
@@ -28,8 +29,6 @@
 - need a chair room?
 
 
-- model
-   - randomize legs (w/forceBilateral)
 
 - bitmaps
    - metal - screws get random rotated cross or straight line
