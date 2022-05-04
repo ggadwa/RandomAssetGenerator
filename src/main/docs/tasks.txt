@@ -1,36 +1,21 @@
 
 
-- hands are bad
-- randomize organic vertexes
-- models merge meshes (connect connected vertexes)
-
-
 - add upper and lower story (different textures!)
 - each has a simple/complex flag (only hallways or squares or anything)
 - each happens by extending two random rooms and connecting them by walking towards each x/z
 
+- hand and feet still odd
+- randomize organic vertexes
+- models merge meshes (connect connected vertexes)
 
-
-
-- mosiac can have border
 
 - monster sound effect is bad
 - more sound effects
 
-
-- collisions between room small walls and platform sides
-- make thing that adds additional horz/vert platforms to rooms
-
 - need to export tangents
-- figure out stairs later
-- need frames in doorways to make up for missing headers and no-space walls
-- equipment could have a desk?
-- need a chair room?
-
-
 
 - bitmaps
    - metal - screws get random rotated cross or straight line
 
 jpackage (doesn't seem to work, need more testing)
-c:/Java/jdk-15.0.2/bin/jpackage --name RandomAssetGenerator --input c:\Code\RandomAssetGenerator\target --main-jar RandomAssetGenerator-1.0.jar --main-class com.klinksoftware.rag.RandomAssetGenerator --win-dir-chooser --type EXE
+c:/Java/jdk-17.0.2/bin/jpackage --name RandomAssetGenerator --input c:\Code\RandomAssetGenerator\target --main-jar RandomAssetGenerator-1.0.jar --main-class com.klinksoftware.rag.RandomAssetGenerator --win-dir-chooser --type EXE

@@ -19,10 +19,10 @@ public class BitmapMosaic extends BitmapBase
         //
 
     @Override
-    public void generateInternal()    {
-        int         x,y,lft,rgt,top,bot,tileWid,tileHigh,
-                    splitCount;
-        RagColor    groutColor,mosaicColor,mosaic2Color,col;
+    public void generateInternal() {
+        int x, y, lft, rgt, top, bot, tileWid, tileHigh, splitCount;
+        boolean hasBorder;
+        RagColor groutColor, mosaicColor, mosaic2Color, mosaic3Color, col;
 
             // some random values
 
@@ -30,9 +30,12 @@ public class BitmapMosaic extends BitmapBase
 
         groutColor=getRandomGray(0.4f,0.6f);
         mosaicColor=getRandomColor();
-        mosaic2Color=getRandomColor();
+        mosaic2Color = getRandomColor();
+        mosaic3Color = getRandomColor();
 
-        col=new RagColor(0.0f,0.0f,0.0f);
+        col = new RagColor(0.0f, 0.0f, 0.0f);
+
+        hasBorder = AppWindow.random.nextBoolean();
 
             // tile sizes
 
@@ -68,8 +71,12 @@ public class BitmapMosaic extends BitmapBase
                 bot=((y*tileHigh)+tileHigh)-AppWindow.random.nextInt(3);
 
                     // the color
-
-                col.setFromColorFactor(mosaicColor,mosaic2Color,getPerlineColorFactorForPosition(lft,top));
+                col.setFromColorFactor(mosaicColor, mosaic2Color, getPerlineColorFactorForPosition(lft, top));
+                if ((hasBorder) && ((x == 0) || (y == 0))) {
+                    col.setFromColorFactor(mosaicColor, mosaic3Color, getPerlineColorFactorForPosition(lft, top));
+                } else {
+                    col.setFromColorFactor(mosaicColor, mosaic2Color, getPerlineColorFactorForPosition(lft, top));
+                }
 
                     // draw
 

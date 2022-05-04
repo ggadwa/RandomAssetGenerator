@@ -13,7 +13,7 @@ public class MeshModelUtility
     private static final int CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT = 3;
     private static final int CYLINDER_ORGANIC_AROUND_SURFACE_COUNT = 24;
     private static final int CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT = 1;
-    private static final int CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT = 5;
+    private static final int CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT = 4;
 
         //
         // build a cylinder around a limb
@@ -70,11 +70,6 @@ public class MeshModelUtility
             ang = 0.0f;
 
             for (n = 0; n != aroundCount; n++) {
-
-                // force last segment to wrap
-                if (n == (aroundCount - 1)) {
-                    ang = 0.0f;
-                }
 
                 rd = ang * ((float) Math.PI / 180.0f);
 
@@ -141,7 +136,7 @@ public class MeshModelUtility
         // top close
         if ((meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_ALL) || (meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_TOP)) {
             vIdx = vertexArray.size() / 3;
-            vStartIdx = vOrigStartIdx = aroundCount * (acrossCount + 0);
+            vStartIdx = vOrigStartIdx = aroundCount * acrossCount;
 
             // middle vertex
             vertexArray.addAll(Arrays.asList(topPnt.x, topPnt.y, topPnt.z));
@@ -150,9 +145,9 @@ public class MeshModelUtility
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
             uvArray.addAll(Arrays.asList(0.5f, 0.5f));
 
-            for (n = 0; n != (aroundCount - 1); n++) {
+            for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
-                indexArray.add((n == (aroundCount - 2)) ? vOrigStartIdx : (vStartIdx + 1));
+                indexArray.add((n == (aroundCount - 1)) ? vOrigStartIdx : (vStartIdx + 1));
                 indexArray.add(vIdx);
 
                 vStartIdx++;
@@ -170,9 +165,9 @@ public class MeshModelUtility
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
             uvArray.addAll(Arrays.asList(0.5f, 0.5f));
 
-            for (n = 0; n != (aroundCount - 1); n++) {
+            for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
-                indexArray.add((n == (aroundCount - 2)) ? 0 : (vStartIdx + 1));
+                indexArray.add((n == (aroundCount - 1)) ? 0 : (vStartIdx + 1));
                 indexArray.add(vIdx);
 
                 vStartIdx++;
@@ -246,7 +241,7 @@ public class MeshModelUtility
         // build mesh around limb
         //
 
-    public static Mesh buildMeshAroundBoneLimb(Skeleton skeleton, int modelType, Limb limb)    {
+    public static Mesh buildMeshAroundBoneLimb(Skeleton skeleton, int modelType, Limb limb) {
         Bone bone1, bone2;
         Mesh mesh;
 
