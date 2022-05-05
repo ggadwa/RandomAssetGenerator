@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.mesh;
 
+import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.SettingsModel;
 import static com.klinksoftware.rag.mesh.MeshMapUtility.floatArrayListToFloat;
 import static com.klinksoftware.rag.mesh.MeshMapUtility.intArrayListToInt;
@@ -191,13 +192,40 @@ public class MeshModelUtility
 
     private static void clipFloorVertexes(Mesh mesh)
     {
-        int         n,vIdx,nVertex;
+        int n, vIdx, nVertex;
 
         nVertex=mesh.vertexes.length/3;
 
         for (n=0;n!=nVertex;n++) {
             vIdx=n*3;
             if (mesh.vertexes[vIdx+1]<0) mesh.vertexes[vIdx+1]=0.0f;
+        }
+    }
+
+    private static void randomizeVertexes(Mesh mesh, float percentMove, float moveFactor) {
+        int n, vIdx, nVertex;
+        RagPoint normal, vertex;
+
+        normal = new RagPoint(0.0f, 0.0f, 0.0f);
+        vertex = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        nVertex = mesh.vertexes.length / 3;
+
+        for (n = 0; n != nVertex; n++) {
+            if (AppWindow.random.nextFloat() > percentMove) {
+                continue;
+            }
+
+            vIdx = n * 3;
+
+            normal.setFromValues(mesh.normals[vIdx], mesh.normals[vIdx + 1], mesh.normals[vIdx + 2]);
+            normal.scale(AppWindow.random.nextFloat(moveFactor * 2.0f) - moveFactor);
+
+            vertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
+            vertex.addPoint(normal);
+            mesh.vertexes[vIdx] = vertex.x;
+            mesh.vertexes[vIdx + 1] = vertex.y;
+            mesh.vertexes[vIdx + 2] = vertex.z;
         }
     }
 
@@ -209,7 +237,7 @@ public class MeshModelUtility
     private static void rebuildNormals(Mesh mesh, Bone bone1, Bone bone2)    {
         int n, vIdx, nVertex;
         float d, d2;
-        RagPoint    pnt;
+        RagPoint pnt;
 
         nVertex=mesh.vertexes.length/3;
 
@@ -257,8 +285,11 @@ public class MeshModelUtility
             mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
         }
 
-        clipFloorVertexes(mesh);
         rebuildNormals(mesh, bone1, bone2);
+        if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
+            //    randomizeVertexes(mesh, 0.7f, 0.1f);
+        }
+        clipFloorVertexes(mesh);
 
         return(mesh);
     }
