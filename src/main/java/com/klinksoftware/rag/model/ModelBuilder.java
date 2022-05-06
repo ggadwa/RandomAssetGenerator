@@ -64,6 +64,11 @@ public class ModelBuilder
         meshList=new MeshList();
         wrapLimbs(modelType);
 
+        // any randomization
+        if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
+            //meshList.randomizeVertexes(0.7f, 0.1f);
+        }
+
             // skeletons and meshes are created with absolute
             // points, we need to change this to relative before
             // saving the model

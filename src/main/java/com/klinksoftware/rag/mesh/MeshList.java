@@ -90,12 +90,11 @@ public class MeshList
     }
 
     public void makeListSimpleCube(String bitmapName) {
-        int n, idx;
+        int idx;
         ArrayList<Float> vertexArray, uvArray;
         ArrayList<Integer> indexArray;
         int[] indexes;
         float[] vertexes, normals, tangents, uvs;
-        RagPoint centerPnt, rotPnt;
 
         // allocate proper buffers
         vertexArray = new ArrayList<>();
@@ -169,6 +168,12 @@ public class MeshList
 
         meshes.clear();
         meshes.add(new Mesh("cube", bitmapName, vertexes, normals, tangents, uvs, indexes));
+    }
+
+    public void randomizeVertexes(float percentMove, float moveFactor) {
+        for (Mesh mesh : meshes) {
+            mesh.randomizeVertexes(percentMove, moveFactor, meshes);
+        }
     }
 
 }
