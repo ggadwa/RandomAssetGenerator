@@ -453,7 +453,7 @@ public class BitmapBase
         }
     }
 
-    protected void drawPerlinNoiseReplaceColorRect(int lft, int top, int rgt, int bot, RagColor color, float replaceValue) {
+    protected void drawPerlinNoiseReplaceColorRect(int lft, int top, int rgt, int bot, RagColor color, float replaceValue, boolean doNormals) {
         int x, y, idx;
         float noiseValue;
         RagPoint normal;
@@ -472,12 +472,14 @@ public class BitmapBase
                     colorData[idx + 1] = color.g;
                     colorData[idx + 2] = color.b;
 
-                    normal.setFromValues((1.0f - noiseValue), 0.0f, noiseValue);
-                    normal.normalize();
+                    if (doNormals) {
+                        normal.setFromValues((1.0f - noiseValue), 0.0f, noiseValue);
+                        normal.normalize();
 
-                    normalData[idx] = (normal.x + 1.0f) * 0.5f;           // normals are -1...1 packed into a byte
-                    normalData[idx + 1] = (normal.y + 1.0f) * 0.5f;
-                    normalData[idx + 2] = (normal.z + 1.0f) * 0.5f;
+                        normalData[idx] = (normal.x + 1.0f) * 0.5f;           // normals are -1...1 packed into a byte
+                        normalData[idx + 1] = (normal.y + 1.0f) * 0.5f;
+                        normalData[idx + 2] = (normal.z + 1.0f) * 0.5f;
+                    }
                 }
             }
         }
@@ -2292,7 +2294,19 @@ public class BitmapBase
     // misc
     //
     public void drawScrew(int x, int y, RagColor screwColor, RagColor outlineColor, int screwSize, int edgeSize) {
+        int mx, my;
+
         drawOval(x, y, (x + screwSize), (y + screwSize), 0.0f, 1.0f, 0.0f, 0.0f, edgeSize, 0.8f, screwColor, outlineColor, 0.5f, false, false, 1.0f, 0.0f);
+
+        if (AppWindow.random.nextBoolean()) {
+            my = y + (screwSize / 2);
+            drawLineColor(x, my, (x + screwSize), my, outlineColor);
+            drawLineNormal(x, my, (x + screwSize), my, NORMAL_TOP_45);
+        } else {
+            mx = x + (screwSize / 2);
+            drawLineColor(mx, y, mx, (y + screwSize), outlineColor);
+            drawLineNormal(mx, y, mx, (y + screwSize), NORMAL_LEFT_45);
+        }
     }
 
         //

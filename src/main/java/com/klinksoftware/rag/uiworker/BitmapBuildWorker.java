@@ -31,73 +31,8 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         seed=Calendar.getInstance().getTimeInMillis();
         AppWindow.random.setSeed(seed);
 
-        switch (bitmapName) {
-            case "Brick":
-                bitmap = new BitmapBrick();
-                break;
-            case "Computer":
-                bitmap = new BitmapComputer();
-                break;
-            case "Concrete":
-                bitmap = new BitmapConcrete();
-                break;
-            case "Control Panel":
-                bitmap = new BitmapControlPanel();
-                break;
-            case "Geometric":
-                bitmap = new BitmapGeometric();
-                break;
-            case "Glass":
-                bitmap = new BitmapGlass();
-                break;
-            case "Ground":
-                bitmap = new BitmapGround();
-                break;
-            case "Liquid":
-                bitmap = new BitmapLiquid();
-                break;
-            case "Metal":
-                bitmap = new BitmapMetal();
-                break;
-            case "Metal Box":
-                bitmap = new BitmapMetalBox();
-                break;
-            case "Monitor":
-                bitmap = new BitmapMonitor();
-                break;
-            case "Monster":
-                bitmap = new BitmapMonster();
-                break;
-            case "Mosaic":
-                bitmap = new BitmapMosaic();
-                break;
-            case "Organic":
-                bitmap = new BitmapOrganic();
-                break;
-            case "Pipe":
-                bitmap = new BitmapPipe();
-                break;
-            case "Plaster":
-                bitmap = new BitmapPlaster();
-                break;
-            case "Stone":
-                bitmap = new BitmapStone();
-                break;
-            case "Tile":
-                bitmap = new BitmapTile();
-                break;
-            case "Wood":
-                bitmap = new BitmapWood();
-                break;
-            case "Wood Box":
-                bitmap = new BitmapWoodBox();
-                break;
-            default:
-                bitmap = new BitmapBase();
-                break;
-        }
-
         try {
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + bitmapName.replace(" ", ""))).getConstructor(null).newInstance(null);
             bitmap.generate();
         } catch (Exception e) {
             e.printStackTrace();

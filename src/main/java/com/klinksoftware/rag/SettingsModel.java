@@ -18,7 +18,7 @@ public class SettingsModel extends SettingsBase {
     private static final String[] MODEL_TYPE = {"Humanoid", "Animal", "Blob", "Robot"};
 
     private JButton generateModelButton, exportModelButton;
-    private JCheckBox thinCheckBox, bilateralCheckBox;
+    private JCheckBox thinCheckBox, bilateralCheckBox, roughCheckBox;
     private JComboBox modelTypeCombo;
 
     public SettingsModel(AppWindow appWindow) {
@@ -42,6 +42,9 @@ public class SettingsModel extends SettingsBase {
         bilateralCheckBox = addCheckBox(y, "Bilateral", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
+        roughCheckBox = addCheckBox(y, "Rough", true);
+        y += (ROW_HEIGHT + ROW_GAP);
+
         exportModelButton = addButton(y, "Export Model", BUTTON_EXPORT_MODEL);
     }
 
@@ -49,7 +52,7 @@ public class SettingsModel extends SettingsBase {
     public void buttonClick(int id) {
         switch (id) {
             case BUTTON_GENERATE_MODEL:
-                (new ModelBuildWorker(appWindow, modelTypeCombo.getSelectedIndex(), thinCheckBox.isSelected(), bilateralCheckBox.isSelected())).execute();
+                (new ModelBuildWorker(appWindow, modelTypeCombo.getSelectedIndex(), thinCheckBox.isSelected(), bilateralCheckBox.isSelected(), roughCheckBox.isSelected())).execute();
                 return;
             case BUTTON_EXPORT_MODEL:
                 (new ModelExportWorker(appWindow)).execute();

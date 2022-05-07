@@ -19,12 +19,11 @@ public class BitmapStone extends BitmapBase
         //
 
     @Override
-    public void generateInternal()    {
-        int             y,yCount,yAdd,xOff,yOff,edgeSize,
-                        lft,rgt,top,bot;
-        float           xRoundFactor,yRoundFactor,normalZFactor;
-        float[]         backgroundData,stoneCopyData;
-        RagColor        stoneColor,altStoneColor,drawStoneColor,groutColor,outlineColor;
+    public void generateInternal() {
+        int y, yCount, yAdd, xOff, yOff, edgeSize, lft, rgt, top, bot;
+        float xRoundFactor, yRoundFactor, normalZFactor;
+        float[] backgroundData, stoneCopyData;
+        RagColor stoneColor, altStoneColor, drawStoneColor, groutColor, outlineColor;
 
         stoneColor=getRandomColor();
         altStoneColor=getRandomColorDull(0.9f);

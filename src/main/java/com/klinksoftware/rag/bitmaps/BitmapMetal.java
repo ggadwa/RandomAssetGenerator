@@ -5,15 +5,13 @@ import com.klinksoftware.rag.utility.*;
 
 public class BitmapMetal extends BitmapBase
 {
-    public final static float[][][][] CORRUGATION_LINES
-            =                                        {
-                                            {{{0.0f,1.0f},{1.0f,0.0f}},{{0.0f,0.0f},{1.0f,1.0f}},{{0.0f,0.0f},{1.0f,1.0f}},{{0.0f,1.0f},{1.0f,0.0f}}},  // diamonds
-                                            {{{0.0f,1.0f},{1.0f,0.0f}},{{0.0f,0.0f},{1.0f,1.0f}},{{0.0f,1.0f},{1.0f,0.0f}},{{0.0f,0.0f},{1.0f,1.0f}}},  // waves
-                                            {{{0.5f,0.0f},{0.5f,1.0f}},{{0.0f,0.5f},{1.0f,0.5f}},{{0.0f,0.5f},{1.0f,0.5f}},{{0.5f,0.0f},{0.5f,1.0f}}}   // pluses
-                                        };
+    public final static float[][][][] CORRUGATION_LINES = {
+        {{{0.0f, 1.0f}, {1.0f, 0.0f}}, {{0.0f, 0.0f}, {1.0f, 1.0f}}, {{0.0f, 0.0f}, {1.0f, 1.0f}}, {{0.0f, 1.0f}, {1.0f, 0.0f}}}, // diamonds
+        {{{0.0f, 1.0f}, {1.0f, 0.0f}}, {{0.0f, 0.0f}, {1.0f, 1.0f}}, {{0.0f, 1.0f}, {1.0f, 0.0f}}, {{0.0f, 0.0f}, {1.0f, 1.0f}}}, // waves
+        {{{0.5f, 0.0f}, {0.5f, 1.0f}}, {{0.0f, 0.5f}, {1.0f, 0.5f}}, {{0.0f, 0.5f}, {1.0f, 0.5f}}, {{0.5f, 0.0f}, {0.5f, 1.0f}}} // pluses
+    };
 
-    public BitmapMetal()
-    {
+    public BitmapMetal() {
         super();
 
         hasNormal=true;
@@ -26,14 +24,12 @@ public class BitmapMetal extends BitmapBase
         // metal pieces
         //
 
-    private void generateMetalCorrugation(int lft,int top,int rgt,int bot,RagColor metalColor)
-    {
-        int         x,y,dx,dy,sx,sy,ex,ey,wid,high,idx,
-                    corrCount,corrWid,corrHigh,
-                    lineStyle;
-        float       lineWid,lineHigh;
-        float[][]   line;
-        RagColor    metalCorrColor;
+    private void generateMetalCorrugation(int lft, int top, int rgt, int bot, RagColor metalColor) {
+        int x, y, dx, dy, sx, sy, ex, ey, wid, high, idx;
+        int corrCount, corrWid, corrHigh, lineStyle;
+        float lineWid, lineHigh;
+        float[][] line;
+        RagColor metalCorrColor;
 
         wid=rgt-lft;
         high=bot-top;
@@ -88,12 +84,12 @@ public class BitmapMetal extends BitmapBase
         }
     }
 
-    private void generateMetalScrews(int lft, int top, int rgt, int bot, RagColor screwColor, int screwSize)    {
-        int         mx,my,edgeSize;
-        RagColor    outlineColor;
+    private void generateMetalScrews(int lft, int top, int rgt, int bot, RagColor screwColor, int screwSize) {
+        int mx, my, edgeSize;
+        RagColor outlineColor;
 
         edgeSize=screwSize/2;
-        outlineColor=adjustColor(screwColor,0.8f);
+        outlineColor = adjustColor(screwColor, 0.5f);
 
             // corners
 
@@ -116,10 +112,9 @@ public class BitmapMetal extends BitmapBase
         }
     }
 
-    private void generateMetalWave(int lft,int top,int rgt,int bot,RagColor color)
-    {
-        int             sz,waveCount;
-        RagColor        frameColor;
+    private void generateMetalWave(int lft, int top, int rgt, int bot, RagColor color) {
+        int sz, waveCount;
+        RagColor frameColor;
 
         drawMetalShine(lft,top,rgt,bot,color);
 
@@ -136,9 +131,8 @@ public class BitmapMetal extends BitmapBase
     }
 
     public void generateMetalPanel(int lft, int top, int rgt, int bot, RagColor metalColor, RagColor altMetalColor, int edgeSize, int screwSize, boolean isBox) {
-        int         lft2,rgt2,top2,bot2,
-                    sz,panelType;
-        RagColor    color,screwColor,frameColor;
+        int lft2, rgt2, top2, bot2, sz, panelType;
+        RagColor color, screwColor, frameColor;
 
             // colors
 
@@ -206,17 +200,15 @@ public class BitmapMetal extends BitmapBase
         }
     }
 
-    private void generateMetalRegular(RagColor metalColor, RagColor altMetalColor, int edgeSize, int screwSize)    {
-        int     mx,my,panelCount;
+    private void generateMetalPlates(RagColor metalColor, RagColor altMetalColor, int edgeSize, int screwSize) {
+        int mx, my;
 
             // either single, dual, or 4 panel
 
         mx=textureSize/2;
         my=textureSize/2;
 
-        panelCount=AppWindow.random.nextInt(3);
-
-        switch (panelCount) {
+        switch (AppWindow.random.nextInt(3)) {
             case 0:
                 generateMetalPanel(0, 0, textureSize, textureSize, metalColor, altMetalColor, edgeSize, screwSize, false);
                 break;
@@ -233,16 +225,15 @@ public class BitmapMetal extends BitmapBase
         }
     }
 
-    private void generateMetalHexagon(RagColor metalColor,RagColor altMetalColor,int edgeSize,int screwSize)
-    {
-        int         x,y,lft,top,pointSize,
-                    xCount,yCount,xSize,ySize;
-        RagColor    color;
+    private void generateMetalHexagon(RagColor metalColor, RagColor altMetalColor, int edgeSize) {
+        int x, y, lft, top, pointSize, xCount, yCount, xSize, ySize;
+        boolean hasBorder;
+        RagColor color;
 
-            // sizing
+        hasBorder = AppWindow.random.nextFloat() > 0.7f;
 
-        xCount=2+(2*AppWindow.random.nextInt(2));
-        yCount=2+(2*AppWindow.random.nextInt(5));
+        xCount = 3 + (2 * AppWindow.random.nextInt(3));
+        yCount = 3 + (2 * AppWindow.random.nextInt(6));
 
         xSize=textureSize/xCount;
         ySize=textureSize/yCount;
@@ -254,13 +245,16 @@ public class BitmapMetal extends BitmapBase
         for (x=0;x<=xCount;x++) {
             top=((x&0x1)==0)?0:-(ySize/2);
 
-            for (y=0;y<=yCount;y++) {
+            for (y = 0; y <= yCount; y++) {
 
-                    // sometimes an alt color, but never on wrapping rows
-
-                color=metalColor;
-                if ((x!=0) && (x!=xCount) && (y!=0) && (y!=yCount)) {
-                    color=adjustColorRandom(metalColor,0.9f,1.1f);
+                if (((y == 0) || (y == yCount)) && (hasBorder)) {
+                    color = altMetalColor;
+                } else {
+                    if ((x != 0) && (x != xCount) && (y != 0) && (y != yCount)) {
+                        color = adjustColorRandom(metalColor, 0.9f, 1.1f);
+                    } else {
+                        color = metalColor;
+                    }
                 }
 
                 drawHexagon(lft,top,((lft+xSize)-pointSize),(top+ySize),pointSize,edgeSize,color);
@@ -271,12 +265,42 @@ public class BitmapMetal extends BitmapBase
         }
     }
 
-    private void generateMetalSheet(RagColor metalColor)
-    {
-        createPerlinNoiseData(16,16);
-        drawRect(0,0,textureSize,textureSize,metalColor);
-        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.8f,1.0f);
-        drawMetalShine(0,0,textureSize,textureSize,metalColor);
+    private void generateMetalTreads(RagColor metalColor, int edgeSize, int screwSize) {
+        int n, ty, by, yAdd, treadCount;
+        boolean alternateScrews;
+        RagColor color, altMetalColor, frameColor, outlineColor;
+
+        alternateScrews = AppWindow.random.nextBoolean();
+        altMetalColor = adjustColorRandom(metalColor, 0.7f, 1.1f);
+
+        treadCount = 4 + AppWindow.random.nextInt(4);
+
+        ty = 0;
+        yAdd = textureSize / treadCount;
+
+        for (n = 0; n != treadCount; n++) {
+            by = (n == (treadCount - 1)) ? textureSize : (ty + yAdd);
+
+            // the plank
+            color = ((n & 0x1) == 0) ? metalColor : altMetalColor;
+            frameColor = adjustColor(color, 0.7f);
+
+            createPerlinNoiseData(16, 16);
+            drawRect(0, ty, textureSize, by, color);
+            drawPerlinNoiseRect(0, ty, textureSize, by, 0.8f, 1.0f);
+            drawMetalShine(0, ty, textureSize, by, color);
+            draw3DFrameRect(0, ty, textureSize, by, edgeSize, frameColor, true);
+
+            // any screws
+            if ((!alternateScrews) || ((n & 0x1) == 0)) {
+                color = ((n & 0x1) != 0) ? metalColor : altMetalColor;
+                outlineColor = adjustColor(color, 0.5f);
+                drawScrew(screwSize, (((ty + by) / 2) - (screwSize / 2)), color, outlineColor, screwSize, edgeSize);
+                drawScrew((textureSize - (screwSize * 2)), (((ty + by) / 2) - (screwSize / 2)), (((n & 0x1) != 0) ? metalColor : altMetalColor), outlineColor, screwSize, edgeSize);
+            }
+
+            ty += yAdd;
+        }
     }
 
         //
@@ -284,24 +308,24 @@ public class BitmapMetal extends BitmapBase
         //
 
     @Override
-    public void generateInternal()    {
-        int         edgeSize,screwSize;
-        RagColor    metalColor,altMetalColor;
+    public void generateInternal() {
+        int edgeSize, screwSize;
+        RagColor metalColor, altMetalColor;
 
         metalColor=getRandomColor();
         altMetalColor=getRandomColor();
-        edgeSize=(int)(((float)textureSize*0.005)+(AppWindow.random.nextFloat()*((float)textureSize*0.005)));
-        screwSize=(int)(((float)textureSize*0.03)+(AppWindow.random.nextFloat()*((float)textureSize*0.05)));
+        edgeSize = 4 + AppWindow.random.nextInt(5);
+        screwSize = 5 + AppWindow.random.nextInt(25);
 
         switch (AppWindow.random.nextInt(3)) {
             case 0:
-                generateMetalRegular(metalColor, altMetalColor, edgeSize, screwSize);
+                generateMetalPlates(metalColor, altMetalColor, edgeSize, screwSize);
                 break;
             case 1:
-                generateMetalHexagon(metalColor,altMetalColor,edgeSize,screwSize);
+                generateMetalHexagon(metalColor, altMetalColor, edgeSize);
                 break;
             default:
-                generateMetalSheet(metalColor);
+                generateMetalTreads(metalColor, edgeSize, screwSize);
                 break;
         }
 

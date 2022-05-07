@@ -21,10 +21,11 @@ public class BitmapMonitor extends BitmapComputer {
         RagColor panelColor;
 
         offset = textureSize / 2;
-        panelEdgeSize = 2 + AppWindow.random.nextInt(4);
-        panelInsideEdgeSize = 2 + AppWindow.random.nextInt(3);
+        panelEdgeSize = 4 + AppWindow.random.nextInt(6);
+        panelInsideEdgeSize = 3 + AppWindow.random.nextInt(3);
 
         panelColor = getRandomGray(0.6f, 0.8f);
+        panelColor.b *= (1.0f + AppWindow.random.nextFloat(0.2f));
 
         drawRect(0, 0, textureSize, textureSize, panelColor);
         draw3DFrameRect(0, 0, offset, offset, panelEdgeSize, panelColor, true);                       // left and right

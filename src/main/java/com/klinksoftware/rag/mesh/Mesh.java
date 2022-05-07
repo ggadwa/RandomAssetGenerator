@@ -144,11 +144,12 @@ public class Mesh
 
     public void randomizeVertexes(float percentMove, float moveFactor, ArrayList<Mesh> meshes) {
         int n, k, vIdx, nVertex, nCheckVertex;
-        RagPoint normal, vertex, origVertex;
+        RagPoint normal, vertex, origVertex, checkVertex;
 
         normal = new RagPoint(0.0f, 0.0f, 0.0f);
         vertex = new RagPoint(0.0f, 0.0f, 0.0f);
         origVertex = new RagPoint(0.0f, 0.0f, 0.0f);
+        checkVertex = new RagPoint(0.0f, 0.0f, 0.0f);
 
         nVertex = vertexes.length / 3;
 
@@ -174,16 +175,20 @@ public class Mesh
 
             // check for equal vertexes to move
             for (Mesh mesh : meshes) {
+                if (mesh == this) {
+                    continue;
+                }
+
                 nCheckVertex = mesh.vertexes.length / 3;
 
                 vIdx = 0;
 
                 for (k = 0; k != nCheckVertex; k++) {
-                    vertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
-                    if (vertex.isEqual(origVertex)) {
-                        vertexes[vIdx] = vertex.x;
-                        vertexes[vIdx + 1] = vertex.y;
-                        vertexes[vIdx + 2] = vertex.z;
+                    checkVertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
+                    if (checkVertex.isEqual(origVertex)) {
+                        mesh.vertexes[vIdx] = vertex.x;
+                        mesh.vertexes[vIdx + 1] = vertex.y;
+                        mesh.vertexes[vIdx + 2] = vertex.z;
                     }
                     vIdx += 3;
                 }

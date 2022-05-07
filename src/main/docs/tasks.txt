@@ -1,7 +1,5 @@
 
 
-- models merge meshes (connect connected vertexes)
-  - turn back on randomizer after that
 
 - add upper and lower story (different textures!)
 - each has a simple/complex flag (only hallways or squares or anything)
@@ -14,8 +12,11 @@
 
 - need to export tangents
 
-- bitmaps
-   - metal - screws get random rotated cross or straight line
+
+- dirt needs to not collide stones
+- more distinct control panels pieces (keyboard)
+- rust on metal
+
 
 - try jpackage
 c:/Java/jdk-17.0.2/bin/jpackage --name RandomAssetGenerator --input c:\Code\RandomAssetGenerator\target --main-jar RandomAssetGenerator-1.0.jar --main-class com.klinksoftware.rag.RandomAssetGenerator --win-dir-chooser --type EXE

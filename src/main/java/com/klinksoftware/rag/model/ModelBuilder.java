@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.model;
 
+import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.SettingsModel;
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.export.Export;
@@ -42,7 +43,7 @@ public class ModelBuilder
     }
 
     // build a model
-    public void build(int modelType, boolean thin, boolean bilaterial) {
+    public void build(int modelType, boolean thin, boolean bilaterial, boolean rough) {
         BitmapBase bitmapBase;
 
         // for now just the monster texture
@@ -65,8 +66,8 @@ public class ModelBuilder
         wrapLimbs(modelType);
 
         // any randomization
-        if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
-            //meshList.randomizeVertexes(0.7f, 0.1f);
+        if ((modelType != SettingsModel.MODEL_TYPE_ROBOT) && (rough)) {
+            meshList.randomizeVertexes((0.6f + AppWindow.random.nextFloat(1.0f)), (0.05f + AppWindow.random.nextFloat(0.05f)));
         }
 
             // skeletons and meshes are created with absolute

@@ -21,8 +21,8 @@ public class BitmapControlPanel extends BitmapComputer {
         RagColor panelColor, panelInsideColor;
 
         offset = textureSize / 2;
-        panelEdgeSize = 2 + AppWindow.random.nextInt(4);
-        panelInsideEdgeSize = 2 + AppWindow.random.nextInt(3);
+        panelEdgeSize = 4 + AppWindow.random.nextInt(6);
+        panelInsideEdgeSize = 3 + AppWindow.random.nextInt(3);
 
         panelColor = getRandomGray(0.6f, 0.8f);
         panelInsideColor = adjustColor(panelColor, 1.1f);
@@ -31,9 +31,9 @@ public class BitmapControlPanel extends BitmapComputer {
         // used to wrap the object around cubes
         drawRect(0, 0, textureSize, textureSize, panelColor);
 
-        generateComputerComponents(0, 0, offset, offset, panelInsideColor, panelInsideEdgeSize, true);             // left and right
-        generateComputerComponents(offset, 0, textureSize, offset, panelInsideColor, panelInsideEdgeSize, true);   // front and back
-        draw3DFrameRect(0, offset, offset, textureSize, panelEdgeSize, panelColor, true);                     // top and bottom
+        drawBlankPanel(0, 0, offset, offset, panelEdgeSize, panelColor); // left and right
+        generateComputerComponents(offset, 0, textureSize, offset, panelInsideColor, panelInsideEdgeSize, true); // front and back
+        drawBlankPanel(0, offset, offset, textureSize, panelEdgeSize, panelColor); // top and bottom
 
         // set the emissive
         emissiveFactor = new RagPoint(1.0f, 1.0f, 1.0f);

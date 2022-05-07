@@ -9,15 +9,16 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
     private int modelType;
-    private boolean thin, bilaterial;
+    private boolean thin, bilaterial, rough;
 
     public static ModelBuilder generatedModel = null;
 
-    public ModelBuildWorker(AppWindow appWindow, int modelType, boolean thin, boolean bilaterial) {
+    public ModelBuildWorker(AppWindow appWindow, int modelType, boolean thin, boolean bilaterial, boolean rough) {
         this.appWindow = appWindow;
         this.modelType = modelType;
         this.thin = thin;
         this.bilaterial = bilaterial;
+        this.rough = rough;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
 
         try {
             modelBuilder = new ModelBuilder();
-            modelBuilder.build(modelType, thin, bilaterial);
+            modelBuilder.build(modelType, thin, bilaterial, rough);
         }
         catch (Exception e)
         {

@@ -1,11 +1,7 @@
 package com.klinksoftware.rag.uiworker;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.sound.SoundAlien;
 import com.klinksoftware.rag.sound.SoundBase;
-import com.klinksoftware.rag.sound.SoundExplosion;
-import com.klinksoftware.rag.sound.SoundBang;
-import com.klinksoftware.rag.sound.SoundMonster;
 import java.util.*;
 import javax.swing.*;
 
@@ -32,25 +28,8 @@ public class SoundBuildWorker extends SwingWorker<Integer, Void> {
         seed = Calendar.getInstance().getTimeInMillis();
         AppWindow.random.setSeed(seed);
 
-        switch (soundName) {
-            case "Alien":
-                sound = new SoundAlien();
-                break;
-            case "Bang":
-                sound = new SoundBang();
-                break;
-            case "Explosion":
-                sound = new SoundExplosion();
-                break;
-            case "Monster":
-                sound = new SoundMonster();
-                break;
-            default:
-                sound = new SoundBase();
-                break;
-        }
-
         try {
+            sound = (SoundBase) (Class.forName("com.klinksoftware.rag.sound.Sound" + soundName.replace(" ", ""))).getConstructor(null).newInstance(null);
             sound.generate();
         } catch (Exception e) {
             e.printStackTrace();

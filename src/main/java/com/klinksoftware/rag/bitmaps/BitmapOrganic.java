@@ -23,7 +23,7 @@ public class BitmapOrganic extends BitmapBase {
 
         createPerlinNoiseData(16, 16);
         color = getRandomColor();
-        drawPerlinNoiseReplaceColorRect(0, 0, textureSize, textureSize, adjustColor(color, 0.8f), 0.5f);
+        drawPerlinNoiseReplaceColorRect(0, 0, textureSize, textureSize, adjustColor(color, 0.8f), 0.5f, true);
         drawPerlinNoiseColorRect(0, 0, textureSize, textureSize, color, 0.7f);
 
         createMetallicRoughnessMap((0.2f + AppWindow.random.nextFloat(0.5f)), 0.6f);

@@ -12,8 +12,8 @@ public class SettingsTexture extends SettingsBase {
     private static final int BUTTON_EXPORT_TEXTURE = 1;
 
     private static final String[] TEXTURE_ITEMS = {
-        "Brick", "Computer", "Concrete", "Control Panel",
-        "Geometric", "Glass", "Ground", "Liquid", "Metal",
+        "Brick", "Computer", "Concrete", "Control Panel", "Dirt",
+        "Geometric", "Glass", "Grass", "Liquid", "Metal",
         "Metal Box", "Monitor", "Monster", "Mosaic", "Organic",
         "Pipe", "Plaster", "Stone", "Tile", "Wood", "Wood Box"};
 

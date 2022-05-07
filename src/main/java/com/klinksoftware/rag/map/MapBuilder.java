@@ -473,7 +473,7 @@ public class MapBuilder
                 bitmapBase = new BitmapMosaic();
                 break;
             case 5:
-                bitmapBase = new BitmapGround();
+                bitmapBase = new BitmapGrass();
                 break;
             default:
                 bitmapBase = new BitmapMetal();
