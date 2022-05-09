@@ -24,7 +24,7 @@ public class BitmapControlPanel extends BitmapComputer {
         panelEdgeSize = 4 + AppWindow.random.nextInt(6);
         panelInsideEdgeSize = 3 + AppWindow.random.nextInt(3);
 
-        panelColor = getRandomGray(0.6f, 0.8f);
+        panelColor = getRandomColor();
         panelInsideColor = adjustColor(panelColor, 1.1f);
 
         // this is a collection of plates that are

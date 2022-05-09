@@ -268,7 +268,8 @@ public class WalkView extends AWTGLCanvas {
     //
 
     public void setCameraWalkView(float x,float y,float z) {
-        cameraPoint.setFromValues(x,y,z);
+        cameraPoint.setFromValues(x, y, z);
+        cameraAngle.setFromValues(0.0f, 0.0f, 0.0f);
         cameraCenterRotate = false;
         fixedLightPoint = null;
     }
@@ -315,13 +316,11 @@ public class WalkView extends AWTGLCanvas {
     //
 
     private void stageMeshList() {
-        int n,nMesh,boneIdx,textureSize,textureId;
-        boolean hasAlpha;
+        int n, nMesh, boneIdx;
         String bitmapName;
         Mesh mesh;
         BitmapBase bitmapBase;
         RagPoint tempPnt;
-        ByteBuffer bitmapBuf;
         WalkViewTexture texture;
 
         if (incommingMeshList==null) return;

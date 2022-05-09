@@ -7,6 +7,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 public class SettingsBase extends JPanel {
 
@@ -63,6 +64,24 @@ public class SettingsBase extends JPanel {
         comboxBox.setBounds(PANEL_MIDPOINT, (y + 5), (PANEL_MIDPOINT - 10), ROW_HEIGHT);
 
         return (comboxBox);
+    }
+
+    protected JSlider addSlider(int y, String title, float value) {
+        JLabel label;
+        JSlider slider;
+
+        label = new JLabel(title + ":");
+        label.setHorizontalAlignment(JLabel.RIGHT);
+        add(label);
+        label.setBounds(5, (y + 5), (PANEL_MIDPOINT - 10), ROW_HEIGHT);
+
+        slider = new JSlider(JSlider.HORIZONTAL, 0, 100, (int) (value * 100.0f));
+        slider.setMinorTickSpacing(20);
+        slider.setPaintTicks(true);
+        add(slider);
+        slider.setBounds(PANEL_MIDPOINT, (y + 5), (PANEL_MIDPOINT - 10), ROW_HEIGHT);
+
+        return (slider);
     }
 
     public void enableAll(boolean enable) {

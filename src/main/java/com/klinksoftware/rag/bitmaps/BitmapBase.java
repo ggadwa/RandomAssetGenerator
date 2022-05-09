@@ -2264,7 +2264,11 @@ public class BitmapBase
 
     protected void drawSimpleCrack(int sx,int sy,int ex,int ey,int segCount,int lineXVarient,int lineYVarient,RagColor color)
     {
-        int         n,dx,dy,dx2,dy2;
+        int n, dx, dy, dx2, dy2;
+
+        if ((Math.abs(lineXVarient) <= 1) || (Math.abs(lineYVarient) <= 1)) {
+            return;
+        }
 
         dx=sx;
         dy=sy;

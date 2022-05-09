@@ -203,21 +203,24 @@ public class BitmapComputer extends BitmapBase
         }
     }
 
-    private void generateComputerComponentDials(int lft, int top, int rgt, int bot, int edgeSize) {
-        int x, y, mx, my, xCount, yCount, xMargin, yMargin, dx, dy, sz;
+    private void generateComputerComponentDials(int lft, int top, int rgt, int bot) {
+        int x, y, mx, my, xCount, yCount, xMargin, yMargin;
+        int margin, dx, dy, dx2, dy2, sz;
         RagColor dialColor, outlineColor;
 
-        lft += edgeSize;
-        rgt -= edgeSize;
-        top += edgeSize;
-        bot -= edgeSize;
+        margin = 5 + AppWindow.random.nextInt(5);
+
+        lft += margin;
+        rgt -= margin;
+        top += margin;
+        bot -= margin;
 
         if ((rgt - lft) > (bot - top)) {
-            sz = (bot - top) - (edgeSize * 2);
+            sz = (bot - top);
             xCount = (rgt - lft) / sz;
             yCount = 1;
         } else {
-            sz = (rgt - lft) - (edgeSize * 2);
+            sz = (rgt - lft);
             xCount = 1;
             yCount = (bot - top) / sz;
         }
@@ -229,22 +232,25 @@ public class BitmapComputer extends BitmapBase
             yCount = 1;
         }
 
-        xMargin = (((rgt - lft) - (xCount * sz)) / 2) + 1;
-        yMargin = (((bot - top) - (yCount * sz)) / 2) + 1;
+        xMargin = (((rgt - lft) - (xCount * (sz + margin))) / 2);
+        yMargin = (((bot - top) - (yCount * (sz + margin))) / 2);
 
         dialColor = getRandomColor();
         outlineColor = adjustColor(dialColor, 0.5f);
 
         for (y = 0; y != yCount; y++) {
-            dy = (top + yMargin) + (y * (sz - edgeSize));
+            dy = (top + yMargin) + (y * (sz + margin));
+            dy2 = dy + sz;
 
             for (x = 0; x != xCount; x++) {
-                dx = (lft + xMargin) + (x * (sz - edgeSize));
+                dx = (lft + xMargin) + (x * (sz + margin));
+                dx2 = dx + sz;
 
-                drawOval(dx, dy, (dx + (sz - (edgeSize * 2))), (dy + (sz - (edgeSize * 2))), 0.0f, 1.0f, 0.0f, 0.0f, 4, 0.8f, dialColor, outlineColor, 0.5f, false, false, 1.0f, 0.0f);
+                drawOval(dx, dy, dx2, dy2, 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.8f, outlineColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+                drawOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.8f, dialColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
 
-                mx = dx + ((sz - (edgeSize * 2)) / 2);
-                my = dy + ((sz - (edgeSize * 2)) / 2);
+                mx = dx + (sz / 2);
+                my = dy + (sz / 2);
 
                 switch (AppWindow.random.nextInt(4)) {
                     case 0:
@@ -252,16 +258,16 @@ public class BitmapComputer extends BitmapBase
                         drawLineNormal(mx, dy, mx, my, NORMAL_LEFT_45);
                         break;
                     case 1:
-                        drawLineColor(mx, my, mx, (dy + (sz - (edgeSize * 2))), outlineColor);
-                        drawLineNormal(mx, my, mx, (dy + (sz - (edgeSize * 2))), NORMAL_RIGHT_45);
+                        drawLineColor(mx, my, mx, (dy2 - 2), outlineColor);
+                        drawLineNormal(mx, my, mx, (dy2 - 2), NORMAL_RIGHT_45);
                         break;
                     case 2:
                         drawLineColor(dx, my, mx, my, outlineColor);
                         drawLineNormal(dx, my, mx, my, NORMAL_TOP_45);
                         break;
                     default:
-                        drawLineColor(mx, my, (dx + (sz - (edgeSize * 2))), my, outlineColor);
-                        drawLineNormal(mx, my, (dx + (sz - (edgeSize * 2))), my, NORMAL_BOTTOM_45);
+                        drawLineColor(mx, my, (dx2 - 2), my, outlineColor);
+                        drawLineNormal(mx, my, (dx2 - 2), my, NORMAL_BOTTOM_45);
                         break;
                 }
             }
@@ -401,7 +407,8 @@ public class BitmapComputer extends BitmapBase
         int mx, my, sz, lx, ty, rx, by, rndTry;
         int lightCount, buttonCount;
         int minPanelSize, extraPanelSize, skipPanelSize;
-        boolean hadWires, hadShutter, hadScreen, hadBlank, rndSuccess;
+        boolean hadWires, hadShutter, hadScreen, hadDials, hadBlank, rndSuccess;
+        RagColor altPanelColor;
 
             // inside components
             // these are stacks of vertical or horizontal chunks
@@ -411,7 +418,8 @@ public class BitmapComputer extends BitmapBase
 
         hadWires=false;
         hadShutter=false;
-        hadScreen=false;
+        hadScreen = false;
+        hadDials = false;
         hadBlank=false;
         lightCount=0;
         buttonCount=0;
@@ -448,9 +456,9 @@ public class BitmapComputer extends BitmapBase
 
                 // box around components, can
                 // be randonly in or out
-
-            drawRect(lx,ty,rx,by,panelColor);
-            draw3DFrameRect(lx,ty,rx,by,edgeSize,panelColor,(AppWindow.random.nextBoolean()));
+            altPanelColor = adjustColorRandom(panelColor, 0.8f, 1.0f);
+            drawRect(lx, ty, rx, by, altPanelColor);
+            draw3DFrameRect(lx, ty, rx, by, edgeSize, altPanelColor, (AppWindow.random.nextBoolean()));
 
                 // draw the components
                 // we only allow one blank, wires, or shutter
@@ -511,10 +519,11 @@ public class BitmapComputer extends BitmapBase
                         rndSuccess=true;
                         break;
                     case 6:
-                        if (!isControlPanel) {
+                        if ((!isControlPanel) || (hadDials)) {
                             break;
                         }
-                        generateComputerComponentDials(lx, ty, rx, by, edgeSize);
+                        hadDials = true;
+                        generateComputerComponentDials(lx, ty, rx, by);
                         rndSuccess = true;
                         break;
                     default:

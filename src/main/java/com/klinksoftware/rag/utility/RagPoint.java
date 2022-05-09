@@ -203,7 +203,7 @@ public class RagPoint
         return(new RagPoint(x,y,z));
     }
 
-    public boolean isEqual(RagPoint pnt) {
-        return ((pnt.x == x) && (pnt.y == y) && (pnt.z == z));
+    public boolean isCloseEqual(RagPoint pnt) {
+        return (((int) (pnt.x * 100.0f) == (int) (x * 100.0f)) && ((int) (pnt.y * 100.0f) == (int) (y * 100.0f)) && ((int) (pnt.z * 100.0f) == (int) (z * 100.0f)));
     }
 }

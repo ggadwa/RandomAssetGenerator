@@ -5,6 +5,7 @@ import com.klinksoftware.rag.uiworker.ModelExportWorker;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JSlider;
 
 public class SettingsModel extends SettingsBase {
 
@@ -18,8 +19,9 @@ public class SettingsModel extends SettingsBase {
     private static final String[] MODEL_TYPE = {"Humanoid", "Animal", "Blob", "Robot"};
 
     private JButton generateModelButton, exportModelButton;
-    private JCheckBox thinCheckBox, bilateralCheckBox, roughCheckBox;
+    private JCheckBox thinCheckBox, bilateralCheckBox;
     private JComboBox modelTypeCombo;
+    private JSlider roughSlider;
 
     public SettingsModel(AppWindow appWindow) {
         super(appWindow);
@@ -42,7 +44,7 @@ public class SettingsModel extends SettingsBase {
         bilateralCheckBox = addCheckBox(y, "Bilateral", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        roughCheckBox = addCheckBox(y, "Rough", true);
+        roughSlider = addSlider(y, "Rough", 0.2f);
         y += (ROW_HEIGHT + ROW_GAP);
 
         exportModelButton = addButton(y, "Export Model", BUTTON_EXPORT_MODEL);
@@ -52,7 +54,7 @@ public class SettingsModel extends SettingsBase {
     public void buttonClick(int id) {
         switch (id) {
             case BUTTON_GENERATE_MODEL:
-                (new ModelBuildWorker(appWindow, modelTypeCombo.getSelectedIndex(), thinCheckBox.isSelected(), bilateralCheckBox.isSelected(), roughCheckBox.isSelected())).execute();
+                (new ModelBuildWorker(appWindow, modelTypeCombo.getSelectedIndex(), thinCheckBox.isSelected(), bilateralCheckBox.isSelected(), ((float) roughSlider.getValue() / 100.0f))).execute();
                 return;
             case BUTTON_EXPORT_MODEL:
                 (new ModelExportWorker(appWindow)).execute();

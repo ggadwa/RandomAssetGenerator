@@ -251,11 +251,10 @@ public class MapBuilder
     }
 
         //
-        // build a single story of a room
+        // build main floor
         //
 
-    private int addStory(ArrayList<MapRoom> rooms,int startX,int startZ,int story,int roomCount,int roomExtensionCount)
-    {
+    private int addMainFloor(ArrayList<MapRoom> rooms, int roomCount, int roomExtensionCount)    {
         int         n,placeCount,moveCount,failCount,
                     touchIdx,firstRoomIdx,endRoomIdx;
         float       origX,origZ,xAdd,zAdd;
@@ -265,9 +264,9 @@ public class MapBuilder
             // always can be laid down
 
         room=new MapRoom(mapPieceList.getRandomPiece());
-        room.x=startX;
-        room.z=startZ;
-        room.story=story;
+        room.x = 0;
+        room.z = 0;
+
         rooms.add(room);
 
         roomCount--;
@@ -282,7 +281,7 @@ public class MapBuilder
 
         for (n=0;n!=roomCount;n++) {
             room=new MapRoom(mapPieceList.getRandomPiece());
-            room.story=story;
+            room.story = MapRoom.ROOM_STORY_MAIN;
 
             failCount=25;
 
@@ -290,8 +289,8 @@ public class MapBuilder
                 placeCount=10;
 
                 while (placeCount>0) {
-                    room.x=startX+AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE;
-                    room.z=startZ+AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE*2)-ROOM_RANDOM_LOCATION_DISTANCE;
+                    room.x = AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE * 2) - ROOM_RANDOM_LOCATION_DISTANCE;
+                    room.z = AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE * 2) - ROOM_RANDOM_LOCATION_DISTANCE;
                     if (!room.collides(rooms)) break;
 
                     placeCount--;
@@ -374,7 +373,7 @@ public class MapBuilder
 
         for (n=0;n!=roomExtensionCount;n++) {
             room=new MapRoom(mapPieceList.getRandomPiece());
-            room.story=story;
+            room.story = MapRoom.ROOM_STORY_MAIN;
 
             failCount=25;
 
@@ -425,6 +424,29 @@ public class MapBuilder
             // story on
 
         return(firstRoomIdx+AppWindow.random.nextInt(endRoomIdx-firstRoomIdx));
+    }
+
+    private void addUpperFloor(ArrayList<MapRoom> rooms) {
+        int roomStartIdx, roomEndIdx;
+        MapRoom startRoom, endRoom;
+
+        // get a start and end room for upper floor
+        roomStartIdx = AppWindow.random.nextInt(rooms.size());
+
+        while (true) {
+            roomEndIdx = AppWindow.random.nextInt(rooms.size());
+            if (roomEndIdx != roomStartIdx) {
+                break;
+            }
+        }
+
+        // set them as upper extensions
+        startRoom = rooms.get(roomStartIdx);
+        endRoom = rooms.get(roomEndIdx);
+
+        startRoom.hasUpperExtension = true;
+        endRoom.hasUpperExtension = true;
+
     }
 
     //
@@ -526,14 +548,12 @@ public class MapBuilder
         // build a map
         //
 
-    public void build()
-    {
-        int                 n,x,z,k,roomCount,roomExtensionCount,
-                            storyCount,nextStoryRoomIdx;
-        boolean             ceilings,decorations;
-        RagPoint            centerPnt;
-        MapRoom             room;
-        ArrayList<MapRoom>  rooms;
+    public void build() {
+        int n, k, roomCount, roomExtensionCount;
+        boolean ceilings, decorations, upperFloor, lowerFloor;
+        RagPoint centerPnt;
+        MapRoom room;
+        ArrayList<MapRoom> rooms;
 
             // some generator classes
 
@@ -541,38 +561,25 @@ public class MapBuilder
         mapPieceList=new MapPieceList();
 
             // some settings
-
-        storyCount=3;
         ceilings=true;
-        decorations=false;
+        decorations = false;
+        upperFloor = true;
+        lowerFloor = true;
 
             // map components
 
         rooms=new ArrayList<>();
         meshList=new MeshList();
 
-        x=0;
-        z=0;
-
-        roomCount=10+AppWindow.random.nextInt(15);
+        // the main floor
+        roomCount = 10 + AppWindow.random.nextInt(15);
         roomExtensionCount=AppWindow.random.nextInt(5);
 
-        for (n=0;n!=storyCount;n++) {
+        addMainFloor(rooms, roomCount, roomExtensionCount);
 
-                // add the story
-
-            nextStoryRoomIdx=addStory(rooms,x,z,n,roomCount,roomExtensionCount);
-
-                // reduce room counts
-
-            roomCount=(int)(((float)roomCount)*0.5f);
-            roomExtensionCount=(int)(((float)roomExtensionCount)*0.5f);
-
-                // next story start
-
-            room=rooms.get(nextStoryRoomIdx);
-            x=room.x+AppWindow.random.nextInt(4)-2;
-            z=room.z+AppWindow.random.nextInt(4)-2;
+        // upper floor
+        if (upperFloor) {
+            addUpperFloor(rooms);
         }
 
             // eliminate all combined walls

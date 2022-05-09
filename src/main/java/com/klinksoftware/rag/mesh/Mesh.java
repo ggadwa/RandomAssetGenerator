@@ -185,7 +185,7 @@ public class Mesh
 
                 for (k = 0; k != nCheckVertex; k++) {
                     checkVertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
-                    if (checkVertex.isEqual(origVertex)) {
+                    if (checkVertex.isCloseEqual(origVertex)) {
                         mesh.vertexes[vIdx] = vertex.x;
                         mesh.vertexes[vIdx + 1] = vertex.y;
                         mesh.vertexes[vIdx + 2] = vertex.z;

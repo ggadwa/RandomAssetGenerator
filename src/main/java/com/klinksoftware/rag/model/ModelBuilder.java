@@ -43,7 +43,7 @@ public class ModelBuilder
     }
 
     // build a model
-    public void build(int modelType, boolean thin, boolean bilaterial, boolean rough) {
+    public void build(int modelType, boolean thin, boolean bilaterial, float rough) {
         BitmapBase bitmapBase;
 
         // for now just the monster texture
@@ -66,8 +66,8 @@ public class ModelBuilder
         wrapLimbs(modelType);
 
         // any randomization
-        if ((modelType != SettingsModel.MODEL_TYPE_ROBOT) && (rough)) {
-            meshList.randomizeVertexes((0.6f + AppWindow.random.nextFloat(1.0f)), (0.05f + AppWindow.random.nextFloat(0.05f)));
+        if ((modelType != SettingsModel.MODEL_TYPE_ROBOT) && (rough > 0.0f)) {
+            meshList.randomizeVertexes((0.6f + AppWindow.random.nextFloat(1.0f)), (0.1f * rough));
         }
 
             // skeletons and meshes are created with absolute

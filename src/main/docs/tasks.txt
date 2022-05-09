@@ -1,6 +1,11 @@
 
 
+steps 
+  - meshmaputility fix it for new enum based story
 
+
+- map has complexity slider, at 0 = all squares, then percentage of when it picks (random) square vs piece
+- map has a size slider
 - add upper and lower story (different textures!)
 - each has a simple/complex flag (only hallways or squares or anything)
 - each happens by extending two random rooms and connecting them by walking towards each x/z
