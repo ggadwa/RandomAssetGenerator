@@ -41,7 +41,7 @@ public class SettingsMap extends SettingsBase {
     public void buttonClick(int id) {
         switch (id) {
             case BUTTON_GENERATE_MAP:
-                (new MapBuildWorker(appWindow)).execute();
+                (new MapBuildWorker(appWindow, upperFloorCheckBox.isSelected(), lowerFloorCheckBox.isSelected(), decorationsCheckBox.isSelected())).execute();
                 return;
             case BUTTON_EXPORT_MAP:
                 (new MapExportWorker(appWindow)).execute();

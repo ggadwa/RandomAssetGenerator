@@ -83,7 +83,7 @@ public class MapBuilder
 
                                 // only blank out walls that are at the same story
 
-                            if (room.story==room2.story) {
+                            if (room.storyEqual(room2)) {
                                 room.hideWall(vIdx);
                                 room2.hideWall(vIdx2);
                             }
@@ -254,11 +254,10 @@ public class MapBuilder
         // build main floor
         //
 
-    private int addMainFloor(ArrayList<MapRoom> rooms, int roomCount, int roomExtensionCount)    {
-        int         n,placeCount,moveCount,failCount,
-                    touchIdx,firstRoomIdx,endRoomIdx;
-        float       origX,origZ,xAdd,zAdd;
-        MapRoom     room,lastRoom,connectRoom;
+    private void addMainFloor(ArrayList<MapRoom> rooms, int roomCount, int roomExtensionCount) {
+        int n, placeCount, moveCount, failCount, touchIdx, firstRoomIdx, endRoomIdx;
+        float origX, origZ, xAdd, zAdd;
+        MapRoom room, lastRoom, connectRoom;
 
             // first room is alone so it
             // always can be laid down
@@ -268,9 +267,6 @@ public class MapBuilder
         room.z = 0;
 
         rooms.add(room);
-
-        roomCount--;
-        if (roomCount<=0) return(rooms.size()-1);
 
         lastRoom=room;
 
@@ -419,18 +415,14 @@ public class MapBuilder
                 failCount--;
             }
         }
-
-            // finally return a room to start the next
-            // story on
-
-        return(firstRoomIdx+AppWindow.random.nextInt(endRoomIdx-firstRoomIdx));
     }
 
-    private void addUpperFloor(ArrayList<MapRoom> rooms) {
+    private void addUpperOrLowerFloor(ArrayList<MapRoom> rooms, boolean upper) {
         int roomStartIdx, roomEndIdx;
-        MapRoom startRoom, endRoom;
+        int x, z, xDif, zDif, sizeX, sizeZ;
+        MapRoom startRoom, endRoom, room, nextRoom;
 
-        // get a start and end room for upper floor
+        // get a start and end room for floor
         roomStartIdx = AppWindow.random.nextInt(rooms.size());
 
         while (true) {
@@ -440,133 +432,151 @@ public class MapBuilder
             }
         }
 
-        // set them as upper extensions
+        // need to switch rooms with rectangular rooms
+        // so they are eaiser to connect and add stairs
         startRoom = rooms.get(roomStartIdx);
+        startRoom.changePiece(mapPieceList.createSpecificRectangularPiece(startRoom.piece.sizeX, startRoom.piece.sizeZ));
+
         endRoom = rooms.get(roomEndIdx);
+        endRoom.changePiece(mapPieceList.createSpecificRectangularPiece(endRoom.piece.sizeX, endRoom.piece.sizeZ));
 
-        startRoom.hasUpperExtension = true;
-        endRoom.hasUpperExtension = true;
+        // add the new rooms
+        if (upper) {
+            startRoom.hasUpperExtension = true;
+            endRoom.hasUpperExtension = true;
+            rooms.add(startRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION));
+            rooms.add(endRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION));
+        } else {
+            startRoom.hasLowerExtension = true;
+            endRoom.hasLowerExtension = true;
+            rooms.add(startRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION));
+            rooms.add(endRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION));
+        }
+        /*
+        // walk along with rectangles until we connect
+        room = startRoom;
 
+        while (true) {
+            if (room.touches(endRoom)) {
+                break;
+            }
+
+            // walk along until we connect
+            xDif = Math.abs(room.x - endRoom.x);
+            zDif = Math.abs(room.z - endRoom.z);
+
+            if (xDif > zDif) {
+                sizeZ = room.piece.sizeZ;
+                if (sizeZ > zDif) {
+                    //sizeZ = zDif;
+                }
+                sizeX = xDif;
+                if (sizeX > 10) {
+                    sizeX = 10;
+                }
+
+                if (endRoom.x < room.x) {
+                    x = room.x - sizeX;
+                } else {
+                    x = room.x + room.piece.sizeX;
+                }
+                z = room.z;
+            } else {
+                sizeX = room.piece.sizeX;
+                if (sizeX > xDif) {
+                    //sizeX = xDif;
+                }
+                sizeZ = zDif;
+                if (sizeZ > 10) {
+                    sizeZ = 10;
+                }
+
+                if (endRoom.z < room.z) {
+                    z = room.z - sizeZ;
+                } else {
+                    z = room.z + room.piece.sizeZ;
+                }
+                x = room.x;
+            }
+
+            nextRoom = new MapRoom(mapPieceList.createSpecificRectangularPiece(sizeX, sizeZ));
+            nextRoom.x = x;
+            nextRoom.z = z;
+            nextRoom.story = upper ? MapRoom.ROOM_STORY_UPPER : MapRoom.ROOM_STORY_LOWER;
+
+            // if we collide, just exit out, we can't connect
+            if (nextRoom.collides(rooms)) {
+                break;
+            }
+
+            rooms.add(nextRoom);
+
+            room = nextRoom;
+        }
+         */
     }
 
     //
     // required bitmaps
     //
     public void buildRequiredBitmaps() {
-        BitmapBase bitmapBase;
+        String[] wallBitmaps = {"Brick", "Geometric", "Metal", "Mosaic", "Organic", "Plaster", "Stone", "Tile", "Wood"};
+        String[] floorBitmaps = {"Brick", "Concrete", "Dirt", "Grass", "Metal", "Mosaic", "Tile", "Wood"};
+        String[] ceilingBitmaps = {"Brick", "Concrete", "Metal", "Mosaic", "Plaster", "Tile", "Wood"};
+        String[] platformBitmaps = {"Brick", "Concrete", "Metal", "Wood"};
 
-        // wall
-        switch (AppWindow.random.nextInt(5)) {
-            case 0:
-                bitmapBase = new BitmapBrick();
-                break;
-            case 1:
-                bitmapBase = new BitmapStone();
-                break;
-            case 2:
-                bitmapBase = new BitmapWood();
-                break;
-            case 3:
-                bitmapBase = new BitmapTile();
-                break;
-            default:
-                bitmapBase = new BitmapMetal();
-                break;
+        BitmapBase bitmap;
+
+        try {
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap.generate();
+            bitmaps.put("wall_main", bitmap);
+
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap.generate();
+            bitmaps.put("wall_upper", bitmap);
+
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap.generate();
+            bitmaps.put("wall_lower", bitmap);
+
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + floorBitmaps[AppWindow.random.nextInt(floorBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap.generate();
+            bitmaps.put("floor", bitmap);
+
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + floorBitmaps[AppWindow.random.nextInt(floorBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap.generate();
+            bitmaps.put("floor_lower", bitmap);
+
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + ceilingBitmaps[AppWindow.random.nextInt(ceilingBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap.generate();
+            bitmaps.put("ceiling", bitmap);
+
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + ceilingBitmaps[AppWindow.random.nextInt(ceilingBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap.generate();
+            bitmaps.put("ceiling_upper", bitmap);
+
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + platformBitmaps[AppWindow.random.nextInt(platformBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap.generate();
+            bitmaps.put("platform", bitmap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        bitmapBase.generate();
-        bitmaps.put("wall", bitmapBase);
-
-        // floor
-        switch (AppWindow.random.nextInt(7)) {
-            case 0:
-                bitmapBase = new BitmapBrick();
-                break;
-            case 1:
-                bitmapBase = new BitmapWood();
-                break;
-            case 2:
-                bitmapBase = new BitmapConcrete();
-                break;
-            case 3:
-                bitmapBase = new BitmapTile();
-                break;
-            case 4:
-                bitmapBase = new BitmapMosaic();
-                break;
-            case 5:
-                bitmapBase = new BitmapGrass();
-                break;
-            default:
-                bitmapBase = new BitmapMetal();
-                break;
-        }
-
-        bitmapBase.generate();
-        bitmaps.put("floor", bitmapBase);
-
-        // ceiling
-        switch (AppWindow.random.nextInt(4)) {
-            case 0:
-                bitmapBase = new BitmapBrick();
-                break;
-            case 1:
-                bitmapBase = new BitmapWood();
-                break;
-            case 2:
-                bitmapBase = new BitmapConcrete();
-                break;
-            default:
-                bitmapBase = new BitmapMetal();
-                break;
-        }
-
-        bitmapBase.generate();
-        bitmaps.put("ceiling", bitmapBase);
-
-        // platform
-        switch (AppWindow.random.nextInt(4)) {
-            case 0:
-                bitmapBase = new BitmapBrick();
-                break;
-            case 1:
-                bitmapBase = new BitmapWood();
-                break;
-            case 2:
-                bitmapBase = new BitmapConcrete();
-                break;
-            default:
-                bitmapBase = new BitmapMetal();
-                break;
-        }
-
-        bitmapBase.generate();
-        bitmaps.put("platform", bitmapBase);
     }
 
         //
         // build a map
         //
 
-    public void build() {
+    public void build(boolean upperFloor, boolean lowerFloor, boolean decorations) {
         int n, k, roomCount, roomExtensionCount;
-        boolean ceilings, decorations, upperFloor, lowerFloor;
         RagPoint centerPnt;
         MapRoom room;
         ArrayList<MapRoom> rooms;
 
-            // some generator classes
-
         bitmaps = new HashMap<>();
         mapPieceList=new MapPieceList();
-
-            // some settings
-        ceilings=true;
-        decorations = false;
-        upperFloor = true;
-        lowerFloor = true;
-
-            // map components
 
         rooms=new ArrayList<>();
         meshList=new MeshList();
@@ -579,7 +589,10 @@ public class MapBuilder
 
         // upper floor
         if (upperFloor) {
-            addUpperFloor(rooms);
+            addUpperOrLowerFloor(rooms, true);
+        }
+        if (lowerFloor) {
+            addUpperOrLowerFloor(rooms, false);
         }
 
             // eliminate all combined walls
@@ -597,13 +610,13 @@ public class MapBuilder
         for (n=0;n!=roomCount;n++) {
             room=rooms.get(n);
 
-            centerPnt=new RagPoint((((room.x*SEGMENT_SIZE)+(room.piece.sizeX*SEGMENT_SIZE))*0.5f),((room.story*(SEGMENT_SIZE+this.FLOOR_HEIGHT))+(SEGMENT_SIZE*0.5f)),(((room.z*SEGMENT_SIZE)+(room.piece.sizeZ*SEGMENT_SIZE))*0.5f));
+            centerPnt = new RagPoint((((room.x * SEGMENT_SIZE) + (room.piece.sizeX * SEGMENT_SIZE)) * 0.5f), ((SEGMENT_SIZE + this.FLOOR_HEIGHT) + (SEGMENT_SIZE * 0.5f)), (((room.z * SEGMENT_SIZE) + (room.piece.sizeZ * SEGMENT_SIZE)) * 0.5f));
 
                 // meshes
 
-            MeshMapUtility.buildRoomWalls(meshList,room,centerPnt,("wall_"+Integer.toString(n)));
-            MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("floor_"+Integer.toString(n)),(room.hasRoomBelow(rooms)?"platform":"floor"),true);
-            if (ceilings) MeshMapUtility.buildRoomFloorCeiling(meshList,room,centerPnt,("ceiling_"+Integer.toString(n)),(room.hasRoomAbove(rooms)?"platform":"ceiling"),false);
+            MeshMapUtility.buildRoomWalls(meshList, room, centerPnt, n);
+            MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, true);
+            MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, false);
 
                 // decorations
 

@@ -7,8 +7,10 @@ public class MapRoom
 {
 
     public static final int ROOM_STORY_MAIN = 0;
-    public static final int ROOM_STORY_UPPER = -1;
-    public static final int ROOM_STORY_LOWER = 1;
+    public static final int ROOM_STORY_UPPER = 1;
+    public static final int ROOM_STORY_LOWER = 2;
+    public static final int ROOM_STORY_UPPER_EXTENSION = 3;
+    public static final int ROOM_STORY_LOWER_EXTENSION = 4;
 
     public int x, z, story;
     public boolean hasUpperExtension, hasLowerExtension;
@@ -46,6 +48,63 @@ public class MapRoom
         grid=new int[piece.sizeX*piece.sizeZ];
     }
 
+    public MapRoom duplicate(int story) {
+        MapRoom room;
+
+        room = new MapRoom(piece);
+        room.x = x;
+        room.z = z;
+
+        room.story = story;
+        room.hasUpperExtension = false;
+        room.hasLowerExtension = false;
+
+        // need a copy of floor grid
+        room.floorGrid = piece.floorGrid.clone();
+        room.ceilingGrid = piece.floorGrid.clone();
+
+        // flags for staircases
+        room.requiredStairs = new ArrayList<>();
+
+        // wall hiding
+        room.wallHideArray = new byte[piece.vertexes.length];
+
+        // grids for blocking off floor/stories/etc
+        room.grid = new int[piece.sizeX * piece.sizeZ];
+
+        return (room);
+    }
+
+    public void changePiece(MapPiece piece) {
+        this.piece = piece;
+
+        wallHideArray = new byte[piece.vertexes.length];
+        grid = new int[piece.sizeX * piece.sizeZ];
+    }
+
+    //
+    // compare stories
+    //
+    public boolean storyEqual(MapRoom room) {
+        if ((story == ROOM_STORY_MAIN) && (room.story == ROOM_STORY_MAIN)) {
+            return (true);
+        }
+        if ((story == ROOM_STORY_UPPER) && ((room.story == ROOM_STORY_UPPER) || (room.story == ROOM_STORY_UPPER_EXTENSION))) {
+            return (true);
+        }
+        if ((story == ROOM_STORY_UPPER_EXTENSION) && ((room.story == ROOM_STORY_UPPER) || (room.story == ROOM_STORY_UPPER_EXTENSION))) {
+            return (true);
+        }
+        if ((story == ROOM_STORY_LOWER) && ((room.story == ROOM_STORY_LOWER) || (room.story == ROOM_STORY_LOWER_EXTENSION))) {
+            return (true);
+        }
+        if ((story == ROOM_STORY_LOWER_EXTENSION) && ((room.story == ROOM_STORY_LOWER) || (room.story == ROOM_STORY_LOWER_EXTENSION))) {
+            return (true);
+        }
+
+        return (false);
+    }
+
         //
         // collisions and touches with room boxes
         //
@@ -57,7 +116,9 @@ public class MapRoom
 
         for (n=0;n!=rooms.size();n++) {
             checkRoom=rooms.get(n);
-            if (checkRoom.story!=story) continue;
+            if (!storyEqual(checkRoom)) {
+                continue;
+            }
 
             if (x>=(checkRoom.x+checkRoom.piece.sizeX)) continue;
             if ((x+piece.sizeX)<=checkRoom.x) continue;
@@ -77,7 +138,9 @@ public class MapRoom
 
         for (n=0;n!=rooms.size();n++) {
             checkRoom=rooms.get(n);
-            if (checkRoom.story!=story) continue;
+            if (!storyEqual(checkRoom)) {
+                continue;
+            }
 
             if ((x==(checkRoom.x+checkRoom.piece.sizeX)) || ((x+piece.sizeX)==checkRoom.x)) {
                 if (z>=(checkRoom.z+checkRoom.piece.sizeZ)) continue;
@@ -95,44 +158,24 @@ public class MapRoom
         return(-1);
     }
 
-    public boolean hasRoomAbove(ArrayList<MapRoom> rooms)
-    {
-        int         n;
-        MapRoom     checkRoom;
-
-        for (n=0;n!=rooms.size();n++) {
-            checkRoom=rooms.get(n);
-            if (checkRoom.story!=(story+1)) continue;
-
-            if (x>=(checkRoom.x+checkRoom.piece.sizeX)) continue;
-            if ((x+piece.sizeX)<=checkRoom.x) continue;
-            if (z>=(checkRoom.z+checkRoom.piece.sizeZ)) continue;
-            if ((z+piece.sizeZ)<=checkRoom.z) continue;
-
-            return(true);
+    public boolean touches(MapRoom room) {
+        if (!storyEqual(room)) {
+            return (false);
         }
 
-        return(false);
-    }
-
-    public boolean hasRoomBelow(ArrayList<MapRoom> rooms)
-    {
-        int         n;
-        MapRoom     checkRoom;
-
-        for (n=0;n!=rooms.size();n++) {
-            checkRoom=rooms.get(n);
-            if (checkRoom.story!=(story-1)) continue;
-
-            if (x>=(checkRoom.x+checkRoom.piece.sizeX)) continue;
-            if ((x+piece.sizeX)<=checkRoom.x) continue;
-            if (z>=(checkRoom.z+checkRoom.piece.sizeZ)) continue;
-            if ((z+piece.sizeZ)<=checkRoom.z) continue;
-
-            return(true);
+        if ((x == (room.x + room.piece.sizeX)) || ((x + piece.sizeX) == room.x)) {
+            if ((z < (room.z + room.piece.sizeZ)) || ((z + piece.sizeZ) > room.z)) {
+                return (true);
+            }
         }
 
-        return(false);
+        if ((z == (room.z + room.piece.sizeZ)) || ((z + piece.sizeZ) == room.z)) {
+            if ((x < (room.x + room.piece.sizeX)) || ((x + piece.sizeX) > room.x)) {
+                return (true);
+            }
+        }
+
+        return (false);
     }
 
         //
@@ -145,7 +188,9 @@ public class MapRoom
                     vertexCount,vertexCount2;
         float       ax,az,ax2,az2,bx,bz,bx2,bz2;
 
-        if (checkRoom.story!=story) return(false);
+        if (!storyEqual(checkRoom)) {
+            return (false);
+        }
 
             // check to see if two rooms share a wall segment
 
@@ -195,7 +240,9 @@ public class MapRoom
                             touchMin,touchMax;
         ArrayList<Float>    touchPoints;
 
-        if (checkRoom.story!=story) return(null);
+        if (!storyEqual(checkRoom)) {
+            return (null);
+        }
 
         touchPoints=new ArrayList<>();
 

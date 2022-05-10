@@ -12,10 +12,9 @@ public class MapPieceList
 {
     private List<MapPiece>          pieces;
 
-    public MapPieceList()
-    {
-        String          jsonStr;
-        File            jsonFile;
+    public MapPieceList() {
+        String jsonStr;
+        File jsonFile;
 
             // get the pieces from json in resources
             // at data/pieces.json
@@ -32,12 +31,11 @@ public class MapPieceList
         }
     }
 
-    private MapPiece dupTransformPiece(MapPiece origPiece,boolean rotate,boolean flipX,boolean flipZ)
-    {
-        int         n,k,x,z;
-        int[]       tempGrid;
-        float       f;
-        MapPiece    piece;
+    private MapPiece dupTransformPiece(MapPiece origPiece, boolean rotate, boolean flipX, boolean flipZ) {
+        int n, k, x, z;
+        int[] tempGrid;
+        float f;
+        MapPiece piece;
 
             // no change
 
@@ -100,28 +98,23 @@ public class MapPieceList
         return(piece);
     }
 
-    public MapPiece getRandomPiece()    {
-        int                 idx;
+    public MapPiece getRandomPiece() {
+        int idx;
 
         idx=AppWindow.random.nextInt(this.pieces.size());
         //idx=25;   // testing new pieces
         return(this.dupTransformPiece(this.pieces.get(idx),AppWindow.random.nextBoolean(),AppWindow.random.nextBoolean(),AppWindow.random.nextBoolean()));
     }
 
-    public MapPiece getRandomPiece2() {
+    public MapPiece createSpecificRectangularPiece(int sizeX, int sizeZ) {
         int n,x,z,idx;
-        MapPiece piece=new MapPiece();
+        MapPiece piece;
 
-        /*
-            public int sizeX,sizeZ;
-    public int[] floorGrid;
-    public float[][] vertexes;
-    public boolean decorate;
-    public String name;
-*/
-        piece.name="rect";
-        piece.sizeX=1+AppWindow.random.nextInt(10);
-        piece.sizeZ=1+AppWindow.random.nextInt(10);
+        piece = new MapPiece();
+
+        piece.name = "rect";
+        piece.sizeX = sizeX;
+        piece.sizeZ = sizeZ;
 
         piece.decorate=false;
         piece.floorGrid=new int[piece.sizeX*piece.sizeZ];
@@ -148,9 +141,6 @@ public class MapPieceList
             piece.vertexes[idx][0]=0;
             piece.vertexes[idx++][1]=z;
         }
-
-System.out.println(idx);
-
 
         return(piece);
     }

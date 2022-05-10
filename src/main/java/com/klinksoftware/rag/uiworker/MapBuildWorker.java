@@ -8,11 +8,15 @@ import javax.swing.*;
 public class MapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
+    private boolean upperFloor, lowerFloor, decorations;
 
     public static MapBuilder generatedMap = null;
 
-    public MapBuildWorker(AppWindow appWindow) {
+    public MapBuildWorker(AppWindow appWindow, boolean upperFloor, boolean lowerFloor, boolean decorations) {
         this.appWindow=appWindow;
+        this.upperFloor = upperFloor;
+        this.lowerFloor = lowerFloor;
+        this.decorations = decorations;
     }
 
     @Override
@@ -32,7 +36,7 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 
         try {
             mapBuilder = new MapBuilder();
-            mapBuilder.build();
+            mapBuilder.build(upperFloor, lowerFloor, decorations);
         }
         catch (Exception e)
         {
