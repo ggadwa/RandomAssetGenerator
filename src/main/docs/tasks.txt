@@ -1,8 +1,8 @@
 
 
 
-- extended rooms have to be squares, as is basement/upper pieces
-- upper and lower work oddly, there's some weird collisions and missing collisions
+
+
 - get rid of floorGrid ceilingGrid (grid?)
 - go back to polygon ceilings/floors
 
@@ -18,10 +18,10 @@
 
 - need to export tangents
 
-
 - dirt needs to not collide stones
 - more distinct control panels pieces (keyboard)
 - rust on metal
+- hexagons have white line
 
 
 - try jpackage

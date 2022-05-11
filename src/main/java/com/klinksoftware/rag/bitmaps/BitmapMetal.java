@@ -232,8 +232,8 @@ public class BitmapMetal extends BitmapBase
 
         hasBorder = AppWindow.random.nextFloat() > 0.7f;
 
-        xCount = 3 + (2 * AppWindow.random.nextInt(3));
-        yCount = 3 + (2 * AppWindow.random.nextInt(6));
+        xCount = 2 + (2 * AppWindow.random.nextInt(2));
+        yCount = 2 + (2 * AppWindow.random.nextInt(3));
 
         xSize=textureSize/xCount;
         ySize=textureSize/yCount;

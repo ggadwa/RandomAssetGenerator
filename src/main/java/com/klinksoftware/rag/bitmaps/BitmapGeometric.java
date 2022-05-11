@@ -89,19 +89,16 @@ public class BitmapGeometric extends BitmapBase {
         return(true);
     }
 
-    @Override
-    public void generateInternal() {
+    public void generateSingleGeometric(float normalFactor) {
         int x, y, idx, div;
         int maxPathCount, branchCount;
+        float fh, fv;
         byte[] drawBytes, drawBackup;
-        RagColor color;
-
-        color = getRandomColor();
-        drawRect(0, 0, textureSize, textureSize, color);
+        RagColor colorLft, colorRgt, colorTop, colorBot;
 
         // recurse snake draw
         drawBytes = new byte[SNAKE_PIXEL_SIZE * SNAKE_PIXEL_SIZE];
-        maxPathCount = 20 + AppWindow.random.nextInt(20);
+        maxPathCount = 25 + AppWindow.random.nextInt(25);
         branchCount = 10 + AppWindow.random.nextInt(10);
 
         recurseSnakeDraw(drawBytes, (SNAKE_PIXEL_SIZE / 2), (SNAKE_PIXEL_SIZE / 2), 0, 0, branchCount, 0, maxPathCount);
@@ -126,24 +123,51 @@ public class BitmapGeometric extends BitmapBase {
         idx = 0;
         div = textureSize / SNAKE_PIXEL_SIZE;
 
-        color = getRandomColor();
+        colorLft = getRandomColor();
+        colorRgt = getRandomColor();
+        colorTop = getRandomColor();
+        colorBot = getRandomColor();
 
         for (y = 0; y != textureSize; y++) {
             for (x = 0; x != textureSize; x++) {
                 if (drawBytes[((y / div) * SNAKE_PIXEL_SIZE) + (x / div)] == 1) {
-                    colorData[idx] = color.r;
-                    colorData[idx + 1] = color.g;
-                    colorData[idx + 2] = color.b;
 
-                    normalData[idx] = -0.65f;
-                    normalData[idx + 1] = 0.02f;
-                    normalData[idx + 2] = 0.75f;
+                    fh = (float) (textureSize - x);
+                    fv = (float) (textureSize - y);
+
+                    colorData[idx] = (((colorLft.r * (1.0f - fh)) + (colorRgt.r * fh)) * 0.5f) + (((colorTop.r * (1.0f - fv)) + (colorBot.r * fv)) * 0.5f);
+                    colorData[idx + 1] = (((colorLft.g * (1.0f - fh)) + (colorRgt.g * fh)) * 0.5f) + (((colorTop.g * (1.0f - fv)) + (colorBot.g * fv)) * 0.5f);
+                    colorData[idx + 2] = (((colorLft.b * (1.0f - fh)) + (colorRgt.b * fh)) * 0.5f) + (((colorTop.b * (1.0f - fv)) + (colorBot.b * fv)) * 0.5f);
+
+                    normalData[idx] = 0.65f * normalFactor;
+                    normalData[idx + 1] = 0.02f * normalFactor;
+                    normalData[idx + 2] = 0.75f * normalFactor;
                 }
 
                 idx += 4;
             }
+        }
+    }
 
-            adjustColor(color, (AppWindow.random.nextBoolean() ? 0.05f : 1.05f));
+    @Override
+    public void generateInternal() {
+        int n, geoCount;
+        float normalFactor;
+        RagColor color;
+
+        // background
+        color = getRandomColor();
+        drawRect(0, 0, textureSize, textureSize, color);
+        createNormalNoiseData(3.0f, 0.4f);
+        drawNormalNoiseRect(0, 0, textureSize, textureSize);
+
+        // random geometrics
+        geoCount = 1 + AppWindow.random.nextInt(3);
+        normalFactor = 1.0f;
+
+        for (n = 0; n != geoCount; n++) {
+            generateSingleGeometric(normalFactor);
+            normalFactor = -normalFactor;
         }
 
         // finish with metallic roughness

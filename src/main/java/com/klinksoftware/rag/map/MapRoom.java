@@ -164,18 +164,26 @@ public class MapRoom
         }
 
         if ((x == (room.x + room.piece.sizeX)) || ((x + piece.sizeX) == room.x)) {
-            if ((z < (room.z + room.piece.sizeZ)) || ((z + piece.sizeZ) > room.z)) {
+            if ((z < (room.z + room.piece.sizeZ)) && ((z + piece.sizeZ) > room.z)) {
                 return (true);
             }
         }
 
         if ((z == (room.z + room.piece.sizeZ)) || ((z + piece.sizeZ) == room.z)) {
-            if ((x < (room.x + room.piece.sizeX)) || ((x + piece.sizeX) > room.x)) {
+            if ((x < (room.x + room.piece.sizeX)) && ((x + piece.sizeX) > room.x)) {
                 return (true);
             }
         }
 
         return (false);
+    }
+
+    public int distance(MapRoom room) {
+        int dx, dz;
+
+        dx = Math.abs((room.x + (room.piece.sizeX / 2)) - (x + (piece.sizeX / 2)));
+        dz = Math.abs((room.z + (room.piece.sizeZ / 2)) - (z + (piece.sizeZ / 2)));
+        return ((int) Math.sqrt((dx * dx) + (dz * dz)));
     }
 
         //

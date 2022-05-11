@@ -11,7 +11,8 @@ import java.util.*;
 
 public class MapBuilder
 {
-    public static final int ROOM_RANDOM_LOCATION_DISTANCE=100;
+    public static final int ROOM_RANDOM_LOCATION_DISTANCE = 100;
+    public static final int UPPER_LOWER_FLOOR_MAX_DISTANCE = 20;
     public static final float SEGMENT_SIZE=10.0f;
     public static final float FLOOR_HEIGHT=1.0f;
 
@@ -419,22 +420,27 @@ public class MapBuilder
 
     private void addUpperOrLowerFloor(ArrayList<MapRoom> rooms, boolean upper) {
         int roomStartIdx, roomEndIdx;
-        int x, z, xDif, zDif, sizeX, sizeZ;
+        int lx, rx, tz, bz, x, z, xDif, zDif, sizeX, sizeZ;
         MapRoom startRoom, endRoom, room, nextRoom;
 
-        // get a start and end room for floor
+        // get a start room for floor
         roomStartIdx = AppWindow.random.nextInt(rooms.size());
+        startRoom = rooms.get(roomStartIdx);
 
+        // find an end room that's close
         while (true) {
             roomEndIdx = AppWindow.random.nextInt(rooms.size());
-            if (roomEndIdx != roomStartIdx) {
+            if (roomEndIdx == roomStartIdx) {
+                continue;
+            }
+
+            if (startRoom.distance(rooms.get(roomEndIdx)) < UPPER_LOWER_FLOOR_MAX_DISTANCE) {
                 break;
             }
         }
 
         // need to switch rooms with rectangular rooms
         // so they are eaiser to connect and add stairs
-        startRoom = rooms.get(roomStartIdx);
         startRoom.changePiece(mapPieceList.createSpecificRectangularPiece(startRoom.piece.sizeX, startRoom.piece.sizeZ));
 
         endRoom = rooms.get(roomEndIdx);
@@ -452,7 +458,7 @@ public class MapBuilder
             rooms.add(startRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION));
             rooms.add(endRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION));
         }
-        /*
+
         // walk along with rectangles until we connect
         room = startRoom;
 
@@ -462,41 +468,33 @@ public class MapBuilder
             }
 
             // walk along until we connect
-            xDif = Math.abs(room.x - endRoom.x);
-            zDif = Math.abs(room.z - endRoom.z);
+            xDif = Math.abs((room.x + (room.piece.sizeX / 2)) - (endRoom.x + (endRoom.piece.sizeX / 2)));
+            zDif = Math.abs((room.z + (room.piece.sizeZ / 2)) - (endRoom.z + (endRoom.piece.sizeZ / 2)));
 
             if (xDif > zDif) {
-                sizeZ = room.piece.sizeZ;
-                if (sizeZ > zDif) {
-                    //sizeZ = zDif;
-                }
-                sizeX = xDif;
-                if (sizeX > 10) {
-                    sizeX = 10;
-                }
-
                 if (endRoom.x < room.x) {
-                    x = room.x - sizeX;
+                    x = endRoom.x + endRoom.piece.sizeX;
+                    sizeX = room.x - x;
                 } else {
                     x = room.x + room.piece.sizeX;
+                    sizeX = endRoom.x - x;
                 }
                 z = room.z;
+                sizeZ = room.piece.sizeZ;
             } else {
-                sizeX = room.piece.sizeX;
-                if (sizeX > xDif) {
-                    //sizeX = xDif;
-                }
-                sizeZ = zDif;
-                if (sizeZ > 10) {
-                    sizeZ = 10;
-                }
-
                 if (endRoom.z < room.z) {
-                    z = room.z - sizeZ;
+                    z = endRoom.z + endRoom.piece.sizeZ;
+                    sizeZ = room.z - z;
                 } else {
                     z = room.z + room.piece.sizeZ;
+                    sizeZ = endRoom.z - z;
                 }
                 x = room.x;
+                sizeX = room.piece.sizeX;
+            }
+
+            if ((sizeX <= 0) || (sizeZ <= 0)) {
+                break;
             }
 
             nextRoom = new MapRoom(mapPieceList.createSpecificRectangularPiece(sizeX, sizeZ));
@@ -513,7 +511,6 @@ public class MapBuilder
 
             room = nextRoom;
         }
-         */
     }
 
     //

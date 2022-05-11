@@ -34,13 +34,13 @@ public class BitmapGrass extends BitmapDirt {
             // line half from top
             x2 = x + AppWindow.random.nextInt(xMove * 2) - xMove;
             y = halfSize + AppWindow.random.nextInt(halfSize);
-            drawRandomLine(x, 0, x2, (y + 5), 0, 0, textureSize, textureSize, 10, lineColor, false);
+            drawLineColor(x, 0, x2, (y + 5), lineColor);
             drawLineNormal(x, 0, x2, (y + 5), ((x & 0x1) == 0x0) ? NORMAL_BOTTOM_RIGHT_45 : NORMAL_TOP_LEFT_45);
 
             // line half from bottom
             x2 = x + AppWindow.random.nextInt(xMove * 2) - xMove;
             y = textureSize - (halfSize + AppWindow.random.nextInt(halfSize));
-            drawRandomLine(x2, (y - 5), x, textureSize, 0, 0, textureSize, textureSize, 10, lineColor, false);
+            drawLineColor(x2, (y - 5), x, textureSize, lineColor);
             drawLineNormal(x2, (y - 5), x, textureSize, ((x & 0x1) == 0x0) ? NORMAL_TOP_LEFT_45 : NORMAL_BOTTOM_RIGHT_45);
         }
 
