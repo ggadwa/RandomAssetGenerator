@@ -29,7 +29,7 @@ public class SoundBuildWorker extends SwingWorker<Integer, Void> {
         AppWindow.random.setSeed(seed);
 
         try {
-            sound = (SoundBase) (Class.forName("com.klinksoftware.rag.sound.Sound" + soundName.replace(" ", ""))).getConstructor(null).newInstance(null);
+            sound = (SoundBase) (Class.forName("com.klinksoftware.rag.sound.Sound" + soundName.replace(" ", ""))).getConstructor().newInstance();
             sound.generate();
         } catch (Exception e) {
             e.printStackTrace();

@@ -420,30 +420,36 @@ public class MapBuilder
 
     private void addUpperOrLowerFloor(ArrayList<MapRoom> rooms, boolean upper) {
         int roomStartIdx, roomEndIdx;
-        int lx, rx, tz, bz, x, z, xDif, zDif, sizeX, sizeZ;
+        int x, z, xDif, zDif, sizeX, sizeZ;
         MapRoom startRoom, endRoom, room, nextRoom;
 
-        // get a start room for floor
-        roomStartIdx = AppWindow.random.nextInt(rooms.size());
-        startRoom = rooms.get(roomStartIdx);
+        // get a start room for floor (only from main rooms)
+        while (true) {
+            roomStartIdx = AppWindow.random.nextInt(rooms.size());
+            startRoom = rooms.get(roomStartIdx);
+            if (startRoom.story == MapRoom.ROOM_STORY_MAIN) {
+                break;
+            }
+        }
 
-        // find an end room that's close
+        // find an end room that's close and only a main room
         while (true) {
             roomEndIdx = AppWindow.random.nextInt(rooms.size());
             if (roomEndIdx == roomStartIdx) {
                 continue;
             }
 
-            if (startRoom.distance(rooms.get(roomEndIdx)) < UPPER_LOWER_FLOOR_MAX_DISTANCE) {
-                break;
+            endRoom = rooms.get(roomEndIdx);
+            if (endRoom.story == MapRoom.ROOM_STORY_MAIN) {
+                if (startRoom.distance(endRoom) < UPPER_LOWER_FLOOR_MAX_DISTANCE) {
+                    break;
+                }
             }
         }
 
         // need to switch rooms with rectangular rooms
         // so they are eaiser to connect and add stairs
         startRoom.changePiece(mapPieceList.createSpecificRectangularPiece(startRoom.piece.sizeX, startRoom.piece.sizeZ));
-
-        endRoom = rooms.get(roomEndIdx);
         endRoom.changePiece(mapPieceList.createSpecificRectangularPiece(endRoom.piece.sizeX, endRoom.piece.sizeZ));
 
         // add the new rooms
@@ -525,35 +531,35 @@ public class MapBuilder
         BitmapBase bitmap;
 
         try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
             bitmap.generate();
             bitmaps.put("wall_main", bitmap);
 
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
             bitmap.generate();
             bitmaps.put("wall_upper", bitmap);
 
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
             bitmap.generate();
             bitmaps.put("wall_lower", bitmap);
 
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + floorBitmaps[AppWindow.random.nextInt(floorBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + floorBitmaps[AppWindow.random.nextInt(floorBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
             bitmap.generate();
             bitmaps.put("floor", bitmap);
 
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + floorBitmaps[AppWindow.random.nextInt(floorBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + floorBitmaps[AppWindow.random.nextInt(floorBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
             bitmap.generate();
             bitmaps.put("floor_lower", bitmap);
 
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + ceilingBitmaps[AppWindow.random.nextInt(ceilingBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + ceilingBitmaps[AppWindow.random.nextInt(ceilingBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
             bitmap.generate();
             bitmaps.put("ceiling", bitmap);
 
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + ceilingBitmaps[AppWindow.random.nextInt(ceilingBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + ceilingBitmaps[AppWindow.random.nextInt(ceilingBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
             bitmap.generate();
             bitmaps.put("ceiling_upper", bitmap);
 
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + platformBitmaps[AppWindow.random.nextInt(platformBitmaps.length)].replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + platformBitmaps[AppWindow.random.nextInt(platformBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
             bitmap.generate();
             bitmaps.put("platform", bitmap);
 
@@ -618,6 +624,17 @@ public class MapBuilder
                 // decorations
 
             if ((room.piece.decorate) && (decorations)) this.buildDecoration(room,n);
+        }
+
+        // any platforms
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+            if (room.hasUpperExtension) {
+                (new MapPlatform(meshList, room, n)).build(true);
+            }
+            if (room.hasLowerExtension) {
+                (new MapPlatform(meshList, room, n)).build(false);
+            }
         }
 
             // any steps

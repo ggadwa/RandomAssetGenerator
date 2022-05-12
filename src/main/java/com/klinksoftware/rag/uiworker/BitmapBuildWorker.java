@@ -32,7 +32,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         AppWindow.random.setSeed(seed);
 
         try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + bitmapName.replace(" ", ""))).getConstructor(null).newInstance(null);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + bitmapName.replace(" ", ""))).getConstructor().newInstance();
             bitmap.generate();
         } catch (Exception e) {
             e.printStackTrace();
