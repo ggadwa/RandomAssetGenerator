@@ -255,15 +255,14 @@ public class MapBuilder
         // build main floor
         //
 
-    private void addMainFloor(ArrayList<MapRoom> rooms, int roomCount, int roomExtensionCount) {
+    private void addMainFloor(ArrayList<MapRoom> rooms, int roomCount, int roomExtensionCount, float mapCompactFactor, boolean complex) {
         int n, placeCount, moveCount, failCount, touchIdx, firstRoomIdx, endRoomIdx;
         float origX, origZ, xAdd, zAdd;
         MapRoom room, lastRoom, connectRoom;
 
-            // first room is alone so it
-            // always can be laid down
-
-        room=new MapRoom(mapPieceList.getRandomPiece());
+        // first room is alone so it
+        // always can be laid down
+        room = new MapRoom(mapPieceList.getRandomPiece(1.0f, complex));
         room.x = 0;
         room.z = 0;
 
@@ -277,7 +276,7 @@ public class MapBuilder
         firstRoomIdx=rooms.size();
 
         for (n=0;n!=roomCount;n++) {
-            room=new MapRoom(mapPieceList.getRandomPiece());
+            room = new MapRoom(mapPieceList.getRandomPiece(mapCompactFactor, complex));
             room.story = MapRoom.ROOM_STORY_MAIN;
 
             failCount=25;
@@ -369,7 +368,7 @@ public class MapBuilder
             // these rooms try to attach to existing rooms
 
         for (n=0;n!=roomExtensionCount;n++) {
-            room=new MapRoom(mapPieceList.getRandomPiece());
+            room = new MapRoom(mapPieceList.getRandomPiece(1.0f, complex));
             room.story = MapRoom.ROOM_STORY_MAIN;
 
             failCount=25;
@@ -427,42 +426,58 @@ public class MapBuilder
         while (true) {
             roomStartIdx = AppWindow.random.nextInt(rooms.size());
             startRoom = rooms.get(roomStartIdx);
-            if (startRoom.story == MapRoom.ROOM_STORY_MAIN) {
+            if ((startRoom.story == MapRoom.ROOM_STORY_MAIN) && (startRoom.piece.sizeX >= 5) && (startRoom.piece.sizeZ >= 5)) {
                 break;
             }
         }
 
         // find an end room that's close and only a main room
-        while (true) {
-            roomEndIdx = AppWindow.random.nextInt(rooms.size());
-            if (roomEndIdx == roomStartIdx) {
-                continue;
-            }
+        // sometimes we don't have one, and just a single room
+        endRoom = null;
 
-            endRoom = rooms.get(roomEndIdx);
-            if (endRoom.story == MapRoom.ROOM_STORY_MAIN) {
-                if (startRoom.distance(endRoom) < UPPER_LOWER_FLOOR_MAX_DISTANCE) {
-                    break;
+        if (AppWindow.random.nextFloat() > 0.25f) {
+            while (true) {
+                roomEndIdx = AppWindow.random.nextInt(rooms.size());
+                if (roomEndIdx == roomStartIdx) {
+                    continue;
+                }
+
+                endRoom = rooms.get(roomEndIdx);
+                if ((endRoom.story == MapRoom.ROOM_STORY_MAIN) && (endRoom.piece.sizeX >= 5) && (endRoom.piece.sizeZ >= 5)) {
+                    if (startRoom.distance(endRoom) < UPPER_LOWER_FLOOR_MAX_DISTANCE) {
+                        break;
+                    }
                 }
             }
         }
 
         // need to switch rooms with rectangular rooms
         // so they are eaiser to connect and add stairs
-        startRoom.changePiece(mapPieceList.createSpecificRectangularPiece(startRoom.piece.sizeX, startRoom.piece.sizeZ));
-        endRoom.changePiece(mapPieceList.createSpecificRectangularPiece(endRoom.piece.sizeX, endRoom.piece.sizeZ));
+        startRoom.changePiece(mapPieceList.createSpecificRectangularPiece(startRoom.piece.sizeX, startRoom.piece.sizeZ, false));
+        if (endRoom != null) {
+            endRoom.changePiece(mapPieceList.createSpecificRectangularPiece(endRoom.piece.sizeX, endRoom.piece.sizeZ, false));
+        }
 
         // add the new rooms
         if (upper) {
             startRoom.hasUpperExtension = true;
-            endRoom.hasUpperExtension = true;
             rooms.add(startRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION));
-            rooms.add(endRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION));
+
+            if (endRoom != null) {
+                endRoom.hasUpperExtension = true;
+                rooms.add(endRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION));
+            }
         } else {
             startRoom.hasLowerExtension = true;
-            endRoom.hasLowerExtension = true;
             rooms.add(startRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION));
-            rooms.add(endRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION));
+            if (endRoom != null) {
+                endRoom.hasLowerExtension = true;
+                rooms.add(endRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION));
+            }
+        }
+
+        if (endRoom == null) {
+            return;
         }
 
         // walk along with rectangles until we connect
@@ -503,7 +518,7 @@ public class MapBuilder
                 break;
             }
 
-            nextRoom = new MapRoom(mapPieceList.createSpecificRectangularPiece(sizeX, sizeZ));
+            nextRoom = new MapRoom(mapPieceList.createSpecificRectangularPiece(sizeX, sizeZ, true));
             nextRoom.x = x;
             nextRoom.z = z;
             nextRoom.story = upper ? MapRoom.ROOM_STORY_UPPER : MapRoom.ROOM_STORY_LOWER;
@@ -572,7 +587,7 @@ public class MapBuilder
         // build a map
         //
 
-    public void build(boolean upperFloor, boolean lowerFloor, boolean decorations) {
+    public void build(float mapSize, float mapCompactFactor, boolean complex, boolean upperFloor, boolean lowerFloor, boolean decorations) {
         int n, k, roomCount, roomExtensionCount;
         RagPoint centerPnt;
         MapRoom room;
@@ -585,10 +600,10 @@ public class MapBuilder
         meshList=new MeshList();
 
         // the main floor
-        roomCount = 10 + AppWindow.random.nextInt(15);
-        roomExtensionCount=AppWindow.random.nextInt(5);
+        roomCount = 1 + (int) (50.0f * mapSize);
+        roomExtensionCount = AppWindow.random.nextInt(roomCount / 10);
 
-        addMainFloor(rooms, roomCount, roomExtensionCount);
+        addMainFloor(rooms, roomCount, roomExtensionCount, mapCompactFactor, complex);
 
         // upper floor
         if (upperFloor) {

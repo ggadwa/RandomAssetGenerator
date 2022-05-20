@@ -41,7 +41,7 @@ public class BitmapGrass extends BitmapDirt {
             x2 = x + AppWindow.random.nextInt(xMove * 2) - xMove;
             y = textureSize - (halfSize + AppWindow.random.nextInt(halfSize));
             drawLineColor(x2, (y - 5), x, textureSize, lineColor);
-            drawLineNormal(x2, (y - 5), x, textureSize, ((x & 0x1) == 0x0) ? NORMAL_TOP_LEFT_45 : NORMAL_BOTTOM_RIGHT_45);
+            drawLineNormal(x2, (y - 5), x, textureSize, ((x & 0x1) == 0x0) ? NORMAL_BOTTOM_RIGHT_45 : NORMAL_TOP_LEFT_45);
         }
 
         // finish with the metallic-roughness

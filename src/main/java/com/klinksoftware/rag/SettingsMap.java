@@ -4,6 +4,7 @@ import com.klinksoftware.rag.uiworker.MapBuildWorker;
 import com.klinksoftware.rag.uiworker.MapExportWorker;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JSlider;
 
 public class SettingsMap extends SettingsBase {
 
@@ -11,7 +12,8 @@ public class SettingsMap extends SettingsBase {
     private static final int BUTTON_EXPORT_MAP = 1;
 
     private JButton generateMapButton, exportMapButton;
-    private JCheckBox upperFloorCheckBox, lowerFloorCheckBox, decorationsCheckBox;
+    private JSlider sizeSlider, compactSlider;
+    private JCheckBox complexCheckBox, upperFloorCheckBox, lowerFloorCheckBox, decorationsCheckBox;
 
     public SettingsMap(AppWindow appWindow) {
         super(appWindow);
@@ -23,6 +25,15 @@ public class SettingsMap extends SettingsBase {
         y = 0;
 
         generateMapButton = addButton(y, "Generate Map", BUTTON_GENERATE_MAP);
+        y += (ROW_HEIGHT + ROW_GAP);
+
+        sizeSlider = addSlider(y, "Size", 0.6f);
+        y += (ROW_HEIGHT + ROW_GAP);
+
+        compactSlider = addSlider(y, "Compact", 0.6f);
+        y += (ROW_HEIGHT + ROW_GAP);
+
+        complexCheckBox = addCheckBox(y, "Complex", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
         upperFloorCheckBox = addCheckBox(y, "Upper Floor", true);
@@ -41,7 +52,15 @@ public class SettingsMap extends SettingsBase {
     public void buttonClick(int id) {
         switch (id) {
             case BUTTON_GENERATE_MAP:
-                (new MapBuildWorker(appWindow, upperFloorCheckBox.isSelected(), lowerFloorCheckBox.isSelected(), decorationsCheckBox.isSelected())).execute();
+                (new MapBuildWorker(
+                        appWindow,
+                        ((float) sizeSlider.getValue() / 100.0f),
+                        ((float) compactSlider.getValue() / 100.0f),
+                        complexCheckBox.isSelected(),
+                        upperFloorCheckBox.isSelected(),
+                        lowerFloorCheckBox.isSelected(),
+                        decorationsCheckBox.isSelected()
+                )).execute();
                 return;
             case BUTTON_EXPORT_MAP:
                 (new MapExportWorker(appWindow)).execute();

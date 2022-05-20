@@ -98,15 +98,31 @@ public class MapPieceList
         return(piece);
     }
 
-    public MapPiece getRandomPiece() {
+    public MapPiece getRandomPiece(float mapCompactFactor, boolean complex) {
         int idx;
 
-        idx=AppWindow.random.nextInt(this.pieces.size());
-        //idx=25;   // testing new pieces
-        return(this.dupTransformPiece(this.pieces.get(idx),AppWindow.random.nextBoolean(),AppWindow.random.nextBoolean(),AppWindow.random.nextBoolean()));
+        // compact factor determines how many hallways there ends up
+        // being (less hallways = more compact)
+        if (AppWindow.random.nextFloat() > mapCompactFactor) {
+            if (AppWindow.random.nextBoolean()) {
+                return (createSpecificRectangularPiece((1 + AppWindow.random.nextInt(1)), (4 + AppWindow.random.nextInt(6)), false));
+            } else {
+                return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (1 + AppWindow.random.nextInt(1)), false));
+            }
+        }
+
+        // complex rooms pick from any of the random shapes
+        if (complex) {
+            idx = AppWindow.random.nextInt(this.pieces.size());
+            //idx=25;   // testing new pieces
+            return (this.dupTransformPiece(this.pieces.get(idx), AppWindow.random.nextBoolean(), AppWindow.random.nextBoolean(), AppWindow.random.nextBoolean()));
+        }
+
+        // non-complex are always rectangles
+        return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (4 + AppWindow.random.nextInt(6)), true));
     }
 
-    public MapPiece createSpecificRectangularPiece(int sizeX, int sizeZ) {
+    public MapPiece createSpecificRectangularPiece(int sizeX, int sizeZ, boolean decorate) {
         int n,x,z,idx;
         MapPiece piece;
 
@@ -116,7 +132,7 @@ public class MapPieceList
         piece.sizeX = sizeX;
         piece.sizeZ = sizeZ;
 
-        piece.decorate=false;
+        piece.decorate = decorate;
         piece.floorGrid=new int[piece.sizeX*piece.sizeZ];
         for (n=0;n!=(piece.sizeX*piece.sizeZ);n++) {
             piece.floorGrid[n]=1;

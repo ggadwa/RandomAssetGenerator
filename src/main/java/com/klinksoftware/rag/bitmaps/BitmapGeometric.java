@@ -2,6 +2,7 @@ package com.klinksoftware.rag.bitmaps;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
+import org.apache.commons.math3.complex.Complex;
 
 public class BitmapGeometric extends BitmapBase {
 
@@ -16,6 +17,9 @@ public class BitmapGeometric extends BitmapBase {
         hasAlpha = false;
     }
 
+    //
+    // snake geometric
+    //
     private void recurseSnakeDraw(byte[] drawBytes, int x, int y, int dx, int dy, int branchCount, int pathCount, int maxPathCount) {
         int n;
         int offset;
@@ -47,7 +51,7 @@ public class BitmapGeometric extends BitmapBase {
         recurseSnakeDraw(drawBytes, (x + 1), y, 1, 0, branchCount, (1 + AppWindow.random.nextInt(maxPathCount)), maxPathCount);
     }
 
-    private boolean floodFill(byte[] drawBytes, int x, int y, int recurseCount)    {
+    private boolean snakeFloodFill(byte[] drawBytes, int x, int y, int recurseCount) {
         if (recurseCount > SNAKE_PIXEL_SIZE) {
             return (false);
         }
@@ -59,28 +63,28 @@ public class BitmapGeometric extends BitmapBase {
 
         if (y>0) {
             if (drawBytes[((y - 1) * SNAKE_PIXEL_SIZE) + x] == 0) {
-                if (!floodFill(drawBytes, x, (y - 1), (recurseCount + 1))) {
+                if (!snakeFloodFill(drawBytes, x, (y - 1), (recurseCount + 1))) {
                     return (false);
                 }
             }
         }
         if (y < (SNAKE_PIXEL_SIZE - 1)) {
             if (drawBytes[((y + 1) * SNAKE_PIXEL_SIZE) + x] == 0) {
-                if (!floodFill(drawBytes, x, (y + 1), (recurseCount + 1))) {
+                if (!snakeFloodFill(drawBytes, x, (y + 1), (recurseCount + 1))) {
                     return (false);
                 }
             }
         }
         if (x>0) {
             if (drawBytes[(y * SNAKE_PIXEL_SIZE) + (x - 1)] == 0) {
-                if (!floodFill(drawBytes, (x - 1), y, (recurseCount + 1))) {
+                if (!snakeFloodFill(drawBytes, (x - 1), y, (recurseCount + 1))) {
                     return (false);
                 }
             }
         }
         if (x < (SNAKE_PIXEL_SIZE - 1)) {
             if (drawBytes[(y * SNAKE_PIXEL_SIZE) + (x + 1)] == 0) {
-                if (!floodFill(drawBytes, (x + 1), y, (recurseCount + 1))) {
+                if (!snakeFloodFill(drawBytes, (x + 1), y, (recurseCount + 1))) {
                     return (false);
                 }
             }
@@ -89,7 +93,7 @@ public class BitmapGeometric extends BitmapBase {
         return(true);
     }
 
-    public void generateSingleGeometric(float normalFactor) {
+    public void generateSingleSnakeGeometric(float normalFactor) {
         int x, y, idx, div;
         int maxPathCount, branchCount;
         float fh, fv;
@@ -113,7 +117,7 @@ public class BitmapGeometric extends BitmapBase {
                 }
 
                 System.arraycopy(drawBytes, 0, drawBackup, 0, drawBytes.length);
-                if (!floodFill(drawBytes, x, y, 0)) {
+                if (!snakeFloodFill(drawBytes, x, y, 0)) {
                     System.arraycopy(drawBackup, 0, drawBytes, 0, drawBytes.length);
                 }
             }
@@ -149,15 +153,10 @@ public class BitmapGeometric extends BitmapBase {
         }
     }
 
-    @Override
-    public void generateInternal() {
+    private void snakeGeometric() {
         int n, geoCount;
         float normalFactor;
-        RagColor color;
 
-        // background
-        color = getRandomColor();
-        drawRect(0, 0, textureSize, textureSize, color);
         createNormalNoiseData(3.0f, 0.4f);
         drawNormalNoiseRect(0, 0, textureSize, textureSize);
 
@@ -166,9 +165,105 @@ public class BitmapGeometric extends BitmapBase {
         normalFactor = 1.0f;
 
         for (n = 0; n != geoCount; n++) {
-            generateSingleGeometric(normalFactor);
+            generateSingleSnakeGeometric(normalFactor);
             normalFactor = -normalFactor;
         }
+    }
+
+    //
+    // madelbrot
+    //
+    private int mand(Complex zc, int max) {
+        int t;
+        Complex zc2;
+
+        zc2 = zc;
+
+        for (t = 0; t < max; t++) {
+            if (zc2.abs() > 2.0) {
+                return (t);
+            }
+            zc2 = zc2.multiply(zc2).add(zc);
+        }
+        return (max);
+    }
+
+    private void mandelbrotGeometric() {
+        int n, x, y, colorIdx, idx;
+        int max;
+        float normalFactor;
+        double dx, dy, mid, sz, zoom, xOff, yOff;
+        Complex zc;
+        RagColor[] colors;
+        RagColor color2;
+
+        sz = (double) textureSize;
+        mid = sz * 0.5;
+        max = 255;
+
+        colors = new RagColor[8];
+        for (n = 0; n != 8; n++) {
+            colors[n] = getRandomColor();
+        }
+
+        zoom = (0.3 + AppWindow.random.nextDouble(1.5)) / sz;
+        xOff = AppWindow.random.nextDouble(2.0f) - 1.0f;
+        yOff = AppWindow.random.nextDouble(2.0f) - 1.0f;
+
+        for (x = 0; x != textureSize; x++) {
+            for (y = 0; y != textureSize; y++) {
+                dx = (((double) x - mid) * zoom) + xOff;
+                dy = (((double) y - mid) * zoom) + yOff;
+                zc = new Complex(dx, dy);
+
+                colorIdx = mand(zc, max);
+                if (colorIdx >= max) {
+                    continue;
+                }
+
+                color2 = colors[colorIdx % 8];
+
+                idx = ((y * textureSize) + x) * 4;
+                colorData[idx] = color2.r;
+                colorData[idx + 1] = color2.g;
+                colorData[idx + 2] = color2.b;
+
+                normalFactor = ((float) colorIdx / 8.0f);
+                normalData[idx] = 0.65f * normalFactor;
+                normalData[idx + 1] = 0.02f * normalFactor;
+                normalData[idx + 2] = 0.75f * normalFactor;
+            }
+        }
+    }
+
+    //
+    // borders
+    //
+    private void generateBorder(RagColor color) {
+
+    }
+
+    @Override
+    public void generateInternal() {
+        RagColor color;
+
+        // background
+        color = getRandomColor();
+        drawRect(0, 0, textureSize, textureSize, color);
+
+        // geometric
+        switch (AppWindow.random.nextInt(2)) {
+            case 0:
+                snakeGeometric();
+                break;
+            case 1:
+                mandelbrotGeometric();
+                break;
+        }
+
+        // frame
+        color = adjustColor(color, (0.6f + AppWindow.random.nextFloat(0.2f)));
+        draw3DFrameRect(0, 0, textureSize, textureSize, (2 + AppWindow.random.nextInt(8)), color, true);
 
         // finish with metallic roughness
         createMetallicRoughnessMap((0.1f + AppWindow.random.nextFloat(0.6f)), 0.5f);

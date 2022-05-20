@@ -1,17 +1,13 @@
 
 
-
-
+- fix upper/lower connections
+- need stairs and proper platforms
 
 - get rid of floorGrid ceilingGrid (grid?)
 - go back to polygon ceilings/floors
 
-- map has complexity slider, at 0 = all squares, then percentage of when it picks (random) square vs piece
-- map has a size slider (# of rooms, extensions)
-- map has compact checkbox (if there are hallways or not)
-- each has a simple/complex flag (only hallways or squares or anything)
 
-
+- uv map models
 
 - monster sound effect is bad
 - more sound effects
