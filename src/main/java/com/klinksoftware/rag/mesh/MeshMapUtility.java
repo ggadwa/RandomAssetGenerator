@@ -650,24 +650,19 @@ public class MeshMapUtility
         // staircases
         //
 
-    public static void buildStairs(MeshList meshList,MapRoom room,String name,float x,float y,float z,int dir,float stepWidth,boolean sides)
-    {
-        /*
-        int                 n,trigIdx;
-        float               sx,sx2,sy,sz,sz2,
-                            stepSize,stepHigh;
-        ArrayList<Float>    vertexArray;
-        ArrayList<Integer>  indexArray;
-        int[]               indexes;
-        float[]             vertexes,normals,uvs;
-        RagPoint            centerPnt;
-
-        //if (dir==STAIR_DIR_POS_Z) return;
+    public static void buildStairs(MeshList meshList, MapRoom room, String name, float x, float y, float z, int dir, float stepWidth, boolean sides) {
+        int n, trigIdx;
+        float sx, sx2, sy, sz, sz2, stepSize, stepHigh;
+        ArrayList<Float> vertexArray;
+        ArrayList<Integer> indexArray;
+        int[] indexes;
+        float[] vertexes, normals, tangents, uvs;
+        RagPoint centerPnt;
 
             // step sizes
 
         stepSize=(MapBuilder.SEGMENT_SIZE*2.0f)/(float)STAIR_STEP_COUNT;
-        stepHigh=MapBuilder.SEGMENT_SIZE/(float)STAIR_STEP_COUNT;
+        stepHigh = (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT) / (float) STAIR_STEP_COUNT;
 
         centerPnt=null;
 
@@ -686,13 +681,13 @@ public class MeshMapUtility
             case STAIR_DIR_NEG_Z:
                 sx=x;
                 sx2=sx+(MapBuilder.SEGMENT_SIZE*stepWidth);
-                centerPnt=new RagPoint((x+(MapBuilder.SEGMENT_SIZE*0.5f)),room.offset.y,(z+MapBuilder.SEGMENT_SIZE));
+                centerPnt = new RagPoint((x + (MapBuilder.SEGMENT_SIZE * 0.5f)), y, (z + MapBuilder.SEGMENT_SIZE));
                 break;
             case STAIR_DIR_POS_X:
             case STAIR_DIR_NEG_X:
                 sz=z;
                 sz2=sz+(MapBuilder.SEGMENT_SIZE*stepWidth);
-                centerPnt=new RagPoint((x+MapBuilder.SEGMENT_SIZE),room.offset.y,(z+(MapBuilder.SEGMENT_SIZE*0.5f)));
+                centerPnt = new RagPoint((x + MapBuilder.SEGMENT_SIZE), y, (z + (MapBuilder.SEGMENT_SIZE * 0.5f)));
                 break;
         }
 
@@ -769,7 +764,7 @@ public class MeshMapUtility
             // step back
 
         if (sides) {
-            sy=y+MapBuilder.SEGMENT_SIZE;
+            sy = y + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT);
 
             switch (dir) {
                 case STAIR_DIR_POS_Z:
@@ -802,11 +797,10 @@ public class MeshMapUtility
         vertexes=floatArrayListToFloat(vertexArray);
         indexes=intArrayListToInt(indexArray);
         normals=MeshMapUtility.buildNormals(vertexes,indexes,centerPnt,false);
-        uvs=MeshMapUtility.buildUVs(vertexes,normals,(1.0f/MapBuilder.SEGMENT_SIZE));
-        MeshMapUtility.buildTangents(vertexes,uvs,indexes);
+        uvs = MeshMapUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
+        tangents = MeshMapUtility.buildTangents(vertexes, uvs, indexes);
 
-        meshList.add(new Mesh(name,"step",vertexes,normals,uvs,indexes));
-*/
+        meshList.add(new Mesh(name, "platform", vertexes, normals, tangents, uvs, indexes));
     }
 
         //

@@ -1,13 +1,17 @@
 
 
-- fix upper/lower connections
-- need stairs and proper platforms
+- change monster -> fur & scale
+- make scale much better
+- make model bitmap maker that compresses other textures into four square
 
+- fix upper/lower connections
+- need platform knock outs
 - get rid of floorGrid ceilingGrid (grid?)
 - go back to polygon ceilings/floors
 
 
 - uv map models
+- make arm sizes = to size of torso bone to top torso etc, same with legs
 
 - monster sound effect is bad
 - more sound effects

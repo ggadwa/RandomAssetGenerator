@@ -202,13 +202,13 @@ public class AppWindow implements WindowListener {
                 }
 
                 @Override
-                public void keyPressed(KeyEvent e) {
-                    walkView.keyPress(e.getKeyChar());
+                    public void keyPressed(KeyEvent e) {
+                    walkView.keyPress(e.getKeyCode());
                 }
 
                 @Override
                 public void keyReleased(KeyEvent e) {
-                    walkView.keyRelease(e.getKeyChar());
+                    walkView.keyRelease(e.getKeyCode());
                 }
             });
 

@@ -66,9 +66,8 @@ public class Mesh
         center.z=center.z/f;
     }
 
-    public void makeVertexesRelativeToPoint(RagPoint pnt)
-    {
-        int         n;
+    public void makeVertexesRelativeToPoint(RagPoint pnt) {
+        int n;
 
         for (n=0;n<vertexes.length;n+=3) {
             vertexes[n]-=pnt.x;
@@ -77,21 +76,19 @@ public class Mesh
         }
     }
 
-    public void transformUVs(float uAdd,float vAdd,float uReduce,float vReduce)
-    {
-        int         n;
+    public void transformUVs(float uAdd, float vAdd, float uReduce, float vReduce) {
+        int n;
 
         for (n=0;n<uvs.length;n+=2) {
-            uvs[n]=(uvs[n]*uReduce)+uAdd;
-            uvs[n+1]=(uvs[n+1]*uReduce)+uAdd;
+            uvs[n] = (uvs[n] * uReduce) + uAdd;
+            uvs[n + 1] = (uvs[n + 1] * vReduce) + vAdd;
         }
     }
 
-    public void combine(Mesh mesh)
-    {
-        int         n,idx,indexOffset;
-        int[]       indexes2;
-        float[]     vertexes2,normals2,uvs2;
+    public void combine(Mesh mesh) {
+        int n, idx, indexOffset;
+        int[] indexes2;
+        float[] vertexes2, normals2, uvs2;
 
             // combine the arrays
 

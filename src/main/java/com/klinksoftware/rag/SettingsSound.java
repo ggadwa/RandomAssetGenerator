@@ -4,7 +4,7 @@ import com.klinksoftware.rag.uiworker.SoundBuildWorker;
 import com.klinksoftware.rag.uiworker.SoundExportWorker;
 import com.klinksoftware.rag.uiworker.SoundPlayAgainWorker;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JList;
 
 public class SettingsSound extends SettingsBase {
 
@@ -15,7 +15,7 @@ public class SettingsSound extends SettingsBase {
     private static final String[] SOUND_ITEMS = {"Alien", "Bang", "Explosion", "Monster"};
 
     private JButton generateSoundButton, playAgainButton, exportSoundButton;
-    private JComboBox soundTypeCombo;
+    private JList soundTypeList;
 
     public SettingsSound(AppWindow appWindow) {
         super(appWindow);
@@ -32,8 +32,8 @@ public class SettingsSound extends SettingsBase {
         playAgainButton = addButton(y, "Play Again", BUTTON_PLAY_AGAIN);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        soundTypeCombo = addComboBox(y, "Sound Type", SOUND_ITEMS, 0);
-        y += (ROW_HEIGHT + ROW_GAP);
+        soundTypeList = addList(y, "Sound Type", SOUND_ITEMS, 0);
+        y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         exportSoundButton = addButton(y, "Export Sound", BUTTON_EXPORT_SOUND);
     }
@@ -42,7 +42,7 @@ public class SettingsSound extends SettingsBase {
     public void buttonClick(int id) {
         switch (id) {
             case BUTTON_GENERATE_SOUND:
-                (new SoundBuildWorker(appWindow, SOUND_ITEMS[soundTypeCombo.getSelectedIndex()])).execute();
+                (new SoundBuildWorker(appWindow, SOUND_ITEMS[soundTypeList.getSelectedIndex()])).execute();
                 return;
             case BUTTON_PLAY_AGAIN:
                 (new SoundPlayAgainWorker(appWindow)).execute();

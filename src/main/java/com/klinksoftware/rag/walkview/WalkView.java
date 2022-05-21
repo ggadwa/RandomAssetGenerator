@@ -4,6 +4,7 @@ import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.Skeleton;
+import java.awt.event.KeyEvent;
 import java.nio.*;
 import java.nio.charset.*;
 import java.nio.file.*;
@@ -22,7 +23,8 @@ public class WalkView extends AWTGLCanvas {
     private static final float RAG_NEAR_Z=1.0f;
     private static final float RAG_FAR_Z=500.0f;
     private static final float RAG_FOV=55.0f;
-    private static final float RAG_MOVE_SPEED=0.01f;
+    private static final float RAG_MOVE_SPEED = 0.01f;
+    private static final float RAG_SPEED_MULTIPLIER = 2.0f;
     private static final long RAG_PAINT_TICK=33;
     private static final float RAG_LIGHT_INTENSITY=500.0f;
 
@@ -32,7 +34,7 @@ public class WalkView extends AWTGLCanvas {
     private int perspectiveMatrixUniformId,viewMatrixUniformId,normalMatrixUniformId,lightPositionIntensityUniformId;
     private long nextPaintTick;
     private float aspectRatio;
-    private float moveX,moveY,moveZ;
+    private float moveX, moveY, moveZ, speedMultiplier;
     private float cameraRotateDistance,cameraRotateOffsetY;
     private boolean cameraCenterRotate;
     private MeshList meshList, incommingMeshList;
@@ -49,7 +51,6 @@ public class WalkView extends AWTGLCanvas {
 
     @Override
     public void initGL() {
-        int n;
         String vertexSource, fragmentSource;
         String errorStr;
 
@@ -89,7 +90,8 @@ public class WalkView extends AWTGLCanvas {
         moveX=0;
         moveY=0;
         moveZ=0;
-        movePoint=new RagPoint(0.0f,0.0f,0.0f);
+        movePoint = new RagPoint(0.0f, 0.0f, 0.0f);
+        speedMultiplier = 1.0f;
 
         cameraCenterRotate=false;
         cameraRotateDistance=0.0f;
@@ -286,8 +288,7 @@ public class WalkView extends AWTGLCanvas {
     // textures
     //
 
-    private int loadTexture(int textureSize,boolean hasAlpha,byte[] textureData)
-    {
+    private int loadTexture(int textureSize, boolean hasAlpha, byte[] textureData) {
         int textureId;
         ByteBuffer bitmapBuf;
 
@@ -394,8 +395,7 @@ public class WalkView extends AWTGLCanvas {
         incommingBitmaps = null;
     }
 
-    public void shutdown()
-    {
+    public void shutdown() {
         if (vertexShaderId!=-1) glDeleteShader(vertexShaderId);
         if (fragmentShaderId!=-1) glDeleteShader(fragmentShaderId);
         if (programId!=-1) glDeleteProgram(programId);
@@ -405,12 +405,11 @@ public class WalkView extends AWTGLCanvas {
     // drawing camera/eye setup
     //
 
-    private void setupCameraWalkView()
-    {
-            // any movement
+    private void setupCameraWalkView() {
+        // any movement
 
-        if ((moveX!=0.0f) || (moveZ!=0.0f)) {
-            movePoint.setFromValues(moveX,0,moveZ);
+        if ((moveX != 0.0f) || (moveZ != 0.0f)) {
+            movePoint.setFromValues((moveX * speedMultiplier), 0, (moveZ * speedMultiplier));
             rotMatrix.setRotationFromYAngle(cameraAngle.y);
             rotMatrix2.setRotationFromXAngle(cameraAngle.x);
             rotMatrix.multiply(rotMatrix2);
@@ -419,7 +418,9 @@ public class WalkView extends AWTGLCanvas {
             cameraPoint.addPoint(movePoint);
         }
 
-        if (moveY!=0.0f) cameraPoint.y+=moveY;
+        if (moveY != 0.0f) {
+            cameraPoint.y += (moveY * speedMultiplier);
+        }
 
             // setup the eye point
 
@@ -432,8 +433,7 @@ public class WalkView extends AWTGLCanvas {
         eyePoint.matrixMultiply(rotMatrix);
     }
 
-    private void setupCameraCenterRotate()
-    {
+    private void setupCameraCenterRotate() {
             // any movement
 
        cameraRotateDistance-=moveZ;
@@ -455,8 +455,7 @@ public class WalkView extends AWTGLCanvas {
     // convert point to eye cordinates
     //
 
-    private void convertToEyeCoordinates(RagPoint pnt,RagPoint eyePnt)
-    {
+    private void convertToEyeCoordinates(RagPoint pnt, RagPoint eyePnt) {
         eyePnt.x=(pnt.x*viewMatrix.data[0])+(pnt.y*viewMatrix.data[4])+(pnt.z*viewMatrix.data[8])+viewMatrix.data[12];
         eyePnt.y=(pnt.x*viewMatrix.data[1])+(pnt.y*viewMatrix.data[5])+(pnt.z*viewMatrix.data[9])+viewMatrix.data[13];
         eyePnt.z=(pnt.x*viewMatrix.data[2])+(pnt.y*viewMatrix.data[6])+(pnt.z*viewMatrix.data[10])+viewMatrix.data[14];
@@ -617,36 +616,49 @@ public class WalkView extends AWTGLCanvas {
         }
     }
 
-    public void keyPress(char key) {
-        if ((key == 'w') || (key == 'W')) {
-            moveZ = RAG_MOVE_SPEED;
-        }
-        if ((key == 's') || (key == 'S')) {
-            moveZ = -RAG_MOVE_SPEED;
-        }
-        if ((key == 'a') || (key == 'A')) {
-            moveX = RAG_MOVE_SPEED;
-        }
-        if ((key == 'd') || (key == 'D')) {
-            moveX = -RAG_MOVE_SPEED;
-        }
-        if ((key == 'q') || (key == 'Q')) {
-            moveY = RAG_MOVE_SPEED;
-        }
-        if ((key == 'e') || (key == 'E')) {
-            moveY = -RAG_MOVE_SPEED;
+    public void keyPress(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.VK_SHIFT:
+                speedMultiplier = RAG_SPEED_MULTIPLIER;
+                return;
+            case KeyEvent.VK_W:
+                moveZ = RAG_MOVE_SPEED;
+                return;
+            case KeyEvent.VK_S:
+                moveZ = -RAG_MOVE_SPEED;
+                return;
+            case KeyEvent.VK_A:
+                moveX = RAG_MOVE_SPEED;
+                return;
+            case KeyEvent.VK_D:
+                moveX = -RAG_MOVE_SPEED;
+                return;
+            case KeyEvent.VK_Q:
+                moveY = RAG_MOVE_SPEED;
+                return;
+            case KeyEvent.VK_E:
+                moveY = -RAG_MOVE_SPEED;
+                return;
         }
     }
 
-    public void keyRelease(char key) {
-        if ((key == 'w') || (key == 'W') || (key == 's') || (key == 'S')) {
-            moveZ = 0.0f;
-        }
-        if ((key == 'a') || (key == 'A') || (key == 'd') || (key == 'D')) {
-            moveX = 0.0f;
-        }
-        if ((key == 'q') || (key == 'Q') || (key == 'e') || (key == 'E')) {
-            moveY = 0.0f;
+    public void keyRelease(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.VK_SHIFT:
+                speedMultiplier = 1.0f;
+                return;
+            case KeyEvent.VK_W:
+            case KeyEvent.VK_S:
+                moveZ = 0.0f;
+                return;
+            case KeyEvent.VK_A:
+            case KeyEvent.VK_D:
+                moveX = 0.0f;
+                return;
+            case KeyEvent.VK_Q:
+            case KeyEvent.VK_E:
+                moveY = 0.0f;
+                return;
         }
     }
 }

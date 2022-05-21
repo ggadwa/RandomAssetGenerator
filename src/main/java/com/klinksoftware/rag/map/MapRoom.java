@@ -15,9 +15,9 @@ public class MapRoom
     public int x, z, story;
     public boolean hasUpperExtension, hasLowerExtension;
     public byte[] wallHideArray;
-    public int[] grid, floorGrid, ceilingGrid;
+    public int[] floorGrid, ceilingGrid;
+    public boolean[] platformGrid;
     public MapPiece piece;
-    public ArrayList<MapRoom> requiredStairs;
 
     public MapRoom(MapPiece piece)
     {
@@ -35,17 +35,12 @@ public class MapRoom
         floorGrid=piece.floorGrid.clone();
         ceilingGrid=piece.floorGrid.clone();
 
-            // flags for staircases
-
-        requiredStairs=new ArrayList<>();
-
             // wall hiding
 
         wallHideArray=new byte[piece.vertexes.length];
 
-            // grids for blocking off floor/stories/etc
-
-        grid=new int[piece.sizeX*piece.sizeZ];
+        // grids for blocking off platforms
+        platformGrid = new boolean[piece.sizeX * piece.sizeZ];
     }
 
     public MapRoom duplicate(int story) {
@@ -63,14 +58,8 @@ public class MapRoom
         room.floorGrid = piece.floorGrid.clone();
         room.ceilingGrid = piece.floorGrid.clone();
 
-        // flags for staircases
-        room.requiredStairs = new ArrayList<>();
-
-        // wall hiding
         room.wallHideArray = new byte[piece.vertexes.length];
-
-        // grids for blocking off floor/stories/etc
-        room.grid = new int[piece.sizeX * piece.sizeZ];
+        room.platformGrid = new boolean[piece.sizeX * piece.sizeZ];
 
         return (room);
     }
@@ -79,7 +68,7 @@ public class MapRoom
         this.piece = piece;
 
         wallHideArray = new byte[piece.vertexes.length];
-        grid = new int[piece.sizeX * piece.sizeZ];
+        platformGrid = new boolean[piece.sizeX * piece.sizeZ];
     }
 
     //
@@ -330,17 +319,15 @@ public class MapRoom
     }
 
         //
-        // grids (for marking off areas used by things)
+        // platform grid
         //
 
-    public void setGrid(int x,int z,int flag)
-    {
-        grid[(piece.sizeX*piece.sizeZ)+(z*piece.sizeZ)+x]=flag;
+    public void setPlatformGrid(int x, int z)    {
+        platformGrid[(z * piece.sizeX) + x] = true;
     }
 
-    public int getGrid(int x,int z)
-    {
-        return(grid[(piece.sizeX*piece.sizeZ)+(z*piece.sizeZ)+x]);
+    public boolean getPlatformGrid(int x, int z)    {
+        return (platformGrid[(z * piece.sizeX) + x]);
     }
 
 }

@@ -169,89 +169,6 @@ public class MapBuilder
     }
 
         //
-        // room steps
-        //
-
-    private void buildSteps(MapRoom room,String name,MapRoom toRoom)
-    {
-        /*
-        int                 x,z,noSkipX,noSkipZ,min,max;
-        boolean             doAll;
-        RagBound            touchRange;
-        MapStory            mapStory;
-
-            // force step bitmap
-
-        bitmapGenerator.generateStep();
-
-            // step meshes
-
-        mapStory=new MapStory(meshList,room,name);
-
-        if (room.z==(toRoom.z+toRoom.size.z)) {
-            touchRange=room.getTouchWallRange(toRoom,true);
-            min=(int)touchRange.min;
-            max=(int)touchRange.max;
-
-            doAll=((max-min)<=2);
-            noSkipX=min+AppWindow.random.nextInt((max+1)-min);
-
-            for (x=min;x<=max;x++) {
-                if ((AppWindow.random.nextBoolean()) || (x==noSkipX) || (doAll)) {
-                    mapStory.addStairs(x,1,MeshMapUtility.STAIR_DIR_NEG_Z,0);
-                }
-            }
-            return;
-        }
-        if ((room.z+room.size.z)==toRoom.z) {
-            touchRange=room.getTouchWallRange(toRoom,true);
-            min=(int)touchRange.min;
-            max=(int)touchRange.max;
-
-            doAll=((max-min)<=2);
-            noSkipX=min+AppWindow.random.nextInt((max+1)-min);
-
-            for (x=min;x<=max;x++) {
-                if ((AppWindow.random.nextBoolean()) || (x==noSkipX) || (doAll)) {
-                    mapStory.addStairs(x,(room.piece.size.z-2),MeshMapUtility.STAIR_DIR_POS_Z,0);
-                }
-            }
-            return;
-        }
-        if (room.x==(toRoom.x+toRoom.size.x)) {
-            touchRange=room.getTouchWallRange(toRoom,false);
-            min=(int)touchRange.min;
-            max=(int)touchRange.max;
-
-            doAll=((max-min)<=2);
-            noSkipZ=min+AppWindow.random.nextInt((max+1)-min);
-
-            for (z=min;z<=max;z++) {
-                if ((AppWindow.random.nextBoolean()) || (z==noSkipZ) || (doAll)) {
-                    mapStory.addStairs(1,z,MeshMapUtility.STAIR_DIR_NEG_X,0);
-                }
-            }
-            return;
-        }
-        if ((room.x+room.size.x)==toRoom.x) {
-            touchRange=room.getTouchWallRange(toRoom,false);
-            min=(int)touchRange.min;
-            max=(int)touchRange.max;
-
-            doAll=((max-min)<=2);
-            noSkipZ=min+AppWindow.random.nextInt((max+1)-min);
-
-            for (z=min;z<=max;z++) {
-                if ((AppWindow.random.nextBoolean()) || (z==noSkipZ) || (doAll)) {
-                    mapStory.addStairs((room.piece.size.x-2),z,MeshMapUtility.STAIR_DIR_POS_X,0);
-                }
-            }
-            return;
-        }
-*/
-    }
-
-        //
         // build main floor
         //
 
@@ -641,6 +558,17 @@ public class MapBuilder
             if ((room.piece.decorate) && (decorations)) this.buildDecoration(room,n);
         }
 
+        // any steps
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+            if (room.hasUpperExtension) {
+                (new MapStair(meshList, room, n)).build(true);
+            }
+            if (room.hasLowerExtension) {
+                (new MapStair(meshList, room, n)).build(false);
+            }
+        }
+
         // any platforms
         for (n = 0; n != roomCount; n++) {
             room = rooms.get(n);
@@ -649,16 +577,6 @@ public class MapBuilder
             }
             if (room.hasLowerExtension) {
                 (new MapPlatform(meshList, room, n)).build(false);
-            }
-        }
-
-            // any steps
-
-        for (n=0;n!=roomCount;n++) {
-            room=rooms.get(n);
-
-            for (k=0;k!=room.requiredStairs.size();k++) {
-                buildSteps(room,("room_"+Integer.toString(n)+"_step_"+Integer.toString(k)),room.requiredStairs.get(k));
             }
         }
 

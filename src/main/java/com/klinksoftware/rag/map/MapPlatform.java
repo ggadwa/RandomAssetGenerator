@@ -26,115 +26,35 @@ public class MapPlatform {
     }
 
         //
-        // stairs
+        // check for walls on platform segments
         //
 
-    public void addStairs(int x,int z,int dir,int storyIdx)
-    {
-        /*
-        float           y,floorHigh;
-
-        floorHigh=MapBuilder.SEGMENT_SIZE*0.1f;
-        y=room.offset.y+(storyIdx*MapBuilder.SEGMENT_SIZE)+(floorHigh*storyIdx);
-
-        switch (dir)
-        {
-            case MeshMapUtility.STAIR_DIR_POS_Z:
-                room.setGridAllStories(x,z,FLAG_STEPS);
-                room.setGridAllStories(x,(z+1),FLAG_STEPS);
-                if ((z-1)>=0) room.setGridAllStories(x,(z-1),FLAG_STEPS);   // area ahead of steps
-                break;
-            case MeshMapUtility.STAIR_DIR_NEG_Z:
-                room.setGridAllStories(x,z,FLAG_STEPS);
-                room.setGridAllStories(x,(z-1),FLAG_STEPS);
-                if ((z+1)<(room.piece.size.z-1)) room.setGridAllStories(x,(z+1),FLAG_STEPS);   // area ahead of steps
-                break;
-            case MeshMapUtility.STAIR_DIR_POS_X:
-                room.setGridAllStories(x,z,FLAG_STEPS);
-                room.setGridAllStories((x+1),z,FLAG_STEPS);
-                if ((x-1)>=0) room.setGridAllStories((x-1),z,FLAG_STEPS);   // area ahead of steps
-                break;
-            case MeshMapUtility.STAIR_DIR_NEG_X:
-                room.setGridAllStories(x,z,FLAG_STEPS);
-                room.setGridAllStories((x-1),z,FLAG_STEPS);
-                if ((x+1)<(room.piece.size.x-1)) room.setGridAllStories((x+1),z,FLAG_STEPS);   // area ahead of steps
-                break;
+    private boolean hasNegXWall(int x, int z) {
+        if (x == 0) {
+            return (true);
         }
-
-        MeshMapUtility.buildStairs(meshList,room,name,(room.offset.x+((float)x*MapBuilder.SEGMENT_SIZE)),y,(room.offset.z+((float)z*MapBuilder.SEGMENT_SIZE)),dir,1.0f,true);
-*/
+        return (room.getPlatformGrid((x - 1), z));
     }
 
-        //
-        // second story segments
-        //
-
-    private boolean hasNegXWall(int storyIdx,int x,int z)
-    {
-        /*
-        int     flag,flag2;
-
-        if (x==0) return(true);
-
-        flag=room.getGrid(storyIdx,x,z);
-        flag2=room.getGrid(storyIdx,(x-1),z);
-
-        if ((flag2==FLAG_NONE) || (flag2==FLAG_STEPS)) return(true);
-        if (flag==flag2) return(false);           // if both the same type of wall, eliminate
-        if ((flag==FLAG_PLATFORM) && (flag2==FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
-*/
-        return(true);
+    private boolean hasPosXWall(int x, int z) {
+        if (x >= (this.room.piece.sizeX - 1)) {
+            return (true);
+        }
+        return (room.getPlatformGrid((x + 1), z));
     }
 
-    private boolean hasPosXWall(int storyIdx,int x,int z)
-    {
-        /*
-        int     flag,flag2;
-
-        if (x==(this.room.piece.size.x-1)) return(true);
-
-        flag=room.getGrid(storyIdx,x,z);
-        flag2=room.getGrid(storyIdx,(x+1),z);
-
-        if ((flag2==FLAG_NONE) || (flag2==FLAG_STEPS)) return(true);
-        if (flag==flag2) return(false);           // if both the same type of wall, eliminate
-        if ((flag==FLAG_PLATFORM) && (flag2==FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
-*/
-        return(true);
+    private boolean hasNegZWall(int x, int z) {
+        if (z == 0) {
+            return (true);
+        }
+        return (room.getPlatformGrid(x, (z - 1)));
     }
 
-    private boolean hasNegZWall(int storyIdx,int x,int z)
-    {
-        /*
-        int     flag,flag2;
-
-        if (z==0) return(true);
-
-        flag=room.getGrid(storyIdx,x,z);
-        flag2=room.getGrid(storyIdx,x,(z-1));
-
-        if ((flag2==FLAG_NONE) || (flag2==FLAG_STEPS)) return(true);
-        if (flag==flag2) return(false);           // if both the same type of wall, eliminate
-        if ((flag==FLAG_PLATFORM) && (flag2==FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
-*/
-        return(true);
-    }
-
-    private boolean hasPosZWall(int storyIdx,int x,int z)
-    {
-        /*
-        int     flag,flag2;
-
-        if (z==(this.room.piece.size.z-1)) return(true);
-
-        flag=room.getGrid(storyIdx,x,z);
-        flag2=room.getGrid(storyIdx,x,(z+1));
-
-        if ((flag2==FLAG_NONE) || (flag2==FLAG_STEPS)) return(true);
-        if (flag==flag2) return(false);           // if both the same type of wall, eliminate
-        if ((flag==FLAG_PLATFORM) && (flag2==FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
-*/
-        return(true);
+    private boolean hasPosZWall(int x, int z) {
+        if (z >= (this.room.piece.sizeZ - 1)) {
+            return (false);
+        }
+        return (room.getPlatformGrid(x, (z + 1)));
     }
 
     private void setupRandomPlatforms(int startX,int startZ,int storyIdx)
@@ -229,7 +149,7 @@ public class MapPlatform {
 */
     }
 
-    private void addPlatforms(boolean[] grid, float y) {
+    private void addPlatforms(float y) {
         int x, z, trigIdx;
         float ty, by, negX, posX, negZ, posZ, floorHigh;
         ArrayList<Float> vertexArray, normalArray;
@@ -250,7 +170,7 @@ public class MapPlatform {
 
         for (z = 0; z != room.piece.sizeZ; z++) {
             for (x = 0; x != room.piece.sizeX; x++) {
-                if (!grid[(z * room.piece.sizeX) + x]) {
+                if (room.getPlatformGrid(x, z)) {
                     continue;
                 }
 
@@ -262,19 +182,19 @@ public class MapPlatform {
                 posX = (room.x + (x + 1)) * MapBuilder.SEGMENT_SIZE;
                 negZ = (room.z + z) * MapBuilder.SEGMENT_SIZE;
                 posZ = (room.z + (z + 1)) * MapBuilder.SEGMENT_SIZE;
-                /*
-                if (hasNegXWall(storyIdx,x,z)) {
+
+                if (hasNegXWall(x, z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,negZ,negX,ty,posZ,negX,by,posZ,negX,by,negZ));
                     normalArray.addAll(Arrays.asList(-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f));
                     trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
 
-                if (hasPosXWall(storyIdx,x,z)) {
+                if (hasPosXWall(x, z)) {
                     vertexArray.addAll(Arrays.asList(posX,ty,negZ,posX,ty,posZ,posX,by,posZ,posX,by,negZ));
                     normalArray.addAll(Arrays.asList(1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f));
                     trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
-                */
+
                     // always draw the top
 
                 vertexArray.addAll(Arrays.asList(negX,ty,negZ,negX,ty,posZ,posX,ty,posZ,posX,ty,negZ));
@@ -285,19 +205,17 @@ public class MapPlatform {
                 normalArray.addAll(Arrays.asList(0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f));
                 trigIdx = MeshMapUtility.addQuadToIndexes(indexArray, trigIdx);
 
-                /*
-                if (hasNegZWall(storyIdx,x,z)) {
+                if (hasNegZWall(x, z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,negZ,posX,ty,negZ,posX,by,negZ,negX,by,negZ));
                     normalArray.addAll(Arrays.asList(0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f));
                     trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
 
-                if (hasPosZWall(storyIdx,x,z)) {
+                if (hasPosZWall(x, z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,posZ,posX,ty,posZ,posX,by,posZ,negX,by,posZ));
                     normalArray.addAll(Arrays.asList(0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f));
                     trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
-                 */
             }
         }
 
@@ -315,20 +233,7 @@ public class MapPlatform {
         //
 
     public void build(boolean upper) {
-        int x, z;
         float y;
-        boolean[] grid;
-
-        grid = new boolean[room.piece.sizeX * room.piece.sizeZ];
-
-        for (x = 0; x != room.piece.sizeX; x++) {
-            grid[x] = true;
-            grid[x + (room.piece.sizeX * (room.piece.sizeZ - 1))] = true;
-        }
-        for (z = 0; z != room.piece.sizeZ; z++) {
-            grid[room.piece.sizeX * z] = true;
-            grid[(room.piece.sizeX * z) + (room.piece.sizeX - 1)] = true;
-        }
 
         if (upper) {
             y = MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT;
@@ -337,7 +242,6 @@ public class MapPlatform {
         }
 
         //    setupRandomPlatforms(x,z,1);
-        addPlatforms(grid, y);
-
+        addPlatforms(y);
     }
 }

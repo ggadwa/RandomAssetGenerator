@@ -232,12 +232,30 @@ public class MeshModelUtility
         bone2 = skeleton.bones.get(limb.bone2Idx);
 
         // build the cylinder around the bones
-        // todo -- different uv mapping here
         if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
             mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
-            // todo - randomize here
         } else {
             mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
+        }
+
+        // uv mapping
+        switch (limb.meshType) {
+            case Limb.UV_MAP_TYPE_BODY:
+                mesh.transformUVs(0.0f, 0.0f, 0.5f, 0.5f);
+                break;
+            case Limb.UV_MAP_TYPE_ARM:
+            case Limb.UV_MAP_TYPE_LEG:
+                mesh.transformUVs(0.5f, 0.0f, 0.5f, 0.5f);
+                break;
+            case Limb.UV_MAP_TYPE_HAND:
+            case Limb.UV_MAP_TYPE_FOOT:
+            case Limb.UV_MAP_TYPE_NECK:
+            case Limb.UV_MAP_TYPE_WHIP:
+                mesh.transformUVs(0.0f, 0.5f, 0.5f, 0.5f);
+                break;
+            case Limb.UV_MAP_TYPE_HEAD:
+                mesh.transformUVs(0.5f, 0.5f, 0.5f, 0.5f);
+                break;
         }
 
         rebuildNormals(mesh, bone1, bone2);
