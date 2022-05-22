@@ -53,7 +53,7 @@ public class ModelBuilder
         } else {
             bitmapBase = new BitmapMetal();
         }
-        bitmapBase = new BitmapBase();    // uv test
+        bitmapBase = new BitmapTest();    // uv test
         bitmapBase.generate();
         bitmaps.put("bitmap", bitmapBase);
 

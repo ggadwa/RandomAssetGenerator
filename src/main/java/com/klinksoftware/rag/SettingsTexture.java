@@ -13,9 +13,10 @@ public class SettingsTexture extends SettingsBase {
 
     private static final String[] TEXTURE_ITEMS = {
         "Brick", "Computer", "Concrete", "Control Panel", "Dirt",
-        "Geometric", "Glass", "Grass", "Liquid", "Metal",
+        "Fur", "Geometric", "Glass", "Grass", "Liquid", "Metal",
         "Metal Box", "Monitor", "Monster", "Mosaic", "Organic",
-        "Pipe", "Plaster", "Stone", "Tile", "Wood", "Wood Box"};
+        "Pipe", "Plaster", "Scale", "Stone", "Test", "Tile",
+        "Wood", "Wood Box"};
 
     private JButton generateTextureButton, exportTextureButton;
     private JList textureTypeList;

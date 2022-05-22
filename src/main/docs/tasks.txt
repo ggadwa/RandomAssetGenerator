@@ -1,14 +1,13 @@
 
 
-- change monster -> fur & scale
-- make scale much better
+- spots should be in grid with random offsets and random size differences
+- make scale texture much better
 - make model bitmap maker that compresses other textures into four square
 
 - fix upper/lower connections
 - need platform knock outs
 - get rid of floorGrid ceilingGrid (grid?)
 - go back to polygon ceilings/floors
-
 
 - uv map models
 - make arm sizes = to size of torso bone to top torso etc, same with legs
@@ -18,10 +17,9 @@
 
 - need to export tangents
 
+- metals can have dirtstreak (like brick)
 - dirt needs to not collide stones
 - more distinct control panels pieces (keyboard)
-- rust on metal
-- hexagons have white line
 
 
 - try jpackage

@@ -100,7 +100,7 @@ public class BitmapStone extends BitmapBase
 
                     // and copy over
 
-                blockCopy(colorData,(lft+xOff),(top+yOff),rgt,bot,stoneCopyData);
+                blockCopy(colorData, (lft + xOff), (top + yOff), rgt, bot, stoneCopyData);
 
                 lft=rgt;
                 if (rgt==(textureSize-1)) break;

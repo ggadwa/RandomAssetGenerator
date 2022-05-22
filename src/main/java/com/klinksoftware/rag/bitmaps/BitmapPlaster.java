@@ -14,43 +14,6 @@ public class BitmapPlaster extends BitmapBase {
         hasAlpha = false;
     }
 
-    private void generateStainsOverlay() {
-        int n, k, lft, top, rgt, bot;
-        int stainCount, stainSize;
-        int xSize, ySize, markCount;
-
-        stainCount = AppWindow.random.nextInt(5);
-        stainSize = (int) ((float) textureSize * 0.1f);
-
-        for (n = 0; n != stainCount; n++) {
-            lft = AppWindow.random.nextInt(textureSize);
-            xSize = stainSize + AppWindow.random.nextInt(stainSize);
-
-            top = AppWindow.random.nextInt(textureSize);
-            ySize = stainSize + AppWindow.random.nextInt(stainSize);
-
-            markCount = 2 + AppWindow.random.nextInt(4);
-
-            for (k = 0; k != markCount; k++) {
-                rgt = lft + xSize;
-                if (rgt >= textureSize) {
-                    rgt = textureSize - 1;
-                }
-                bot = top + ySize;
-                if (bot >= textureSize) {
-                    bot = textureSize - 1;
-                }
-
-                drawOvalStain(lft, top, rgt, bot, 0.01f, 0.15f, 0.85f);
-
-                lft += (AppWindow.random.nextBoolean()) ? (-(xSize / 3)) : (xSize / 3);
-                top += (AppWindow.random.nextBoolean()) ? (-(ySize / 3)) : (ySize / 3);
-                xSize = (int) ((float) xSize * 0.8f);
-                ySize = (int) ((float) ySize * 0.8f);
-            }
-        }
-    }
-
     @Override
     public void generateInternal() {
         int n, x, y, x2, y2, lineCount;
@@ -89,9 +52,7 @@ public class BitmapPlaster extends BitmapBase {
         }
 
         // any stains
-        if (AppWindow.random.nextBoolean()) {
-            generateStainsOverlay();
-        }
+        generateStainsOverlay();
 
         blur(colorData, 0, 0, textureSize, textureSize, 25, false);
 

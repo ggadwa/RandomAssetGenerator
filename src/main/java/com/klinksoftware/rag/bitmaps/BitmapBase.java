@@ -196,17 +196,37 @@ public class BitmapBase
         // block copy
         //
 
-    protected void blockCopy(float[] fromData,int lft,int top,int rgt,int bot,float[] toData)
-    {
-        int     x,y,idx,rowCount;
+    protected void blockCopy(float[] fromData, int lft, int top, int rgt, int bot, float[] toData) {
+        int x, y, idx, xCount;
 
-        rowCount=(rgt-lft)*4;
+        xCount = (rgt - lft) * 4;
 
-        for (y=top;y!=bot;y++) {
-            idx=((y*textureSize)+lft)*4;
+        for (y = top; y != bot; y++) {
+            idx = ((y * textureSize) + lft) * 4;
 
-            for (x=0;x!=rowCount;x++) {
-                toData[idx]=fromData[idx++];
+            for (x = 0; x != xCount; x++) {
+                toData[idx] = fromData[idx++];
+            }
+        }
+    }
+
+    protected void blockQuarterCopy(float[] fromData, float[] toData, int toOffsetX, int toOffsetY) {
+        int x, y, count;
+        int fromIdx, toIdx;
+
+        count = textureSize / 2;
+
+        for (y = 0; y != count; y++) {
+            toIdx = (((y + toOffsetY) * textureSize) + toOffsetX) * 4;
+            fromIdx = ((y * 2) * textureSize) * 4;
+
+            for (x = 0; x != count; x++) {
+                toData[toIdx] = fromData[fromIdx];
+                toData[toIdx + 1] = fromData[fromIdx + 1];
+                toData[toIdx + 2] = fromData[fromIdx + 2];
+                toData[toIdx + 3] = fromData[fromIdx + 3];
+                toIdx += 4;
+                fromIdx += 8;
             }
         }
     }
@@ -1336,7 +1356,7 @@ public class BitmapBase
             // fill the hexagon
 
         if (color!=null) {
-            drawRect(lx,top,rx,bot,color);
+            drawRect((lx - 1), top, (rx + 1), bot, color);
             drawTriangle(lx,top,lft,my,lx,bot,color);
             drawTriangle(rx,top,rgt,my,rx,bot,color);
         }
@@ -2295,6 +2315,65 @@ public class BitmapBase
     }
 
     //
+    // overlays
+    //
+    public void generateSpotsOverlay() {
+        int n, x, y, spotMin, spotAdd, spotCount, spotSize;
+
+        spotMin = (int) ((float) textureSize * 0.1f);
+        spotAdd = spotMin / 2;
+        spotCount = 10 + AppWindow.random.nextInt(10);
+
+        for (n = 0; n != spotCount; n++) {
+            spotSize = spotMin + AppWindow.random.nextInt(spotAdd);
+            x = AppWindow.random.nextInt(textureSize - spotSize) - 1;
+            y = AppWindow.random.nextInt(textureSize - spotSize) - 1;
+            drawOvalDarken(x, y, (x + spotSize), (y + spotSize), (0.8f + (AppWindow.random.nextFloat() * 0.2f)));
+        }
+    }
+
+    public void generateStainsOverlay() {
+        int n, k, lft, top, rgt, bot;
+        int stainCount, stainSize;
+        int xSize, ySize, markCount;
+        float outerPercentage, innerPercentage, darken;
+
+        stainCount = AppWindow.random.nextInt(8);
+        stainSize = (int) ((float) textureSize * 0.1f);
+
+        for (n = 0; n != stainCount; n++) {
+            lft = AppWindow.random.nextInt(textureSize);
+            xSize = stainSize + AppWindow.random.nextInt(stainSize);
+
+            top = AppWindow.random.nextInt(textureSize);
+            ySize = stainSize + AppWindow.random.nextInt(stainSize);
+
+            darken = 0.7f + AppWindow.random.nextFloat(0.25f);
+            outerPercentage = 0.01f + AppWindow.random.nextFloat(0.05f);
+            innerPercentage = 0.1f + AppWindow.random.nextFloat(0.2f);
+            markCount = 2 + AppWindow.random.nextInt(4);
+
+            for (k = 0; k != markCount; k++) {
+                rgt = lft + xSize;
+                if (rgt >= textureSize) {
+                    rgt = textureSize - 1;
+                }
+                bot = top + ySize;
+                if (bot >= textureSize) {
+                    bot = textureSize - 1;
+                }
+
+                drawOvalStain(lft, top, rgt, bot, outerPercentage, innerPercentage, darken);
+
+                lft += (AppWindow.random.nextBoolean()) ? (-(xSize / 3)) : (xSize / 3);
+                top += (AppWindow.random.nextBoolean()) ? (-(ySize / 3)) : (ySize / 3);
+                xSize = (int) ((float) xSize * 0.8f);
+                ySize = (int) ((float) ySize * 0.8f);
+            }
+        }
+    }
+
+    //
     // misc
     //
     public void drawScrew(int x, int y, RagColor screwColor, RagColor outlineColor, int screwSize, int edgeSize) {
@@ -2499,15 +2578,7 @@ public class BitmapBase
         // generate mainline
         //
 
-    protected void generateInternal()    {
-        int         mid;
-
-        mid=textureSize/2;
-
-        drawRect(0,0,mid,mid,new RagColor(1.0f,1.0f,0.0f));
-        drawRect(mid,0,textureSize,mid,new RagColor(1.0f,0.0f,0.0f));
-        drawRect(0,mid,mid,textureSize,new RagColor(0.0f,1.0f,0.0f));
-        drawRect(mid,mid,textureSize,textureSize,new RagColor(0.0f,0.0f,1.0f));
+    protected void generateInternal() {
     }
 
     public void generate() {

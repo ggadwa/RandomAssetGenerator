@@ -241,20 +241,20 @@ public class MeshModelUtility
         // uv mapping
         switch (limb.meshType) {
             case Limb.UV_MAP_TYPE_BODY:
-                mesh.transformUVs(0.0f, 0.0f, 0.5f, 0.5f);
+                //mesh.transformUVs(0.0f, 0.0f, 0.5f, 0.5f);
                 break;
             case Limb.UV_MAP_TYPE_ARM:
             case Limb.UV_MAP_TYPE_LEG:
-                mesh.transformUVs(0.5f, 0.0f, 0.5f, 0.5f);
+                //mesh.transformUVs(0.5f, 0.0f, 0.5f, 0.5f);
                 break;
             case Limb.UV_MAP_TYPE_HAND:
             case Limb.UV_MAP_TYPE_FOOT:
             case Limb.UV_MAP_TYPE_NECK:
             case Limb.UV_MAP_TYPE_WHIP:
-                mesh.transformUVs(0.0f, 0.5f, 0.5f, 0.5f);
+                //mesh.transformUVs(0.0f, 0.5f, 0.5f, 0.5f);
                 break;
             case Limb.UV_MAP_TYPE_HEAD:
-                mesh.transformUVs(0.5f, 0.5f, 0.5f, 0.5f);
+                //mesh.transformUVs(0.5f, 0.5f, 0.5f, 0.5f);
                 break;
         }
 

@@ -36,9 +36,4 @@ public class Limb
         this.bone1Idx = bone1Idx;
         this.bone2Idx = bone2Idx;
     }
-
-    //public int getRandomBoneIndex()
-    //{
-    //    return(boneIndexes[AppWindow.random.nextInt(boneIndexes.length)]);
-    //}
 }
