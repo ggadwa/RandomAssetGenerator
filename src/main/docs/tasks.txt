@@ -1,15 +1,16 @@
 
 
-- spots should be in grid with random offsets and random size differences
+- model limbs have bad uvs on wrap around
+  - wrap offset a bit so faces are in the middle?
+
+- fur spots should be in grid with random offsets and random size differences
 - make scale texture much better
-- make model bitmap maker that compresses other textures into four square
 
 - fix upper/lower connections
 - need platform knock outs
 - get rid of floorGrid ceilingGrid (grid?)
 - go back to polygon ceilings/floors
 
-- uv map models
 - make arm sizes = to size of torso bone to top torso etc, same with legs
 
 - monster sound effect is bad

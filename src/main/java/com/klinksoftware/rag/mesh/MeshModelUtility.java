@@ -18,7 +18,7 @@ public class MeshModelUtility
         //
         // build a cylinder around a limb
         //
-    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, RagPoint topPnt, float topRadius, int aroundCount, int acrossCount) {
+    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, RagPoint topPnt, float topRadius, int aroundCount, int acrossCount, float uOffset, float vOffset, float uSize, float vSize) {
         int n, k, rowIdx, row2Idx, rowStartIdx, row2StartIdx, vIdx, vStartIdx, vOrigStartIdx;
         float ang, angAdd, acrossPos, acrossAdd;
         float tx, ty, tz;
@@ -95,7 +95,7 @@ public class MeshModelUtility
                 normal.setFromValues((tx - centerPnt.x), (ty - centerPnt.y), (tz - centerPnt.z));
                 normal.normalize();
                 normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-                uvArray.addAll(Arrays.asList((ang / 360.0f), ((float) k / (float) acrossCount)));
+                uvArray.addAll(Arrays.asList((((ang / 360.0f) * uSize) + uOffset), ((((float) k / (float) acrossCount)) * vSize) + vOffset));
 
                 ang += angAdd;
             }
@@ -143,7 +143,7 @@ public class MeshModelUtility
             normal.setFromValues((topPnt.x - botPnt.x), (topPnt.y - botPnt.y), (topPnt.z - botPnt.z));
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-            uvArray.addAll(Arrays.asList(0.5f, 0.5f));
+            uvArray.addAll(Arrays.asList((uOffset + (uSize * 0.5f)), (vOffset + (vSize * 0.5f))));
 
             for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
@@ -163,7 +163,7 @@ public class MeshModelUtility
             normal.setFromValues((botPnt.x - topPnt.x), (botPnt.y - topPnt.y), (botPnt.z - topPnt.z));
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-            uvArray.addAll(Arrays.asList(0.5f, 0.5f));
+            uvArray.addAll(Arrays.asList((uOffset + (uSize * 0.5f)), (vOffset + (vSize * 0.5f))));
 
             for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
@@ -233,29 +233,9 @@ public class MeshModelUtility
 
         // build the cylinder around the bones
         if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
-            mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
+            mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT, limb.uOffset, limb.vOffset, limb.uSize, limb.vSize);
         } else {
-            mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
-        }
-
-        // uv mapping
-        switch (limb.meshType) {
-            case Limb.UV_MAP_TYPE_BODY:
-                //mesh.transformUVs(0.0f, 0.0f, 0.5f, 0.5f);
-                break;
-            case Limb.UV_MAP_TYPE_ARM:
-            case Limb.UV_MAP_TYPE_LEG:
-                //mesh.transformUVs(0.5f, 0.0f, 0.5f, 0.5f);
-                break;
-            case Limb.UV_MAP_TYPE_HAND:
-            case Limb.UV_MAP_TYPE_FOOT:
-            case Limb.UV_MAP_TYPE_NECK:
-            case Limb.UV_MAP_TYPE_WHIP:
-                //mesh.transformUVs(0.0f, 0.5f, 0.5f, 0.5f);
-                break;
-            case Limb.UV_MAP_TYPE_HEAD:
-                //mesh.transformUVs(0.5f, 0.5f, 0.5f, 0.5f);
-                break;
+            mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT, limb.uOffset, limb.vOffset, limb.uSize, limb.vSize);
         }
 
         rebuildNormals(mesh, bone1, bone2);

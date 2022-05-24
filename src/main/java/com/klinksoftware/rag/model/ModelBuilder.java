@@ -51,9 +51,8 @@ public class ModelBuilder
         if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
             bitmapBase = new BitmapMonster();
         } else {
-            bitmapBase = new BitmapMetal();
+            bitmapBase = new BitmapRobot();
         }
-        bitmapBase = new BitmapTest();    // uv test
         bitmapBase.generate();
         bitmaps.put("bitmap", bitmapBase);
 

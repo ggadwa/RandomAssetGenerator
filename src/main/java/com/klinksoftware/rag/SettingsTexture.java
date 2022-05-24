@@ -15,8 +15,8 @@ public class SettingsTexture extends SettingsBase {
         "Brick", "Computer", "Concrete", "Control Panel", "Dirt",
         "Fur", "Geometric", "Glass", "Grass", "Liquid", "Metal",
         "Metal Box", "Monitor", "Monster", "Mosaic", "Organic",
-        "Pipe", "Plaster", "Scale", "Stone", "Test", "Tile",
-        "Wood", "Wood Box"};
+        "Pipe", "Plaster", "Robot", "Scale", "Stone", "Test",
+        "Tile", "Wood", "Wood Box"};
 
     private JButton generateTextureButton, exportTextureButton;
     private JList textureTypeList;

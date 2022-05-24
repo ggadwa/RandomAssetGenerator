@@ -1,22 +1,23 @@
 package com.klinksoftware.rag.bitmaps;
 
-import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.utility.*;
 
-public class BitmapMonster extends BitmapBase
-{
-    public BitmapMonster() {
+public class BitmapRobot extends BitmapBase {
+
+    public BitmapRobot() {
         super();
 
-        hasNormal=true;
-        hasMetallicRoughness=true;
-        hasEmissive=false;
-        hasAlpha=false;
+        hasNormal = true;
+        hasMetallicRoughness = true;
+        hasEmissive = false;
+        hasAlpha = false;
     }
 
     private void generateFaceChunkEye(int x, int y, RagColor eyeColor) {
-        drawOval(x, y, (x + 30), (y + 20), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, this.COLOR_WHITE, this.COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
-        drawOval((x + 10), (y + 1), (x + 20), (y + 19), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, eyeColor, null, 0.5f, false, false, 1.0f, 0.0f);
+        this.drawRect(x, y, (x + 30), (y + 20), eyeColor);
+        this.draw3DFrameRect(x, y, (x + 30), (y + 20), 5, COLOR_BLACK, true);
+        //drawOval(x, y, (x + 30), (y + 20), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, this.COLOR_WHITE, this.COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+        //drawOval((x + 10), (y + 1), (x + 20), (y + 19), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, eyeColor, null, 0.5f, false, false, 1.0f, 0.0f);
     }
 
     private void generateAddFace() {
@@ -33,18 +34,7 @@ public class BitmapMonster extends BitmapBase
     private void generateSingleChunk(int x, int y) {
         BitmapBase bitmap;
 
-        switch (AppWindow.random.nextInt(3)) {
-            case 0:
-                bitmap = new BitmapFur();
-                break;
-            case 1:
-                bitmap = new BitmapScale();
-                break;
-            default:
-                bitmap = new BitmapOrganic();
-                break;
-        }
-
+        bitmap = new BitmapMetal();
         bitmap.generate();
 
         blockQuarterCopy(bitmap.colorData, colorData, x, y);
