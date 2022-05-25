@@ -60,18 +60,26 @@ public class MapStair {
             case MeshMapUtility.STAIR_DIR_POS_Z:
                 room.setPlatformGrid(x, z);
                 room.setPlatformGrid(x, (z + 1));
+                room.setBlockedGrid(x, z);
+                room.setBlockedGrid(x, (z + 1));
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_Z:
                 room.setPlatformGrid(x, z);
                 room.setPlatformGrid(x, (z - 1));
+                room.setBlockedGrid(x, z);
+                room.setBlockedGrid(x, (z - 1));
                 break;
             case MeshMapUtility.STAIR_DIR_POS_X:
                 room.setPlatformGrid(x, z);
                 room.setPlatformGrid((x + 1), z);
+                room.setBlockedGrid(x, z);
+                room.setBlockedGrid((x + 1), z);
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_X:
                 room.setPlatformGrid(x, z);
                 room.setPlatformGrid((x - 1), z);
+                room.setBlockedGrid(x, z);
+                room.setBlockedGrid((x - 1), z);
                 break;
         }
 

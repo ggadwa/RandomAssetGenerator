@@ -1,10 +1,6 @@
 
 
-- model limbs have bad uvs on wrap around
-  - wrap offset a bit so faces are in the middle?
 
-- fur spots should be in grid with random offsets and random size differences
-- make scale texture much better
 
 - fix upper/lower connections
 - need platform knock outs

@@ -15,7 +15,7 @@ public class BitmapMonster extends BitmapBase
     }
 
     private void generateFaceChunkEye(int x, int y, RagColor eyeColor) {
-        drawOval(x, y, (x + 30), (y + 20), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, this.COLOR_WHITE, this.COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+        drawOval(x, y, (x + 30), (y + 20), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, COLOR_WHITE, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
         drawOval((x + 10), (y + 1), (x + 20), (y + 19), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, eyeColor, null, 0.5f, false, false, 1.0f, 0.0f);
     }
 
@@ -24,10 +24,10 @@ public class BitmapMonster extends BitmapBase
 
         eyeColor = this.getRandomColor();
 
-        drawOval(440, 400, 520, 425, 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, this.COLOR_BLACK, this.COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+        drawOval(445, 355, 495, 380, 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.5f, COLOR_BLACK, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
 
-        generateFaceChunkEye(440, 450, eyeColor);
-        generateFaceChunkEye(490, 450, eyeColor);
+        generateFaceChunkEye(440, 400, eyeColor);
+        generateFaceChunkEye(475, 400, eyeColor);
     }
 
     private void generateSingleChunk(int x, int y) {

@@ -19,10 +19,10 @@ public class MeshModelUtility
         // build a cylinder around a limb
         //
     public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, RagPoint topPnt, float topRadius, int aroundCount, int acrossCount, float uOffset, float vOffset, float uSize, float vSize) {
-        int n, k, rowIdx, row2Idx, rowStartIdx, row2StartIdx, vIdx, vStartIdx, vOrigStartIdx;
+        int n, k, rowIdx, row2Idx, vIdx, vStartIdx;
         float ang, angAdd, acrossPos, acrossAdd;
         float tx, ty, tz;
-        float rd, rAdd, rad;
+        float rd, rAdd, rad, u, uAdd;
         ArrayList<Float> vertexArray, normalArray, uvArray;
         ArrayList<Integer> indexArray;
         int[] indexes;
@@ -68,8 +68,15 @@ public class MeshModelUtility
             centerPnt.z = botPnt.z + (((topPnt.z - botPnt.z) * (float) k) / (float) acrossCount);
 
             ang = 0.0f;
+            u = uOffset;
+            uAdd = uSize / (float) (aroundCount + 1);
 
-            for (n = 0; n != aroundCount; n++) {
+            // we need to dupliacte the seam so the uvs work
+            for (n = 0; n != (aroundCount + 1); n++) {
+
+                if (n == aroundCount) {
+                    ang = 0.0f;
+                }
 
                 rd = ang * ((float) Math.PI / 180.0f);
 
@@ -95,9 +102,10 @@ public class MeshModelUtility
                 normal.setFromValues((tx - centerPnt.x), (ty - centerPnt.y), (tz - centerPnt.z));
                 normal.normalize();
                 normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-                uvArray.addAll(Arrays.asList((((ang / 360.0f) * uSize) + uOffset), ((((float) k / (float) acrossCount)) * vSize) + vOffset));
+                uvArray.addAll(Arrays.asList(u, ((((float) k / (float) acrossCount)) * vSize) + vOffset));
 
                 ang += angAdd;
+                u += uAdd;
             }
 
             rad += rAdd;
@@ -107,26 +115,16 @@ public class MeshModelUtility
         // the cylinder triangles
         for (k = 0; k != acrossCount; k++) {
 
-            rowIdx = rowStartIdx = k * aroundCount;
-            row2Idx = row2StartIdx = rowIdx + aroundCount;
+            rowIdx = k * (aroundCount + 1);
+            row2Idx = rowIdx + (aroundCount + 1);
 
             for (n = 0; n != aroundCount; n++) {
-
-                if (n == (aroundCount - 1)) {
-                    indexArray.add(rowIdx);
-                    indexArray.add(rowStartIdx);
-                    indexArray.add(row2Idx);
-                    indexArray.add(rowStartIdx);
-                    indexArray.add(row2StartIdx);
-                    indexArray.add(row2Idx);
-                } else {
-                    indexArray.add(rowIdx);
-                    indexArray.add(rowIdx + 1);
-                    indexArray.add(row2Idx);
-                    indexArray.add(rowIdx + 1);
-                    indexArray.add(row2Idx + 1);
-                    indexArray.add(row2Idx);
-                }
+                indexArray.add(rowIdx);
+                indexArray.add(rowIdx + 1);
+                indexArray.add(row2Idx);
+                indexArray.add(rowIdx + 1);
+                indexArray.add(row2Idx + 1);
+                indexArray.add(row2Idx);
 
                 rowIdx++;
                 row2Idx++;
@@ -136,18 +134,18 @@ public class MeshModelUtility
         // top close
         if ((meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_ALL) || (meshType == Limb.MESH_TYPE_CYLINDER_CLOSE_TOP)) {
             vIdx = vertexArray.size() / 3;
-            vStartIdx = vOrigStartIdx = aroundCount * acrossCount;
+            vStartIdx = (aroundCount + 1) * acrossCount;
 
             // middle vertex
             vertexArray.addAll(Arrays.asList(topPnt.x, topPnt.y, topPnt.z));
             normal.setFromValues((topPnt.x - botPnt.x), (topPnt.y - botPnt.y), (topPnt.z - botPnt.z));
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-            uvArray.addAll(Arrays.asList((uOffset + (uSize * 0.5f)), (vOffset + (vSize * 0.5f))));
+            uvArray.addAll(Arrays.asList((uOffset + (uSize * 0.5f)), vOffset));
 
             for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
-                indexArray.add((n == (aroundCount - 1)) ? vOrigStartIdx : (vStartIdx + 1));
+                indexArray.add(vStartIdx + 1);
                 indexArray.add(vIdx);
 
                 vStartIdx++;
@@ -163,11 +161,11 @@ public class MeshModelUtility
             normal.setFromValues((botPnt.x - topPnt.x), (botPnt.y - topPnt.y), (botPnt.z - topPnt.z));
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-            uvArray.addAll(Arrays.asList((uOffset + (uSize * 0.5f)), (vOffset + (vSize * 0.5f))));
+            uvArray.addAll(Arrays.asList((uOffset + (uSize * 0.5f)), (vOffset + vSize)));
 
             for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
-                indexArray.add((n == (aroundCount - 1)) ? 0 : (vStartIdx + 1));
+                indexArray.add(vStartIdx + 1);
                 indexArray.add(vIdx);
 
                 vStartIdx++;

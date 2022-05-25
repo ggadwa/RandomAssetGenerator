@@ -151,7 +151,7 @@ public class MapPlatform {
 
     private void addPlatforms(float y) {
         int x, z, trigIdx;
-        float ty, by, negX, posX, negZ, posZ, floorHigh;
+        float ty, by, negX, posX, negZ, posZ;
         ArrayList<Float> vertexArray, normalArray;
         ArrayList<Integer> indexArray;
         float[] vertexes, normals, uvs, tangents;
@@ -165,8 +165,7 @@ public class MapPlatform {
 
             // make the segments
 
-        trigIdx=0;
-        floorHigh=MapBuilder.SEGMENT_SIZE*0.1f;
+        trigIdx = 0;
 
         for (z = 0; z != room.piece.sizeZ; z++) {
             for (x = 0; x != room.piece.sizeX; x++) {

@@ -20,10 +20,12 @@ public class BitmapScale extends BitmapBase {
         int xCount, scaleCount, sWid, sHigh;
         RagColor scaleColor, borderColor, col;
 
-        scaleCount = 12 + AppWindow.random.nextInt(20);
+        scaleCount = 5 + AppWindow.random.nextInt(20);
 
         sWid = textureSize / scaleCount;
         sHigh = textureSize / scaleCount;
+
+        scaleCount = textureSize / sHigh;  // readjust scales so they always fit
 
         scaleColor = getRandomColor();
         borderColor = adjustColor(scaleColor, 0.7f);
@@ -38,9 +40,9 @@ public class BitmapScale extends BitmapBase {
         blur(colorData, 0, 0, textureSize, textureSize, 5, false);
 
         // scales (need extra row for overlap)
-        dy = textureSize - sHigh;
+        dy = textureSize - (sHigh / 2);
 
-        for (y = 0; y != (scaleCount + 1); y++) {
+        for (y = 0; y <= ((scaleCount + 1) * 2); y++) {
 
             if ((y % 2) == 0) {
                 dx = 0;
@@ -56,15 +58,15 @@ public class BitmapScale extends BitmapBase {
                 // wrapping rows
                 col = scaleColor;
 
-                if ((y != 0) && (y != scaleCount) && (x != 0) && (x != (xCount - 1))) {
-                    if (AppWindow.random.nextFloat() < 0.2f) {
-                        col = adjustColor(scaleColor, (0.6f + (AppWindow.random.nextFloat() * 0.3f)));
+                if ((y != 0) && (y != ((scaleCount + 1) * 2)) && (x != 0) && (x != (xCount - 1))) {
+                    if (AppWindow.random.nextFloat() < 0.3f) {
+                        col = adjustColor(scaleColor, (0.7f + (AppWindow.random.nextFloat() * 0.3f)));
                     }
                 }
 
                 // some slight offsets
                 sx = dx + (AppWindow.random.nextInt(10) - 5);
-                sy = dy + (AppWindow.random.nextInt(10) - 5);
+                sy = dy + (AppWindow.random.nextInt(10) - 3);
                 sx2 = dx + sWid;
                 sy2 = dy + (sHigh * 2);
 
@@ -76,7 +78,7 @@ public class BitmapScale extends BitmapBase {
                 dx += sWid;
             }
 
-            dy -= sHigh;
+            dy -= (sHigh / 2);    // overlap by half
         }
 
         // any spots and stains

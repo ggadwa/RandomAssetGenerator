@@ -2318,17 +2318,34 @@ public class BitmapBase
     // overlays
     //
     public void generateSpotsOverlay() {
-        int n, x, y, spotMin, spotAdd, spotCount, spotSize;
+        int x, y, dx, dy, rx, ry;
+        int spotMin, xCount, yCount, xAdd, yAdd, spotSize, jiggleSize;
 
-        spotMin = (int) ((float) textureSize * 0.1f);
-        spotAdd = spotMin / 2;
-        spotCount = 10 + AppWindow.random.nextInt(10);
+        xCount = 4 + AppWindow.random.nextInt(8);
+        xAdd = textureSize / xCount;
 
-        for (n = 0; n != spotCount; n++) {
-            spotSize = spotMin + AppWindow.random.nextInt(spotAdd);
-            x = AppWindow.random.nextInt(textureSize - spotSize) - 1;
-            y = AppWindow.random.nextInt(textureSize - spotSize) - 1;
-            drawOvalDarken(x, y, (x + spotSize), (y + spotSize), (0.8f + (AppWindow.random.nextFloat() * 0.2f)));
+        yCount = 4 + AppWindow.random.nextInt(8);
+        yAdd = textureSize / yCount;
+
+        spotMin = (xAdd > yAdd) ? (yAdd / 2) : (xAdd / 2);
+        jiggleSize = spotMin / 10;
+
+        dy = 0;
+
+        for (y = 0; y != yCount; y++) {
+
+            dx = 0;
+
+            for (x = 0; x != xCount; x++) {
+                spotSize = spotMin + AppWindow.random.nextInt(spotMin);
+                rx = dx + AppWindow.random.nextInt(jiggleSize);
+                ry = dy + AppWindow.random.nextInt(jiggleSize);
+                drawOvalDarken(rx, ry, (rx + spotSize), (ry + spotSize), (0.8f + (AppWindow.random.nextFloat() * 0.2f)));
+
+                dx += xAdd;
+            }
+
+            dy += yAdd;
         }
     }
 

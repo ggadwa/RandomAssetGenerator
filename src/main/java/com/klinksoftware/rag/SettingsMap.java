@@ -42,7 +42,7 @@ public class SettingsMap extends SettingsBase {
         lowerFloorCheckBox = addCheckBox(y, "Lower Floor", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        decorationsCheckBox = addCheckBox(y, "Decorations", false);
+        decorationsCheckBox = addCheckBox(y, "Decorations", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
         exportMapButton = addButton(y, "Export Map", BUTTON_EXPORT_MAP);

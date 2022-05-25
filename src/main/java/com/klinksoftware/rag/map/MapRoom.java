@@ -16,7 +16,7 @@ public class MapRoom
     public boolean hasUpperExtension, hasLowerExtension;
     public byte[] wallHideArray;
     public int[] floorGrid, ceilingGrid;
-    public boolean[] platformGrid;
+    public boolean[] platformGrid, blockedGrid;
     public MapPiece piece;
 
     public MapRoom(MapPiece piece)
@@ -39,8 +39,9 @@ public class MapRoom
 
         wallHideArray=new byte[piece.vertexes.length];
 
-        // grids for blocking off platforms
+        // grids for blocking off platforms and decorations
         platformGrid = new boolean[piece.sizeX * piece.sizeZ];
+        blockedGrid = new boolean[piece.sizeX * piece.sizeZ];
     }
 
     public MapRoom duplicate(int story) {
@@ -60,6 +61,7 @@ public class MapRoom
 
         room.wallHideArray = new byte[piece.vertexes.length];
         room.platformGrid = new boolean[piece.sizeX * piece.sizeZ];
+        room.blockedGrid = new boolean[piece.sizeX * piece.sizeZ];
 
         return (room);
     }
@@ -69,6 +71,7 @@ public class MapRoom
 
         wallHideArray = new byte[piece.vertexes.length];
         platformGrid = new boolean[piece.sizeX * piece.sizeZ];
+        blockedGrid = new boolean[piece.sizeX * piece.sizeZ];
     }
 
     //
@@ -319,7 +322,7 @@ public class MapRoom
     }
 
         //
-        // platform grid
+        // platform and blocking grid
         //
 
     public void setPlatformGrid(int x, int z)    {
@@ -328,6 +331,14 @@ public class MapRoom
 
     public boolean getPlatformGrid(int x, int z)    {
         return (platformGrid[(z * piece.sizeX) + x]);
+    }
+
+    public void setBlockedGrid(int x, int z) {
+        blockedGrid[(z * piece.sizeX) + x] = true;
+    }
+
+    public boolean getBlockedGrid(int x, int z) {
+        return (blockedGrid[(z * piece.sizeX) + x]);
     }
 
 }

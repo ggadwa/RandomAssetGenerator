@@ -996,26 +996,20 @@ public class MeshMapUtility
         // cylinders
         //
 
-    public static float[] createCylinderSegmentList(int segmentCount,int segmentExtra,float segmentRoundPercentage)
-    {
-        int         n,segCount;
-        float[]     segments;
+    public static float[] createCylinderSegmentList(int segmentCount, int segmentExtra) {
+        int n, segCount;
+        float[] segments;
 
         segCount=segmentCount+AppWindow.random.nextInt(segmentExtra);
         segments=new float[segCount+2];
 
-        segments[0]=1.0f;       // top always biggest
+        segments[0] = 1.0f; // top always biggest
 
         for (n=0;n!=segCount;n++) {
-            if (AppWindow.random.nextFloat()<segmentRoundPercentage) {
-                segments[n+1]=segments[n];
-            }
-            else {
-                segments[n+1]=0.8f+(AppWindow.random.nextFloat()*0.2f);
-            }
+            segments[n + 1] = 0.8f + (AppWindow.random.nextFloat() * 0.2f);
         }
 
-        segments[segCount+1]=1.0f;      // and bottom
+        segments[segCount + 1] = 1.0f; // and bottom
 
         return(segments);
     }

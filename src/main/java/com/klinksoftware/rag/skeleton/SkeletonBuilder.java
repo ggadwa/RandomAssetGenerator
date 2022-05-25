@@ -222,7 +222,7 @@ public class SkeletonBuilder
         //
 
     public void buildLimbHead(Skeleton skeleton, int modelType, int limbIdx, int parentBoneIdx, float neckRadius, float headRadius, float scaleFactor) {
-        int neckBotBoneIdx, neckTopBoneIdx, headBottomBoneIdx, headTopBoneIdx;
+        int neckBotBoneIdx, neckTopBoneIdx, headBottomBoneIdx, headMiddleBoneIdx, headTopBoneIdx;
         float neckLength, headLength;
         boolean hasNeck;
         Bone parentBone;
@@ -252,7 +252,9 @@ public class SkeletonBuilder
 
             pnt = parentBone.pnt.copy();
             vct = new RagPoint(0.0f, neckLength, 0.0f);
-            vct.rotateX(-AppWindow.random.nextFloat(15.0f));
+            if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
+                vct.rotateX(-AppWindow.random.nextFloat(15.0f));
+            }
             pnt.addPoint(vct);
             neckTopBoneIdx = skeleton.addChildBone(parentBoneIdx, ("neck_top_" + Integer.toString(limbIdx)), -1, neckRadius, pnt);
 
@@ -266,11 +268,22 @@ public class SkeletonBuilder
         headLength = headRadius * (0.9f + (AppWindow.random.nextFloat(0.6f)));
 
         pnt=pnt.copy();
-        vct=new RagPoint(0.0f,headLength,0.0f);
-        vct.rotateX(-AppWindow.random.nextFloat(25.0f));
+        vct = new RagPoint(0.0f, (headLength * 0.75f), 0.0f);
+        if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
+            vct.rotateX(-AppWindow.random.nextFloat(25.0f));
+        }
+        pnt.addPoint(vct);
+        headMiddleBoneIdx = skeleton.addChildBone(headBottomBoneIdx, ("head_middle_" + Integer.toString(limbIdx)), -1, headRadius, pnt);
+
+        pnt = pnt.copy();
+        vct = new RagPoint(0.0f, (headLength * 0.25f), 0.0f);
+        if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
+            vct.rotateX(-AppWindow.random.nextFloat(25.0f));
+        }
         pnt.addPoint(vct);
 
-        headTopBoneIdx=skeleton.addChildBone(headBottomBoneIdx,("head_top_"+Integer.toString(limbIdx)),-1,headRadius,pnt);
+        headRadius = headRadius * (0.2f + AppWindow.random.nextFloat(0.5f));
+        headTopBoneIdx = skeleton.addChildBone(headBottomBoneIdx, ("head_top_" + Integer.toString(limbIdx)), -1, headRadius, pnt);
 
             // the limb over the neck and head
         if (modelType == SettingsModel.MODEL_TYPE_ANIMAL) {
@@ -283,7 +296,8 @@ public class SkeletonBuilder
             skeleton.addLimb(("neck_" + Integer.toString(limbIdx)), Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, 0.5f, 0.5f, 0.5f, 0.1f, neckBotBoneIdx, neckTopBoneIdx);
             skeleton.addLimb(("jaw_" + Integer.toString(limbIdx)), Limb.MESH_TYPE_CYLINDER, Limb.LIMB_AXIS_Y, meshScale, 0.5f, 0.6f, 0.5f, 0.1f, neckTopBoneIdx, headBottomBoneIdx);
         }
-        skeleton.addLimb(("head_" + Integer.toString(limbIdx)), Limb.MESH_TYPE_CYLINDER_CLOSE_ALL, Limb.LIMB_AXIS_Y, meshScale, 0.5f, 0.7f, 0.5f, 0.3f, headBottomBoneIdx, headTopBoneIdx);
+        skeleton.addLimb(("head_bottom_" + Integer.toString(limbIdx)), Limb.MESH_TYPE_CYLINDER_CLOSE_BOTTOM, Limb.LIMB_AXIS_Y, meshScale, 0.5f, 0.7f, 0.5f, 0.2f, headBottomBoneIdx, headMiddleBoneIdx);
+        skeleton.addLimb(("head_top_" + Integer.toString(limbIdx)), Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, Limb.LIMB_AXIS_Y, meshScale, 0.5f, 0.9f, 0.5f, 0.1f, headMiddleBoneIdx, headTopBoneIdx);
     }
 
         //
@@ -478,6 +492,9 @@ public class SkeletonBuilder
             return;
         }
 
+        // legs can be bigger than arms
+        limbRadius = limbRadius + (AppWindow.random.nextFloat(0.2f));
+
         // some settings
         footRot = AppWindow.random.nextFloat(15.0f);
         footLength = limbRadius + (AppWindow.random.nextFloat(limbRadius * 2.0f));
@@ -528,12 +545,16 @@ public class SkeletonBuilder
 
     public void buildHead(Skeleton skeleton, int modelType, float limbRadius, float scaleFactor) {
         int boneIdx;
-        float headRadius;
+        float headRadius, neckRadius;
 
-        headRadius = 0.4f + (AppWindow.random.nextFloat(0.6f));
+        headRadius = 0.5f + (AppWindow.random.nextFloat(0.8f));
+        neckRadius = headRadius * (0.9f - AppWindow.random.nextFloat(0.5f));
+        if (neckRadius < limbRadius) {
+            neckRadius = limbRadius;
+        }
 
         boneIdx=skeleton.findBoneIndex("Torso_Top");
-        buildLimbHead(skeleton, modelType, 0, boneIdx, limbRadius, headRadius, scaleFactor);
+        buildLimbHead(skeleton, modelType, 0, boneIdx, neckRadius, headRadius, scaleFactor);
     }
 
         //
@@ -549,13 +570,20 @@ public class SkeletonBuilder
         // skeleton hunch angle
         switch (modelType) {
             case SettingsModel.MODEL_TYPE_ANIMAL:
-                hunchAng = (60.0f + (AppWindow.random.nextFloat(60.0f)));
+                hunchAng = (70.0f + (AppWindow.random.nextFloat(40.0f)));
+                scaleFactor = thin ? (0.3f + (AppWindow.random.nextFloat(0.5f))) : (0.6f + (AppWindow.random.nextFloat(0.3f)));
+                break;
+            case SettingsModel.MODEL_TYPE_BLOB:
+                hunchAng = AppWindow.random.nextFloat(20.0f);
+                scaleFactor = thin ? (0.4f + (AppWindow.random.nextFloat(0.6f))) : (0.6f + (AppWindow.random.nextFloat(0.4f)));
                 break;
             case SettingsModel.MODEL_TYPE_ROBOT:
                 hunchAng = 0.0f;
+                scaleFactor = thin ? (0.4f + (AppWindow.random.nextFloat(0.6f))) : (0.6f + (AppWindow.random.nextFloat(0.4f)));
                 break;
-            default:
+            default:    // humanoid
                 hunchAng = AppWindow.random.nextFloat(20.0f);
+                scaleFactor = thin ? (0.3f + (AppWindow.random.nextFloat(0.5f))) : (0.6f + (AppWindow.random.nextFloat(0.3f)));
                 break;
         }
 
@@ -563,7 +591,6 @@ public class SkeletonBuilder
         limbRadius = 0.2f + (AppWindow.random.nextFloat(0.2f));
 
         // skeleton scale factor
-        scaleFactor = thin ? (0.3f + (AppWindow.random.nextFloat(0.5f))) : (0.6f + (AppWindow.random.nextFloat(0.3f)));
 
         // build the skeleton
         buildBody(skeleton, modelType, hunchAng, scaleFactor);

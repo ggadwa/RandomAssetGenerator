@@ -34,13 +34,11 @@ public class MapBuilder
         // deleting shared walls, floors, and ceilings
         //
 
-    private void removeSharedWalls(ArrayList<MapRoom> rooms)
-    {
-        int         n,k,roomCount,vIdx,vIdx2,
-                    nextIdx,nextIdx2,
-                    vertexCount,vertexCount2;
-        float       ax,az,ax2,az2,bx,bz,bx2,bz2;
-        MapRoom     room,room2;
+    private void removeSharedWalls(ArrayList<MapRoom> rooms) {
+        int n, k, roomCount, vIdx, vIdx2;
+        int nextIdx, nextIdx2, vertexCount, vertexCount2;
+        float ax, az, ax2, az2, bx, bz, bx2, bz2;
+        MapRoom room, room2;
 
             // run through ever room against every other room
             // and pull any walls that are equal as they will
@@ -100,43 +98,42 @@ public class MapBuilder
     }
 
         //
-        // room decorations
+        // decorations
         //
 
-    private void buildDecoration(MapRoom room,int roomIdx)
-    {
+    private void buildDecorations(ArrayList<MapRoom> rooms, HashMap<String, BitmapBase> bitmaps, MeshList meshList) {
+        int n, roomCount;
+        MapRoom room;
+        MapPillar mapPillar = null;
+
+        roomCount = rooms.size();
+
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+            if (!room.piece.decorate) {
+                continue;
+            }
+
+            // pillars
+            if (AppWindow.random.nextFloat() > 0.4f) {
+
+                // initialize once so all pillars are the same
+                if (mapPillar == null) {
+                    buildPillarBitmaps(bitmaps);
+                    mapPillar = new MapPillar(meshList);
+                }
+
+                mapPillar.build(room, n);
+            }
+
+        }
+
         /*
         int         decorationType;
 
-            // some decorations can't work in some rooms
-
-        while (true) {
-            decorationType=AppWindow.random.nextInt(6);
-
-                // stories only in rooms with more than one story
-
-            if (decorationType==0) {
-                if (room.storyCount>1) break;
-                continue;
-            }
-
-                // equipment only in big rooms
-
-            if (decorationType==3) {
-                if ((room.piece.size.x==10) || (room.piece.size.z==10)) break;
-                continue;
-            }
-
-            break;
-        }
 
             // build the decoration
 
-        switch (decorationType) {
-            case 0:
-                bitmapGenerator.generatePlatform();
-                (new MapStory(meshList,room,("story_"+Integer.toString(roomIdx)))).build();
-                break;
             case 1:
                 bitmapGenerator.generatePillar();
                 (new MapPillar(meshList,room,("pillar_"+Integer.toString(roomIdx)))).build();
@@ -160,12 +157,8 @@ public class MapBuilder
                 bitmapGenerator.generatePipe();
                 (new MapPipe(meshList,room,("pipe_"+Integer.toString(roomIdx)))).build();
                 break;
-            case 5:
-                bitmapGenerator.generatePlatform();
-                (new MapAltar(meshList,room,("alter_"+Integer.toString(roomIdx)))).build();
-                break;
         }
-*/
+         */
     }
 
         //
@@ -500,12 +493,26 @@ public class MapBuilder
         }
     }
 
+    public void buildPillarBitmaps(HashMap<String, BitmapBase> bitmaps) {
+        String[] pillarBitmaps = {"Brick", "Concrete", "Metal", "Mosaic", "Plaster", "Stone", "Tile"};
+
+        BitmapBase bitmap;
+
+        try {
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + pillarBitmaps[AppWindow.random.nextInt(pillarBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
+            bitmap.generate();
+            bitmaps.put("pillar", bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
         //
         // build a map
         //
 
     public void build(float mapSize, float mapCompactFactor, boolean complex, boolean upperFloor, boolean lowerFloor, boolean decorations) {
-        int n, k, roomCount, roomExtensionCount;
+        int n, roomCount, roomExtensionCount;
         RagPoint centerPnt;
         MapRoom room;
         ArrayList<MapRoom> rooms;
@@ -552,10 +559,6 @@ public class MapBuilder
             MeshMapUtility.buildRoomWalls(meshList, room, centerPnt, n);
             MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, true);
             MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, false);
-
-                // decorations
-
-            if ((room.piece.decorate) && (decorations)) this.buildDecoration(room,n);
         }
 
         // any steps
@@ -578,6 +581,11 @@ public class MapBuilder
             if (room.hasLowerExtension) {
                 (new MapPlatform(meshList, room, n)).build(false);
             }
+        }
+
+        // decorations
+        if (decorations) {
+            buildDecorations(rooms, bitmaps, meshList);
         }
 
             // now build the fake skeleton
