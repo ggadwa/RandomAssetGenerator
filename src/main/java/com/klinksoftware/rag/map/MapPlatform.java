@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.map;
 
+import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.mesh.*;
 
 import java.util.*;
@@ -15,141 +16,92 @@ public class MapPlatform {
     public static final int FLAG_PLATFORM=2;
     public static final int FLAG_WALL=3;
 
-    private int roomNumber;
     private MeshList meshList;
-    private MapRoom room;
+    private ArrayList<MapRoom> rooms;
 
-    public MapPlatform(MeshList meshList, MapRoom room, int roomNumber) {
-        this.meshList=meshList;
-        this.room=room;
-        this.roomNumber = roomNumber;
+    public MapPlatform(MeshList meshList, ArrayList<MapRoom> rooms) {
+        this.meshList = meshList;
+        this.rooms = rooms;
     }
 
         //
         // check for walls on platform segments
         //
 
-    private boolean hasNegXWall(int x, int z) {
+    private boolean hasNegXWall(MapRoom room, int x, int z) {
         if (x == 0) {
             return (true);
         }
         return (room.getPlatformGrid((x - 1), z));
     }
 
-    private boolean hasPosXWall(int x, int z) {
-        if (x >= (this.room.piece.sizeX - 1)) {
+    private boolean hasPosXWall(MapRoom room, int x, int z) {
+        if (x >= (room.piece.sizeX - 1)) {
             return (true);
         }
         return (room.getPlatformGrid((x + 1), z));
     }
 
-    private boolean hasNegZWall(int x, int z) {
+    private boolean hasNegZWall(MapRoom room, int x, int z) {
         if (z == 0) {
             return (true);
         }
         return (room.getPlatformGrid(x, (z - 1)));
     }
 
-    private boolean hasPosZWall(int x, int z) {
-        if (z >= (this.room.piece.sizeZ - 1)) {
+    private boolean hasPosZWall(MapRoom room, int x, int z) {
+        if (z >= (room.piece.sizeZ - 1)) {
             return (false);
         }
         return (room.getPlatformGrid(x, (z + 1)));
     }
 
-    private void setupRandomPlatforms(int startX,int startZ,int storyIdx)
-    {
-        /*
-        int         x,z,gx,gz,sx,sz,
-                    dir,orgDir;
-        boolean     wallStop;
+    private void knockOutPlatformSides(MapRoom room) {
+        int x, z;
 
-        gx=startX;
-        gz=startZ;
-
-            // start the random wander of segments
-
-        while (true) {
-
-                // next random direction
-
-            dir=AppWindow.random.nextInt(4);
-            orgDir=dir;
-
-                // find open direction
-
-            sx=sz=0;
-            wallStop=false;
-
-            while (true) {
-
-                switch (dir) {
-                    case PLATFORM_DIR_POS_Z:
-                        sx=gx;
-                        sz=gz+1;
-                        break;
-                    case PLATFORM_DIR_NEG_Z:
-                        sx=gx;
-                        sz=gz-1;
-                        break;
-                    case PLATFORM_DIR_POS_X:
-                        sx=gx+1;
-                        sz=gz;
-                        break;
-                    case PLATFORM_DIR_NEG_X:
-                        sx=gx-1;
-                        sz=gz;
-                        break;
-                }
-
-                if ((room.getGrid(storyIdx,sx,sz)!=this.FLAG_NONE) || (sx<0) || (sx>=room.piece.size.x) || (sz<0) || (sz>=room.piece.size.z)) {
-                    dir++;
-                    if (dir==4) dir=0;
-                    if (dir==orgDir) {
-                        wallStop=true;
+        // randomly open up sides
+        if (AppWindow.random.nextBoolean()) {
+            if (!room.touchesNegativeX(rooms)) {
+                for (x = 0; x != room.piece.sizeX; x++) {
+                    if (room.checkPlatformGridAcrossX(x)) {
                         break;
                     }
+                    room.setPlatformGridAcrossX(x);
                 }
-                else {
-                    break;
-                }
-            }
-
-            if (wallStop) break;
-
-                // add grid spot
-
-            room.setGrid(storyIdx,sx,sz,FLAG_PLATFORM);
-
-            gx=sx;
-            gz=sz;
-        }
-
-            // randomly make stripes where stories
-            // become solid walls instead of floating blocks
-            // only do it on first story
-
-        if (storyIdx==1) {
-            for (x=1;x<(room.piece.size.x-1);x++) {
-                if (AppWindow.random.nextFloat()<0.2f) {
-                    for (z=1;z<(room.piece.size.z-1);z++) {
-                        if (room.getGrid(storyIdx,x,z)==FLAG_PLATFORM) room.setGrid(storyIdx,x,z,FLAG_WALL);
-                    }
-                }
-            }
-
-            for (z=1;z<(room.piece.size.z-1);z++) {
-                if (AppWindow.random.nextFloat()<0.2f) {
-                    for (x=1;x<(room.piece.size.x-1);x++) {
-                        if (room.getGrid(storyIdx,x,z)==FLAG_PLATFORM) room.setGrid(storyIdx,x,z,FLAG_WALL);
+            } else {
+                if (!room.touchesPositiveX(rooms)) {
+                    for (x = (room.piece.sizeX - 1); x != 0; x--) {
+                        if (room.checkPlatformGridAcrossX(x)) {
+                            break;
+                        }
+                        room.setPlatformGridAcrossX(x);
                     }
                 }
             }
         }
-*/
+
+        if (AppWindow.random.nextBoolean()) {
+            if (!room.touchesNegativeZ(rooms)) {
+                for (z = 0; z != room.piece.sizeZ; z++) {
+                    if (room.checkPlatformGridAcrossZ(z)) {
+                        break;
+                    }
+                    room.setPlatformGridAcrossZ(z);
+                }
+            } else {
+                if (!room.touchesPositiveZ(rooms)) {
+                    for (z = (room.piece.sizeZ - 1); z != 0; z--) {
+                        if (room.checkPlatformGridAcrossX(z)) {
+                            break;
+                        }
+                        room.setPlatformGridAcrossX(z);
+                    }
+                }
+            }
+        }
     }
 
-    private void addPlatforms(float y) {
+    private void addPlatforms(MapRoom room, int roomNumber, float y) {
         int x, z, trigIdx;
         float ty, by, negX, posX, negZ, posZ;
         ArrayList<Float> vertexArray, normalArray;
@@ -182,13 +134,13 @@ public class MapPlatform {
                 negZ = (room.z + z) * MapBuilder.SEGMENT_SIZE;
                 posZ = (room.z + (z + 1)) * MapBuilder.SEGMENT_SIZE;
 
-                if (hasNegXWall(x, z)) {
+                if (hasNegXWall(room, x, z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,negZ,negX,ty,posZ,negX,by,posZ,negX,by,negZ));
                     normalArray.addAll(Arrays.asList(-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f));
                     trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
 
-                if (hasPosXWall(x, z)) {
+                if (hasPosXWall(room, x, z)) {
                     vertexArray.addAll(Arrays.asList(posX,ty,negZ,posX,ty,posZ,posX,by,posZ,posX,by,negZ));
                     normalArray.addAll(Arrays.asList(1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f));
                     trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
@@ -204,13 +156,13 @@ public class MapPlatform {
                 normalArray.addAll(Arrays.asList(0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f));
                 trigIdx = MeshMapUtility.addQuadToIndexes(indexArray, trigIdx);
 
-                if (hasNegZWall(x, z)) {
+                if (hasNegZWall(room, x, z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,negZ,posX,ty,negZ,posX,by,negZ,negX,by,negZ));
                     normalArray.addAll(Arrays.asList(0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f));
                     trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
                 }
 
-                if (hasPosZWall(x, z)) {
+                if (hasPosZWall(room, x, z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,posZ,posX,ty,posZ,posX,by,posZ,negX,by,posZ));
                     normalArray.addAll(Arrays.asList(0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f));
                     trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
@@ -231,7 +183,7 @@ public class MapPlatform {
         // second story mainline
         //
 
-    public void build(boolean upper) {
+    public void build(MapRoom room, int roomNumber, boolean upper) {
         float y;
 
         if (upper) {
@@ -240,7 +192,7 @@ public class MapPlatform {
             y = -MapBuilder.FLOOR_HEIGHT;
         }
 
-        //    setupRandomPlatforms(x,z,1);
-        addPlatforms(y);
+        knockOutPlatformSides(room);
+        addPlatforms(room, roomNumber, y);
     }
 }

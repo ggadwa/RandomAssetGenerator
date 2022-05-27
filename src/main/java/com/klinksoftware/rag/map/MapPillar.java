@@ -4,9 +4,7 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 
-public class MapPillar
-{
-
+public class MapPillar {
     private float[] cylinderSegments;
     private MeshList meshList;
 

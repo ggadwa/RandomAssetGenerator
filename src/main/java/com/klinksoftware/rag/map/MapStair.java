@@ -2,21 +2,21 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.mesh.*;
+import java.util.ArrayList;
 
 public class MapStair {
-    private int roomNumber;
     private MeshList meshList;
-    private MapRoom room;
+    private ArrayList<MapRoom> rooms;
 
-    public MapStair(MeshList meshList, MapRoom room, int roomNumber) {
+    public MapStair(MeshList meshList, ArrayList<MapRoom> rooms) {
         this.meshList = meshList;
-        this.room = room;
-        this.roomNumber = roomNumber;
+        this.rooms = rooms;
     }
 
-    public void build(boolean upper) {
-        int x, z, dir;
+    public void build(MapRoom room, int roomNumber, boolean upper) {
+        int x, z, x2, z2, dir;
         float sx, sy, sz;
+        boolean smallStairHole;
         String name;
 
         // possible directions
@@ -43,7 +43,38 @@ public class MapStair {
                 break;
         }
 
-        // possition
+        // mark off the grid
+        smallStairHole = AppWindow.random.nextBoolean();
+
+        switch (dir)
+        {
+            case MeshMapUtility.STAIR_DIR_POS_Z:
+                for (z2 = (z + 1); z2 >= (smallStairHole ? z : 0); z2--) {
+                    room.setPlatformGrid(x, z2);
+                    room.setBlockedGrid(x, z2);
+                }
+                break;
+            case MeshMapUtility.STAIR_DIR_NEG_Z:
+                for (z2 = (z - 1); z2 <= (smallStairHole ? z : (room.piece.sizeZ - 1)); z2++) {
+                    room.setPlatformGrid(x, z2);
+                    room.setBlockedGrid(x, z2);
+                }
+                break;
+            case MeshMapUtility.STAIR_DIR_POS_X:
+                for (x2 = (x + 1); x2 >= (smallStairHole ? x : 0); x2--) {
+                    room.setPlatformGrid(x2, z);
+                    room.setBlockedGrid(x2, z);
+                }
+                break;
+            case MeshMapUtility.STAIR_DIR_NEG_X:
+                for (x2 = (x - 1); x2 <= (smallStairHole ? x : (room.piece.sizeX - 1)); x2++) {
+                    room.setPlatformGrid(x2, z);
+                    room.setBlockedGrid(x2, z);
+                }
+                break;
+        }
+
+        // make the stairs
         sx = (room.x + x) * MapBuilder.SEGMENT_SIZE;
         sz = (room.z + z) * MapBuilder.SEGMENT_SIZE;
         if (upper) {
@@ -52,39 +83,9 @@ public class MapStair {
             sy = -(MapBuilder.SEGMENT_SIZE + (MapBuilder.FLOOR_HEIGHT * 2.0f));
         }
 
-        dir = MeshMapUtility.STAIR_DIR_POS_Z;
-
-        // mark off the grid
-        switch (dir)
-        {
-            case MeshMapUtility.STAIR_DIR_POS_Z:
-                room.setPlatformGrid(x, z);
-                room.setPlatformGrid(x, (z + 1));
-                room.setBlockedGrid(x, z);
-                room.setBlockedGrid(x, (z + 1));
-                break;
-            case MeshMapUtility.STAIR_DIR_NEG_Z:
-                room.setPlatformGrid(x, z);
-                room.setPlatformGrid(x, (z - 1));
-                room.setBlockedGrid(x, z);
-                room.setBlockedGrid(x, (z - 1));
-                break;
-            case MeshMapUtility.STAIR_DIR_POS_X:
-                room.setPlatformGrid(x, z);
-                room.setPlatformGrid((x + 1), z);
-                room.setBlockedGrid(x, z);
-                room.setBlockedGrid((x + 1), z);
-                break;
-            case MeshMapUtility.STAIR_DIR_NEG_X:
-                room.setPlatformGrid(x, z);
-                room.setPlatformGrid((x - 1), z);
-                room.setBlockedGrid(x, z);
-                room.setBlockedGrid((x - 1), z);
-                break;
-        }
-
-        // make the stairs
         name = "stair_" + Integer.toString(roomNumber);
         MeshMapUtility.buildStairs(meshList, room, name, sx, sy, sz, dir, 1.0f, true);
+
+        room.stairDir = dir;
     }
 }

@@ -1,9 +1,11 @@
 
 
+- platform knocks outs need to be different
+   - track direction of steps, can only knock out up to top step
+   - never knock out direction of step
 
-
+- walls on stairs
 - fix upper/lower connections
-- need platform knock outs
 - get rid of floorGrid ceilingGrid (grid?)
 - go back to polygon ceilings/floors
 

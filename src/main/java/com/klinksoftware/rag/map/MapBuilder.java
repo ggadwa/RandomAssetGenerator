@@ -336,7 +336,7 @@ public class MapBuilder
         while (true) {
             roomStartIdx = AppWindow.random.nextInt(rooms.size());
             startRoom = rooms.get(roomStartIdx);
-            if ((startRoom.story == MapRoom.ROOM_STORY_MAIN) && (startRoom.piece.sizeX >= 5) && (startRoom.piece.sizeZ >= 5)) {
+            if ((startRoom.story == MapRoom.ROOM_STORY_MAIN) && (!startRoom.hasLowerExtension) && (!startRoom.hasUpperExtension) && (startRoom.piece.sizeX >= 5) && (startRoom.piece.sizeZ >= 5)) {
                 break;
             }
         }
@@ -353,7 +353,7 @@ public class MapBuilder
                 }
 
                 endRoom = rooms.get(roomEndIdx);
-                if ((endRoom.story == MapRoom.ROOM_STORY_MAIN) && (endRoom.piece.sizeX >= 5) && (endRoom.piece.sizeZ >= 5)) {
+                if ((endRoom.story == MapRoom.ROOM_STORY_MAIN) && (!startRoom.hasLowerExtension) && (!startRoom.hasUpperExtension) && (endRoom.piece.sizeX >= 5) && (endRoom.piece.sizeZ >= 5)) {
                     if (startRoom.distance(endRoom) < UPPER_LOWER_FLOOR_MAX_DISTANCE) {
                         break;
                     }
@@ -516,6 +516,8 @@ public class MapBuilder
         RagPoint centerPnt;
         MapRoom room;
         ArrayList<MapRoom> rooms;
+        MapStair mapStair;
+        MapPlatform mapPlatform;
 
         bitmaps = new HashMap<>();
         mapPieceList=new MapPieceList();
@@ -562,24 +564,28 @@ public class MapBuilder
         }
 
         // any steps
+        mapStair = new MapStair(meshList, rooms);
+
         for (n = 0; n != roomCount; n++) {
             room = rooms.get(n);
-            if (room.hasUpperExtension) {
-                (new MapStair(meshList, room, n)).build(true);
+            if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
+                mapStair.build(room, n, true);
             }
-            if (room.hasLowerExtension) {
-                (new MapStair(meshList, room, n)).build(false);
+            if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
+                mapStair.build(room, n, false);
             }
         }
 
         // any platforms
+        mapPlatform = new MapPlatform(meshList, rooms);
+
         for (n = 0; n != roomCount; n++) {
             room = rooms.get(n);
-            if (room.hasUpperExtension) {
-                (new MapPlatform(meshList, room, n)).build(true);
+            if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
+                mapPlatform.build(room, n, true);
             }
-            if (room.hasLowerExtension) {
-                (new MapPlatform(meshList, room, n)).build(false);
+            if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
+                mapPlatform.build(room, n, false);
             }
         }
 

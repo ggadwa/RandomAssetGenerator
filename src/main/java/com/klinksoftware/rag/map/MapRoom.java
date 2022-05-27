@@ -12,7 +12,7 @@ public class MapRoom
     public static final int ROOM_STORY_UPPER_EXTENSION = 3;
     public static final int ROOM_STORY_LOWER_EXTENSION = 4;
 
-    public int x, z, story;
+    public int x, z, story, stairDir;
     public boolean hasUpperExtension, hasLowerExtension;
     public byte[] wallHideArray;
     public int[] floorGrid, ceilingGrid;
@@ -27,6 +27,7 @@ public class MapRoom
         this.z=0;
 
         this.story = ROOM_STORY_MAIN;
+        this.stairDir = 0;
         this.hasUpperExtension = false;
         this.hasLowerExtension = false;
 
@@ -52,6 +53,7 @@ public class MapRoom
         room.z = z;
 
         room.story = story;
+        room.stairDir = 0;
         room.hasUpperExtension = false;
         room.hasLowerExtension = false;
 
@@ -148,6 +150,102 @@ public class MapRoom
         }
 
         return(-1);
+    }
+
+    public boolean touchesNegativeX(ArrayList<MapRoom> rooms) {
+        int n;
+        MapRoom checkRoom;
+
+        for (n = 0; n != rooms.size(); n++) {
+            checkRoom = rooms.get(n);
+            if (!storyEqual(checkRoom)) {
+                continue;
+            }
+
+            if (x == (checkRoom.x + checkRoom.piece.sizeX)) {
+                if (z >= (checkRoom.z + checkRoom.piece.sizeZ)) {
+                    continue;
+                }
+                if ((z + piece.sizeZ) <= checkRoom.z) {
+                    continue;
+                }
+                return (true);
+            }
+        }
+
+        return (false);
+    }
+
+    public boolean touchesPositiveX(ArrayList<MapRoom> rooms) {
+        int n;
+        MapRoom checkRoom;
+
+        for (n = 0; n != rooms.size(); n++) {
+            checkRoom = rooms.get(n);
+            if (!storyEqual(checkRoom)) {
+                continue;
+            }
+
+            if ((x + piece.sizeX) == checkRoom.x) {
+                if (z >= (checkRoom.z + checkRoom.piece.sizeZ)) {
+                    continue;
+                }
+                if ((z + piece.sizeZ) <= checkRoom.z) {
+                    continue;
+                }
+                return (true);
+            }
+        }
+
+        return (false);
+    }
+
+    public boolean touchesNegativeZ(ArrayList<MapRoom> rooms) {
+        int n;
+        MapRoom checkRoom;
+
+        for (n = 0; n != rooms.size(); n++) {
+            checkRoom = rooms.get(n);
+            if (!storyEqual(checkRoom)) {
+                continue;
+            }
+
+            if (z == (checkRoom.z + checkRoom.piece.sizeZ)) {
+                if (x >= (checkRoom.x + checkRoom.piece.sizeX)) {
+                    continue;
+                }
+                if ((x + piece.sizeX) <= checkRoom.x) {
+                    continue;
+                }
+                return (true);
+            }
+        }
+
+        return (false);
+    }
+
+    public boolean touchesPositiveZ(ArrayList<MapRoom> rooms) {
+        int n;
+        MapRoom checkRoom;
+
+        for (n = 0; n != rooms.size(); n++) {
+            checkRoom = rooms.get(n);
+            if (!storyEqual(checkRoom)) {
+                continue;
+            }
+
+            if ((z + piece.sizeZ) == checkRoom.z) {
+                if (x >= (checkRoom.x + checkRoom.piece.sizeX)) {
+                    continue;
+                }
+                if ((x + piece.sizeX) <= checkRoom.x) {
+                    continue;
+                }
+                return (true);
+            }
+        }
+
+        return (false);
     }
 
     public boolean touches(MapRoom room) {
@@ -331,6 +429,46 @@ public class MapRoom
 
     public boolean getPlatformGrid(int x, int z)    {
         return (platformGrid[(z * piece.sizeX) + x]);
+    }
+
+    public boolean checkPlatformGridAcrossX(int x) {
+        int z;
+
+        for (z = 0; z != piece.sizeZ; z++) {
+            if (platformGrid[(z * piece.sizeX) + x]) {
+                return (true);
+            }
+        }
+
+        return (false);
+    }
+
+    public void setPlatformGridAcrossX(int x) {
+        int z;
+
+        for (z = 0; z != piece.sizeZ; z++) {
+            platformGrid[(z * piece.sizeX) + x] = true;
+        }
+    }
+
+    public boolean checkPlatformGridAcrossZ(int z) {
+        int x;
+
+        for (x = 0; x != piece.sizeX; x++) {
+            if (platformGrid[(z * piece.sizeX) + x]) {
+                return (true);
+            }
+        }
+
+        return (false);
+    }
+
+    public void setPlatformGridAcrossZ(int z) {
+        int x;
+
+        for (x = 0; x != piece.sizeX; x++) {
+            platformGrid[(z * piece.sizeX) + x] = true;
+        }
     }
 
     public void setBlockedGrid(int x, int z) {

@@ -398,7 +398,7 @@ public class MeshMapUtility
         float px, py, pz;
         ArrayList<Float> vertexArray;
         ArrayList<Integer> indexArray;
-        int[] indexes, grid;
+        int[] indexes;
         float[] vertexes, normals, tangents, uvs;
         MapPiece piece;
 
@@ -436,10 +436,7 @@ public class MeshMapUtility
                 break;
         }
 
-        // from grid
-        grid=floor?room.floorGrid:room.ceilingGrid;
-
-        vertexArray=new ArrayList<>();
+        vertexArray = new ArrayList<>();
         indexArray=new ArrayList<>();
 
         trigIdx=0;
@@ -447,54 +444,17 @@ public class MeshMapUtility
         for (z=0;z!=piece.sizeZ;z++) {
             pz=(room.z+z)*MapBuilder.SEGMENT_SIZE;
             for (x=0;x!=piece.sizeX;x++) {
-                if (grid[(z*piece.sizeX)+x]==MapBuilder.FC_MARK_EMPTY) continue;
+                if (piece.floorGrid[(z * piece.sizeX) + x] != 1) {
+                    //    continue;
+                }
 
-                    // add the quad
-
-                px=(room.x+x)*MapBuilder.SEGMENT_SIZE;
+                px = (room.x + x) * MapBuilder.SEGMENT_SIZE;
                 vertexArray.addAll(Arrays.asList(px,py,pz));
                 vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,pz));
                 vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,(pz+MapBuilder.SEGMENT_SIZE)));
                 vertexArray.addAll(Arrays.asList(px,py,(pz+MapBuilder.SEGMENT_SIZE)));
 
-                trigIdx=addQuadToIndexes(indexArray,trigIdx);
-
-                    // add any platform walls
-
-                if (grid[(z*piece.sizeX)+x]==MapBuilder.FC_MARK_FILL_PLATFORM) {
-                    if ((z>0) && (grid[((z-1)*piece.sizeX)+x]==MapBuilder.FC_MARK_EMPTY)) {
-                        vertexArray.addAll(Arrays.asList(px,py,pz));
-                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,pz));
-                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),(py-MapBuilder.FLOOR_HEIGHT),pz));
-                        vertexArray.addAll(Arrays.asList(px,(py-MapBuilder.FLOOR_HEIGHT),pz));
-
-                        trigIdx=addQuadToIndexes(indexArray,trigIdx);
-                    }
-                    if ((z<(piece.sizeZ-1)) && (grid[((z+1)*piece.sizeX)+x]==MapBuilder.FC_MARK_EMPTY)) {
-                        vertexArray.addAll(Arrays.asList(px,py,(pz+MapBuilder.SEGMENT_SIZE)));
-                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,(pz+MapBuilder.SEGMENT_SIZE)));
-                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),(py-MapBuilder.FLOOR_HEIGHT),(pz+MapBuilder.SEGMENT_SIZE)));
-                        vertexArray.addAll(Arrays.asList(px,(py-MapBuilder.FLOOR_HEIGHT),(pz+MapBuilder.SEGMENT_SIZE)));
-
-                        trigIdx=addQuadToIndexes(indexArray,trigIdx);
-                    }
-                    if ((x>0) && (grid[(z*piece.sizeX)+(x-1)]==MapBuilder.FC_MARK_EMPTY)) {
-                        vertexArray.addAll(Arrays.asList(px,py,pz));
-                        vertexArray.addAll(Arrays.asList(px,py,(pz+MapBuilder.SEGMENT_SIZE)));
-                        vertexArray.addAll(Arrays.asList(px,(py-MapBuilder.FLOOR_HEIGHT),(pz+MapBuilder.SEGMENT_SIZE)));
-                        vertexArray.addAll(Arrays.asList(px,(py-MapBuilder.FLOOR_HEIGHT),pz));
-
-                        trigIdx=addQuadToIndexes(indexArray,trigIdx);
-                    }
-                    if ((x<(piece.sizeX-1)) && (grid[(z*piece.sizeX)+(x+1)]==MapBuilder.FC_MARK_EMPTY)) {
-                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,pz));
-                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,(pz+MapBuilder.SEGMENT_SIZE)));
-                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),(py-MapBuilder.FLOOR_HEIGHT),(pz+MapBuilder.SEGMENT_SIZE)));
-                        vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),(py-MapBuilder.FLOOR_HEIGHT),pz));
-
-                        trigIdx=addQuadToIndexes(indexArray,trigIdx);
-                    }
-                }
+                trigIdx = addQuadToIndexes(indexArray, trigIdx);
             }
         }
 
