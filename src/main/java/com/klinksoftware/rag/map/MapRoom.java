@@ -12,11 +12,13 @@ public class MapRoom
     public static final int ROOM_STORY_UPPER_EXTENSION = 3;
     public static final int ROOM_STORY_LOWER_EXTENSION = 4;
 
-    public int x, z, story, stairDir;
+    public int x, z, story;
+    public int stairDir, stairX, stairZ;
     public boolean hasUpperExtension, hasLowerExtension;
     public byte[] wallHideArray;
     public int[] floorGrid, ceilingGrid;
     public boolean[] platformGrid, blockedGrid;
+    public MapRoom extendedFromRoom;
     public MapPiece piece;
 
     public MapRoom(MapPiece piece)
@@ -28,8 +30,12 @@ public class MapRoom
 
         this.story = ROOM_STORY_MAIN;
         this.stairDir = 0;
+        this.stairX = 0;
+        this.stairZ = 0;
+
         this.hasUpperExtension = false;
         this.hasLowerExtension = false;
+        this.extendedFromRoom = null;
 
             // need a copy of floor grid
 
@@ -54,8 +60,12 @@ public class MapRoom
 
         room.story = story;
         room.stairDir = 0;
+        this.stairX = 0;
+        this.stairZ = 0;
+
         room.hasUpperExtension = false;
         room.hasLowerExtension = false;
+        room.extendedFromRoom = null;
 
         // need a copy of floor grid
         room.floorGrid = piece.floorGrid.clone();
@@ -443,11 +453,11 @@ public class MapRoom
         return (false);
     }
 
-    public void setPlatformGridAcrossX(int x) {
+    public void setPlatformGridAcrossX(int x, boolean value) {
         int z;
 
         for (z = 0; z != piece.sizeZ; z++) {
-            platformGrid[(z * piece.sizeX) + x] = true;
+            platformGrid[(z * piece.sizeX) + x] = value;
         }
     }
 
@@ -463,11 +473,11 @@ public class MapRoom
         return (false);
     }
 
-    public void setPlatformGridAcrossZ(int z) {
+    public void setPlatformGridAcrossZ(int z, boolean value) {
         int x;
 
         for (x = 0; x != piece.sizeX; x++) {
-            platformGrid[(z * piece.sizeX) + x] = true;
+            platformGrid[(z * piece.sizeX) + x] = value;
         }
     }
 
@@ -477,6 +487,10 @@ public class MapRoom
 
     public boolean getBlockedGrid(int x, int z) {
         return (blockedGrid[(z * piece.sizeX) + x]);
+    }
+
+    public int getFloorGrid(int x, int z) {
+        return (floorGrid[(z * piece.sizeX) + x]);
     }
 
 }

@@ -46,8 +46,7 @@ public class MapStair {
         // mark off the grid
         smallStairHole = AppWindow.random.nextBoolean();
 
-        switch (dir)
-        {
+        switch (dir) {
             case MeshMapUtility.STAIR_DIR_POS_Z:
                 for (z2 = (z + 1); z2 >= (smallStairHole ? z : 0); z2--) {
                     room.setPlatformGrid(x, z2);
@@ -86,6 +85,9 @@ public class MapStair {
         name = "stair_" + Integer.toString(roomNumber);
         MeshMapUtility.buildStairs(meshList, room, name, sx, sy, sz, dir, 1.0f, true);
 
+        // save for platform calcs later
         room.stairDir = dir;
+        room.stairX = x;
+        room.stairZ = z;
     }
 }

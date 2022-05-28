@@ -102,9 +102,11 @@ public class MapBuilder
         //
 
     private void buildDecorations(ArrayList<MapRoom> rooms, HashMap<String, BitmapBase> bitmaps, MeshList meshList) {
-        int n, roomCount;
+        int n, x, z, roomCount;
+        float by;
         MapRoom room;
         MapPillar mapPillar = null;
+        MapStorage mapStorage = null;
 
         roomCount = rooms.size();
 
@@ -114,16 +116,44 @@ public class MapBuilder
                 continue;
             }
 
-            // pillars
-            if (AppWindow.random.nextFloat() > 0.4f) {
+            // room bottom Y
+            switch (room.story) {
+                case MapRoom.ROOM_STORY_UPPER:
+                case MapRoom.ROOM_STORY_UPPER_EXTENSION:
+                    by = MapBuilder.SEGMENT_SIZE + (MapBuilder.FLOOR_HEIGHT * 2);
+                    break;
+                case MapRoom.ROOM_STORY_LOWER:
+                case MapRoom.ROOM_STORY_LOWER_EXTENSION:
+                    by = -(MapBuilder.SEGMENT_SIZE + (MapBuilder.FLOOR_HEIGHT * 2));
+                    break;
+                default:
+                    by = 0;
+                    break;
+            }
 
-                // initialize once so all pillars are the same
-                if (mapPillar == null) {
-                    buildPillarBitmaps(bitmaps);
-                    mapPillar = new MapPillar(meshList);
+            // the decorations
+            for (z = 0; z != room.piece.sizeZ; z++) {
+                for (x = 0; x != room.piece.sizeX; x++) {
+                    if ((room.getFloorGrid(x, z) != 1) || (room.getBlockedGrid(x, z))) {
+                        continue;
+                    }
+                    if (AppWindow.random.nextBoolean()) {
+                        continue;
+                    }
+
+                    /*
+                    if (mapPillar == null) {
+                        mapPillar = new MapPillar(meshList, bitmaps);
+                    }
+                    mapPillar.build(room, n, x, by, z);
+                     */
+                    if (mapStorage == null) {
+                        mapStorage = new MapStorage(meshList, bitmaps);
+                    }
+                    mapStorage.build(room, n, x, by, z);
+
+                    room.setBlockedGrid(x, z);
                 }
-
-                mapPillar.build(room, n);
             }
 
         }
@@ -330,7 +360,7 @@ public class MapBuilder
     private void addUpperOrLowerFloor(ArrayList<MapRoom> rooms, boolean upper) {
         int roomStartIdx, roomEndIdx;
         int x, z, xDif, zDif, sizeX, sizeZ;
-        MapRoom startRoom, endRoom, room, nextRoom;
+        MapRoom startRoom, endRoom, startFloorRoom, endFloorRoom, room, nextRoom;
 
         // get a start room for floor (only from main rooms)
         while (true) {
@@ -369,56 +399,67 @@ public class MapBuilder
         }
 
         // add the new rooms
+        endFloorRoom = null;
+
         if (upper) {
             startRoom.hasUpperExtension = true;
-            rooms.add(startRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION));
+            startFloorRoom = startRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION);
+            startFloorRoom.extendedFromRoom = startRoom;
+            rooms.add(startFloorRoom);
 
             if (endRoom != null) {
                 endRoom.hasUpperExtension = true;
-                rooms.add(endRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION));
+                endFloorRoom = endRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION);
+                endFloorRoom.extendedFromRoom = endRoom;
+                rooms.add(endFloorRoom);
             }
         } else {
             startRoom.hasLowerExtension = true;
-            rooms.add(startRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION));
+            startFloorRoom = startRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION);
+            startFloorRoom.extendedFromRoom = startRoom;
+            rooms.add(startFloorRoom);
+
             if (endRoom != null) {
                 endRoom.hasLowerExtension = true;
-                rooms.add(endRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION));
+                endFloorRoom = endRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION);
+                endFloorRoom.extendedFromRoom = endRoom;
+                rooms.add(endFloorRoom);
             }
         }
 
-        if (endRoom == null) {
+        if (endFloorRoom == null) {
             return;
         }
 
         // walk along with rectangles until we connect
-        room = startRoom;
+        room = startFloorRoom;
 
         while (true) {
-            if (room.touches(endRoom)) {
+            if (room.touches(endFloorRoom)) {
                 break;
             }
 
             // walk along until we connect
-            xDif = Math.abs((room.x + (room.piece.sizeX / 2)) - (endRoom.x + (endRoom.piece.sizeX / 2)));
-            zDif = Math.abs((room.z + (room.piece.sizeZ / 2)) - (endRoom.z + (endRoom.piece.sizeZ / 2)));
+            xDif = Math.abs((room.x + (room.piece.sizeX / 2)) - (endFloorRoom.x + (endFloorRoom.piece.sizeX / 2)));
+            zDif = Math.abs((room.z + (room.piece.sizeZ / 2)) - (endFloorRoom.z + (endFloorRoom.piece.sizeZ / 2)));
 
             if (xDif > zDif) {
-                if (endRoom.x < room.x) {
-                    x = endRoom.x + endRoom.piece.sizeX;
+                if (endFloorRoom.x < room.x) {
+                    x = endFloorRoom.x + endFloorRoom.piece.sizeX;
                     sizeX = room.x - x;
                 } else {
                     x = room.x + room.piece.sizeX;
-                    sizeX = endRoom.x - x;
+                    sizeX = endFloorRoom.x - x;
                 }
                 z = room.z;
                 sizeZ = room.piece.sizeZ;
             } else {
-                if (endRoom.z < room.z) {
-                    z = endRoom.z + endRoom.piece.sizeZ;
+                if (endFloorRoom.z < room.z) {
+                    z = endFloorRoom.z + endFloorRoom.piece.sizeZ;
                     sizeZ = room.z - z;
                 } else {
                     z = room.z + room.piece.sizeZ;
-                    sizeZ = endRoom.z - z;
+                    sizeZ = endFloorRoom.z - z;
                 }
                 x = room.x;
                 sizeX = room.piece.sizeX;
@@ -488,20 +529,6 @@ public class MapBuilder
             bitmap.generate();
             bitmaps.put("platform", bitmap);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void buildPillarBitmaps(HashMap<String, BitmapBase> bitmaps) {
-        String[] pillarBitmaps = {"Brick", "Concrete", "Metal", "Mosaic", "Plaster", "Stone", "Tile"};
-
-        BitmapBase bitmap;
-
-        try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + pillarBitmaps[AppWindow.random.nextInt(pillarBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("pillar", bitmap);
         } catch (Exception e) {
             e.printStackTrace();
         }

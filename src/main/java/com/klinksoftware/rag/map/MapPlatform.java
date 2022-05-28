@@ -56,48 +56,62 @@ public class MapPlatform {
         return (room.getPlatformGrid(x, (z + 1)));
     }
 
-    private void knockOutPlatformSides(MapRoom room) {
-        int x, z;
+    private void knockOutPlatformSides(MapRoom room, MapRoom platformRoom) {
+        int x, z, k;
 
-        // randomly open up sides
-        if (AppWindow.random.nextBoolean()) {
-            if (!room.touchesNegativeX(rooms)) {
-                for (x = 0; x != room.piece.sizeX; x++) {
-                    if (room.checkPlatformGridAcrossX(x)) {
-                        break;
-                    }
-                    room.setPlatformGridAcrossX(x);
+        // can open up the side of the stairs facing
+        // away from the steps
+        switch (room.stairDir) {
+            case MeshMapUtility.STAIR_DIR_POS_Z:
+                k = platformRoom.touchesNegativeZ(rooms) ? 1 : 0;
+                for (z = k; z <= (room.stairZ + 1); z++) {
+                    room.setPlatformGridAcrossZ(z, true);
                 }
-            } else {
-                if (!room.touchesPositiveX(rooms)) {
-                    for (x = (room.piece.sizeX - 1); x != 0; x--) {
-                        if (room.checkPlatformGridAcrossX(x)) {
-                            break;
-                        }
-                        room.setPlatformGridAcrossX(x);
-                    }
+                if ((platformRoom.touchesNegativeX(rooms)) || (AppWindow.random.nextBoolean())) {
+                    room.setPlatformGridAcrossX(0, false);
                 }
-            }
-        }
-
-        if (AppWindow.random.nextBoolean()) {
-            if (!room.touchesNegativeZ(rooms)) {
-                for (z = 0; z != room.piece.sizeZ; z++) {
-                    if (room.checkPlatformGridAcrossZ(z)) {
-                        break;
-                    }
-                    room.setPlatformGridAcrossZ(z);
+                if ((platformRoom.touchesPositiveX(rooms)) || (AppWindow.random.nextBoolean())) {
+                    room.setPlatformGridAcrossX((room.piece.sizeX - 1), false);
                 }
-            } else {
-                if (!room.touchesPositiveZ(rooms)) {
-                    for (z = (room.piece.sizeZ - 1); z != 0; z--) {
-                        if (room.checkPlatformGridAcrossX(z)) {
-                            break;
-                        }
-                        room.setPlatformGridAcrossX(z);
-                    }
+                break;
+            case MeshMapUtility.STAIR_DIR_NEG_Z:
+                k = platformRoom.touchesPositiveZ(rooms) ? (room.piece.sizeZ - 2) : (room.piece.sizeZ - 1);
+                for (z = k; z >= (room.stairZ - 1); z--) {
+                    room.setPlatformGridAcrossZ(z, true);
                 }
-            }
+                if ((platformRoom.touchesNegativeX(rooms)) || (AppWindow.random.nextBoolean())) {
+                    room.setPlatformGridAcrossX(0, false);
+                }
+                if ((platformRoom.touchesPositiveX(rooms)) || (AppWindow.random.nextBoolean())) {
+                    room.setPlatformGridAcrossX((room.piece.sizeX - 1), false);
+                }
+                break;
+            case MeshMapUtility.STAIR_DIR_POS_X:
+                k = platformRoom.touchesNegativeX(rooms) ? 1 : 0;
+                for (x = k; x <= (room.stairX + 1); x++) {
+                    room.setPlatformGridAcrossX(x, true);
+                }
+                if ((platformRoom.touchesNegativeZ(rooms)) || (AppWindow.random.nextBoolean())) {
+                    room.setPlatformGridAcrossZ(0, false);
+                }
+                if ((platformRoom.touchesPositiveZ(rooms)) || (AppWindow.random.nextBoolean())) {
+                    room.setPlatformGridAcrossZ((room.piece.sizeZ - 1), false);
+                }
+                break;
+            case MeshMapUtility.STAIR_DIR_NEG_X:
+                k = platformRoom.touchesPositiveX(rooms) ? (room.piece.sizeX - 2) : (room.piece.sizeX - 1);
+                for (x = k; x >= (room.stairX - 1); x--) {
+                    room.setPlatformGridAcrossX(x, true);
+                }
+                room.setPlatformGridAcrossZ(0, false);
+                room.setPlatformGridAcrossZ((room.piece.sizeZ - 1), false);
+                if ((platformRoom.touchesNegativeZ(rooms)) || (AppWindow.random.nextBoolean())) {
+                    room.setPlatformGridAcrossZ(0, false);
+                }
+                if ((platformRoom.touchesPositiveZ(rooms)) || (AppWindow.random.nextBoolean())) {
+                    room.setPlatformGridAcrossZ((room.piece.sizeZ - 1), false);
+                }
+                break;
         }
     }
 
@@ -192,7 +206,9 @@ public class MapPlatform {
             y = -MapBuilder.FLOOR_HEIGHT;
         }
 
-        knockOutPlatformSides(room);
+        if (AppWindow.random.nextBoolean()) {
+            knockOutPlatformSides(room, (upper ? room : room.extendedFromRoom));
+        }
         addPlatforms(room, roomNumber, y);
     }
 }

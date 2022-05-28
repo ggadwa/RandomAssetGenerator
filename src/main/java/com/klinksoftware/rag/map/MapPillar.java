@@ -1,44 +1,63 @@
 package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
+import com.klinksoftware.rag.bitmaps.BitmapBase;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
+import java.util.HashMap;
 
 public class MapPillar {
+
+    private boolean squareBase;
     private float[] cylinderSegments;
     private MeshList meshList;
 
-    public MapPillar(MeshList meshList) {
+    public MapPillar(MeshList meshList, HashMap<String, BitmapBase> bitmaps) {
         this.meshList = meshList;
 
+        buildBitmap(bitmaps);
+
+        squareBase = AppWindow.random.nextBoolean();
         cylinderSegments = MeshMapUtility.createCylinderSegmentList(1, 5);
+    }
+
+    public void buildBitmap(HashMap<String, BitmapBase> bitmaps) {
+        String[] pillarBitmaps = {"Brick", "Concrete", "Metal", "Mosaic", "Plaster", "Stone", "Tile"};
+
+        BitmapBase bitmap;
+
+        try {
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + pillarBitmaps[AppWindow.random.nextInt(pillarBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
+            bitmap.generate();
+            bitmaps.put("pillar", bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
         //
         // pillars
         //
 
-    public void build(MapRoom room, int roomNumber) {
-        int x, z, gx, gz, lx, rx, tz, bz;
-        float baseHigh, by, pillarTy, ty, pillarBy, offset, radius, baseRadius;
-        boolean squareBase;
+    public void build(MapRoom room, int roomNumber, int x, float by, int z) {
+        float pillarTy, ty, pillarBy, radius, baseRadius;
         String name;
         RagPoint centerPnt;
         Mesh mesh;
 
-        name = "pillar_" + Integer.toString(roomNumber);
-        squareBase = AppWindow.random.nextBoolean();
+        name = "pillar_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
-        centerPnt = new RagPoint(room.x * MapBuilder.SEGMENT_SIZE, 0, room.z * MapBuilder.SEGMENT_SIZE);
-
-        ty = MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT;
+        ty = by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT);
         pillarTy = ty - MapBuilder.FLOOR_HEIGHT;
-        by = 0;
         pillarBy = by + MapBuilder.FLOOR_HEIGHT;
+
+        // xz position
+        centerPnt = new RagPoint((((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE / 2)), ((ty + by) / 2), ((room.z + z) * MapBuilder.SEGMENT_SIZE + (MapBuilder.SEGMENT_SIZE / 2)));
 
         radius = MapBuilder.SEGMENT_SIZE / 4.0f;
         baseRadius = radius * 1.5f;
 
+        // create the pillar
         mesh = MeshMapUtility.createCylinder(room, name, "pillar", centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);
 
         if (squareBase) {
@@ -49,48 +68,6 @@ public class MapPillar {
             mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", centerPnt, ty, pillarTy, baseRadius, false, true));
         }
 
-        //room.setBlockedGrid(x,z)
-
         meshList.add(mesh);
-
-        /*
-
-            // build the pillars
-
-        offset=MapBuilder.SEGMENT_SIZE*0.5f;
-        radius=MapBuilder.SEGMENT_SIZE*(0.1f+(AppWindow.random.nextFloat()*0.2f));
-        baseRadius=radius*(1.3f+(AppWindow.random.nextFloat()*0.2f));
-
-        cylinderSegments=MeshMapUtility.createCylinderSegmentList(5,3,0.2f);
-        centerPnt=new RagPoint(0.0f,0.0f,0.0f);
-
-        squareBase=AppWindow.random.nextBoolean();
-
-        for (gz=tz;gz<bz;gz++) {
-            for (gx=lx;gx<rx;gx++) {
-                if (pattern[gx-lx][gz-tz]==0x0) continue;
-
-                centerPnt.x=room.offset.x+(((float)gx*MapBuilder.SEGMENT_SIZE)+offset);
-                centerPnt.z=room.offset.z+(((float)gz*MapBuilder.SEGMENT_SIZE)+offset);
-
-                nameSuffix=Integer.toString(gx)+"_"+Integer.toString(gz);
-
-                mesh=MeshMapUtility.createCylinder(room,(this.name+"_"+nameSuffix),"pillar",centerPnt,pillarTy,pillarBy,cylinderSegments,radius,false,false);
-
-                if (squareBase) {
-                    mesh.combine(MeshMapUtility.createCube(room,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),pillarBy,by,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,true,true,false,true,false,MeshMapUtility.UV_MAP));
-                    mesh.combine(MeshMapUtility.createCube(room,(name+"_base_bot_"+nameSuffix),"pillar",(centerPnt.x-baseRadius),(centerPnt.x+baseRadius),ty,pillarTy,(centerPnt.z-baseRadius),(centerPnt.z+baseRadius),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP));
-                }
-                else {
-                    mesh.combine(MeshMapUtility.createMeshCylinderSimple(room,(name+"_base_bot_"+nameSuffix),"pillar",centerPnt,pillarBy,by,baseRadius,true,false));
-                    mesh.combine(MeshMapUtility.createMeshCylinderSimple(room,(this.name+"_base_top_"+nameSuffix),"pillar",centerPnt,ty,pillarTy,baseRadius,false,true));
-                }
-
-                meshList.add(mesh);
-
-                room.setGrid(0,gx,gz,1);
-            }
-        }
-         */
     }
 }
