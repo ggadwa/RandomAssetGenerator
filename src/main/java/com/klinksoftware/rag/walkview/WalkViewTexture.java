@@ -5,4 +5,5 @@ public class WalkViewTexture
     public int colorTextureId;
     public int normalTextureId;
     public int metallicRoughnessTextureId;
+    public int emissiveTextureId;
 }

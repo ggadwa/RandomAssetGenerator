@@ -26,12 +26,13 @@ public class WalkView extends AWTGLCanvas {
     private static final float RAG_MOVE_SPEED = 0.01f;
     private static final float RAG_SPEED_MULTIPLIER = 2.0f;
     private static final long RAG_PAINT_TICK=33;
-    private static final float RAG_LIGHT_INTENSITY=500.0f;
+    private static final float RAG_LIGHT_INTENSITY = 100.0f; //500.0f;
 
     private int wid,high,lastMouseX,lastMouseY;
     private int vertexShaderId,fragmentShaderId,programId;
     private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
-    private int perspectiveMatrixUniformId,viewMatrixUniformId,normalMatrixUniformId,lightPositionIntensityUniformId;
+    private int perspectiveMatrixUniformId, viewMatrixUniformId, normalMatrixUniformId, lightPositionIntensityUniformId;
+    private int hasEmissiveUniformId, emissiveFactorUniformId;
     private long nextPaintTick;
     private float aspectRatio;
     private float moveX, moveY, moveZ, speedMultiplier;
@@ -164,7 +165,10 @@ public class WalkView extends AWTGLCanvas {
         viewMatrixUniformId=glGetUniformLocation(programId,"viewMatrix");
         normalMatrixUniformId=glGetUniformLocation(programId,"normalMatrix");
 
-        lightPositionIntensityUniformId=glGetUniformLocation(programId,"lightPositionIntensity");
+        lightPositionIntensityUniformId = glGetUniformLocation(programId, "lightPositionIntensity");
+
+        hasEmissiveUniformId = glGetUniformLocation(programId, "hasEmissive");
+        emissiveFactorUniformId = glGetUniformLocation(programId, "emissiveFactor");
 
         vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
         vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
@@ -175,7 +179,8 @@ public class WalkView extends AWTGLCanvas {
         glUseProgram(programId);
         glUniform1i(glGetUniformLocation(programId,"baseTex"),0);   // this is always texture slot 0
         glUniform1i(glGetUniformLocation(programId,"normalTex"),1);   // this is always texture slot 1
-        glUniform1i(glGetUniformLocation(programId,"metallicRoughnessTex"),2);   // this is always texture slot 2
+        glUniform1i(glGetUniformLocation(programId, "metallicRoughnessTex"), 2);   // this is always texture slot 2
+        glUniform1i(glGetUniformLocation(programId, "emissiveTex"), 3);   // this is always texture slot 3
         glEnableVertexAttribArray(vertexPositionAttribute);
         glEnableVertexAttribArray(vertexUVAttribute);
         glEnableVertexAttribArray(vertexNormalAttribute);
@@ -342,7 +347,12 @@ public class WalkView extends AWTGLCanvas {
             for (WalkViewTexture texture2 : textures.values()) {
                 if (texture2.colorTextureId!=-1) glDeleteBuffers(texture2.colorTextureId);
                 if (texture2.normalTextureId!=-1) glDeleteBuffers(texture2.normalTextureId);
-                if (texture2.metallicRoughnessTextureId!=-1) glDeleteBuffers(texture2.metallicRoughnessTextureId);
+                if (texture2.metallicRoughnessTextureId != -1) {
+                    glDeleteBuffers(texture2.metallicRoughnessTextureId);
+                }
+                if (texture2.emissiveTextureId != -1) {
+                    glDeleteBuffers(texture2.emissiveTextureId);
+                }
             }
         }
 
@@ -376,7 +386,13 @@ public class WalkView extends AWTGLCanvas {
                 texture = new WalkViewTexture();
                 texture.colorTextureId=loadTexture(bitmapBase.getTextureSize(),bitmapBase.hasAlpha(),bitmapBase.getColorDataAsBytes());
                 texture.normalTextureId=loadTexture(bitmapBase.getTextureSize(),false,bitmapBase.getNormalDataAsBytes());
-                texture.metallicRoughnessTextureId=loadTexture(bitmapBase.getTextureSize(),false,bitmapBase.getMetallicRoughnessDataAsBytes());
+                texture.metallicRoughnessTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getMetallicRoughnessDataAsBytes());
+
+                if (!bitmapBase.hasEmissive()) {
+                    texture.emissiveTextureId = -1;
+                } else {
+                    texture.emissiveTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getEmissiveDataAsBytes());
+                }
 
                 textures.put(bitmapName, texture);
             }
@@ -459,6 +475,17 @@ public class WalkView extends AWTGLCanvas {
         eyePnt.x=(pnt.x*viewMatrix.data[0])+(pnt.y*viewMatrix.data[4])+(pnt.z*viewMatrix.data[8])+viewMatrix.data[12];
         eyePnt.y=(pnt.x*viewMatrix.data[1])+(pnt.y*viewMatrix.data[5])+(pnt.z*viewMatrix.data[9])+viewMatrix.data[13];
         eyePnt.z=(pnt.x*viewMatrix.data[2])+(pnt.y*viewMatrix.data[6])+(pnt.z*viewMatrix.data[10])+viewMatrix.data[14];
+    }
+
+    //
+    // cos glow
+    //
+    private float getEmissiveFactor(long tick) {
+        float f;
+
+        tick = tick % 2000;
+        f = (float) Math.cos((2.0 * Math.PI) * ((double) tick / 2000.0));
+        return ((f * 0.4f) + 0.4f);
     }
 
     //
@@ -557,7 +584,16 @@ public class WalkView extends AWTGLCanvas {
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D,texture.normalTextureId);
                 glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D,texture.metallicRoughnessTextureId);
+                glBindTexture(GL_TEXTURE_2D, texture.metallicRoughnessTextureId);
+                if (texture.emissiveTextureId == -1) {
+                    glUniform1i(hasEmissiveUniformId, 1);
+                    glUniform1f(emissiveFactorUniformId, 0.0f);
+                } else {
+                    glUniform1i(hasEmissiveUniformId, 1);
+                    glUniform1f(emissiveFactorUniformId, getEmissiveFactor(tick));
+                    glActiveTexture(GL_TEXTURE3);
+                    glBindTexture(GL_TEXTURE_2D, texture.emissiveTextureId);
+                }
             }
 
                 // draw the mesh

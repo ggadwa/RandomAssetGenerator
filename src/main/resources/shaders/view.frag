@@ -3,12 +3,12 @@
 uniform lowp sampler2D baseTex;
 uniform lowp sampler2D normalTex;
 uniform lowp sampler2D metallicRoughnessTex;
-//uniform lowp sampler2D emissiveTex;
+uniform lowp sampler2D emissiveTex;
 
 uniform highp vec4 lightPositionIntensity;   // xyz = position, w = intensity
 
-//uniform bool hasEmissive;
-//uniform mediump vec3 emissiveFactor;
+uniform bool hasEmissive;
+uniform mediump float emissiveFactor;
 
 in highp vec3 eyeVector,eyePosition;
 in highp vec2 fragUV;
@@ -87,7 +87,7 @@ void main(void)
 
     pixel.rgb=(tex.rgb*lightCol);
     pixel.rgb+=(min(metallic,1.0)*lightCol);
-    //if (hasEmissive) pixel.rgb+=(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
+    if (hasEmissive) pixel.rgb+=(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
     pixel.a=tex.a;
 
     outputPixel=pixel;

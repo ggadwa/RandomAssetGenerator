@@ -7,15 +7,12 @@ import com.klinksoftware.rag.utility.*;
 import java.util.HashMap;
 
 public class MapStorage {
-
-    private float boxSize;
     private MeshList meshList;
 
     public MapStorage(MeshList meshList, HashMap<String, BitmapBase> bitmaps)    {
         this.meshList=meshList;
 
         buildBitmap(bitmaps);
-        boxSize = (MapBuilder.SEGMENT_SIZE * 0.2f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.2f));
     }
 
     public void buildBitmap(HashMap<String, BitmapBase> bitmaps) {
@@ -38,7 +35,7 @@ public class MapStorage {
 
     private void addBoxes(MapRoom room, int roomNumber, int x, float by, int z) {
         int stackLevel, stackCount;
-        float dx, dy, dz, boxHalfSize;
+        float dx, dy, dz, boxSize, boxHalfSize;
         String name;
         RagPoint rotAngle;
         Mesh mesh, mesh2;
@@ -49,6 +46,7 @@ public class MapStorage {
         dy = 0;
         dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
 
+        boxSize = (MapBuilder.SEGMENT_SIZE * 0.2f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.2f));
         boxHalfSize=boxSize*0.5f;
 
         rotAngle=new RagPoint(0.0f,0.0f,0.0f);

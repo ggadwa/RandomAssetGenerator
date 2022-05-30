@@ -331,6 +331,6 @@ public class BitmapMetal extends BitmapBase
 
             // finish with the metallic-roughness
 
-        createMetallicRoughnessMap(0.5f,0.6f);
+        createMetallicRoughnessMap(0.5f, 0.6f);
     }
 }

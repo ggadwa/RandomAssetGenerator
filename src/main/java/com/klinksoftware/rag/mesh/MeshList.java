@@ -162,7 +162,7 @@ public class MeshList
         indexes = MeshMapUtility.intArrayListToInt(indexArray);
 
         // create the mesh
-        normals = MeshMapUtility.buildNormals(vertexes, indexes, new RagPoint(0.0f, 0.0f, 0.0f), true);
+        normals = MeshMapUtility.buildNormals(vertexes, indexes, new RagPoint(0.0f, 0.0f, 0.0f), false);
         uvs = MeshMapUtility.floatArrayListToFloat(uvArray);
         tangents = MeshMapUtility.buildTangents(vertexes, uvs, indexes);
 
