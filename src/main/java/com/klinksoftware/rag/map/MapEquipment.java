@@ -3,22 +3,40 @@ package com.klinksoftware.rag.map;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
 import com.klinksoftware.rag.bitmaps.BitmapComputer;
+import com.klinksoftware.rag.bitmaps.BitmapGlass;
+import com.klinksoftware.rag.bitmaps.BitmapLiquid;
+import com.klinksoftware.rag.bitmaps.BitmapMonitor;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 import java.util.HashMap;
 
 public class MapEquipment {
 
+    private float computerWidth, computerHeight;
+    private float terminalWidth, terminalHeight;
+    private float tubeRadius, tubeHeight, tubeCapRadius, tubeTopCapHeight, tubeBotCapHeight;
     private MeshList meshList;
 
     public MapEquipment(MeshList meshList, HashMap<String, BitmapBase> bitmaps) {
         this.meshList = meshList;
 
         buildBitmap(bitmaps);
+
+        computerWidth = MapBuilder.SEGMENT_SIZE * (0.6f + AppWindow.random.nextFloat(0.2f));
+        computerHeight = (MapBuilder.SEGMENT_SIZE - MapBuilder.FLOOR_HEIGHT) * (0.7f + AppWindow.random.nextFloat(0.3f));
+
+        terminalWidth = MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f));
+        terminalHeight = (MapBuilder.SEGMENT_SIZE - MapBuilder.FLOOR_HEIGHT) * (0.3f + AppWindow.random.nextFloat(0.2f));
+
+        tubeCapRadius = (MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f))) * 0.5f;
+        tubeRadius = tubeCapRadius * (0.7f + AppWindow.random.nextFloat(0.2f));
+        tubeHeight = (MapBuilder.SEGMENT_SIZE - MapBuilder.FLOOR_HEIGHT) * (0.7f + AppWindow.random.nextFloat(0.3f));
+        tubeTopCapHeight = tubeHeight * (0.15f + AppWindow.random.nextFloat(0.2f));
+        tubeBotCapHeight = tubeHeight * (0.15f + AppWindow.random.nextFloat(0.2f));
     }
 
     public void buildBitmap(HashMap<String, BitmapBase> bitmaps) {
-        String[] accessoryBitmaps = {"Concrete", "Metal", "Tile"};
+        String[] accessoryBitmaps = {"Concrete", "Metal"};
 
         BitmapBase bitmap;
 
@@ -33,92 +51,107 @@ public class MapEquipment {
         bitmap = new BitmapComputer();
         bitmap.generate();
         bitmaps.put("computer", bitmap);
+
+        bitmap = new BitmapMonitor();
+        bitmap.generate();
+        bitmaps.put("monitor", bitmap);
+
+        bitmap = new BitmapLiquid();
+        bitmap.generate();
+        bitmaps.put("liquid", bitmap);
+
+        bitmap = new BitmapGlass();
+        bitmap.generate();
+        bitmaps.put("glass", bitmap);
     }
 
         //
-        // platform
+        // pedestals
         //
 
-    private void addPedestal(MapRoom room, int roomNumber, int x, float by, int z) {
-        float dx, dz;
+    private void addPedestal(MapRoom room, int roomNumber, int x, float by, int z, float width) {
+        float dx, dz, widOffset;
         String name;
 
-        dx = (room.x + x) * MapBuilder.SEGMENT_SIZE;
-        dz = (room.z + z) * MapBuilder.SEGMENT_SIZE;
+        // pedestal a little bigger than equipment
+        width += (MapBuilder.SEGMENT_SIZE * 0.05f);
+        if (width > MapBuilder.SEGMENT_SIZE) {
+            width = MapBuilder.SEGMENT_SIZE;
+        }
+
+        widOffset = (MapBuilder.SEGMENT_SIZE - width) * 0.5f;
+
+        dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + widOffset;
+        dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + widOffset;
 
         name = "pedestal_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        meshList.add(MeshMapUtility.createCube(room, name, "accessory", dx, (dx + MapBuilder.SEGMENT_SIZE), by, (by + MapBuilder.FLOOR_HEIGHT), dz, (dz + MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+        meshList.add(MeshMapUtility.createCube(room, name, "accessory", dx, (dx + width), by, (by + MapBuilder.FLOOR_HEIGHT), dz, (dz + width), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
     }
 
         //
         // computer banks
         //
 
-    private void addBank(MapRoom room, int roomNumber, int x, float by, int z, float wid, float high) {
+    private void addBank(MapRoom room, int roomNumber, int x, float by, int z) {
         float dx, dy, dz, widOffset;
         String name;
 
-            // bank platform
-
-        addPedestal(room, roomNumber, x, by, z);
-
-            // computer bank
-
-        widOffset=(MapBuilder.SEGMENT_SIZE-wid)*0.5f;
+        widOffset = (MapBuilder.SEGMENT_SIZE - computerWidth) * 0.5f;
 
         dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + widOffset;
         dy = by + MapBuilder.FLOOR_HEIGHT;
         dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + widOffset;
 
+        addPedestal(room, roomNumber, x, by, z, computerWidth);
+
         name = "computer_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        meshList.add(MeshMapUtility.createCube(room, name, "computer", dx, (dx + wid), dy, (dy + high), dz, (dz + wid), true, true, true, true, true, false, false, MeshMapUtility.UV_BOX));
+        meshList.add(MeshMapUtility.createCube(room, name, "computer", dx, (dx + computerWidth), dy, (dy + computerHeight), dz, (dz + computerWidth), true, true, true, true, true, false, false, MeshMapUtility.UV_BOX));
     }
 
         //
         // terminals
         //
 
-    public void addTerminal(MapRoom room,int gx,int gz,float wid,float high,int pieceCount)
-    {
-        /*
-        float       x,y,z,widOffset,
-                    deskHalfWid,deskShortHalfWid,
-                    standWid,standHalfWid,standHigh;
-        RagPoint    rotAngle;
-        Mesh        mesh;
+    public void addTerminal(MapRoom room, int roomNumber, int x, float by, int z) {
+        float dx, dz, widOffset;
+        float deskHalfWid, deskShortHalfWid, standWid, standHalfWid, standHigh;
+        String name;
+        RagPoint rotAngle;
+        Mesh mesh;
 
             // the desk and stand
 
-        widOffset=(MapBuilder.SEGMENT_SIZE-wid)*0.5f;
+        widOffset = (MapBuilder.SEGMENT_SIZE - terminalWidth) * 0.5f;
 
-        x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
-        y=room.offset.y;
-        z=(room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
+        dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
+        dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
 
-        deskHalfWid=wid*0.5f;
+        deskHalfWid = terminalWidth * 0.5f;
         deskShortHalfWid=deskHalfWid*0.9f;
 
-        standWid=wid*0.05f;
+        standWid = terminalWidth * 0.05f;
         standHalfWid=standWid*0.5f;
-        standHigh=high*0.1f;
+        standHigh = terminalHeight * 0.1f;
 
-        rotAngle=new RagPoint(0.0f,(AppWindow.random.nextBoolean()?0.0f:90.0f),0.0f);
-        mesh=MeshMapUtility.createCube(room,(name+"_monitor_box_"+pieceCount),"accessory",(x-deskHalfWid),(x+deskHalfWid),y,(y+high),(z-deskShortHalfWid),(z+deskShortHalfWid),true,true,true,true,true,false,false,MeshMapUtility.UV_MAP);
+        rotAngle = new RagPoint(0.0f, (AppWindow.random.nextBoolean() ? 0.0f : 90.0f), 0.0f);
+        name = "monitor_stand_bottom_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+        mesh = MeshMapUtility.createCube(room, name, "accessory", (dx - deskHalfWid), (dx + deskHalfWid), by, (by + terminalHeight), (dz - deskShortHalfWid), (dz + deskShortHalfWid), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP);
 
-        y+=high;
+        by += terminalHeight;
 
-        rotAngle.setFromValues(0.0f,(AppWindow.random.nextFloat()*360.0f),0.0f);
-        mesh.combine(MeshMapUtility.createCubeRotated(room,(name+"_monitor_stand_"+pieceCount),"accessory",(x-standHalfWid),(x+standHalfWid),y,(y+standHigh),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,false,false,false,MeshMapUtility.UV_MAP));
+        rotAngle.setFromValues(0.0f, (AppWindow.random.nextFloat() * 360.0f), 0.0f);
+        name = "monitor_stand_top_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+        mesh.combine(MeshMapUtility.createCubeRotated(room, name, "accessory", (dx - standHalfWid), (dx + standHalfWid), by, (by + standHigh), (dz - standHalfWid), (dz + standHalfWid), rotAngle, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP));
 
         meshList.add(mesh);
 
             // the monitor
 
-        x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+widOffset;
-        y+=standHigh;
+        dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + widOffset;
+        by += standHigh;
 
-        meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_monitor_"+pieceCount),"monitor",x,(x+wid),y,(y+high),(z-standHalfWid),(z+standHalfWid),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX));
-    */
+        name = "monitor_stand_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+        meshList.add(MeshMapUtility.createCubeRotated(room, name, "monitor", dx, (dx + terminalWidth), by, (by + ((terminalWidth * 6) / 9)), (dz - standHalfWid), (dz + standHalfWid), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_BOX));
     }
 
         //
@@ -173,62 +206,51 @@ public class MapEquipment {
         // lab tubes
         //
 
-    private void addTubeInternal(RagPoint centerPnt,String tubeName,float tubeRadius,float tubeHigh,float tubeCapRadius,float tubeTopCapHigh,float tubeBotCapHigh)
-    {
-        /*
-        float       yBotCapBy,yBotCapTy,yTopCapBy,yTopCapTy,y;
-        Mesh        mesh,mesh2;
+    public void addTube(MapRoom room, int roomNumber, int x, float by, int z) {
+        float dx, dz;
+        float yBotCapBy, yBotCapTy, yTopCapBy, yTopCapTy, y;
+        String name;
+        RagPoint centerPnt;
+        Mesh mesh, mesh2;
 
-            // the top and bottom caps
+        name = "tube_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
-        yBotCapBy=centerPnt.y;
-        yBotCapTy=yBotCapBy+tubeBotCapHigh;
+        // tube center
+        dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
+        dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
 
-        yTopCapBy=yBotCapTy+tubeHigh;
-        yTopCapTy=yTopCapBy+tubeTopCapHigh;
+        centerPnt = new RagPoint(dx, (by + (tubeHeight * 0.5f)), dz);
 
-        mesh=null;
+        // the top and bottom caps
+        yBotCapBy = by;
+        yBotCapTy = yBotCapBy + tubeBotCapHeight;
 
-        if (tubeBotCapHigh!=0.0f) {
-            mesh=MeshMapUtility.createMeshCylinderSimple(room,(name+"_top"),"accessory",centerPnt,yBotCapTy,yBotCapBy,tubeCapRadius,true,false);
+        yTopCapBy = yBotCapTy + tubeHeight;
+        yTopCapTy = yTopCapBy + tubeTopCapHeight;
+
+        mesh = null;
+
+        if (tubeBotCapHeight != 0.0f) {
+            mesh = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, false);
         }
 
-        if (tubeTopCapHigh!=0.0f) {
-            mesh2=MeshMapUtility.createMeshCylinderSimple(room,(name+"_top"),"accessory",centerPnt,yTopCapTy,yTopCapBy,tubeCapRadius,true,true);
-            if (mesh==null) {
-                mesh=mesh2;
-            }
-            else {
+        if (tubeTopCapHeight != 0.0f) {
+            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
+            if (mesh == null) {
+                mesh = mesh2;
+            } else {
                 mesh.combine(mesh2);
             }
         }
 
         meshList.add(mesh);
 
-            // the tube
+        // the tube
+        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_glass"), "glass", centerPnt, yTopCapBy, yBotCapTy, tubeRadius, false, false));
 
-        meshList.add(MeshMapUtility.createMeshCylinderSimple(room,(name+"_glass"),"glass",centerPnt,yTopCapBy,yBotCapTy,tubeRadius,false,false));
-
-            // the liquid in the tube
-
-        y=yBotCapTy+(AppWindow.random.nextFloat()*(yTopCapBy-yBotCapTy));
-        meshList.add(MeshMapUtility.createMeshCylinderSimple(room,(name+"_liquid"),"liquid",centerPnt,y,yBotCapTy,(tubeRadius*0.98f),true,false));
-*/
-    }
-
-    public void addTube(MapRoom room,int gx,int gz,float tubeRadius,float tubeHigh,float tubeCapRadius,float tubeTopCapHigh,float tubeBotCapHigh,int pieceCount)
-    {
-        /*
-        float           x,z,radius;
-        RagPoint        centerPnt;
-
-        x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
-        z=(room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
-
-        centerPnt=new RagPoint(x,room.offset.y,z);
-
-        addTubeInternal(centerPnt,(name+"_tube_"+pieceCount),tubeRadius,tubeHigh,tubeCapRadius,tubeTopCapHigh,tubeBotCapHigh);
-*/
+        // the liquid in the tube
+        y = yBotCapTy + (AppWindow.random.nextFloat() * (yTopCapBy - yBotCapTy));
+        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_liquid"), "liquid", centerPnt, y, yBotCapTy, (tubeRadius * 0.98f), true, false));
     }
 
         //
@@ -236,7 +258,9 @@ public class MapEquipment {
         //
 
     public void build(MapRoom room, int roomNumber, int x, float by, int z) {
-        addBank(room, roomNumber, x, by, z, MapBuilder.SEGMENT_SIZE, MapBuilder.SEGMENT_SIZE);
+        // addBank(room, roomNumber, x, by, z);
+        //addTube(room, roomNumber, x, by, z);
+        addTerminal(room, roomNumber, x, by, z);
         /*
         int     x,z,lx,rx,tz,bz,skipX,skipZ,
                 pieceType,pieceCount;

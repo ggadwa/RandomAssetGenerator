@@ -103,7 +103,7 @@ public class MapBuilder
 
     private void buildDecorations(ArrayList<MapRoom> rooms, HashMap<String, BitmapBase> bitmaps, MeshList meshList) {
         int n, x, z, roomCount;
-        float by;
+        float rx, rz, by;
         MapRoom room;
         MapPillar mapPillar = null;
         MapStorage mapStorage = null;
@@ -142,24 +142,31 @@ public class MapBuilder
                         continue;
                     }
 
+                    // skip if it's the player starting place
+                    rx = (room.x + x) * MapBuilder.SEGMENT_SIZE;
+                    rz = (room.z + z) * MapBuilder.SEGMENT_SIZE;
+                    if ((viewCenterPoint.x >= rx) && (viewCenterPoint.x <= (rx + MapBuilder.SEGMENT_SIZE)) && (viewCenterPoint.z >= rz) && (viewCenterPoint.z <= (rz + MapBuilder.SEGMENT_SIZE))) {
+                        continue;
+                    }
+
+
                     /*
                     if (mapPillar == null) {
                         mapPillar = new MapPillar(meshList, bitmaps);
                     }
                     mapPillar.build(room, n, x, by, z);
                      */
- /*
+ /*/*
                     if (mapStorage == null) {
                         mapStorage = new MapStorage(meshList, bitmaps);
                     }
                     mapStorage.build(room, n, x, by, z);
                      */
- /*
                     if (mapEquipment == null) {
                         mapEquipment = new MapEquipment(meshList, bitmaps);
                     }
                     mapEquipment.build(room, n, x, by, z);
-*/
+
                     room.setBlockedGrid(x, z);
                 }
             }
@@ -598,6 +605,10 @@ public class MapBuilder
             MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, false);
         }
 
+        // setup the view center point
+        room = rooms.get(0);
+        viewCenterPoint = new RagPoint(((float) (room.piece.sizeX / 2) * SEGMENT_SIZE), (SEGMENT_SIZE * 0.5f), ((float) (room.piece.sizeZ / 2) * SEGMENT_SIZE));
+
         // any steps
         mapStair = new MapStair(meshList, rooms);
 
@@ -632,10 +643,6 @@ public class MapBuilder
             // now build the fake skeleton
 
         skeleton=meshList.rebuildMapMeshesWithSkeleton();
-
-        // setup the view center point
-        room = rooms.get(0);
-        viewCenterPoint = new RagPoint(((float) (room.piece.sizeX / 2) * SEGMENT_SIZE), (SEGMENT_SIZE * 0.5f), ((float) (room.piece.sizeZ / 2) * SEGMENT_SIZE));
     }
 
     public void writeToFile(String path) {

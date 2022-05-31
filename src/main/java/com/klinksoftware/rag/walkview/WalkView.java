@@ -46,6 +46,8 @@ public class WalkView extends AWTGLCanvas {
     private RagPoint eyePoint, cameraPoint, cameraAngle, lightEyePoint, lookAtUpVector, movePoint, fixedLightPoint;
     private RagMatrix4f perspectiveMatrix,viewMatrix,rotMatrix,rotMatrix2;
     private RagMatrix3f normalMatrix;
+    private float[] clipPlane;
+    private RagPlane frustumLeftPlane, frustumRightPlane, frustumTopPlane, frustumBottomPlane, frustumNearPlane, frustumFarPlane;
     private HashMap<String, WalkViewTexture> textures;
 
     public WalkView(GLData glData) {
@@ -75,7 +77,15 @@ public class WalkView extends AWTGLCanvas {
         viewMatrix=new RagMatrix4f();
         normalMatrix=new RagMatrix3f();
         rotMatrix=new RagMatrix4f();
-        rotMatrix2=new RagMatrix4f();
+        rotMatrix2 = new RagMatrix4f();
+
+        clipPlane = new float[16];
+        frustumLeftPlane = new RagPlane(0.0f, 0.0f, 0.0f, 0.0f);
+        frustumRightPlane = new RagPlane(0.0f, 0.0f, 0.0f, 0.0f);
+        frustumTopPlane = new RagPlane(0.0f, 0.0f, 0.0f, 0.0f);
+        frustumBottomPlane = new RagPlane(0.0f, 0.0f, 0.0f, 0.0f);
+        frustumNearPlane = new RagPlane(0.0f, 0.0f, 0.0f, 0.0f);
+        frustumFarPlane = new RagPlane(0.0f, 0.0f, 0.0f, 0.0f);
 
             // no mesh loaded
 
@@ -251,6 +261,9 @@ public class WalkView extends AWTGLCanvas {
         // indexes
         mesh.indexBuf=MemoryUtil.memAllocInt(mesh.indexes.length);
         mesh.indexBuf.put(mesh.indexes).flip();
+
+        // setup the bounds for culling
+        mesh.setGlobalBounds(bonePoint);
     }
 
     private void releaseMesh(Mesh mesh) {
@@ -400,6 +413,8 @@ public class WalkView extends AWTGLCanvas {
 
                 textures.put(bitmapName, texture);
             }
+
+            mesh.hasAlpha = incommingBitmaps.get(bitmapName).hasAlpha();
         }
 
             // unbind any textures
@@ -471,6 +486,102 @@ public class WalkView extends AWTGLCanvas {
         eyePoint.matrixMultiply(rotMatrix);
     }
 
+    private void setupCullingFrustum() {
+
+        // combine the matrixes
+        // to build the frustum
+        // ABCD planes equations
+        clipPlane[0] = (viewMatrix.data[0] * perspectiveMatrix.data[0]) + (viewMatrix.data[1] * perspectiveMatrix.data[4]) + (viewMatrix.data[2] * perspectiveMatrix.data[8]) + (viewMatrix.data[3] * perspectiveMatrix.data[12]);
+        clipPlane[1] = (viewMatrix.data[0] * perspectiveMatrix.data[1]) + (viewMatrix.data[1] * perspectiveMatrix.data[5]) + (viewMatrix.data[2] * perspectiveMatrix.data[9]) + (viewMatrix.data[3] * perspectiveMatrix.data[13]);
+        clipPlane[2] = (viewMatrix.data[0] * perspectiveMatrix.data[2]) + (viewMatrix.data[1] * perspectiveMatrix.data[6]) + (viewMatrix.data[2] * perspectiveMatrix.data[10]) + (viewMatrix.data[3] * perspectiveMatrix.data[14]);
+        clipPlane[3] = (viewMatrix.data[0] * perspectiveMatrix.data[3]) + (viewMatrix.data[1] * perspectiveMatrix.data[7]) + (viewMatrix.data[2] * perspectiveMatrix.data[11]) + (viewMatrix.data[3] * perspectiveMatrix.data[15]);
+
+        clipPlane[4] = (viewMatrix.data[4] * perspectiveMatrix.data[0]) + (viewMatrix.data[5] * perspectiveMatrix.data[4]) + (viewMatrix.data[6] * perspectiveMatrix.data[8]) + (viewMatrix.data[7] * perspectiveMatrix.data[12]);
+        clipPlane[5] = (viewMatrix.data[4] * perspectiveMatrix.data[1]) + (viewMatrix.data[5] * perspectiveMatrix.data[5]) + (viewMatrix.data[6] * perspectiveMatrix.data[9]) + (viewMatrix.data[7] * perspectiveMatrix.data[13]);
+        clipPlane[6] = (viewMatrix.data[4] * perspectiveMatrix.data[2]) + (viewMatrix.data[5] * perspectiveMatrix.data[6]) + (viewMatrix.data[6] * perspectiveMatrix.data[10]) + (viewMatrix.data[7] * perspectiveMatrix.data[14]);
+        clipPlane[7] = (viewMatrix.data[4] * perspectiveMatrix.data[3]) + (viewMatrix.data[5] * perspectiveMatrix.data[7]) + (viewMatrix.data[6] * perspectiveMatrix.data[11]) + (viewMatrix.data[7] * perspectiveMatrix.data[15]);
+
+        clipPlane[8] = (viewMatrix.data[8] * perspectiveMatrix.data[0]) + (viewMatrix.data[9] * perspectiveMatrix.data[4]) + (viewMatrix.data[10] * perspectiveMatrix.data[8]) + (viewMatrix.data[11] * perspectiveMatrix.data[12]);
+        clipPlane[9] = (viewMatrix.data[8] * perspectiveMatrix.data[1]) + (viewMatrix.data[9] * perspectiveMatrix.data[5]) + (viewMatrix.data[10] * perspectiveMatrix.data[9]) + (viewMatrix.data[11] * perspectiveMatrix.data[13]);
+        clipPlane[10] = (viewMatrix.data[8] * perspectiveMatrix.data[2]) + (viewMatrix.data[9] * perspectiveMatrix.data[6]) + (viewMatrix.data[10] * perspectiveMatrix.data[10]) + (viewMatrix.data[11] * perspectiveMatrix.data[14]);
+        clipPlane[11] = (viewMatrix.data[8] * perspectiveMatrix.data[3]) + (viewMatrix.data[9] * perspectiveMatrix.data[7]) + (viewMatrix.data[10] * perspectiveMatrix.data[11]) + (viewMatrix.data[11] * perspectiveMatrix.data[15]);
+
+        clipPlane[12] = (viewMatrix.data[12] * perspectiveMatrix.data[0]) + (viewMatrix.data[13] * perspectiveMatrix.data[4]) + (viewMatrix.data[14] * perspectiveMatrix.data[8]) + (viewMatrix.data[15] * perspectiveMatrix.data[12]);
+        clipPlane[13] = (viewMatrix.data[12] * perspectiveMatrix.data[1]) + (viewMatrix.data[13] * perspectiveMatrix.data[5]) + (viewMatrix.data[14] * perspectiveMatrix.data[9]) + (viewMatrix.data[15] * perspectiveMatrix.data[13]);
+        clipPlane[14] = (viewMatrix.data[12] * perspectiveMatrix.data[2]) + (viewMatrix.data[13] * perspectiveMatrix.data[6]) + (viewMatrix.data[14] * perspectiveMatrix.data[10]) + (viewMatrix.data[15] * perspectiveMatrix.data[14]);
+        clipPlane[15] = (viewMatrix.data[12] * perspectiveMatrix.data[3]) + (viewMatrix.data[13] * perspectiveMatrix.data[7]) + (viewMatrix.data[14] * perspectiveMatrix.data[11]) + (viewMatrix.data[15] * perspectiveMatrix.data[15]);
+
+        // left plane
+        frustumLeftPlane.a = clipPlane[3] + clipPlane[0];
+        frustumLeftPlane.b = clipPlane[7] + clipPlane[4];
+        frustumLeftPlane.c = clipPlane[11] + clipPlane[8];
+        frustumLeftPlane.d = clipPlane[15] + clipPlane[12];
+        frustumLeftPlane.normalize();
+
+        // right plane
+        frustumRightPlane.a = clipPlane[3] - clipPlane[0];
+        frustumRightPlane.b = clipPlane[7] - clipPlane[4];
+        frustumRightPlane.c = clipPlane[11] - clipPlane[8];
+        frustumRightPlane.d = clipPlane[15] - clipPlane[12];
+        frustumRightPlane.normalize();
+
+        // top plane
+        frustumTopPlane.a = clipPlane[3] - clipPlane[1];
+        frustumTopPlane.b = clipPlane[7] - clipPlane[5];
+        frustumTopPlane.c = clipPlane[11] - clipPlane[9];
+        frustumTopPlane.d = clipPlane[15] - clipPlane[13];
+        frustumTopPlane.normalize();
+
+        // bottom plane
+        frustumBottomPlane.a = clipPlane[3] + clipPlane[1];
+        frustumBottomPlane.b = clipPlane[7] + clipPlane[5];
+        frustumBottomPlane.c = clipPlane[11] + clipPlane[9];
+        frustumBottomPlane.d = clipPlane[15] + clipPlane[13];
+        frustumBottomPlane.normalize();
+
+        // near plane
+        frustumNearPlane.a = clipPlane[3] + clipPlane[2];
+        frustumNearPlane.b = clipPlane[7] + clipPlane[6];
+        frustumNearPlane.c = clipPlane[11] + clipPlane[10];
+        frustumNearPlane.d = clipPlane[15] + clipPlane[14];
+        frustumNearPlane.normalize();
+
+        // far plane
+        frustumFarPlane.a = clipPlane[3] - clipPlane[2];
+        frustumFarPlane.b = clipPlane[7] - clipPlane[6];
+        frustumFarPlane.c = clipPlane[11] - clipPlane[10];
+        frustumFarPlane.d = clipPlane[15] - clipPlane[14];
+        frustumFarPlane.normalize();
+    }
+
+    private boolean boundBoxInFrustum(RagBound xBound, RagBound yBound, RagBound zBound)    {
+            // check if outside the plane, if it is,
+            // then it's considered outside the bounds
+
+        if (!frustumLeftPlane.boundBoxOutsidePlane(xBound, yBound, zBound)) {
+            return (false);
+        }
+        if (!frustumRightPlane.boundBoxOutsidePlane(xBound, yBound, zBound)) {
+            return (false);
+        }
+        if (!frustumTopPlane.boundBoxOutsidePlane(xBound, yBound, zBound)) {
+            return (false);
+        }
+        if (!frustumBottomPlane.boundBoxOutsidePlane(xBound, yBound, zBound)) {
+            return (false);
+        }
+        if (!frustumNearPlane.boundBoxOutsidePlane(xBound, yBound, zBound)) {
+            return (false);
+        }
+        if (!frustumFarPlane.boundBoxOutsidePlane(xBound, yBound, zBound)) {
+            return (false);
+        }
+
+            // otherwise considered within the frustum planes
+
+        return(true);
+    }
+
     //
     // convert point to eye cordinates
     //
@@ -482,7 +593,7 @@ public class WalkView extends AWTGLCanvas {
     }
 
     //
-    // cos glow
+    // cosine glow
     //
     private float getEmissiveFactor(long tick) {
         float f;
@@ -490,6 +601,43 @@ public class WalkView extends AWTGLCanvas {
         tick = tick % 2000;
         f = (float) Math.cos((2.0 * Math.PI) * ((double) tick / 2000.0));
         return ((f * 0.4f) + 0.4f);
+    }
+
+    //
+    // drawing utilities
+    //
+    private void switchTexture(WalkViewTexture texture, long tick) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture.colorTextureId);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture.normalTextureId);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texture.metallicRoughnessTextureId);
+        if (texture.emissiveTextureId == -1) {
+            glUniform1i(hasEmissiveUniformId, 1);
+            glUniform1f(emissiveFactorUniformId, 0.0f);
+        } else {
+            glUniform1i(hasEmissiveUniformId, 1);
+            glUniform1f(emissiveFactorUniformId, getEmissiveFactor(tick));
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, texture.emissiveTextureId);
+        }
+    }
+
+    private void drawSingleMesh(Mesh mesh) {
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
+        glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboUVId);
+        glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, false, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboNormalId);
+        glVertexAttribPointer(vertexNormalAttribute, 3, GL_FLOAT, false, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboTangentId);
+        glVertexAttribPointer(vertexTangentAttribute, 3, GL_FLOAT, false, 0, 0);
+
+        glDrawElements(GL_TRIANGLES, mesh.indexBuf);
     }
 
     //
@@ -523,8 +671,7 @@ public class WalkView extends AWTGLCanvas {
             return;
         }
 
-            // set the camera
-
+        // set the camera
         if (!cameraCenterRotate) {
             setupCameraWalkView();
         }
@@ -532,13 +679,11 @@ public class WalkView extends AWTGLCanvas {
             setupCameraCenterRotate();
         }
 
-            // clear
-
+        // clear
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-            // start the program and setup
-            // the drawing matrixes
-
+        // start the program and setup
+        // the drawing matrixes
         glUseProgram(programId);
 
         try (MemoryStack stack = stackPush()) {
@@ -568,63 +713,75 @@ public class WalkView extends AWTGLCanvas {
             glUniform4fv(lightPositionIntensityUniformId,buf);
         }
 
-            // draw all the meshes
+        // setup culling frustum
+        setupCullingFrustum();
 
+        // draw the opaque meshes
         curTexture=null;
 
-        nMesh=meshList.count();
+        nMesh = meshList.count();
 
-        for (n=0;n!=nMesh;n++) {
-            mesh=meshList.get(n);
-
-                // new texture?
-
-            texture = textures.get(mesh.bitmapName);
-            if (texture!=curTexture) {
-                curTexture=texture;
-
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D,texture.colorTextureId);
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D,texture.normalTextureId);
-                glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, texture.metallicRoughnessTextureId);
-                if (texture.emissiveTextureId == -1) {
-                    glUniform1i(hasEmissiveUniformId, 1);
-                    glUniform1f(emissiveFactorUniformId, 0.0f);
-                } else {
-                    glUniform1i(hasEmissiveUniformId, 1);
-                    glUniform1f(emissiveFactorUniformId, getEmissiveFactor(tick));
-                    glActiveTexture(GL_TEXTURE3);
-                    glBindTexture(GL_TEXTURE_2D, texture.emissiveTextureId);
-                }
+        for (n = 0; n != nMesh; n++) {
+            mesh = meshList.get(n);
+            if (mesh.hasAlpha) {
+                continue;
             }
 
-                // draw the mesh
+            // culled?
+            if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
+                continue;
+            }
 
-            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
-            glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
+            // new texture?
+            texture = textures.get(mesh.bitmapName);
+            if (texture!=curTexture) {
+                curTexture = texture;
+                switchTexture(texture, tick);
+            }
 
-            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboUVId);
-            glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, false, 0, 0);
-
-            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboNormalId);
-            glVertexAttribPointer(vertexNormalAttribute, 3, GL_FLOAT, false, 0, 0);
-
-            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboTangentId);
-            glVertexAttribPointer(vertexTangentAttribute, 3, GL_FLOAT, false, 0, 0);
-
-            glDrawElements(GL_TRIANGLES, mesh.indexBuf);
+            // draw the mesh
+            drawSingleMesh(mesh);
         }
 
-            // shutdown drawing
+        // draw the transparent meshes
+        curTexture = null;
 
+        glEnable(GL_BLEND);
+        glDepthMask(false);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        for (n = 0; n != nMesh; n++) {
+            mesh = meshList.get(n);
+            if (!mesh.hasAlpha) {
+                continue;
+            }
+
+            // culled?
+            if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
+                continue;
+            }
+
+            // new texture?
+            texture = textures.get(mesh.bitmapName);
+            if (texture != curTexture) {
+                curTexture = texture;
+                switchTexture(texture, tick);
+            }
+
+            // draw the mesh
+            drawSingleMesh(mesh);
+        }
+
+        glDepthMask(true);
+        glDisable(GL_BLEND);
+
+        // shutdown drawing
         glBindBuffer(GL_ARRAY_BUFFER,0);
         glBindTexture(GL_TEXTURE_2D,0);
         glUseProgram(0);
 
-            // swap the buffers
-
+        // swap the buffers
         swapBuffers();
     }
 

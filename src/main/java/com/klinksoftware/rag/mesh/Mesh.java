@@ -10,10 +10,11 @@ public class Mesh
     public boolean hasEmissive;
     public String name,bitmapName;
     public int[] indexes;
-    public float[] vertexes,normals,tangents,uvs;
-
+    public float[] vertexes, normals, tangents, uvs;
     public int vboVertexId,vboNormalId,vboTangentId,vboUVId;
     public IntBuffer indexBuf;
+    public RagBound xBound, yBound, zBound;
+    public boolean hasAlpha;
 
     public Mesh(String name,String bitmapName,float[] vertexes,float[] normals,float[] tangents,float[] uvs,int[] indexes)
     {
@@ -64,6 +65,20 @@ public class Mesh
         center.x=center.x/f;
         center.y=center.y/f;
         center.z=center.z/f;
+    }
+
+    public void setGlobalBounds(RagPoint offsetPnt) {
+        int n;
+
+        xBound = new RagBound((vertexes[0] + offsetPnt.x), (vertexes[0] + offsetPnt.x));
+        yBound = new RagBound((vertexes[1] + offsetPnt.y), (vertexes[1] + offsetPnt.y));
+        zBound = new RagBound((vertexes[2] + offsetPnt.z), (vertexes[2] + offsetPnt.z));
+
+        for (n = 0; n < vertexes.length; n += 3) {
+            xBound.adjust(vertexes[n] + offsetPnt.x);
+            yBound.adjust(vertexes[n + 1] + offsetPnt.y);
+            zBound.adjust(vertexes[n + 2] + offsetPnt.z);
+        }
     }
 
     public void makeVertexesRelativeToPoint(RagPoint pnt) {

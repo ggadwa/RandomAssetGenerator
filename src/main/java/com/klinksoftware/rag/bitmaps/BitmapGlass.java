@@ -24,9 +24,9 @@ public class BitmapGlass extends BitmapBase
                     startWid;
         RagColor    color;
 
-            // default glass to white
+        // default glass to random gray
 
-        drawRect(0,0,textureSize,textureSize,COLOR_WHITE);
+        drawRect(0, 0, textureSize, textureSize, this.getRandomGray(0.2f, 0.8f));
 
             // back noise and blur
 

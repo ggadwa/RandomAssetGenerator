@@ -21,7 +21,7 @@ public class MeshMapUtility
     public static final int UV_BOX=1;
     public static final int UV_MAP=2;
 
-    public static final int CYLINDER_SIDE_COUNT=12;
+    public static final int CYLINDER_SIDE_COUNT = 16;
 
         //
         // build UVs for vertex lists
