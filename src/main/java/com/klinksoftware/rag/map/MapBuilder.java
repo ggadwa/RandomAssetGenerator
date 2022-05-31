@@ -107,6 +107,7 @@ public class MapBuilder
         MapRoom room;
         MapPillar mapPillar = null;
         MapStorage mapStorage = null;
+        MapEquipment mapEquipment = null;
 
         roomCount = rooms.size();
 
@@ -147,11 +148,18 @@ public class MapBuilder
                     }
                     mapPillar.build(room, n, x, by, z);
                      */
+ /*
                     if (mapStorage == null) {
                         mapStorage = new MapStorage(meshList, bitmaps);
                     }
                     mapStorage.build(room, n, x, by, z);
-
+                     */
+ /*
+                    if (mapEquipment == null) {
+                        mapEquipment = new MapEquipment(meshList, bitmaps);
+                    }
+                    mapEquipment.build(room, n, x, by, z);
+*/
                     room.setBlockedGrid(x, z);
                 }
             }

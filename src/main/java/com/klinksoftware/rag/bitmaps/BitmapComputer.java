@@ -153,7 +153,9 @@ public class BitmapComputer extends BitmapBase
 
                     // the possible emissive
 
-                if (AppWindow.random.nextBoolean()) drawOvalEmissive(dx,dy,(dx+sz),(dy+sz),adjustColor(color,0.7f));
+                if (AppWindow.random.nextBoolean()) {
+                    drawOvalEmissive((dx + 1), (dy + 1), (dx + (sz - 1)), (dy + (sz - 1)), adjustColor(color, 0.7f));
+                }
             }
         }
     }
@@ -198,7 +200,9 @@ public class BitmapComputer extends BitmapBase
 
                     // the possible emissive
 
-                if (AppWindow.random.nextBoolean()) drawRectEmissive(dx,dy,(dx+sz),(dy+sz),color);
+                if (AppWindow.random.nextBoolean()) {
+                    drawRectEmissive((dx + 2), (dy + 2), (dx + (sz - 4)), (dy + (sz - 4)), color);
+                }
             }
         }
     }

@@ -24,9 +24,10 @@ public class WalkView extends AWTGLCanvas {
     private static final float RAG_FAR_Z=500.0f;
     private static final float RAG_FOV=55.0f;
     private static final float RAG_MOVE_SPEED = 0.01f;
-    private static final float RAG_SPEED_MULTIPLIER = 2.0f;
+    private static final float RAG_SPEED_MULTIPLIER = 3.0f;
     private static final long RAG_PAINT_TICK=33;
-    private static final float RAG_LIGHT_INTENSITY = 100.0f; //500.0f;
+    private static final float RAG_LIGHT_LOW_INTENSITY = 100.0f;
+    private static final float RAG_LIGHT_HIGH_INTENSITY = 500.0f;
 
     private int wid,high,lastMouseX,lastMouseY;
     private int vertexShaderId,fragmentShaderId,programId;
@@ -36,7 +37,8 @@ public class WalkView extends AWTGLCanvas {
     private long nextPaintTick;
     private float aspectRatio;
     private float moveX, moveY, moveZ, speedMultiplier;
-    private float cameraRotateDistance,cameraRotateOffsetY;
+    private float cameraRotateDistance, cameraRotateOffsetY;
+    private float currentLightIntensity;
     private boolean cameraCenterRotate;
     private MeshList meshList, incommingMeshList;
     private Skeleton incommingSkeleton;
@@ -98,6 +100,8 @@ public class WalkView extends AWTGLCanvas {
         cameraRotateDistance=0.0f;
         cameraRotateOffsetY = 0.0f;
         fixedLightPoint = null;
+
+        currentLightIntensity = RAG_LIGHT_LOW_INTENSITY;
 
             // start opengl
 
@@ -560,7 +564,7 @@ public class WalkView extends AWTGLCanvas {
                 convertToEyeCoordinates(cameraPoint, lightEyePoint);
             }
             buf=stack.mallocFloat(4);
-            buf.put(lightEyePoint.x).put(lightEyePoint.y).put(lightEyePoint.z).put(RAG_LIGHT_INTENSITY).flip();
+            buf.put(lightEyePoint.x).put(lightEyePoint.y).put(lightEyePoint.z).put(currentLightIntensity).flip();
             glUniform4fv(lightPositionIntensityUniformId,buf);
         }
 
@@ -695,6 +699,9 @@ public class WalkView extends AWTGLCanvas {
             case KeyEvent.VK_E:
                 moveY = 0.0f;
                 return;
+            case KeyEvent.VK_T:
+                currentLightIntensity = (currentLightIntensity == RAG_LIGHT_LOW_INTENSITY) ? RAG_LIGHT_HIGH_INTENSITY : RAG_LIGHT_LOW_INTENSITY;
+                break;
         }
     }
 }
