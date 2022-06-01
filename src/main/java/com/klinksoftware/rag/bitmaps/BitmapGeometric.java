@@ -4,6 +4,7 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 import org.apache.commons.math3.complex.Complex;
 
+@BitmapInterface
 public class BitmapGeometric extends BitmapBase {
 
     private static final int SNAKE_PIXEL_SIZE = 32;

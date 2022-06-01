@@ -3,6 +3,7 @@ package com.klinksoftware.rag.sound;
 import com.klinksoftware.rag.AppWindow;
 import java.util.ArrayList;
 
+@SoundInterface
 public class SoundAlien extends SoundBase {
 
     public SoundAlien() {

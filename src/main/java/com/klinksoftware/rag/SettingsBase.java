@@ -2,6 +2,8 @@ package com.klinksoftware.rag;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -10,6 +12,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 
 public class SettingsBase extends JPanel {
 
@@ -70,7 +74,7 @@ public class SettingsBase extends JPanel {
         return (comboxBox);
     }
 
-    protected JList addList(int y, String title, String[] items, int selectedIndex) {
+    protected JList addList(int y, String title, ArrayList<String> items, int selectedIndex) {
         JLabel label;
         JScrollPane scroll;
         JList list;
@@ -80,7 +84,7 @@ public class SettingsBase extends JPanel {
         add(label);
         label.setBounds(5, (y + 5), (FIELD_LEFT - 10), ROW_HEIGHT);
 
-        list = new JList(items);
+        list = new JList(items.toArray(new String[0]));
         list.setSelectedIndex(selectedIndex);
 
         scroll = new JScrollPane(list);
@@ -119,4 +123,27 @@ public class SettingsBase extends JPanel {
     public void buttonClick(int id) {
     }
 
+    protected ArrayList<String> getAnnotationClasses(String packagePath, String prefix, Class annotationClass) {
+        int prefixLen;
+        ArrayList<String> items;
+        Reflections reflections;
+        Set<Class<?>> classes;
+
+        setLayout(null);
+
+        // get all the bitmaps
+        reflections = new Reflections(packagePath, Scanners.TypesAnnotated);
+        classes = reflections.getTypesAnnotatedWith(annotationClass);
+
+        prefixLen = prefix.length();
+
+        items = new ArrayList<>();
+        for (Class cls : classes) {
+            items.add(cls.getSimpleName().substring(prefixLen));
+        }
+
+        items.sort(null);
+
+        return (items);
+    }
 }

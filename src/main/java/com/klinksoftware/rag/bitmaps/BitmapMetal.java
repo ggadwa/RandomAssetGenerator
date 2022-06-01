@@ -3,6 +3,7 @@ package com.klinksoftware.rag.bitmaps;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
+@BitmapInterface
 public class BitmapMetal extends BitmapBase
 {
     public final static float[][][][] CORRUGATION_LINES = {

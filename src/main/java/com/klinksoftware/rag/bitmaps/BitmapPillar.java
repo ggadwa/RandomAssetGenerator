@@ -4,20 +4,20 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapConcrete extends BitmapBase
-{
-    public BitmapConcrete() {
+public class BitmapPillar extends BitmapBase {
+
+    public BitmapPillar() {
         super();
 
-        hasNormal=true;
-        hasMetallicRoughness=true;
-        hasEmissive=false;
-        hasAlpha=false;
+        hasNormal = true;
+        hasMetallicRoughness = true;
+        hasEmissive = false;
+        hasAlpha = false;
     }
 
-        //
-        // concrete bitmaps
-        //
+    //
+    // concrete bitmaps
+    //
     private void drawCracks(int lft, int top, int rgt, int bot, RagColor crackColor) {
         int sx, sy, ex, ey;
 
@@ -61,44 +61,46 @@ public class BitmapConcrete extends BitmapBase
         int lft, rgt, top, bot, stainCount, markCount;
         RagColor concreteColor, jointColor, altJointColor, crackColor;
 
-        concreteColor=getRandomColor();
+        concreteColor = getRandomColor();
 
-            // the concrete background
+        // the concrete background
+        drawRect(0, 0, textureSize, textureSize, concreteColor);
 
-        drawRect(0,0,textureSize,textureSize,concreteColor);
+        createPerlinNoiseData(16, 16);
+        drawPerlinNoiseRect(0, 0, textureSize, textureSize, 0.6f, 1.0f);
 
-        createPerlinNoiseData(16,16);
-        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.6f,1.0f);
+        createNormalNoiseData(3.0f, 0.4f);
+        drawNormalNoiseRect(0, 0, textureSize, textureSize);
 
-        createNormalNoiseData(3.0f,0.4f);
-        drawNormalNoiseRect(0,0,textureSize,textureSize);
+        // stains
+        stainCount = AppWindow.random.nextInt(5);
+        stainSize = (int) ((float) textureSize * 0.1f);
 
-            // stains
+        for (n = 0; n != stainCount; n++) {
+            lft = AppWindow.random.nextInt(textureSize);
+            xSize = stainSize + AppWindow.random.nextInt(stainSize);
 
-        stainCount=AppWindow.random.nextInt(5);
-        stainSize=(int)((float)textureSize*0.1f);
+            top = AppWindow.random.nextInt(textureSize);
+            ySize = stainSize + AppWindow.random.nextInt(stainSize);
 
-        for (n=0;n!=stainCount;n++) {
-            lft=AppWindow.random.nextInt(textureSize);
-            xSize=stainSize+AppWindow.random.nextInt(stainSize);
+            markCount = 2 + AppWindow.random.nextInt(4);
 
-            top=AppWindow.random.nextInt(textureSize);
-            ySize=stainSize+AppWindow.random.nextInt(stainSize);
+            for (k = 0; k != markCount; k++) {
+                rgt = lft + xSize;
+                if (rgt >= textureSize) {
+                    rgt = textureSize - 1;
+                }
+                bot = top + ySize;
+                if (bot >= textureSize) {
+                    bot = textureSize - 1;
+                }
 
-            markCount=2+AppWindow.random.nextInt(4);
+                drawOvalStain(lft, top, rgt, bot, 0.01f, 0.15f, 0.85f);
 
-            for (k=0;k!=markCount;k++) {
-                rgt=lft+xSize;
-                if (rgt>=textureSize) rgt=textureSize-1;
-                bot=top+ySize;
-                if (bot>=textureSize) bot=textureSize-1;
-
-                drawOvalStain(lft,top,rgt,bot,0.01f,0.15f,0.85f);
-
-                lft+=(AppWindow.random.nextBoolean())?(-(xSize/3)):(xSize/3);
-                top+=(AppWindow.random.nextBoolean())?(-(ySize/3)):(ySize/3);
-                xSize=(int)((float)xSize*0.8f);
-                ySize=(int)((float)ySize*0.8f);
+                lft += (AppWindow.random.nextBoolean()) ? (-(xSize / 3)) : (xSize / 3);
+                top += (AppWindow.random.nextBoolean()) ? (-(ySize / 3)) : (ySize / 3);
+                xSize = (int) ((float) xSize * 0.8f);
+                ySize = (int) ((float) ySize * 0.8f);
             }
         }
 
@@ -183,8 +185,7 @@ public class BitmapConcrete extends BitmapBase
 
         }
 
-            // finish with the metallic-roughness
-
-        createMetallicRoughnessMap(0.35f,0.3f);
+        // finish with the metallic-roughness
+        createMetallicRoughnessMap(0.35f, 0.3f);
     }
 }

@@ -2315,6 +2315,34 @@ public class BitmapBase
     }
 
     //
+    // planks
+    //
+    protected void generateWoodDrawBoard(int lft, int top, int rgt, int bot, int edgeSize, RagColor woodColor) {
+        RagColor col, frameColor;
+
+        col = adjustColorRandom(woodColor, 0.7f, 1.2f);
+        frameColor = adjustColorRandom(col, 0.65f, 0.75f);
+
+        // the board edge
+        drawRect(lft, top, rgt, bot, col);
+        draw3DFrameRect(lft, top, rgt, bot, edgeSize, frameColor, true);
+
+        // stripes and a noise overlay
+        if ((bot - top) > (rgt - lft)) {
+            drawColorStripeVertical((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 0.1f, col);
+        } else {
+            drawColorStripeHorizontal((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 0.1f, col);
+        }
+
+        drawPerlinNoiseRect((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 0.8f, 1.2f);
+        drawStaticNoiseRect((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 0.9f, 1.0f);
+
+        // blur both the color and the normal
+        blur(colorData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 2, true);
+        blur(normalData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 5, true);
+    }
+
+    //
     // overlays
     //
     public void generateSpotsOverlay() {

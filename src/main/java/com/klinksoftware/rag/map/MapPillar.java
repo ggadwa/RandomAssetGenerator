@@ -2,6 +2,7 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
+import com.klinksoftware.rag.bitmaps.BitmapPillar;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 import java.util.HashMap;
@@ -11,28 +12,14 @@ public class MapPillar {
     private boolean squareBase;
     private float[] cylinderSegments;
     private MeshList meshList;
+    private HashMap<String, BitmapBase> bitmaps;
 
     public MapPillar(MeshList meshList, HashMap<String, BitmapBase> bitmaps) {
         this.meshList = meshList;
-
-        buildBitmap(bitmaps);
+        this.bitmaps = bitmaps;
 
         squareBase = AppWindow.random.nextBoolean();
         cylinderSegments = MeshMapUtility.createCylinderSegmentList(1, 5);
-    }
-
-    public void buildBitmap(HashMap<String, BitmapBase> bitmaps) {
-        String[] pillarBitmaps = {"Brick", "Concrete", "Metal", "Mosaic", "Plaster", "Stone", "Tile"};
-
-        BitmapBase bitmap;
-
-        try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + pillarBitmaps[AppWindow.random.nextInt(pillarBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("pillar", bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
         //
@@ -44,6 +31,14 @@ public class MapPillar {
         String name;
         RagPoint centerPnt;
         Mesh mesh;
+        BitmapBase bitmap;
+
+        // bitmap
+        if (!bitmaps.containsKey("pillar")) {
+            bitmap = new BitmapPillar();
+            bitmap.generate();
+            bitmaps.put("pillar", bitmap);
+        }
 
         name = "pillar_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 

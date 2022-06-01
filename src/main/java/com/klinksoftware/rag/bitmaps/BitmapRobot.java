@@ -2,6 +2,7 @@ package com.klinksoftware.rag.bitmaps;
 
 import com.klinksoftware.rag.utility.*;
 
+@BitmapInterface
 public class BitmapRobot extends BitmapBase {
 
     public BitmapRobot() {

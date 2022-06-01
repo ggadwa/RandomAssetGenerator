@@ -2,6 +2,7 @@ package com.klinksoftware.rag.sound;
 
 import com.klinksoftware.rag.AppWindow;
 
+@SoundInterface
 public class SoundMonster extends SoundBase {
 
     public SoundMonster() {

@@ -1,8 +1,11 @@
 
 
+- pillar bitmap
+
+- model: body needs to be bigger than legs, head smaller than body
+
 - walls on stairs
 - fix upper/lower connections
-- work on pillars
 - get rid of floorGrid ceilingGrid (grid?)
 - go back to polygon ceilings/floors
 

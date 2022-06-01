@@ -3,6 +3,7 @@ package com.klinksoftware.rag.bitmaps;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
+@BitmapInterface
 public class BitmapBrick extends BitmapBase
 {
     public BitmapBrick()    {

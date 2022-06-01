@@ -3,8 +3,7 @@ package com.klinksoftware.rag.map;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
 import com.klinksoftware.rag.bitmaps.BitmapComputer;
-import com.klinksoftware.rag.bitmaps.BitmapGlass;
-import com.klinksoftware.rag.bitmaps.BitmapLiquid;
+import com.klinksoftware.rag.bitmaps.BitmapMetal;
 import com.klinksoftware.rag.bitmaps.BitmapMonitor;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
@@ -14,13 +13,14 @@ public class MapEquipment {
 
     private float computerWidth, computerHeight;
     private float terminalWidth, terminalHeight;
+    private float junctionWidth, pipeHeight, pipeRadius;
     private float tubeRadius, tubeHeight, tubeCapRadius, tubeTopCapHeight, tubeBotCapHeight;
     private MeshList meshList;
+    private HashMap<String, BitmapBase> bitmaps;
 
     public MapEquipment(MeshList meshList, HashMap<String, BitmapBase> bitmaps) {
         this.meshList = meshList;
-
-        buildBitmap(bitmaps);
+        this.bitmaps = bitmaps;
 
         computerWidth = MapBuilder.SEGMENT_SIZE * (0.6f + AppWindow.random.nextFloat(0.2f));
         computerHeight = (MapBuilder.SEGMENT_SIZE - MapBuilder.FLOOR_HEIGHT) * (0.7f + AppWindow.random.nextFloat(0.3f));
@@ -28,41 +28,15 @@ public class MapEquipment {
         terminalWidth = MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f));
         terminalHeight = (MapBuilder.SEGMENT_SIZE - MapBuilder.FLOOR_HEIGHT) * (0.3f + AppWindow.random.nextFloat(0.2f));
 
+        junctionWidth = MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f));
+        pipeHeight = (MapBuilder.SEGMENT_SIZE * 0.2f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.2f));
+        pipeRadius = (MapBuilder.SEGMENT_SIZE * 0.05f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.1f));
+
         tubeCapRadius = (MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f))) * 0.5f;
         tubeRadius = tubeCapRadius * (0.7f + AppWindow.random.nextFloat(0.2f));
         tubeHeight = (MapBuilder.SEGMENT_SIZE - MapBuilder.FLOOR_HEIGHT) * (0.7f + AppWindow.random.nextFloat(0.3f));
         tubeTopCapHeight = tubeHeight * (0.15f + AppWindow.random.nextFloat(0.2f));
         tubeBotCapHeight = tubeHeight * (0.15f + AppWindow.random.nextFloat(0.2f));
-    }
-
-    public void buildBitmap(HashMap<String, BitmapBase> bitmaps) {
-        String[] accessoryBitmaps = {"Concrete", "Metal"};
-
-        BitmapBase bitmap;
-
-        try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + accessoryBitmaps[AppWindow.random.nextInt(accessoryBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("accessory", bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        bitmap = new BitmapComputer();
-        bitmap.generate();
-        bitmaps.put("computer", bitmap);
-
-        bitmap = new BitmapMonitor();
-        bitmap.generate();
-        bitmaps.put("monitor", bitmap);
-
-        bitmap = new BitmapLiquid();
-        bitmap.generate();
-        bitmaps.put("liquid", bitmap);
-
-        bitmap = new BitmapGlass();
-        bitmap.generate();
-        bitmaps.put("glass", bitmap);
     }
 
         //
@@ -72,6 +46,14 @@ public class MapEquipment {
     private void addPedestal(MapRoom room, int roomNumber, int x, float by, int z, float width) {
         float dx, dz, widOffset;
         String name;
+        BitmapBase bitmap;
+
+        // bitmap
+        if (!bitmaps.containsKey("accessory")) {
+            bitmap = new BitmapMetal();
+            bitmap.generate();
+            bitmaps.put("accessory", bitmap);
+        }
 
         // pedestal a little bigger than equipment
         width += (MapBuilder.SEGMENT_SIZE * 0.05f);
@@ -95,6 +77,14 @@ public class MapEquipment {
     private void addBank(MapRoom room, int roomNumber, int x, float by, int z) {
         float dx, dy, dz, widOffset;
         String name;
+        BitmapBase bitmap;
+
+        // bitmap
+        if (!bitmaps.containsKey("computer")) {
+            bitmap = new BitmapComputer();
+            bitmap.generate();
+            bitmaps.put("computer", bitmap);
+        }
 
         widOffset = (MapBuilder.SEGMENT_SIZE - computerWidth) * 0.5f;
 
@@ -118,6 +108,19 @@ public class MapEquipment {
         String name;
         RagPoint rotAngle;
         Mesh mesh;
+        BitmapBase bitmap;
+
+        // bitmap
+        if (!bitmaps.containsKey("accessory")) {
+            bitmap = new BitmapMetal();
+            bitmap.generate();
+            bitmaps.put("accessory", bitmap);
+        }
+        if (!bitmaps.containsKey("monitor")) {
+            bitmap = new BitmapMonitor();
+            bitmap.generate();
+            bitmaps.put("monitor", bitmap);
+        }
 
             // the desk and stand
 
@@ -158,13 +161,25 @@ public class MapEquipment {
         // junctions
         //
 
-    public void addJunction(MapRoom room,int gx,int gz,float juncWid,float pipeHigh,float pipeRadius,int pieceCount)
-    {
+    public void addJunction(MapRoom room, int roomNumber, int x, float by, int z) {
         /*
         boolean         upperPipe,lowerPipe;
         float           x,y,z,juncHalfWid;
         RagPoint        rotAngle,centerPnt;
         Mesh            mesh,mesh2;
+        BitmapBase bitmap;
+
+        // bitmap
+        if (!bitmaps.containsKey("pipe")) {
+            bitmap = new BitmapPipe();
+            bitmap.generate();
+            bitmaps.put("pipe", bitmap);
+        }
+        if (!bitmaps.containsKey("panel")) {
+            bitmap = new BitmapPanel();
+            bitmap.generate();
+            bitmaps.put("panel", bitmap);
+        }
 
         x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
         y=room.offset.y;
@@ -259,8 +274,10 @@ public class MapEquipment {
 
     public void build(MapRoom room, int roomNumber, int x, float by, int z) {
         // addBank(room, roomNumber, x, by, z);
+
+        //addTerminal(room, roomNumber, x, by, z);
         //addTube(room, roomNumber, x, by, z);
-        addTerminal(room, roomNumber, x, by, z);
+        addJunction(room, roomNumber, x, by, z);
         /*
         int     x,z,lx,rx,tz,bz,skipX,skipZ,
                 pieceType,pieceCount;

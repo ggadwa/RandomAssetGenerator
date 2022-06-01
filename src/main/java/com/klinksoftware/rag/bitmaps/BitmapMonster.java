@@ -3,6 +3,7 @@ package com.klinksoftware.rag.bitmaps;
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.utility.*;
 
+@BitmapInterface
 public class BitmapMonster extends BitmapBase
 {
     public BitmapMonster() {

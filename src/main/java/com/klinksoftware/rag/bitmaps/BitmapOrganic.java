@@ -3,6 +3,7 @@ package com.klinksoftware.rag.bitmaps;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
+@BitmapInterface
 public class BitmapOrganic extends BitmapBase {
 
     public BitmapOrganic() {

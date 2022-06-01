@@ -138,7 +138,7 @@ public class MapBuilder
                     if ((room.getFloorGrid(x, z) != 1) || (room.getBlockedGrid(x, z))) {
                         continue;
                     }
-                    if (AppWindow.random.nextBoolean()) {
+                    if (AppWindow.random.nextFloat() > 0.4f) {
                         continue;
                     }
 
@@ -156,17 +156,16 @@ public class MapBuilder
                     }
                     mapPillar.build(room, n, x, by, z);
                      */
- /*/*
                     if (mapStorage == null) {
                         mapStorage = new MapStorage(meshList, bitmaps);
                     }
                     mapStorage.build(room, n, x, by, z);
-                     */
+                    /*
                     if (mapEquipment == null) {
                         mapEquipment = new MapEquipment(meshList, bitmaps);
                     }
                     mapEquipment.build(room, n, x, by, z);
-
+*/
                     room.setBlockedGrid(x, z);
                 }
             }

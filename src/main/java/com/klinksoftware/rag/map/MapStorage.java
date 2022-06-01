@@ -2,31 +2,18 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
+import com.klinksoftware.rag.bitmaps.BitmapStorage;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 import java.util.HashMap;
 
 public class MapStorage {
     private MeshList meshList;
+    private HashMap<String, BitmapBase> bitmaps;
 
     public MapStorage(MeshList meshList, HashMap<String, BitmapBase> bitmaps)    {
-        this.meshList=meshList;
-
-        buildBitmap(bitmaps);
-    }
-
-    public void buildBitmap(HashMap<String, BitmapBase> bitmaps) {
-        String[] pillarBitmaps = {"MetalBox", "WoodBox"};
-
-        BitmapBase bitmap;
-
-        try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + pillarBitmaps[AppWindow.random.nextInt(pillarBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("box", bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.meshList = meshList;
+        this.bitmaps = bitmaps;
     }
 
         //
@@ -39,6 +26,14 @@ public class MapStorage {
         String name;
         RagPoint rotAngle;
         Mesh mesh, mesh2;
+        BitmapBase bitmap;
+
+        // bitmap
+        if (!bitmaps.containsKey("box")) {
+            bitmap = new BitmapStorage();
+            bitmap.generate();
+            bitmaps.put("box", bitmap);
+        }
 
             // box size
 
