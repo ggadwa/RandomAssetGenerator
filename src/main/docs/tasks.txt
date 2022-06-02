@@ -1,6 +1,11 @@
 
 
-- pillar bitmap
+
+
+- pillar square bottom always too small
+- randomize top and bottom of pillars
+
+- panel dials are bad
 
 - model: body needs to be bigger than legs, head smaller than body
 

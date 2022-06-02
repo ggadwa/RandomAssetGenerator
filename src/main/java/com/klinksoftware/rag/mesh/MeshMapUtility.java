@@ -966,7 +966,7 @@ public class MeshMapUtility
         segments[0] = 1.0f; // top always biggest
 
         for (n=0;n!=segCount;n++) {
-            segments[n + 1] = 0.8f + (AppWindow.random.nextFloat() * 0.2f);
+            segments[n + 1] = 0.8f + AppWindow.random.nextFloat(0.2f);
         }
 
         segments[segCount + 1] = 1.0f; // and bottom
@@ -974,17 +974,16 @@ public class MeshMapUtility
         return(segments);
     }
 
-    public static Mesh createCylinder(MapRoom room,String name,String bitmapName,RagPoint centerPnt,float ty,float by,float[] segments,float radius,boolean addTop,boolean addBot)
-    {
-        int                 n,k,t,iIdx,vStartIdx,segCount;
-        float               ang,ang2,angAdd,y,segTy,segBy,yAdd,
-                            botRad,topRad,u1,u2,rd,
-                            tx,tz,bx,bz,tx2,tz2,bx2,bz2;
-        ArrayList<Float>    vertexArray,normalArray,uvArray;
-        ArrayList<Integer>  indexArray;
-        int[]               indexes;
-        float[]             vertexes,normals,tangents,uvs;
-        RagPoint            normal;
+    public static Mesh createCylinder(MapRoom room, String name, String bitmapName, RagPoint centerPnt, float ty, float by, float[] segments, float radius, boolean addTop, boolean addBot) {
+        int n, k, t, iIdx, vStartIdx, segCount;
+        float ang, ang2, angAdd, y, segTy, segBy, yAdd;
+        float botRad, topRad, u1, u2, vScale, vt, vb, rd;
+        float tx, tz, bx, bz, tx2, tz2, bx2, bz2;
+        ArrayList<Float> vertexArray, normalArray, uvArray;
+        ArrayList<Integer> indexArray;
+        int[] indexes;
+        float[] vertexes, normals, tangents, uvs;
+        RagPoint normal;
 
             // allocate arrays
 
@@ -1004,7 +1003,9 @@ public class MeshMapUtility
         yAdd=(ty-by)/(float)segCount;
 
         segBy=by;
-        segTy=by+yAdd;
+        segTy = by + yAdd;
+
+        vScale = 1.0f / MapBuilder.SEGMENT_SIZE;
 
         botRad=segments[0]*radius;
 
@@ -1012,7 +1013,11 @@ public class MeshMapUtility
 
                 // new radius
 
-            topRad=segments[k+1]*radius;
+            topRad = segments[k + 1] * radius;
+
+            // the two Vs
+            vt = 1.0f - (segTy * vScale);
+            vb = 1.0f - (segBy * vScale);
 
                 // cyliner faces
 
@@ -1021,10 +1026,10 @@ public class MeshMapUtility
             for (n=0;n!=CYLINDER_SIDE_COUNT;n++) {
                 ang2=ang+angAdd;
 
-                    // the two Us
+                // the two UVs
 
-                u1=(ang*(float)segCount)/360.0f;
-                u2=(ang2*(float)segCount)/360.0f;
+                u1 = (ang * (float) segCount) / 360.0f;
+                u2 = (ang2 * (float) segCount) / 360.0f;
 
                     // force last segment to wrap
 
@@ -1049,27 +1054,27 @@ public class MeshMapUtility
                 vStartIdx=vertexArray.size();
 
                 vertexArray.addAll(Arrays.asList(tx,segTy,tz));
-                uvArray.addAll(Arrays.asList(u1,0.0f));
+                uvArray.addAll(Arrays.asList(u1, vt));
                 indexArray.add(iIdx++);
 
                 vertexArray.addAll(Arrays.asList(tx2,segTy,tz2));
-                uvArray.addAll(Arrays.asList(u2,0.0f));
+                uvArray.addAll(Arrays.asList(u2, vt));
                 indexArray.add(iIdx++);
 
                 vertexArray.addAll(Arrays.asList(bx,segBy,bz));
-                uvArray.addAll(Arrays.asList(u1,1.0f));
+                uvArray.addAll(Arrays.asList(u1, vb));
                 indexArray.add(iIdx++);
 
                 vertexArray.addAll(Arrays.asList(tx2,segTy,tz2));
-                uvArray.addAll(Arrays.asList(u2,0.0f));
+                uvArray.addAll(Arrays.asList(u2, vt));
                 indexArray.add(iIdx++);
 
                 vertexArray.addAll(Arrays.asList(bx2,segBy,bz2));
-                uvArray.addAll(Arrays.asList(u2,1.0f));
+                uvArray.addAll(Arrays.asList(u2, vb));
                 indexArray.add(iIdx++);
 
                 vertexArray.addAll(Arrays.asList(bx,segBy,bz));
-                uvArray.addAll(Arrays.asList(u1,1.0f));
+                uvArray.addAll(Arrays.asList(u1, vb));
                 indexArray.add(iIdx++);
 
                     // the normals
@@ -1105,7 +1110,7 @@ public class MeshMapUtility
                 rd=ang*((float)Math.PI/180.0f);
 
                 u1=((float)Math.sin(rd)*0.5f)+0.5f;
-                u2=((float)Math.cos(rd)*0.5f)+0.5f;
+                vt = 1.0f - (ty * vScale);
 
                 tx=centerPnt.x+((topRad*(float)Math.sin(rd))+(topRad*(float)Math.cos(rd)));
                 tz=centerPnt.z+((topRad*(float)Math.cos(rd))-(topRad*(float)Math.sin(rd)));
@@ -1113,7 +1118,7 @@ public class MeshMapUtility
                     // the points
 
                 vertexArray.addAll(Arrays.asList(tx,ty,tz));
-                uvArray.addAll(Arrays.asList(u1,u2));
+                uvArray.addAll(Arrays.asList(u1, vt));
                 normalArray.addAll(Arrays.asList(0.0f,1.0f,0.0f));
 
                 ang+=angAdd;
@@ -1136,7 +1141,7 @@ public class MeshMapUtility
                 rd=ang*((float)Math.PI/180.0f);
 
                 u1=((float)Math.sin(rd)*0.5f)+0.5f;
-                u2=((float)Math.cos(rd)*0.5f)+0.5f;
+                vb = 1.0f - (by * vScale);
 
                 bx=centerPnt.x+((botRad*(float)Math.sin(rd))+(botRad*(float)Math.cos(rd)));
                 bz=centerPnt.z+((botRad*(float)Math.cos(rd))-(botRad*(float)Math.sin(rd)));
@@ -1144,7 +1149,7 @@ public class MeshMapUtility
                     // the points
 
                 vertexArray.addAll(Arrays.asList(bx,by,bz));
-                uvArray.addAll(Arrays.asList(u1,u2));
+                uvArray.addAll(Arrays.asList(u1, vb));
                 normalArray.addAll(Arrays.asList(0.0f,-1.0f,0.0f));
 
                 ang+=angAdd;
@@ -1168,8 +1173,7 @@ public class MeshMapUtility
         return(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes));
     }
 
-    public static Mesh createMeshCylinderSimple(MapRoom room,String name,String bitmapName,RagPoint centerPnt,float ty,float by,float radius,boolean addTop,boolean addBot)
-    {
+    public static Mesh createMeshCylinderSimple(MapRoom room, String name, String bitmapName, RagPoint centerPnt, float ty, float by, float radius, boolean addTop, boolean addBot) {
         return(createCylinder(room,name,bitmapName,centerPnt,ty,by,new float[]{1.0f,1.0f},radius,addTop,addBot));
     }
 }

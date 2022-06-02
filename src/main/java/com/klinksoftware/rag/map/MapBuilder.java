@@ -150,16 +150,16 @@ public class MapBuilder
                     }
 
 
-                    /*
                     if (mapPillar == null) {
                         mapPillar = new MapPillar(meshList, bitmaps);
                     }
                     mapPillar.build(room, n, x, by, z);
-                     */
+                    /*
                     if (mapStorage == null) {
                         mapStorage = new MapStorage(meshList, bitmaps);
                     }
                     mapStorage.build(room, n, x, by, z);
+                     */
                     /*
                     if (mapEquipment == null) {
                         mapEquipment = new MapEquipment(meshList, bitmaps);

@@ -10,6 +10,7 @@ import java.util.HashMap;
 public class MapPillar {
 
     private boolean squareBase;
+    private float radius, baseRadius;
     private float[] cylinderSegments;
     private MeshList meshList;
     private HashMap<String, BitmapBase> bitmaps;
@@ -20,6 +21,9 @@ public class MapPillar {
 
         squareBase = AppWindow.random.nextBoolean();
         cylinderSegments = MeshMapUtility.createCylinderSegmentList(1, 5);
+
+        baseRadius = (MapBuilder.SEGMENT_SIZE * (0.2f + AppWindow.random.nextFloat(0.6f))) * 0.5f;
+        radius = baseRadius * (0.8f + AppWindow.random.nextFloat(0.1f));
     }
 
         //
@@ -27,7 +31,7 @@ public class MapPillar {
         //
 
     public void build(MapRoom room, int roomNumber, int x, float by, int z) {
-        float pillarTy, ty, pillarBy, radius, baseRadius;
+        float pillarTy, ty, pillarBy;
         String name;
         RagPoint centerPnt;
         Mesh mesh;
@@ -48,9 +52,6 @@ public class MapPillar {
 
         // xz position
         centerPnt = new RagPoint((((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE / 2)), ((ty + by) / 2), ((room.z + z) * MapBuilder.SEGMENT_SIZE + (MapBuilder.SEGMENT_SIZE / 2)));
-
-        radius = MapBuilder.SEGMENT_SIZE / 4.0f;
-        baseRadius = radius * 1.5f;
 
         // create the pillar
         mesh = MeshMapUtility.createCylinder(room, name, "pillar", centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);

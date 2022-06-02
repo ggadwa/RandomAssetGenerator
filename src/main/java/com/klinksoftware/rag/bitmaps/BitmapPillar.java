@@ -15,175 +15,104 @@ public class BitmapPillar extends BitmapBase {
         hasAlpha = false;
     }
 
-    //
-    // concrete bitmaps
-    //
-    private void drawCracks(int lft, int top, int rgt, int bot, RagColor crackColor) {
-        int sx, sy, ex, ey;
+    private void generatePillarBlock(int lft, int top, int rgt, int bot, int margin, int edgeSize, RagColor concreteColor, RagColor lineColor) {
+        int mx, my;
+        int halfMargin, noiseSize;
+        boolean faceIn;
 
-        if (AppWindow.random.nextBoolean()) {
+        lft += margin;
+        top += margin;
+        rgt -= margin;
+        bot -= margin;
+
+        if ((lft >= rgt) || (top >= bot)) {
             return;
         }
 
-        switch (AppWindow.random.nextInt(4)) {
-            case 0:
-                sx = lft + AppWindow.random.nextInt(rgt - lft);
-                sy = top;
-                ex = AppWindow.random.nextBoolean() ? lft : rgt;
-                ey = top + AppWindow.random.nextInt(bot - top);
-                break;
-            case 1:
-                sx = lft + AppWindow.random.nextInt(rgt - lft);
-                sy = bot;
-                ex = AppWindow.random.nextBoolean() ? lft : rgt;
-                ey = top + AppWindow.random.nextInt(bot - top);
-                break;
-            case 2:
-                sx = lft;
-                sy = top + AppWindow.random.nextInt(bot - top);
-                ex = lft + AppWindow.random.nextInt(rgt - lft);
-                ey = AppWindow.random.nextBoolean() ? lft : rgt;
-                break;
-            default:
-                sx = rgt;
-                sy = top + AppWindow.random.nextInt(rgt - lft);
-                ex = lft + AppWindow.random.nextInt(rgt - lft);
-                ey = AppWindow.random.nextBoolean() ? lft : rgt;
-                break;
+        // the stone background
+        // new for each iteration so it doesn't look like it's outside the 3d effects
+        drawRect(lft, top, rgt, bot, adjustColorRandom(concreteColor, 0.8f, 1.0f));
+
+        noiseSize = AppWindow.random.nextBoolean() ? 16 : 8;
+        createPerlinNoiseData(noiseSize, noiseSize);
+        drawPerlinNoiseRect(lft, top, rgt, bot, 0.8f, 1.0f);
+
+        createNormalNoiseData(3.0f, 0.4f);
+        drawNormalNoiseRect(lft, top, rgt, bot);
+
+        blur(colorData, lft, top, rgt, bot, 1, false);
+
+        // skip out if we don't have enough margin
+        if ((Math.abs(lft - rgt) <= margin) || (Math.abs(top - bot) <= margin)) {
+            return;
         }
 
-        drawSimpleCrack(sx, sy, ex, ey, (4 + AppWindow.random.nextInt(4)), AppWindow.random.nextInt(40), AppWindow.random.nextInt(40), crackColor);
+        halfMargin = margin / 2;
+
+        faceIn = AppWindow.random.nextBoolean();
+
+        switch (AppWindow.random.nextInt(4)) {
+
+            // one box
+            case 0:
+                draw3DFrameRect(lft, top, rgt, bot, edgeSize, lineColor, faceIn);
+                generatePillarBlock(lft, top, rgt, bot, margin, edgeSize, concreteColor, lineColor);
+                break;
+
+            // horizontal boxes
+            case 1:
+                mx = (lft + rgt) / 2;
+                draw3DFrameRect(lft, top, (mx - halfMargin), bot, edgeSize, lineColor, faceIn);
+                generatePillarBlock(lft, top, (mx - halfMargin), bot, margin, edgeSize, concreteColor, lineColor);
+
+                draw3DFrameRect((mx + halfMargin), top, rgt, bot, edgeSize, lineColor, faceIn);
+                generatePillarBlock((mx + halfMargin), top, rgt, bot, margin, edgeSize, concreteColor, lineColor);
+                break;
+
+            // vertical boxes
+            case 2:
+                my = (top + bot) / 2;
+                draw3DFrameRect(lft, top, rgt, (my - halfMargin), edgeSize, lineColor, faceIn);
+                generatePillarBlock(lft, top, rgt, (my - halfMargin), margin, edgeSize, concreteColor, lineColor);
+
+                draw3DFrameRect(lft, (my + halfMargin), rgt, bot, edgeSize, lineColor, faceIn);
+                generatePillarBlock(lft, (my + halfMargin), rgt, bot, margin, edgeSize, concreteColor, lineColor);
+                break;
+
+            // 4 boxes
+            case 3:
+                mx = (lft + rgt) / 2;
+                my = (top + bot) / 2;
+
+                draw3DFrameRect(lft, top, (mx - halfMargin), (my - halfMargin), edgeSize, lineColor, faceIn);
+                generatePillarBlock(lft, top, (mx - halfMargin), (my - halfMargin), margin, edgeSize, concreteColor, lineColor);
+
+                draw3DFrameRect((mx + halfMargin), top, rgt, (my - halfMargin), edgeSize, lineColor, faceIn);
+                generatePillarBlock((mx + halfMargin), top, rgt, (my - halfMargin), margin, edgeSize, concreteColor, lineColor);
+
+                draw3DFrameRect(lft, (my + halfMargin), (mx - halfMargin), bot, edgeSize, lineColor, faceIn);
+                generatePillarBlock(lft, (my + halfMargin), (mx - halfMargin), bot, margin, edgeSize, concreteColor, lineColor);
+
+                draw3DFrameRect((mx + halfMargin), (my + halfMargin), rgt, bot, edgeSize, lineColor, faceIn);
+                generatePillarBlock((mx + halfMargin), (my + halfMargin), rgt, bot, margin, edgeSize, concreteColor, lineColor);
+                break;
+
+        }
     }
 
     @Override
     public void generateInternal() {
-        int n, k, stainSize, xSize, ySize;
-        int lft, rgt, top, bot, stainCount, markCount;
-        RagColor concreteColor, jointColor, altJointColor, crackColor;
+        int margin, edgeSize;
+        RagColor concreteColor, lineColor;
 
+        // recursive draw
         concreteColor = getRandomColor();
+        lineColor = adjustColor(concreteColor, 0.75f);
 
-        // the concrete background
-        drawRect(0, 0, textureSize, textureSize, concreteColor);
+        margin = 15 + AppWindow.random.nextInt(15);
+        edgeSize = 4 + AppWindow.random.nextInt(4);
 
-        createPerlinNoiseData(16, 16);
-        drawPerlinNoiseRect(0, 0, textureSize, textureSize, 0.6f, 1.0f);
-
-        createNormalNoiseData(3.0f, 0.4f);
-        drawNormalNoiseRect(0, 0, textureSize, textureSize);
-
-        // stains
-        stainCount = AppWindow.random.nextInt(5);
-        stainSize = (int) ((float) textureSize * 0.1f);
-
-        for (n = 0; n != stainCount; n++) {
-            lft = AppWindow.random.nextInt(textureSize);
-            xSize = stainSize + AppWindow.random.nextInt(stainSize);
-
-            top = AppWindow.random.nextInt(textureSize);
-            ySize = stainSize + AppWindow.random.nextInt(stainSize);
-
-            markCount = 2 + AppWindow.random.nextInt(4);
-
-            for (k = 0; k != markCount; k++) {
-                rgt = lft + xSize;
-                if (rgt >= textureSize) {
-                    rgt = textureSize - 1;
-                }
-                bot = top + ySize;
-                if (bot >= textureSize) {
-                    bot = textureSize - 1;
-                }
-
-                drawOvalStain(lft, top, rgt, bot, 0.01f, 0.15f, 0.85f);
-
-                lft += (AppWindow.random.nextBoolean()) ? (-(xSize / 3)) : (xSize / 3);
-                top += (AppWindow.random.nextBoolean()) ? (-(ySize / 3)) : (ySize / 3);
-                xSize = (int) ((float) xSize * 0.8f);
-                ySize = (int) ((float) ySize * 0.8f);
-            }
-        }
-
-        blur(colorData, 0, 0, textureSize, textureSize, 1, false);
-
-        // concrete expansion joints
-        jointColor = adjustColorRandom(concreteColor, 0.5f, 0.6f);
-        altJointColor = adjustColor(jointColor, 0.9f);
-
-        crackColor = adjustColorRandom(concreteColor, 0.4f, 0.5f);
-
-        switch (AppWindow.random.nextInt(3)) {
-
-            // long cuts
-            case 0:
-                drawLineColor(1, 0, 1, textureSize, jointColor);
-                drawLineColor(0, 0, 0, textureSize, altJointColor);
-                drawLineColor(2, 0, 2, textureSize, altJointColor);
-                drawLineNormal(1, 0, 1, textureSize, NORMAL_CLEAR);
-                drawLineNormal(0, 0, 0, textureSize, NORMAL_RIGHT_45);
-                drawLineNormal(2, 0, 2, textureSize, NORMAL_LEFT_45);
-
-                drawCracks(2, 2, (textureSize - 4), (textureSize - 4), crackColor);
-                break;
-
-            // big square
-            case 1:
-                drawLineColor(1, 0, 1, textureSize, jointColor);
-                drawLineColor(0, 0, 0, textureSize, altJointColor);
-                drawLineColor(2, 0, 2, textureSize, altJointColor);
-                drawLineNormal(1, 0, 1, textureSize, NORMAL_CLEAR);
-                drawLineNormal(0, 0, 0, textureSize, NORMAL_RIGHT_45);
-                drawLineNormal(2, 0, 2, textureSize, NORMAL_LEFT_45);
-
-                drawLineColor(0, 1, textureSize, 1, jointColor);
-                drawLineColor(0, 0, textureSize, 0, altJointColor);
-                drawLineColor(0, 2, textureSize, 2, altJointColor);
-                drawLineNormal(0, 1, textureSize, 1, NORMAL_CLEAR);
-                drawLineNormal(0, 0, textureSize, 0, NORMAL_RIGHT_45);
-                drawLineNormal(0, 2, textureSize, 2, NORMAL_LEFT_45);
-
-                drawCracks(2, 2, (textureSize - 4), (textureSize - 4), crackColor);
-                break;
-
-            // small square
-            case 2:
-                k = textureSize / 2;
-
-                drawLineColor(1, 0, 1, textureSize, jointColor);
-                drawLineColor(0, 0, 0, textureSize, altJointColor);
-                drawLineColor(2, 0, 2, textureSize, altJointColor);
-                drawLineNormal(1, 0, 1, textureSize, NORMAL_CLEAR);
-                drawLineNormal(0, 0, 0, textureSize, NORMAL_RIGHT_45);
-                drawLineNormal(2, 0, 2, textureSize, NORMAL_LEFT_45);
-
-                drawLineColor((k + 1), 0, (k + 1), textureSize, jointColor);
-                drawLineColor(k, 0, k, textureSize, altJointColor);
-                drawLineColor((k + 2), 0, (k + 2), textureSize, altJointColor);
-                drawLineNormal((k + 1), 0, (k + 1), textureSize, NORMAL_CLEAR);
-                drawLineNormal(k, 0, k, textureSize, NORMAL_RIGHT_45);
-                drawLineNormal((k + 2), 0, (k + 2), textureSize, NORMAL_LEFT_45);
-
-                drawLineColor(0, 1, textureSize, 1, jointColor);
-                drawLineColor(0, 0, textureSize, 0, altJointColor);
-                drawLineColor(0, 2, textureSize, 2, altJointColor);
-                drawLineNormal(0, 1, textureSize, 1, NORMAL_CLEAR);
-                drawLineNormal(0, 0, textureSize, 0, NORMAL_RIGHT_45);
-                drawLineNormal(0, 2, textureSize, 2, NORMAL_LEFT_45);
-
-                drawLineColor(0, (k + 1), textureSize, (k + 1), jointColor);
-                drawLineColor(0, (k + 0), textureSize, (k + 0), altJointColor);
-                drawLineColor(0, (k + 2), textureSize, (k + 2), altJointColor);
-                drawLineNormal(0, (k + 1), textureSize, (k + 1), NORMAL_CLEAR);
-                drawLineNormal(0, (k + 0), textureSize, (k + 0), NORMAL_RIGHT_45);
-                drawLineNormal(0, (k + 2), textureSize, (k + 2), NORMAL_LEFT_45);
-
-                drawCracks(2, 2, (k - 2), (k - 2), crackColor);
-                drawCracks((k + 2), 2, (textureSize - 4), (k - 2), crackColor);
-                drawCracks(2, (k + 2), (k - 2), (textureSize - 4), crackColor);
-                drawCracks((k + 2), (k + 2), (textureSize - 4), (textureSize - 4), crackColor);
-                break;
-
-        }
+        generatePillarBlock(-margin, -margin, (textureSize + margin), (textureSize + margin), margin, edgeSize, concreteColor, lineColor);
 
         // finish with the metallic-roughness
         createMetallicRoughnessMap(0.35f, 0.3f);

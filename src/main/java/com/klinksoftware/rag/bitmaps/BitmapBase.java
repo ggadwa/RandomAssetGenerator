@@ -739,6 +739,23 @@ public class BitmapBase
         }
     }
 
+    //
+    // tinting
+    //
+    protected void tint(int lft, int top, int rgt, int bot, RagColor color, float colFactor) {
+        int x, y, idx;
+
+        for (y = top; y != bot; y++) {
+            for (x = lft; x != rgt; x++) {
+                idx = ((y * textureSize) + x) * 4;
+
+                colorData[idx] = (colorData[idx] * (1.0f - colFactor)) + (color.r * colFactor);
+                colorData[idx + 1] = (colorData[idx + 1] * (1.0f - colFactor)) + (color.g * colFactor);
+                colorData[idx + 2] = (colorData[idx + 2] * (1.0f - colFactor)) + (color.b * colFactor);
+            }
+        }
+    }
+
         //
         // distortions
         //
@@ -2347,16 +2364,20 @@ public class BitmapBase
     //
     public void generateSpotsOverlay() {
         int x, y, dx, dy, rx, ry;
+        int n, extraCount;
         int spotMin, xCount, yCount, xAdd, yAdd, spotSize, jiggleSize;
 
-        xCount = 4 + AppWindow.random.nextInt(8);
+        xCount = 4 + AppWindow.random.nextInt(4);
         xAdd = textureSize / xCount;
 
-        yCount = 4 + AppWindow.random.nextInt(8);
+        yCount = 4 + AppWindow.random.nextInt(4);
         yAdd = textureSize / yCount;
 
         spotMin = (xAdd > yAdd) ? (yAdd / 2) : (xAdd / 2);
         jiggleSize = spotMin / 10;
+        if (jiggleSize < 10) {
+            jiggleSize = 10;
+        }
 
         dy = 0;
 
@@ -2366,9 +2387,14 @@ public class BitmapBase
 
             for (x = 0; x != xCount; x++) {
                 spotSize = spotMin + AppWindow.random.nextInt(spotMin);
-                rx = dx + AppWindow.random.nextInt(jiggleSize);
-                ry = dy + AppWindow.random.nextInt(jiggleSize);
-                drawOvalDarken(rx, ry, (rx + spotSize), (ry + spotSize), (0.8f + (AppWindow.random.nextFloat() * 0.2f)));
+
+                extraCount = 5 + AppWindow.random.nextInt(5);
+
+                for (n = 0; n != extraCount; n++) {
+                    rx = dx + (AppWindow.random.nextInt(jiggleSize * 2) - jiggleSize);
+                    ry = dy + (AppWindow.random.nextInt(jiggleSize * 2) - jiggleSize);
+                    drawOvalDarken(rx, ry, (rx + spotSize), (ry + spotSize), (0.95f + (AppWindow.random.nextFloat() * 0.05f)));
+                }
 
                 dx += xAdd;
             }
