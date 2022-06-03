@@ -1,9 +1,8 @@
 
 
-
-
-- pillar square bottom always too small
-- randomize top and bottom of pillars
+- decorations as slider?
+- finish equipment
+- storage shelves
 
 - panel dials are bad
 
@@ -14,8 +13,6 @@
 - get rid of floorGrid ceilingGrid (grid?)
 - go back to polygon ceilings/floors
 
-- storage shelves
-- other equipment pieces
 
 - make arm sizes = to size of torso bone to top torso etc, same with legs
 

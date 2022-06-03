@@ -138,7 +138,7 @@ public class MapBuilder
                     if ((room.getFloorGrid(x, z) != 1) || (room.getBlockedGrid(x, z))) {
                         continue;
                     }
-                    if (AppWindow.random.nextFloat() > 0.4f) {
+                    if (AppWindow.random.nextFloat() > 0.3f) {
                         continue;
                     }
 
@@ -149,60 +149,33 @@ public class MapBuilder
                         continue;
                     }
 
+                    // random decoration
+                    switch (AppWindow.random.nextInt(3)) {
+                        case 0:
+                            if (mapPillar == null) {
+                                mapPillar = new MapPillar(meshList, bitmaps);
+                            }
+                            mapPillar.build(room, n, x, by, z);
+                            break;
+                        case 1:
+                            if (mapStorage == null) {
+                                mapStorage = new MapStorage(meshList, bitmaps);
+                            }
+                            mapStorage.build(room, n, x, by, z);
+                            break;
+                        case 2:
+                            if (mapEquipment == null) {
+                                mapEquipment = new MapEquipment(meshList, bitmaps);
+                            }
+                            mapEquipment.build(room, n, x, by, z);
+                            break;
+                    }
 
-                    if (mapPillar == null) {
-                        mapPillar = new MapPillar(meshList, bitmaps);
-                    }
-                    mapPillar.build(room, n, x, by, z);
-                    /*
-                    if (mapStorage == null) {
-                        mapStorage = new MapStorage(meshList, bitmaps);
-                    }
-                    mapStorage.build(room, n, x, by, z);
-                     */
-                    /*
-                    if (mapEquipment == null) {
-                        mapEquipment = new MapEquipment(meshList, bitmaps);
-                    }
-                    mapEquipment.build(room, n, x, by, z);
-*/
                     room.setBlockedGrid(x, z);
                 }
             }
 
         }
-
-        /*
-        int         decorationType;
-
-
-            // build the decoration
-
-            case 1:
-                bitmapGenerator.generatePillar();
-                (new MapPillar(meshList,room,("pillar_"+Integer.toString(roomIdx)))).build();
-                break;
-            case 2:
-                bitmapGenerator.generateBox();
-                bitmapGenerator.generateAccessory();
-                (new MapStorage(meshList,room,("storage_"+Integer.toString(roomIdx)))).build();
-                break;
-            case 3:
-                bitmapGenerator.generateComputer();
-                bitmapGenerator.generatePanel();
-                bitmapGenerator.generateMonitor();
-                bitmapGenerator.generatePlatform();
-                bitmapGenerator.generatePipe();
-                bitmapGenerator.generateLiquid();
-                bitmapGenerator.generateGlass();
-                (new MapEquipment(meshList,room,("computer_"+Integer.toString(roomIdx)))).build();
-                break;
-            case 4:
-                bitmapGenerator.generatePipe();
-                (new MapPipe(meshList,room,("pipe_"+Integer.toString(roomIdx)))).build();
-                break;
-        }
-         */
     }
 
         //

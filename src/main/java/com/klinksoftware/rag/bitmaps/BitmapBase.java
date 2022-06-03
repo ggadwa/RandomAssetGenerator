@@ -1,13 +1,20 @@
 package com.klinksoftware.rag.bitmaps;
 
-import com.klinksoftware.rag.*;
+import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.utility.*;
-
-import java.io.*;
-import java.awt.*;
-import java.awt.color.*;
-import java.awt.image.*;
-import javax.imageio.*;
+import java.awt.Point;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class BitmapBase
 {
@@ -31,28 +38,36 @@ public class BitmapBase
     public static final RagColor COLOR_BLACK=new RagColor(0.0f,0.0f,0.0f);
     public static final RagColor COLOR_WHITE=new RagColor(1.0f,1.0f,1.0f);
 
-    public static final float[][] COLOR_PRIMARY_LIST={
-                                        {0.7f,0.0f,0.0f},   // red
-                                        {0.0f,0.7f,0.0f},   // green
-                                        {0.0f,0.0f,0.7f},   // blue
-                                        {0.7f,0.7f,0.0f},   // yellow
-                                        {0.8f,0.0f,0.8f},   // purple
-                                        {0.8f,0.8f,0.0f},   // light blue
-                                        {0.0f,0.9f,0.6f},   // sea green
-                                        {1.0f,0.4f,0.0f},   // orange
-                                        {0.7f,0.4f,0.0f},   // brown
-                                        {0.8f,0.6f,0.0f},   // gold
-                                        {0.8f,0.6f,0.8f},   // lavender
-                                        {1.0f,0.8f,0.8f},   // pink
-                                        {0.6f,0.9f,0.0f},   // lime
-                                        {0.2f,0.5f,0.0f},   // tree green
-                                        {0.5f,0.5f,0.5f},   // gray
-                                        {0.6f,0.0f,0.9f},   // dark purple
-                                        {0.0f,0.3f,0.5f},   // slate blue
-                                        {0.9f,0.6f,0.4f},   // peach
-                                        {0.9f,0.0f,0.4f},   // muave
-                                        {0.8f,0.5f,0.5f}    // dull red
-                                    };
+    public static final float[][] COLOR_PRIMARY_LIST = {
+        {0.7f, 0.0f, 0.0f}, // red
+        {0.0f, 0.7f, 0.0f}, // green
+        {0.0f, 0.0f, 0.7f}, // blue
+        {0.7f, 0.7f, 0.0f}, // yellow
+        {0.8f, 0.0f, 0.8f}, // purple
+        {0.8f, 0.8f, 0.0f}, // light blue
+        {0.0f, 0.9f, 0.6f}, // sea green
+        {1.0f, 0.4f, 0.0f}, // orange
+        {0.7f, 0.4f, 0.0f}, // brown
+        {0.8f, 0.6f, 0.0f}, // gold
+        {0.8f, 0.6f, 0.8f}, // lavender
+        {1.0f, 0.8f, 0.8f}, // pink
+        {0.6f, 0.9f, 0.0f}, // lime
+        {0.2f, 0.5f, 0.0f}, // tree green
+        {0.5f, 0.5f, 0.5f}, // gray
+        {0.6f, 0.0f, 0.9f}, // dark purple
+        {0.0f, 0.3f, 0.5f}, // slate blue
+        {0.9f, 0.6f, 0.4f}, // peach
+        {0.9f, 0.0f, 0.4f}, // muave
+        {0.8f, 0.5f, 0.5f} // dull red
+    };
+    public static final float[][] COLOR_TINT_LIST = {
+        {1.0f, 0.0f, 0.0f},
+        {0.0f, 1.0f, 0.0f},
+        {0.0f, 0.0f, 1.0f},
+        {1.0f, 1.0f, 0.0f},
+        {0.0f, 1.0f, 1.0f},
+        {1.0f, 0.0f, 1.0f}
+    };
 
     protected int           textureSize;
     protected boolean       hasNormal,hasMetallicRoughness,hasEmissive,hasAlpha;
@@ -92,8 +107,7 @@ public class BitmapBase
         // getters
         //
 
-    public boolean hasAlpha()
-    {
+    public boolean hasAlpha() {
         return(hasAlpha);
     }
 
@@ -101,8 +115,7 @@ public class BitmapBase
         return (hasEmissive);
     }
 
-    public int getTextureSize()
-    {
+    public int getTextureSize() {
         return(textureSize);
     }
 
@@ -110,38 +123,41 @@ public class BitmapBase
         // colors
         //
 
-    protected RagColor getRandomColor()
-    {
-        int             idx;
-        float           f,midPoint,darken;
-        float[]         col;
+    protected RagColor getRandomColor() {
+        int idx;
+        float midPoint, darken;
+        float[] col;
 
-            // every once and a while, return a gray
-
-        if (AppWindow.random.nextFloat()<0.1) return(getRandomGray(0.3f,0.7f));
-
-            // random color
-
+        // random color
         idx=AppWindow.random.nextInt(COLOR_PRIMARY_LIST.length);
         col=COLOR_PRIMARY_LIST[idx];
 
-            // every once and a while, a pastel
-
-        if (AppWindow.random.nextFloat()<0.2) {
+        // every once and a while, a pastel
+        if (AppWindow.random.nextFloat() < 0.2f) {
             midPoint=(col[0]+col[1]+col[2])*0.33f;
             return(new RagColor((col[0]+(midPoint-col[0])*0.8f),(col[1]+(midPoint-col[1])*0.8f),(col[2]+(midPoint-col[2])*0.8f)));
         }
 
-            // regular color
+        // every once and a while, a darker color
+        if (AppWindow.random.nextFloat() < 0.2f) {
+            darken = 1.0f - AppWindow.random.nextFloat(0.2f);
+            return (new RagColor((col[0] * darken), (col[1] * darken), (col[2] * darken)));
+        }
 
-        darken=0.1f-(AppWindow.random.nextFloat()*0.2f);
-        return(new RagColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
+        // regular color
+        return (new RagColor(col[0], col[1], col[2]));
     }
 
-    protected RagColor getRandomColorDull(float dullFactor)
-    {
-        float               midPoint;
-        RagColor            color;
+    protected RagColor getRandomTintColor() {
+        float[] col;
+
+        col = COLOR_PRIMARY_LIST[AppWindow.random.nextInt(COLOR_TINT_LIST.length)];
+        return (new RagColor(col[0], col[1], col[2]));
+    }
+
+    protected RagColor getRandomColorDull(float dullFactor) {
+        float midPoint;
+        RagColor color;
 
         color=getRandomColor();
 
@@ -158,9 +174,8 @@ public class BitmapBase
         return(color);
     }
 
-    protected RagColor dullColor(RagColor color,float dullFactor)
-    {
-        float           midPoint;
+    protected RagColor dullColor(RagColor color, float dullFactor) {
+        float midPoint;
 
             // find the midpoint
 
@@ -171,22 +186,19 @@ public class BitmapBase
         return(new RagColor((color.r+(midPoint-color.r)*dullFactor),(color.g+(midPoint-color.g)*dullFactor),(color.b+(midPoint-color.b)*dullFactor)));
     }
 
-    protected RagColor getRandomGray(float minFactor,float maxFactor)
-    {
-        float       col;
+    protected RagColor getRandomGray(float minFactor, float maxFactor) {
+        float col;
 
         col=minFactor+(AppWindow.random.nextFloat()*(maxFactor-minFactor));
         return(new RagColor(col,col,col));
     }
 
-    protected RagColor adjustColor(RagColor color,float factor)
-    {
+    protected RagColor adjustColor(RagColor color, float factor) {
         return(new RagColor((color.r*factor),(color.g*factor),(color.b*factor)));
     }
 
-    protected RagColor adjustColorRandom(RagColor color,float minFactor,float maxFactor)
-    {
-        float       f;
+    protected RagColor adjustColorRandom(RagColor color, float minFactor, float maxFactor) {
+        float f;
 
         f=minFactor+(AppWindow.random.nextFloat()*(maxFactor-minFactor));
         return(new RagColor((color.r*f),(color.g*f),(color.b*f)));

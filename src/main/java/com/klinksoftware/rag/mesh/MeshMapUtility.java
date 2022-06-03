@@ -21,8 +21,6 @@ public class MeshMapUtility
     public static final int UV_BOX=1;
     public static final int UV_MAP=2;
 
-    public static final int CYLINDER_SIDE_COUNT = 16;
-
         //
         // build UVs for vertex lists
         //
@@ -974,7 +972,7 @@ public class MeshMapUtility
         return(segments);
     }
 
-    public static Mesh createCylinder(MapRoom room, String name, String bitmapName, RagPoint centerPnt, float ty, float by, float[] segments, float radius, boolean addTop, boolean addBot) {
+    public static Mesh createCylinder(MapRoom room, String name, String bitmapName, int sideCount, RagPoint centerPnt, float ty, float by, float[] segments, float radius, boolean addTop, boolean addBot) {
         int n, k, t, iIdx, vStartIdx, segCount;
         float ang, ang2, angAdd, y, segTy, segBy, yAdd;
         float botRad, topRad, u1, u2, vScale, vt, vb, rd;
@@ -999,7 +997,7 @@ public class MeshMapUtility
         iIdx=0;
         segCount=segments.length-1;
 
-        angAdd=360.0f/(float)CYLINDER_SIDE_COUNT;
+        angAdd = 360.0f / (float) sideCount;
         yAdd=(ty-by)/(float)segCount;
 
         segBy=by;
@@ -1023,7 +1021,7 @@ public class MeshMapUtility
 
             ang=0.0f;
 
-            for (n=0;n!=CYLINDER_SIDE_COUNT;n++) {
+            for (n = 0; n != sideCount; n++) {
                 ang2=ang+angAdd;
 
                 // the two UVs
@@ -1033,7 +1031,9 @@ public class MeshMapUtility
 
                     // force last segment to wrap
 
-                if (n==(CYLINDER_SIDE_COUNT-1)) ang2=0.0f;
+                if (n == (sideCount - 1)) {
+                    ang2 = 0.0f;
+                }
 
                 rd=ang*((float)Math.PI/180.0f);
                 tx=centerPnt.x+((topRad*(float)Math.sin(rd))+(topRad*(float)Math.cos(rd)));
@@ -1106,7 +1106,7 @@ public class MeshMapUtility
             ang=0.0f;
             topRad=segments[0]*radius;
 
-            for (n=0;n!=CYLINDER_SIDE_COUNT;n++) {
+            for (n = 0; n != sideCount; n++) {
                 rd=ang*((float)Math.PI/180.0f);
 
                 u1=((float)Math.sin(rd)*0.5f)+0.5f;
@@ -1124,7 +1124,7 @@ public class MeshMapUtility
                 ang+=angAdd;
             }
 
-            for (n=0;n!=(CYLINDER_SIDE_COUNT-2);n++) {
+            for (n = 0; n != (sideCount - 2); n++) {
                 indexArray.add(vStartIdx);
                 indexArray.add(vStartIdx+(n+1));
                 indexArray.add(vStartIdx+(n+2));
@@ -1137,7 +1137,7 @@ public class MeshMapUtility
             ang=0.0f;
             botRad=segments[segments.length-1]*radius;
 
-            for (n=0;n!=CYLINDER_SIDE_COUNT;n++) {
+            for (n = 0; n != sideCount; n++) {
                 rd=ang*((float)Math.PI/180.0f);
 
                 u1=((float)Math.sin(rd)*0.5f)+0.5f;
@@ -1155,7 +1155,7 @@ public class MeshMapUtility
                 ang+=angAdd;
             }
 
-            for (n=0;n!=(CYLINDER_SIDE_COUNT-2);n++) {
+            for (n = 0; n != (sideCount - 2); n++) {
                 indexArray.add(vStartIdx);
                 indexArray.add(vStartIdx+(n+1));
                 indexArray.add(vStartIdx+(n+2));
@@ -1173,7 +1173,7 @@ public class MeshMapUtility
         return(new Mesh(name,bitmapName,vertexes,normals,tangents,uvs,indexes));
     }
 
-    public static Mesh createMeshCylinderSimple(MapRoom room, String name, String bitmapName, RagPoint centerPnt, float ty, float by, float radius, boolean addTop, boolean addBot) {
-        return(createCylinder(room,name,bitmapName,centerPnt,ty,by,new float[]{1.0f,1.0f},radius,addTop,addBot));
+    public static Mesh createMeshCylinderSimple(MapRoom room, String name, String bitmapName, int sideCount, RagPoint centerPnt, float ty, float by, float radius, boolean addTop, boolean addBot) {
+        return (createCylinder(room, name, bitmapName, sideCount, centerPnt, ty, by, new float[]{1.0f, 1.0f}, radius, addTop, addBot));
     }
 }

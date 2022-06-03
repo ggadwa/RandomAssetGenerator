@@ -15,10 +15,11 @@ public class BitmapPillar extends BitmapBase {
         hasAlpha = false;
     }
 
-    private void generatePillarBlock(int lft, int top, int rgt, int bot, int margin, int edgeSize, RagColor concreteColor, RagColor lineColor) {
+    private void generatePillarBlock(int lft, int top, int rgt, int bot, int margin, int edgeSize, RagColor color, RagColor altColor) {
         int mx, my;
         int halfMargin, noiseSize;
         boolean faceIn;
+        RagColor drawColor, lineColor;
 
         lft += margin;
         top += margin;
@@ -29,9 +30,13 @@ public class BitmapPillar extends BitmapBase {
             return;
         }
 
+        // random color
+        drawColor = (AppWindow.random.nextFloat() < 0.75f) ? color : altColor;
+        lineColor = adjustColor(drawColor, 0.75f);
+
         // the stone background
         // new for each iteration so it doesn't look like it's outside the 3d effects
-        drawRect(lft, top, rgt, bot, adjustColorRandom(concreteColor, 0.8f, 1.0f));
+        drawRect(lft, top, rgt, bot, adjustColorRandom(drawColor, 0.8f, 1.0f));
 
         noiseSize = AppWindow.random.nextBoolean() ? 16 : 8;
         createPerlinNoiseData(noiseSize, noiseSize);
@@ -56,27 +61,27 @@ public class BitmapPillar extends BitmapBase {
             // one box
             case 0:
                 draw3DFrameRect(lft, top, rgt, bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, top, rgt, bot, margin, edgeSize, concreteColor, lineColor);
+                generatePillarBlock(lft, top, rgt, bot, margin, edgeSize, drawColor, altColor);
                 break;
 
             // horizontal boxes
             case 1:
                 mx = (lft + rgt) / 2;
                 draw3DFrameRect(lft, top, (mx - halfMargin), bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, top, (mx - halfMargin), bot, margin, edgeSize, concreteColor, lineColor);
+                generatePillarBlock(lft, top, (mx - halfMargin), bot, margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect((mx + halfMargin), top, rgt, bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock((mx + halfMargin), top, rgt, bot, margin, edgeSize, concreteColor, lineColor);
+                generatePillarBlock((mx + halfMargin), top, rgt, bot, margin, edgeSize, drawColor, altColor);
                 break;
 
             // vertical boxes
             case 2:
                 my = (top + bot) / 2;
                 draw3DFrameRect(lft, top, rgt, (my - halfMargin), edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, top, rgt, (my - halfMargin), margin, edgeSize, concreteColor, lineColor);
+                generatePillarBlock(lft, top, rgt, (my - halfMargin), margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect(lft, (my + halfMargin), rgt, bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, (my + halfMargin), rgt, bot, margin, edgeSize, concreteColor, lineColor);
+                generatePillarBlock(lft, (my + halfMargin), rgt, bot, margin, edgeSize, drawColor, altColor);
                 break;
 
             // 4 boxes
@@ -85,16 +90,16 @@ public class BitmapPillar extends BitmapBase {
                 my = (top + bot) / 2;
 
                 draw3DFrameRect(lft, top, (mx - halfMargin), (my - halfMargin), edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, top, (mx - halfMargin), (my - halfMargin), margin, edgeSize, concreteColor, lineColor);
+                generatePillarBlock(lft, top, (mx - halfMargin), (my - halfMargin), margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect((mx + halfMargin), top, rgt, (my - halfMargin), edgeSize, lineColor, faceIn);
-                generatePillarBlock((mx + halfMargin), top, rgt, (my - halfMargin), margin, edgeSize, concreteColor, lineColor);
+                generatePillarBlock((mx + halfMargin), top, rgt, (my - halfMargin), margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect(lft, (my + halfMargin), (mx - halfMargin), bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, (my + halfMargin), (mx - halfMargin), bot, margin, edgeSize, concreteColor, lineColor);
+                generatePillarBlock(lft, (my + halfMargin), (mx - halfMargin), bot, margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect((mx + halfMargin), (my + halfMargin), rgt, bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock((mx + halfMargin), (my + halfMargin), rgt, bot, margin, edgeSize, concreteColor, lineColor);
+                generatePillarBlock((mx + halfMargin), (my + halfMargin), rgt, bot, margin, edgeSize, drawColor, altColor);
                 break;
 
         }
@@ -103,16 +108,16 @@ public class BitmapPillar extends BitmapBase {
     @Override
     public void generateInternal() {
         int margin, edgeSize;
-        RagColor concreteColor, lineColor;
+        RagColor color, altColor;
 
         // recursive draw
-        concreteColor = getRandomColor();
-        lineColor = adjustColor(concreteColor, 0.75f);
+        color = getRandomColor();
+        altColor = getRandomColor();
 
         margin = 15 + AppWindow.random.nextInt(15);
         edgeSize = 4 + AppWindow.random.nextInt(4);
 
-        generatePillarBlock(-margin, -margin, (textureSize + margin), (textureSize + margin), margin, edgeSize, concreteColor, lineColor);
+        generatePillarBlock(-margin, -margin, (textureSize + margin), (textureSize + margin), margin, edgeSize, color, altColor);
 
         // finish with the metallic-roughness
         createMetallicRoughnessMap(0.35f, 0.3f);

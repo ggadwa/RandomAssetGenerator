@@ -9,8 +9,8 @@ import java.util.HashMap;
 
 public class MapPillar {
 
-    private boolean squareBase;
-    private float radius, baseRadius;
+    private boolean squareBase, squareColumn;
+    private float radius, baseRadius, capSize;
     private float[] cylinderSegments;
     private MeshList meshList;
     private HashMap<String, BitmapBase> bitmaps;
@@ -20,10 +20,12 @@ public class MapPillar {
         this.bitmaps = bitmaps;
 
         squareBase = AppWindow.random.nextBoolean();
-        cylinderSegments = MeshMapUtility.createCylinderSegmentList(1, 5);
+        squareColumn = AppWindow.random.nextBoolean();
+        capSize = MapBuilder.FLOOR_HEIGHT + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT);
+        cylinderSegments = MeshMapUtility.createCylinderSegmentList(1, 4);
 
         baseRadius = (MapBuilder.SEGMENT_SIZE * (0.2f + AppWindow.random.nextFloat(0.6f))) * 0.5f;
-        radius = baseRadius * (0.8f + AppWindow.random.nextFloat(0.1f));
+        radius = baseRadius * (0.6f + AppWindow.random.nextFloat(0.1f));
     }
 
         //
@@ -47,22 +49,17 @@ public class MapPillar {
         name = "pillar_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
         ty = by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT);
-        pillarTy = ty - MapBuilder.FLOOR_HEIGHT;
-        pillarBy = by + MapBuilder.FLOOR_HEIGHT;
+        pillarTy = ty - capSize;
+        pillarBy = by + capSize;
 
         // xz position
         centerPnt = new RagPoint((((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE / 2)), ((ty + by) / 2), ((room.z + z) * MapBuilder.SEGMENT_SIZE + (MapBuilder.SEGMENT_SIZE / 2)));
 
         // create the pillar
-        mesh = MeshMapUtility.createCylinder(room, name, "pillar", centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);
+        mesh = MeshMapUtility.createCylinder(room, name, "pillar", (squareColumn ? 4 : 16), centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);
 
-        if (squareBase) {
-            mesh.combine(MeshMapUtility.createCube(room, name, "pillar", (centerPnt.x - baseRadius), (centerPnt.x + baseRadius), pillarBy, by, (centerPnt.z - baseRadius), (centerPnt.z + baseRadius), true, true, true, true, false, true, false, MeshMapUtility.UV_MAP));
-            mesh.combine(MeshMapUtility.createCube(room, name, "pillar", (centerPnt.x - baseRadius), (centerPnt.x + baseRadius), ty, pillarTy, (centerPnt.z - baseRadius), (centerPnt.z + baseRadius), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
-        } else {
-            mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", centerPnt, pillarBy, by, baseRadius, true, false));
-            mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", centerPnt, ty, pillarTy, baseRadius, false, true));
-        }
+        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", (squareBase ? 4 : 16), centerPnt, pillarBy, by, baseRadius, true, false));
+        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", (squareBase ? 4 : 16), centerPnt, ty, pillarTy, baseRadius, false, true));
 
         meshList.add(mesh);
     }

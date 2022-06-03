@@ -201,10 +201,10 @@ public class MapEquipment {
         centerPnt=new RagPoint(x,y,z);
 
         if (upperPipe) {
-            mesh=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",centerPnt,((y+pipeHigh)+juncWid),(room.offset.y+((float)room.storyCount*MapBuilder.SEGMENT_SIZE)),pipeRadius,false,false);
+            mesh=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",8,centerPnt,((y+pipeHigh)+juncWid),(room.offset.y+((float)room.storyCount*MapBuilder.SEGMENT_SIZE)),pipeRadius,false,false);
         }
         if (lowerPipe) {
-            mesh2=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",centerPnt,y,(y+pipeHigh),pipeRadius,false,false);
+            mesh2=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",8,centerPnt,y,(y+pipeHigh),pipeRadius,false,false);
             if (mesh==null) {
                 mesh=mesh2;
             }
@@ -246,11 +246,11 @@ public class MapEquipment {
         mesh = null;
 
         if (tubeBotCapHeight != 0.0f) {
-            mesh = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, false);
+            mesh = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, false);
         }
 
         if (tubeTopCapHeight != 0.0f) {
-            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
+            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
             if (mesh == null) {
                 mesh = mesh2;
             } else {
@@ -261,11 +261,11 @@ public class MapEquipment {
         meshList.add(mesh);
 
         // the tube
-        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_glass"), "glass", centerPnt, yTopCapBy, yBotCapTy, tubeRadius, false, false));
+        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_glass"), "glass", 16, centerPnt, yTopCapBy, yBotCapTy, tubeRadius, false, false));
 
         // the liquid in the tube
         y = yBotCapTy + (AppWindow.random.nextFloat() * (yTopCapBy - yBotCapTy));
-        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_liquid"), "liquid", centerPnt, y, yBotCapTy, (tubeRadius * 0.98f), true, false));
+        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_liquid"), "liquid", 16, centerPnt, y, yBotCapTy, (tubeRadius * 0.98f), true, false));
     }
 
         //
@@ -273,11 +273,11 @@ public class MapEquipment {
         //
 
     public void build(MapRoom room, int roomNumber, int x, float by, int z) {
-        // addBank(room, roomNumber, x, by, z);
+        addBank(room, roomNumber, x, by, z);
 
         //addTerminal(room, roomNumber, x, by, z);
         //addTube(room, roomNumber, x, by, z);
-        addJunction(room, roomNumber, x, by, z);
+        //addJunction(room, roomNumber, x, by, z);
         /*
         int     x,z,lx,rx,tz,bz,skipX,skipZ,
                 pieceType,pieceCount;
