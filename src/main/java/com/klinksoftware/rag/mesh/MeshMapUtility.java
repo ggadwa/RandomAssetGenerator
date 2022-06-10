@@ -1035,19 +1035,17 @@ public class MeshMapUtility
                     ang2 = 0.0f;
                 }
 
-                rd=ang*((float)Math.PI/180.0f);
-                tx=centerPnt.x+((topRad*(float)Math.sin(rd))+(topRad*(float)Math.cos(rd)));
-                tz=centerPnt.z+((topRad*(float)Math.cos(rd))-(topRad*(float)Math.sin(rd)));
+                rd = ang * ((float) Math.PI / 180.0f);
+                tx = centerPnt.x + (topRad * (float) Math.cos(rd));
+                tz = centerPnt.z + (topRad * (float) Math.sin(rd));
+                bx = centerPnt.x + (botRad * (float) Math.cos(rd));
+                bz = centerPnt.z + (botRad * (float) Math.sin(rd));
 
-                bx=centerPnt.x+((botRad*(float)Math.sin(rd))+(botRad*(float)Math.cos(rd)));
-                bz=centerPnt.z+((botRad*(float)Math.cos(rd))-(botRad*(float)Math.sin(rd)));
-
-                rd=ang2*((float)Math.PI/180.0f);
-                tx2=centerPnt.x+((topRad*(float)Math.sin(rd))+(topRad*(float)Math.cos(rd)));
-                tz2=centerPnt.z+((topRad*(float)Math.cos(rd))-(topRad*(float)Math.sin(rd)));
-
-                bx2=centerPnt.x+((botRad*(float)Math.sin(rd))+(botRad*(float)Math.cos(rd)));
-                bz2=centerPnt.z+((botRad*(float)Math.cos(rd))-(botRad*(float)Math.sin(rd)));
+                rd = ang2 * ((float) Math.PI / 180.0f);
+                tx2 = centerPnt.x + (topRad * (float) Math.cos(rd));
+                tz2 = centerPnt.z + (topRad * (float) Math.sin(rd));
+                bx2 = centerPnt.x + (botRad * (float) Math.cos(rd));
+                bz2 = centerPnt.z + (botRad * (float) Math.sin(rd));
 
                     // the points
 
@@ -1109,11 +1107,11 @@ public class MeshMapUtility
             for (n = 0; n != sideCount; n++) {
                 rd=ang*((float)Math.PI/180.0f);
 
-                u1=((float)Math.sin(rd)*0.5f)+0.5f;
+                u1 = (ang * (float) segCount) / 360.0f;
                 vt = 1.0f - (ty * vScale);
 
-                tx=centerPnt.x+((topRad*(float)Math.sin(rd))+(topRad*(float)Math.cos(rd)));
-                tz=centerPnt.z+((topRad*(float)Math.cos(rd))-(topRad*(float)Math.sin(rd)));
+                tx = centerPnt.x + (topRad * (float) Math.cos(rd));
+                tz = centerPnt.z + (topRad * (float) Math.sin(rd));
 
                     // the points
 
@@ -1140,11 +1138,11 @@ public class MeshMapUtility
             for (n = 0; n != sideCount; n++) {
                 rd=ang*((float)Math.PI/180.0f);
 
-                u1=((float)Math.sin(rd)*0.5f)+0.5f;
+                u1 = (ang * (float) segCount) / 360.0f;
                 vb = 1.0f - (by * vScale);
 
-                bx=centerPnt.x+((botRad*(float)Math.sin(rd))+(botRad*(float)Math.cos(rd)));
-                bz=centerPnt.z+((botRad*(float)Math.cos(rd))-(botRad*(float)Math.sin(rd)));
+                bx = centerPnt.x + (botRad * (float) Math.cos(rd));
+                bz = centerPnt.z + (botRad * (float) Math.sin(rd));
 
                     // the points
 

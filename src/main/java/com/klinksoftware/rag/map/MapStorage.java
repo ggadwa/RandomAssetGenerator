@@ -2,6 +2,7 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
+import com.klinksoftware.rag.bitmaps.BitmapMetal;
 import com.klinksoftware.rag.bitmaps.BitmapStorage;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
@@ -10,10 +11,16 @@ import java.util.HashMap;
 public class MapStorage {
     private MeshList meshList;
     private HashMap<String, BitmapBase> bitmaps;
+    private float shelfHeight, shelfLegWidth, xShelfMargin, zShelfMargin;
 
     public MapStorage(MeshList meshList, HashMap<String, BitmapBase> bitmaps)    {
         this.meshList = meshList;
         this.bitmaps = bitmaps;
+
+        shelfHeight = MapBuilder.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.35f));
+        shelfLegWidth = MapBuilder.SEGMENT_SIZE * (0.03f + AppWindow.random.nextFloat(0.05f));
+        xShelfMargin = MapBuilder.SEGMENT_SIZE * (0.025f + AppWindow.random.nextFloat(0.05f));
+        zShelfMargin = MapBuilder.SEGMENT_SIZE * (0.025f + AppWindow.random.nextFloat(0.05f));
     }
 
         //
@@ -81,46 +88,52 @@ public class MapStorage {
         // shelves
         //
 
-    private void addShelf(int gx,int gz,int xSize,int zSize,float shelfHigh,float shelfLegWid,float xShelfMargin,float zShelfMargin,float floorDepth,int storageCount)
-    {
-        /*
-        int             x2,z2,stackLevel,stackCount,boxCount;
-        float           x,y,z,bx,bz,
-                        tableXMin,tableXMax,tableZMin,tableZMax,
-                        boxSize;
-        RagPoint        rotAngle;
-        Mesh            shelfMesh,boxMesh,mesh2;
+    private void addShelf(MapRoom room, int roomNumber, int x, float by, int z) {
+        int stackLevel, stackCount;
+        float dx, dz, bx, bz, tableXMin, tableXMax, tableZMin, tableZMax, boxSize;
+        String boxName, shelfName;
+        RagPoint rotAngle;
+        Mesh shelfMesh, boxMesh, mesh2;
+        BitmapBase bitmap;
 
-        x=room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE);
-        z=room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE);
+        // bitmap
+        if (!bitmaps.containsKey("box")) {
+            bitmap = new BitmapStorage();
+            bitmap.generate();
+            bitmaps.put("box", bitmap);
+        }
+        if (!bitmaps.containsKey("accessory")) {
+            bitmap = new BitmapMetal();
+            bitmap.generate();
+            bitmaps.put("accessory", bitmap);
+        }
 
-            // height and width
-
+        // height and width
         stackCount=1+AppWindow.random.nextInt(3);
 
-            // some preset bounds
+        // some preset bounds
+        dx = (room.x + x) * MapBuilder.SEGMENT_SIZE;
+        dz = (room.z + z) * MapBuilder.SEGMENT_SIZE;
 
-        rotAngle=new RagPoint(0.0f,0.0f,0.0f);
-
-        tableXMin=x+xShelfMargin;
-        tableXMax=(x+((float)xSize*MapBuilder.SEGMENT_SIZE))-xShelfMargin;
-        tableZMin=z+zShelfMargin;
-        tableZMax=(z+((float)zSize*MapBuilder.SEGMENT_SIZE))-zShelfMargin;
-
-        y=room.offset.y;
+        tableXMin = dx + xShelfMargin;
+        tableXMax = (dx + MapBuilder.SEGMENT_SIZE) - xShelfMargin;
+        tableZMin = dz + zShelfMargin;
+        tableZMax = (dz + MapBuilder.SEGMENT_SIZE) - zShelfMargin;
 
         rotAngle=new RagPoint(0.0f,0.0f,0.0f);
 
             // the stacked shelves
 
         shelfMesh=null;
-        boxMesh=null;
+        boxMesh = null;
+
+        boxName = "storage_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+        shelfName = "shelfe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
         for (stackLevel=0;stackLevel!=stackCount;stackLevel++) {
 
                 // the table
-
-            mesh2=MeshMapUtility.createCube(room,(name+"_shelf_"+Integer.toString(storageCount)),"accessory",tableXMin,tableXMax,(y+shelfHigh),((y+shelfHigh)+floorDepth),tableZMin,tableZMax,true,true,true,true,true,true,false,MeshMapUtility.UV_MAP);
+            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, tableXMax, (by + shelfHeight), ((by + shelfHeight) + shelfLegWidth), tableZMin, tableZMax, true, true, true, true, true, true, false, MeshMapUtility.UV_MAP);
             if (shelfMesh==null) {
                 shelfMesh=mesh2;
             }
@@ -130,32 +143,31 @@ public class MapStorage {
 
                 // legs
 
-            mesh2=MeshMapUtility.createCube(room,"","accessory",tableXMin,(tableXMin+shelfLegWid),y,(y+shelfHigh),tableZMin,(tableZMin+shelfLegWid),true,true,true,true,false,false,false,MeshMapUtility.UV_MAP);
+            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, (tableXMin + shelfLegWidth), by, (by + shelfHeight), tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
             shelfMesh.combine(mesh2);
 
-            mesh2=MeshMapUtility.createCube(room,"","accessory",tableXMin,(tableXMin+shelfLegWid),y,(y+shelfHigh),(tableZMax-shelfLegWid),tableZMax,true,true,true,true,false,false,false,MeshMapUtility.UV_MAP);
+            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, (tableXMin + shelfLegWidth), by, (by + shelfHeight), (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
             shelfMesh.combine(mesh2);
 
-            mesh2=MeshMapUtility.createCube(room,"","accessory",(tableXMax-shelfLegWid),tableXMax,y,(y+shelfHigh),tableZMin,(tableZMin+shelfLegWid),true,true,true,true,false,false,false,MeshMapUtility.UV_MAP);
+            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", (tableXMax - shelfLegWidth), tableXMax, by, (by + shelfHeight), tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
             shelfMesh.combine(mesh2);
 
-            mesh2=MeshMapUtility.createCube(room,"","accessory",(tableXMax-shelfLegWid),tableXMax,y,(y+shelfHigh),(tableZMax-shelfLegWid),tableZMax,true,true,true,true,false,false,false,MeshMapUtility.UV_MAP);
+            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", (tableXMax - shelfLegWidth), tableXMax, by, (by + shelfHeight), (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
             shelfMesh.combine(mesh2);
 
                 // items on shelf
+            //boxCount=0;
 
-            boxCount=0;
+            //for (z2=gz;z2<(gz+zSize);z2++) {
+            //for (x2=gx;x2<(gx+xSize);x2++) {
+            if (AppWindow.random.nextBoolean()) {
 
-            for (z2=gz;z2<(gz+zSize);z2++) {
-                for (x2=gx;x2<(gx+xSize);x2++) {
-                    if (AppWindow.random.nextBoolean()) continue;
-
-                    boxSize=(shelfHigh*0.5f)+(AppWindow.random.nextFloat()*(shelfHigh*0.25f));
-                    bx=(room.offset.x+((float)x2*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
-                    bz=(room.offset.z+((float)z2*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
+                    boxSize = shelfHeight * (0.5f + (AppWindow.random.nextFloat(0.25f)));
+                    bx = dx + (MapBuilder.SEGMENT_SIZE * 0.5f);
+                    bz = dz + (MapBuilder.SEGMENT_SIZE * 0.5f);
 
                     rotAngle.setFromValues(0.0f,(-10.0f+(AppWindow.random.nextFloat()*20.0f)),0.0f);
-                    mesh2=MeshMapUtility.createCubeRotated(room,(name+"_shelf_box_"+Integer.toString(storageCount)+"_"+Integer.toString(boxCount)),"box",(bx-boxSize),(bx+boxSize),((y+shelfHigh)+floorDepth),(((y+shelfHigh)+floorDepth)+boxSize),(bz-boxSize),(bz+boxSize),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_WHOLE);
+                    mesh2 = MeshMapUtility.createCubeRotated(room, boxName, "box", (bx - boxSize), (bx + boxSize), ((by + shelfHeight) + shelfLegWidth), (((by + shelfHeight) + shelfLegWidth) + boxSize), (bz - boxSize), (bz + boxSize), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_WHOLE);
                     if (boxMesh==null) {
                         boxMesh=mesh2;
                     }
@@ -164,18 +176,20 @@ public class MapStorage {
                     }
                 }
 
-                boxCount++;
-            }
-
+            // boxCount++;
+            //}
                 // go up one level
 
-            y+=(shelfHigh+floorDepth);
-            if (y>(room.offset.y+(MapBuilder.SEGMENT_SIZE*room.storyCount))) break;
+            by += (shelfHeight + shelfLegWidth);
+            if (by > (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)) {
+                break;
+            }
         }
 
         if (shelfMesh!=null) meshList.add(shelfMesh);
-        if (boxMesh!=null) meshList.add(boxMesh);
-*/
+        if (boxMesh != null) {
+            meshList.add(boxMesh);
+        }
     }
 
         //
@@ -183,7 +197,8 @@ public class MapStorage {
         //
 
     public void build(MapRoom room, int roomNumber, int x, float by, int z) {
-        addBoxes(room, roomNumber, x, by, z);
+        //addBoxes(room, roomNumber, x, by, z);
+        addShelf(room, roomNumber, x, by, z);
 
         /*
         int     x,z,x2,z2,lx,rx,tz,bz,xSize,zSize,

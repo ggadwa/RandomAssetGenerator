@@ -1,12 +1,17 @@
 
 
-- decorations as slider?
-- finish equipment
-- storage shelves
+- shelves start with first shelf on ground
+- decorations need to go back to per room
+- separate equipment / lab (lab gets tube and table?)
+
+- check pipes for bad circle algorithm
+- can have decorations on lower floor?
 
 - panel dials are bad
 
+- model: re-align face
 - model: body needs to be bigger than legs, head smaller than body
+- robot model needs random 45/0 turn on parts
 
 - walls on stairs
 - fix upper/lower connections

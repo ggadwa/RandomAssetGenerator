@@ -46,7 +46,7 @@ public class MeshList
         center=new RagPoint(0.0f,0.0f,0.0f);
 
         for (n=0;n!=meshes.size();n++) {
-            mesh=meshes.get(n);
+            mesh = meshes.get(n);
 
             mesh.getCenterPoint(center);
             skeleton.addChildBone(0,mesh.name,n,1.0f,center);

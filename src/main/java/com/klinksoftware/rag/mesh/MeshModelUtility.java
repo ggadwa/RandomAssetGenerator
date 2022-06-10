@@ -78,22 +78,23 @@ public class MeshModelUtility
                     ang = 0.0f;
                 }
 
-                rd = ang * ((float) Math.PI / 180.0f);
+                // this is here to make square cylinders face forward
+                rd = (ang + 45.0f) * ((float) Math.PI / 180.0f);
 
                 switch (axis) {
                     case Limb.LIMB_AXIS_X:
                         tx = acrossPos;
-                        ty = centerPnt.y + (((rad * (float) Math.sin(rd)) + (rad * (float) Math.cos(rd))) * meshScale.y);
-                        tz = centerPnt.z + (((rad * (float) Math.cos(rd)) - (rad * (float) Math.sin(rd))) * meshScale.z);
+                        ty = centerPnt.y + ((rad * (float) Math.cos(rd)) * meshScale.y);
+                        tz = centerPnt.z + ((rad * (float) Math.sin(rd)) * meshScale.z);
                         break;
                     case Limb.LIMB_AXIS_Y:
-                        tx = centerPnt.x + (((rad * (float) Math.sin(rd)) + (rad * (float) Math.cos(rd))) * meshScale.x);
+                        tx = centerPnt.x + ((rad * (float) Math.cos(rd)) * meshScale.x);
                         ty = acrossPos;
-                        tz = centerPnt.z + (((rad * (float) Math.cos(rd)) - (rad * (float) Math.sin(rd))) * meshScale.z);
+                        tz = centerPnt.z + ((rad * (float) Math.sin(rd)) * meshScale.z);
                         break;
                     default: // Z
-                        tx = centerPnt.x + (((rad * (float) Math.sin(rd)) + (rad * (float) Math.cos(rd))) * meshScale.x);
-                        ty = centerPnt.y + (((rad * (float) Math.cos(rd)) - (rad * (float) Math.sin(rd))) * meshScale.y);
+                        tx = centerPnt.x + ((rad * (float) Math.cos(rd)) * meshScale.x);
+                        ty = centerPnt.y + ((rad * (float) Math.sin(rd)) * meshScale.y);
                         tz = acrossPos;
                         break;
                 }

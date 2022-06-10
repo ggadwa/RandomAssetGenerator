@@ -101,7 +101,7 @@ public class MapBuilder
         // decorations
         //
 
-    private void buildDecorations(ArrayList<MapRoom> rooms, HashMap<String, BitmapBase> bitmaps, MeshList meshList) {
+    private void buildDecorations(ArrayList<MapRoom> rooms, HashMap<String, BitmapBase> bitmaps, MeshList meshList, float decorations) {
         int n, x, z, roomCount;
         float rx, rz, by;
         MapRoom room;
@@ -138,7 +138,7 @@ public class MapBuilder
                     if ((room.getFloorGrid(x, z) != 1) || (room.getBlockedGrid(x, z))) {
                         continue;
                     }
-                    if (AppWindow.random.nextFloat() > 0.3f) {
+                    if (AppWindow.random.nextFloat() > decorations) {
                         continue;
                     }
 
@@ -525,7 +525,7 @@ public class MapBuilder
         // build a map
         //
 
-    public void build(float mapSize, float mapCompactFactor, boolean complex, boolean upperFloor, boolean lowerFloor, boolean decorations) {
+    public void build(float mapSize, float mapCompactFactor, boolean complex, boolean upperFloor, boolean lowerFloor, float decorations) {
         int n, roomCount, roomExtensionCount;
         RagPoint centerPnt;
         MapRoom room;
@@ -608,8 +608,8 @@ public class MapBuilder
         }
 
         // decorations
-        if (decorations) {
-            buildDecorations(rooms, bitmaps, meshList);
+        if (decorations > 0.0f) {
+            buildDecorations(rooms, bitmaps, meshList, decorations);
         }
 
             // now build the fake skeleton

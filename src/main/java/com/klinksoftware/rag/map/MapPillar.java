@@ -24,8 +24,8 @@ public class MapPillar {
         capSize = MapBuilder.FLOOR_HEIGHT + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT);
         cylinderSegments = MeshMapUtility.createCylinderSegmentList(1, 4);
 
-        baseRadius = (MapBuilder.SEGMENT_SIZE * (0.2f + AppWindow.random.nextFloat(0.6f))) * 0.5f;
-        radius = baseRadius * (0.6f + AppWindow.random.nextFloat(0.1f));
+        baseRadius = (MapBuilder.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.6f))) * 0.5f;
+        radius = baseRadius * (0.7f + AppWindow.random.nextFloat(0.1f));
     }
 
         //

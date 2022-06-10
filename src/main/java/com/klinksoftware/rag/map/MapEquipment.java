@@ -3,8 +3,12 @@ package com.klinksoftware.rag.map;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
 import com.klinksoftware.rag.bitmaps.BitmapComputer;
+import com.klinksoftware.rag.bitmaps.BitmapControlPanel;
+import com.klinksoftware.rag.bitmaps.BitmapGlass;
+import com.klinksoftware.rag.bitmaps.BitmapLiquid;
 import com.klinksoftware.rag.bitmaps.BitmapMetal;
 import com.klinksoftware.rag.bitmaps.BitmapMonitor;
+import com.klinksoftware.rag.bitmaps.BitmapPipe;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 import java.util.HashMap;
@@ -13,7 +17,7 @@ public class MapEquipment {
 
     private float computerWidth, computerHeight;
     private float terminalWidth, terminalHeight;
-    private float junctionWidth, pipeHeight, pipeRadius;
+    private float junctionWidth, pipeHeight, pipeRadius, junctionHalfDepth;
     private float tubeRadius, tubeHeight, tubeCapRadius, tubeTopCapHeight, tubeBotCapHeight;
     private MeshList meshList;
     private HashMap<String, BitmapBase> bitmaps;
@@ -30,7 +34,8 @@ public class MapEquipment {
 
         junctionWidth = MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f));
         pipeHeight = (MapBuilder.SEGMENT_SIZE * 0.2f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.2f));
-        pipeRadius = (MapBuilder.SEGMENT_SIZE * 0.05f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.1f));
+        pipeRadius = ((MapBuilder.SEGMENT_SIZE * 0.05f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.1f))) * 0.5f;
+        junctionHalfDepth = pipeRadius * 1.1f;
 
         tubeCapRadius = (MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f))) * 0.5f;
         tubeRadius = tubeCapRadius * (0.7f + AppWindow.random.nextFloat(0.2f));
@@ -162,11 +167,10 @@ public class MapEquipment {
         //
 
     public void addJunction(MapRoom room, int roomNumber, int x, float by, int z) {
-        /*
-        boolean         upperPipe,lowerPipe;
-        float           x,y,z,juncHalfWid;
-        RagPoint        rotAngle,centerPnt;
-        Mesh            mesh,mesh2;
+        float dx, dz, juncHalfWid;
+        String name;
+        RagPoint rotAngle, centerPnt, pipePnt;
+        Mesh mesh, mesh2;
         BitmapBase bitmap;
 
         // bitmap
@@ -176,45 +180,98 @@ public class MapEquipment {
             bitmaps.put("pipe", bitmap);
         }
         if (!bitmaps.containsKey("panel")) {
-            bitmap = new BitmapPanel();
+            bitmap = new BitmapControlPanel();
             bitmap.generate();
             bitmaps.put("panel", bitmap);
         }
 
-        x=(room.offset.x+((float)gx*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
-        y=room.offset.y;
-        z=(room.offset.z+((float)gz*MapBuilder.SEGMENT_SIZE))+(MapBuilder.SEGMENT_SIZE*0.5f);
+        dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
+        dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
 
             // the junction
 
-        juncHalfWid=juncWid*0.5f;
+        juncHalfWid = junctionWidth * 0.5f;
 
-        rotAngle=new RagPoint(0.0f,(AppWindow.random.nextBoolean()?0.0f:90.0f),0.0f);
-        meshList.add(MeshMapUtility.createCubeRotated(room,(name+"_panel_"+pieceCount),"panel",(x-juncHalfWid),(x+juncHalfWid),(y+pipeHigh),((y+pipeHigh)+juncWid),(z-pipeRadius),(z+pipeRadius),rotAngle,true,true,true,true,true,true,false,MeshMapUtility.UV_BOX));
+        rotAngle = new RagPoint(0.0f, AppWindow.random.nextFloat(359.0f), 0.0f);
+        name = "junction_panel_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+        meshList.add(MeshMapUtility.createCubeRotated(room, name, "panel", (dx - juncHalfWid), (dx + juncHalfWid), (by + pipeHeight), ((by + pipeHeight) + junctionWidth), (dz - junctionHalfDepth), (dz + junctionHalfDepth), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_BOX));
 
             // the pipes
 
-        upperPipe=AppWindow.random.nextBoolean();
-        lowerPipe=((AppWindow.random.nextBoolean())||(!upperPipe));
+        mesh = null;
+        centerPnt = new RagPoint(dx, by, dz);
 
-        mesh=null;
-        centerPnt=new RagPoint(x,y,z);
-
-        if (upperPipe) {
-            mesh=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",8,centerPnt,((y+pipeHigh)+juncWid),(room.offset.y+((float)room.storyCount*MapBuilder.SEGMENT_SIZE)),pipeRadius,false,false);
-        }
-        if (lowerPipe) {
-            mesh2=MeshMapUtility.createMeshCylinderSimple(room,(name+"_panel_pipe_"+pieceCount),"pipe",8,centerPnt,y,(y+pipeHigh),pipeRadius,false,false);
-            if (mesh==null) {
-                mesh=mesh2;
+        if (AppWindow.random.nextBoolean()) {
+            pipePnt = new RagPoint(((dx - juncHalfWid) + pipeRadius), by, dz);
+            pipePnt.rotateAroundPoint(centerPnt, rotAngle);
+            name = "junction_upper_neg_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, ((by + pipeHeight) + junctionWidth), (by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)), pipeRadius, false, false);
+            if (mesh == null) {
+                mesh = mesh2;
+            } else {
+                mesh.combine(mesh2);
             }
-            else {
+        }
+        if (AppWindow.random.nextBoolean()) {
+            pipePnt = new RagPoint(dx, by, dz);
+            pipePnt.rotateAroundPoint(centerPnt, rotAngle);
+            name = "junction_upper_center_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, ((by + pipeHeight) + junctionWidth), (by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)), pipeRadius, false, false);
+            if (mesh == null) {
+                mesh = mesh2;
+            } else {
+                mesh.combine(mesh2);
+            }
+        }
+        if (AppWindow.random.nextBoolean()) {
+            pipePnt = new RagPoint(((dx + juncHalfWid) - pipeRadius), by, dz);
+            pipePnt.rotateAroundPoint(centerPnt, rotAngle);
+            name = "junction_upper_pos_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, ((by + pipeHeight) + junctionWidth), (by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)), pipeRadius, false, false);
+            if (mesh == null) {
+                mesh = mesh2;
+            } else {
                 mesh.combine(mesh2);
             }
         }
 
-        meshList.add(mesh);
-*/
+        if (AppWindow.random.nextBoolean()) {
+            pipePnt = new RagPoint(((dx - juncHalfWid) + pipeRadius), by, dz);
+            pipePnt.rotateAroundPoint(centerPnt, rotAngle);
+            name = "junction_lower_neg_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, by, (by + pipeHeight), pipeRadius, false, false);
+            if (mesh == null) {
+                mesh = mesh2;
+            } else {
+                mesh.combine(mesh2);
+            }
+        }
+        if (AppWindow.random.nextBoolean()) {
+            pipePnt = new RagPoint(dx, by, dz);
+            pipePnt.rotateAroundPoint(centerPnt, rotAngle);
+            name = "junction_lower_center_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, by, (by + pipeHeight), pipeRadius, false, false);
+            if (mesh == null) {
+                mesh = mesh2;
+            } else {
+                mesh.combine(mesh2);
+            }
+        }
+        if (AppWindow.random.nextBoolean()) {
+            pipePnt = new RagPoint(((dx + juncHalfWid) - pipeRadius), by, dz);
+            pipePnt.rotateAroundPoint(centerPnt, rotAngle);
+            name = "junction_lower_pos_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, by, (by + pipeHeight), pipeRadius, false, false);
+            if (mesh == null) {
+                mesh = mesh2;
+            } else {
+                mesh.combine(mesh2);
+            }
+        }
+
+        if (mesh != null) {
+            meshList.add(mesh);
+        }
     }
 
         //
@@ -227,6 +284,24 @@ public class MapEquipment {
         String name;
         RagPoint centerPnt;
         Mesh mesh, mesh2;
+        BitmapBase bitmap;
+
+        // bitmap
+        if (!bitmaps.containsKey("glass")) {
+            bitmap = new BitmapGlass();
+            bitmap.generate();
+            bitmaps.put("glass", bitmap);
+        }
+        if (!bitmaps.containsKey("liquid")) {
+            bitmap = new BitmapLiquid();
+            bitmap.generate();
+            bitmaps.put("liquid", bitmap);
+        }
+        if (!bitmaps.containsKey("accessory")) {
+            bitmap = new BitmapMetal();
+            bitmap.generate();
+            bitmaps.put("accessory", bitmap);
+        }
 
         name = "tube_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
@@ -240,24 +315,12 @@ public class MapEquipment {
         yBotCapBy = by;
         yBotCapTy = yBotCapBy + tubeBotCapHeight;
 
-        yTopCapBy = yBotCapTy + tubeHeight;
+        yTopCapBy = yBotCapTy + (tubeHeight - (tubeBotCapHeight + tubeTopCapHeight));
         yTopCapTy = yTopCapBy + tubeTopCapHeight;
 
-        mesh = null;
-
-        if (tubeBotCapHeight != 0.0f) {
-            mesh = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, false);
-        }
-
-        if (tubeTopCapHeight != 0.0f) {
-            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
-            if (mesh == null) {
-                mesh = mesh2;
-            } else {
-                mesh.combine(mesh2);
-            }
-        }
-
+        mesh = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, false);
+        mesh2 = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
+        mesh.combine(mesh2);
         meshList.add(mesh);
 
         // the tube
@@ -273,106 +336,21 @@ public class MapEquipment {
         //
 
     public void build(MapRoom room, int roomNumber, int x, float by, int z) {
-        addBank(room, roomNumber, x, by, z);
 
-        //addTerminal(room, roomNumber, x, by, z);
-        //addTube(room, roomNumber, x, by, z);
-        //addJunction(room, roomNumber, x, by, z);
-        /*
-        int     x,z,lx,rx,tz,bz,skipX,skipZ,
-                pieceType,pieceCount;
-        float   bankWid,bankHigh,
-                terminalWid,terminalHigh,
-                juncWid,pipeHigh,pipeRadius,
-                roomHigh,tubeRadius,tubeHigh,
-                tubeCapRadius,tubeTopCapHigh,tubeBotCapHigh,
-                floorDepth;
-        Mesh    mesh;
-
-            // bounds with margins
-
-        lx=room.piece.margins[0];
-        rx=room.piece.size.x-(room.piece.margins[2]);
-        if (!room.requiredStairs.isEmpty()) {
-            if (lx<3) lx=3;
-            if (rx>(room.piece.size.x-3)) rx=room.piece.size.x-3;
+        switch (AppWindow.random.nextInt(4)) {
+            case 0:
+                addBank(room, roomNumber, x, by, z);
+                break;
+            case 1:
+                addTerminal(room, roomNumber, x, by, z);
+                break;
+            case 2:
+                addTube(room, roomNumber, x, by, z);
+                break;
+            case 3:
+                addJunction(room, roomNumber, x, by, z);
+                break;
         }
-        if (rx<=lx) return;
-
-        tz=this.room.piece.margins[1];
-        bz=this.room.piece.size.z-(room.piece.margins[3]);
-        if (!room.requiredStairs.isEmpty()) {
-            if (tz<3) tz=3;
-            if (bz>(room.piece.size.z-3)) bz=room.piece.size.z-3;
-        }
-        if (bz<=tz) return;
-
-            // sizes
-
-        roomHigh=(float)room.storyCount*MapBuilder.SEGMENT_SIZE;
-
-        bankWid=(MapBuilder.SEGMENT_SIZE*0.5f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
-        bankHigh=bankWid*(1.0f+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.15f)));
-
-        terminalWid=(MapBuilder.SEGMENT_SIZE*0.5f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
-        terminalHigh=(MapBuilder.SEGMENT_SIZE*0.2f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.3f));
-
-        juncWid=(MapBuilder.SEGMENT_SIZE*0.4f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.2f));
-        pipeHigh=(MapBuilder.SEGMENT_SIZE*0.2f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.2f));
-        pipeRadius=(MapBuilder.SEGMENT_SIZE*0.05f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.1f));
-
-        tubeRadius=(MapBuilder.SEGMENT_SIZE*0.2f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.15f));
-        tubeHigh=(roomHigh*0.2f)+(AppWindow.random.nextFloat()*(roomHigh*0.3f));
-        tubeCapRadius=tubeRadius*(1.0f+(AppWindow.random.nextFloat()*0.15f));
-        tubeTopCapHigh=(roomHigh*0.05f)+(AppWindow.random.nextFloat()*(roomHigh*0.1f));
-        tubeBotCapHigh=(roomHigh*0.05f)+(AppWindow.random.nextFloat()*(roomHigh*0.1f));
-
-        floorDepth=MapBuilder.SEGMENT_SIZE*0.1f;
-
-            // if enough room, make a path
-            // through the equipment
-
-        skipX=-1;
-        if ((rx-lx)>2) skipX=(lx+1)+AppWindow.random.nextInt((rx-lx)-2);
-        skipZ=-1;
-        if ((bz-tz)>2) skipZ=(tz+1)+AppWindow.random.nextInt((bz-tz)-2);
-
-            // the pieces
-
-        pieceCount=0;
-
-        for (z=tz;z<bz;z++) {
-            if (z==skipZ) continue;
-
-            for (x=lx;x<rx;x++) {
-                if (x==skipX) continue;
-
-                    // only terminals on edges
-
-                pieceType=AppWindow.random.nextInt(4);
-                if ((pieceType==1) && ((z!=tz) && (z!=(bz-1)) && (x!=lx) && (x!=(rx-1)))) pieceType=0;
-
-                switch (pieceType) {
-                    case 0:
-                        addBank(room,x,z,bankWid,bankHigh,floorDepth,pieceCount);
-                        break;
-                    case 1:
-                        this.addTerminal(room,x,z,terminalWid,terminalHigh,pieceCount);
-                        break;
-                    case 2:
-                        this.addJunction(room,x,z,juncWid,pipeHigh,pipeRadius,pieceCount);
-                        break;
-                    case 3:
-                        addTube(room,x,z,tubeRadius,tubeHigh,tubeCapRadius,tubeTopCapHigh,tubeBotCapHigh,pieceCount);
-                        break;
-                }
-
-                pieceCount++;
-
-                this.room.setGrid(0,x,z,1);
-            }
-        }
-*/
     }
 
 }

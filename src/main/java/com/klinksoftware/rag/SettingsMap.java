@@ -12,8 +12,8 @@ public class SettingsMap extends SettingsBase {
     private static final int BUTTON_EXPORT_MAP = 1;
 
     private JButton generateMapButton, exportMapButton;
-    private JSlider sizeSlider, compactSlider;
-    private JCheckBox complexCheckBox, upperFloorCheckBox, lowerFloorCheckBox, decorationsCheckBox;
+    private JSlider sizeSlider, compactSlider, decorationSlider;
+    private JCheckBox complexCheckBox, upperFloorCheckBox, lowerFloorCheckBox;
 
     public SettingsMap(AppWindow appWindow) {
         super(appWindow);
@@ -42,7 +42,7 @@ public class SettingsMap extends SettingsBase {
         lowerFloorCheckBox = addCheckBox(y, "Lower Floor", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        decorationsCheckBox = addCheckBox(y, "Decorations", true);
+        decorationSlider = addSlider(y, "Decorations", 0.3f);
         y += (ROW_HEIGHT + ROW_GAP);
 
         exportMapButton = addButton(y, "Export Map", BUTTON_EXPORT_MAP);
@@ -59,7 +59,7 @@ public class SettingsMap extends SettingsBase {
                         complexCheckBox.isSelected(),
                         upperFloorCheckBox.isSelected(),
                         lowerFloorCheckBox.isSelected(),
-                        decorationsCheckBox.isSelected()
+                        ((float) decorationSlider.getValue() / 100.0f)
                 )).execute();
                 return;
             case BUTTON_EXPORT_MAP:

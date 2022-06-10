@@ -8,12 +8,12 @@ import javax.swing.*;
 public class MapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
-    private float mapSize, mapCompact;
-    private boolean complex, upperFloor, lowerFloor, decorations;
+    private float mapSize, mapCompact, decorations;
+    private boolean complex, upperFloor, lowerFloor;
 
     public static MapBuilder generatedMap = null;
 
-    public MapBuildWorker(AppWindow appWindow, float mapSize, float mapCompact, boolean complex, boolean upperFloor, boolean lowerFloor, boolean decorations) {
+    public MapBuildWorker(AppWindow appWindow, float mapSize, float mapCompact, boolean complex, boolean upperFloor, boolean lowerFloor, float decorations) {
         this.appWindow = appWindow;
         this.mapSize = mapSize;
         this.mapCompact = mapCompact;
