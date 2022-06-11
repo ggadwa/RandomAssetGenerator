@@ -79,7 +79,7 @@ public class MeshModelUtility
                 }
 
                 // this is here to make square cylinders face forward
-                rd = (ang + 45.0f) * ((float) Math.PI / 180.0f);
+                rd = (ang - 45.0f) * ((float) Math.PI / 180.0f);
 
                 switch (axis) {
                     case Limb.LIMB_AXIS_X:

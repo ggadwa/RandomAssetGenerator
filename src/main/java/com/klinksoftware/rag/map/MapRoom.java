@@ -16,7 +16,7 @@ public class MapRoom
     public int stairDir, stairX, stairZ;
     public boolean hasUpperExtension, hasLowerExtension;
     public byte[] wallHideArray;
-    public int[] floorGrid, ceilingGrid;
+    public int[] floorGrid;
     public boolean[] platformGrid, blockedGrid;
     public MapRoom extendedFromRoom;
     public MapPiece piece;
@@ -39,8 +39,7 @@ public class MapRoom
 
             // need a copy of floor grid
 
-        floorGrid=piece.floorGrid.clone();
-        ceilingGrid=piece.floorGrid.clone();
+        floorGrid = piece.floorGrid.clone();
 
             // wall hiding
 
@@ -69,7 +68,6 @@ public class MapRoom
 
         // need a copy of floor grid
         room.floorGrid = piece.floorGrid.clone();
-        room.ceilingGrid = piece.floorGrid.clone();
 
         room.wallHideArray = new byte[piece.vertexes.length];
         room.platformGrid = new boolean[piece.sizeX * piece.sizeZ];
@@ -160,6 +158,16 @@ public class MapRoom
         }
 
         return(-1);
+    }
+
+    public boolean roomAtPosition(ArrayList<MapRoom> rooms, int cx, int cz) {
+        for (MapRoom checkRoom : rooms) {
+            if ((cx >= checkRoom.x) && (cx < (checkRoom.x + checkRoom.piece.sizeX)) && (cz >= checkRoom.z) && (cz < (checkRoom.z + checkRoom.piece.sizeZ))) {
+                return (true);
+            }
+        }
+
+        return (false);
     }
 
     public boolean touchesNegativeX(ArrayList<MapRoom> rooms) {

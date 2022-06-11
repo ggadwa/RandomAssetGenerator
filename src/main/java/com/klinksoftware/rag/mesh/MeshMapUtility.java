@@ -442,8 +442,8 @@ public class MeshMapUtility
         for (z=0;z!=piece.sizeZ;z++) {
             pz=(room.z+z)*MapBuilder.SEGMENT_SIZE;
             for (x=0;x!=piece.sizeX;x++) {
-                if (piece.floorGrid[(z * piece.sizeX) + x] != 1) {
-                    //    continue;
+                if (piece.floorGrid[(z * piece.sizeX) + x] == 0) {
+                    continue;
                 }
 
                 px = (room.x + x) * MapBuilder.SEGMENT_SIZE;

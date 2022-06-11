@@ -6,14 +6,20 @@ import com.klinksoftware.rag.bitmaps.BitmapMetal;
 import com.klinksoftware.rag.bitmaps.BitmapStorage;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MapStorage {
+
+    private float shelfHeight, shelfLegWidth, xShelfMargin, zShelfMargin;
+    private MapBuilder mapBuilder;
+    private ArrayList<MapRoom> rooms;
     private MeshList meshList;
     private HashMap<String, BitmapBase> bitmaps;
-    private float shelfHeight, shelfLegWidth, xShelfMargin, zShelfMargin;
 
-    public MapStorage(MeshList meshList, HashMap<String, BitmapBase> bitmaps)    {
+    public MapStorage(MapBuilder mapBuilder, ArrayList<MapRoom> rooms, MeshList meshList, HashMap<String, BitmapBase> bitmaps) {
+        this.mapBuilder = mapBuilder;
+        this.rooms = rooms;
         this.meshList = meshList;
         this.bitmaps = bitmaps;
 
@@ -84,15 +90,59 @@ public class MapStorage {
         meshList.add(mesh);
     }
 
+    //
+    // big box
+    //
+    private void addBigBox(MapRoom room, int roomNumber, int x, float by, int z) {
+        float dx, dz, boxWidth, boxHeight;
+        String name;
+        RagPoint rotAngle;
+        BitmapBase bitmap;
+
+        // bitmap
+        if (!bitmaps.containsKey("box")) {
+            bitmap = new BitmapStorage();
+            bitmap.generate();
+            bitmaps.put("box", bitmap);
+        }
+
+        dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
+        dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
+
+        boxWidth = (MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.4f))) * 0.5f;
+        boxHeight = MapBuilder.SEGMENT_SIZE * (0.7f + AppWindow.random.nextFloat(0.3f));
+
+        name = "storage_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+        rotAngle = new RagPoint(0.0f, (AppWindow.random.nextFloat(30.0f) - 15.0f), 0.0f);
+        meshList.add(MeshMapUtility.createCubeRotated(room, name, "box", (dx - boxWidth), (dx + boxWidth), by, (by + boxHeight), (dz - boxWidth), (dz + boxWidth), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_WHOLE));
+    }
+
         //
         // shelves
         //
+    private Mesh addShelfBox(MapRoom room, Mesh boxMesh, float bx, float by, float bz, float boxSize, int boxCount, String boxName) {
+        int n;
+        RagPoint rotAngle;
+        Mesh mesh2;
+
+        for (n = 0; n != boxCount; n++) {
+            rotAngle = new RagPoint(0.0f, (AppWindow.random.nextFloat(30.0f) - 15.0f), 0.0f);
+            mesh2 = MeshMapUtility.createCubeRotated(room, boxName, "box", (bx - boxSize), (bx + boxSize), (by + shelfLegWidth), ((by + shelfLegWidth) + boxSize), (bz - boxSize), (bz + boxSize), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_WHOLE);
+            if (boxMesh == null) {
+                boxMesh = mesh2;
+            } else {
+                boxMesh.combine(mesh2);
+            }
+            by += boxSize;
+        }
+
+        return (boxMesh);
+    }
 
     private void addShelf(MapRoom room, int roomNumber, int x, float by, int z) {
         int stackLevel, stackCount;
-        float dx, dz, bx, bz, tableXMin, tableXMax, tableZMin, tableZMax, boxSize;
+        float dx, dz, bx, bz, origBy, tableXMin, tableXMax, tableZMin, tableZMax, boxSize;
         String boxName, shelfName;
-        RagPoint rotAngle;
         Mesh shelfMesh, boxMesh, mesh2;
         BitmapBase bitmap;
 
@@ -109,18 +159,18 @@ public class MapStorage {
         }
 
         // height and width
-        stackCount=1+AppWindow.random.nextInt(3);
+        stackCount = 2 + AppWindow.random.nextInt(3);
 
         // some preset bounds
         dx = (room.x + x) * MapBuilder.SEGMENT_SIZE;
         dz = (room.z + z) * MapBuilder.SEGMENT_SIZE;
 
+        origBy = by;
+
         tableXMin = dx + xShelfMargin;
         tableXMax = (dx + MapBuilder.SEGMENT_SIZE) - xShelfMargin;
         tableZMin = dz + zShelfMargin;
         tableZMax = (dz + MapBuilder.SEGMENT_SIZE) - zShelfMargin;
-
-        rotAngle=new RagPoint(0.0f,0.0f,0.0f);
 
             // the stacked shelves
 
@@ -128,12 +178,12 @@ public class MapStorage {
         boxMesh = null;
 
         boxName = "storage_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        shelfName = "shelfe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
+        shelfName = "shelf_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
         for (stackLevel=0;stackLevel!=stackCount;stackLevel++) {
 
-                // the table
-            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, tableXMax, (by + shelfHeight), ((by + shelfHeight) + shelfLegWidth), tableZMin, tableZMax, true, true, true, true, true, true, false, MeshMapUtility.UV_MAP);
+            // the table
+            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, tableXMax, by, (by + shelfLegWidth), tableZMin, tableZMax, true, true, true, true, true, true, false, MeshMapUtility.UV_MAP);
             if (shelfMesh==null) {
                 shelfMesh=mesh2;
             }
@@ -141,47 +191,60 @@ public class MapStorage {
                 shelfMesh.combine(mesh2);
             }
 
-                // legs
+            // legs
+            if (stackLevel != 0) {
+                mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, (tableXMin + shelfLegWidth), (by - shelfHeight), by, tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
+                shelfMesh.combine(mesh2);
 
-            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, (tableXMin + shelfLegWidth), by, (by + shelfHeight), tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
-            shelfMesh.combine(mesh2);
+                mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, (tableXMin + shelfLegWidth), (by - shelfHeight), by, (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
+                shelfMesh.combine(mesh2);
 
-            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, (tableXMin + shelfLegWidth), by, (by + shelfHeight), (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
-            shelfMesh.combine(mesh2);
+                mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", (tableXMax - shelfLegWidth), tableXMax, (by - shelfHeight), by, tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
+                shelfMesh.combine(mesh2);
 
-            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", (tableXMax - shelfLegWidth), tableXMax, by, (by + shelfHeight), tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
-            shelfMesh.combine(mesh2);
+                mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", (tableXMax - shelfLegWidth), tableXMax, (by - shelfHeight), by, (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
+                shelfMesh.combine(mesh2);
+            }
 
-            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", (tableXMax - shelfLegWidth), tableXMax, by, (by + shelfHeight), (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
-            shelfMesh.combine(mesh2);
-
-                // items on shelf
-            //boxCount=0;
-
-            //for (z2=gz;z2<(gz+zSize);z2++) {
-            //for (x2=gx;x2<(gx+xSize);x2++) {
+            // items on shelf
+            // one big item
             if (AppWindow.random.nextBoolean()) {
+                boxSize = shelfHeight * (0.5f + (AppWindow.random.nextFloat(0.25f)));
+                bx = dx + (MapBuilder.SEGMENT_SIZE * 0.5f);
+                bz = dz + (MapBuilder.SEGMENT_SIZE * 0.5f);
 
-                    boxSize = shelfHeight * (0.5f + (AppWindow.random.nextFloat(0.25f)));
-                    bx = dx + (MapBuilder.SEGMENT_SIZE * 0.5f);
-                    bz = dz + (MapBuilder.SEGMENT_SIZE * 0.5f);
-
-                    rotAngle.setFromValues(0.0f,(-10.0f+(AppWindow.random.nextFloat()*20.0f)),0.0f);
-                    mesh2 = MeshMapUtility.createCubeRotated(room, boxName, "box", (bx - boxSize), (bx + boxSize), ((by + shelfHeight) + shelfLegWidth), (((by + shelfHeight) + shelfLegWidth) + boxSize), (bz - boxSize), (bz + boxSize), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_WHOLE);
-                    if (boxMesh==null) {
-                        boxMesh=mesh2;
-                    }
-                    else {
-                        boxMesh.combine(mesh2);
-                    }
+                boxMesh = addShelfBox(room, boxMesh, bx, by, bz, boxSize, 1, boxName);
+            } // up to 4 small items
+            else {
+                if (AppWindow.random.nextBoolean()) {
+                    boxSize = shelfHeight * (0.15f + (AppWindow.random.nextFloat(0.2f)));
+                    bx = dx + (MapBuilder.SEGMENT_SIZE * 0.25f);
+                    bz = dz + (MapBuilder.SEGMENT_SIZE * 0.25f);
+                    boxMesh = addShelfBox(room, boxMesh, bx, by, bz, boxSize, (AppWindow.random.nextBoolean() ? 2 : 1), boxName);
                 }
+                if (AppWindow.random.nextBoolean()) {
+                    boxSize = shelfHeight * (0.15f + (AppWindow.random.nextFloat(0.2f)));
+                    bx = dx + (MapBuilder.SEGMENT_SIZE * 0.75f);
+                    bz = dz + (MapBuilder.SEGMENT_SIZE * 0.25f);
+                    boxMesh = addShelfBox(room, boxMesh, bx, by, bz, boxSize, (AppWindow.random.nextBoolean() ? 2 : 1), boxName);
+                }
+                if (AppWindow.random.nextBoolean()) {
+                    boxSize = shelfHeight * (0.15f + (AppWindow.random.nextFloat(0.2f)));
+                    bx = dx + (MapBuilder.SEGMENT_SIZE * 0.25f);
+                    bz = dz + (MapBuilder.SEGMENT_SIZE * 0.75f);
+                    boxMesh = addShelfBox(room, boxMesh, bx, by, bz, boxSize, (AppWindow.random.nextBoolean() ? 2 : 1), boxName);
+                }
+                if (AppWindow.random.nextBoolean()) {
+                    boxSize = shelfHeight * (0.15f + (AppWindow.random.nextFloat(0.2f)));
+                    bx = dx + (MapBuilder.SEGMENT_SIZE * 0.75f);
+                    bz = dz + (MapBuilder.SEGMENT_SIZE * 0.75f);
+                    boxMesh = addShelfBox(room, boxMesh, bx, by, bz, boxSize, (AppWindow.random.nextBoolean() ? 2 : 1), boxName);
+                }
+            }
 
-            // boxCount++;
-            //}
-                // go up one level
-
+            // go up one level
             by += (shelfHeight + shelfLegWidth);
-            if (by > (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)) {
+            if ((by - origBy) > (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)) {
                 break;
             }
         }
@@ -196,74 +259,33 @@ public class MapStorage {
         // storage
         //
 
-    public void build(MapRoom room, int roomNumber, int x, float by, int z) {
-        //addBoxes(room, roomNumber, x, by, z);
-        addShelf(room, roomNumber, x, by, z);
+    public void build(MapRoom room, int roomNumber, float by, float decorations) {
+        int x, z;
 
-        /*
-        int     x,z,x2,z2,lx,rx,tz,bz,xSize,zSize,
-                storageCount;
-        float   boxSize,shelfHigh,shelfLegWid,xShelfMargin,zShelfMargin,
-                floorDepth;
+        for (z = 0; z != room.piece.sizeZ; z++) {
+            for (x = 0; x != room.piece.sizeX; x++) {
+                if (!mapBuilder.isGoodStructureDecorationPosition(rooms, room, x, z)) {
+                    continue;
+                }
+                if (AppWindow.random.nextFloat() > decorations) {
+                    continue;
+                }
 
-            // create the pieces
-
-        storageCount=0;
-
-        boxSize=(MapBuilder.SEGMENT_SIZE*0.4f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.4f));
-
-        shelfHigh=(MapBuilder.SEGMENT_SIZE*0.35f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.35f));
-        shelfLegWid=(MapBuilder.SEGMENT_SIZE*0.03f)+(AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.05f));
-        xShelfMargin=(MapBuilder.SEGMENT_SIZE*0.025f)+AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.05f);
-        zShelfMargin=(MapBuilder.SEGMENT_SIZE*0.025f)+AppWindow.random.nextFloat()*(MapBuilder.SEGMENT_SIZE*0.05f);
-
-                    // add item to segment
-
-
-
-
-
-        if (AppWindow.random.nextBoolean()) {
-            // stack of boxes
-            addBoxes(x,z,boxSize,storageCount);
-        } else {
-            // shelf with possible boxes
-
-                        xSize=zSize=1;
-
-                        if (AppWindow.random.nextBoolean()) {           // shelfs have random sizes
-                            xSize=2;
-                            if ((x+xSize)>=rx) {
-                                xSize=1;
-                            }
-                            else {
-                                if (room.getGrid(0,(x+1),z)!=0) xSize=1;
-                            }
-                        }
-                        else {
-                            zSize=2;
-                            if ((z+zSize)>=bz) {
-                                zSize=1;
-                            }
-                            else {
-                                if (room.getGrid(0,x,(z+1))!=0) zSize=1;
-                            }
-                        }
-
-                        addShelf(x,z,xSize,zSize,shelfHigh,shelfLegWid,xShelfMargin,zShelfMargin,floorDepth,storageCount);
-                        storageCount++;
-
-                        for (z2=z;z2<(z+zSize);z2++) {
-                            for (x2=x;x2<(x+xSize);x2++) {
-                                room.setGrid(0,x2,z2,1);
-                            }
-                        }
-
+                switch (AppWindow.random.nextInt(3)) {
+                    case 0:
+                        addBoxes(room, roomNumber, x, by, z);
+                        break;
+                    case 1:
+                        addBigBox(room, roomNumber, x, by, z);
+                        break;
+                    case 2:
+                        addShelf(room, roomNumber, x, by, z);
                         break;
                 }
+
+                room.setBlockedGrid(x, z);
             }
         }
-*/
     }
 
 }

@@ -1,16 +1,15 @@
 package com.klinksoftware.rag.map;
 
-import com.klinksoftware.rag.*;
-
 import java.util.*;
 import java.io.*;
 import java.nio.file.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.core.type.*;
+import com.klinksoftware.rag.AppWindow;
 
-public class MapPieceList
-{
-    private List<MapPiece>          pieces;
+public class MapPieceList {
+
+    private List<MapPiece> pieces;
 
     public MapPieceList() {
         String jsonStr;
@@ -105,9 +104,9 @@ public class MapPieceList
         // being (less hallways = more compact)
         if (AppWindow.random.nextFloat() > mapCompactFactor) {
             if (AppWindow.random.nextBoolean()) {
-                return (createSpecificRectangularPiece((1 + AppWindow.random.nextInt(1)), (4 + AppWindow.random.nextInt(6)), false));
+                return (createSpecificRectangularPiece((1 + AppWindow.random.nextInt(1)), (4 + AppWindow.random.nextInt(6)), false, false));
             } else {
-                return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (1 + AppWindow.random.nextInt(1)), false));
+                return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (1 + AppWindow.random.nextInt(1)), false, false));
             }
         }
 
@@ -119,10 +118,10 @@ public class MapPieceList
         }
 
         // non-complex are always rectangles
-        return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (4 + AppWindow.random.nextInt(6)), true));
+        return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (4 + AppWindow.random.nextInt(6)), true, true));
     }
 
-    public MapPiece createSpecificRectangularPiece(int sizeX, int sizeZ, boolean decorate) {
+    public MapPiece createSpecificRectangularPiece(int sizeX, int sizeZ, boolean decorateOK, boolean structureOK) {
         int n,x,z,idx;
         MapPiece piece;
 
@@ -132,7 +131,8 @@ public class MapPieceList
         piece.sizeX = sizeX;
         piece.sizeZ = sizeZ;
 
-        piece.decorate = decorate;
+        piece.decorateOK = decorateOK;
+        piece.structureOK = structureOK;
         piece.floorGrid=new int[piece.sizeX*piece.sizeZ];
         for (n=0;n!=(piece.sizeX*piece.sizeZ);n++) {
             piece.floorGrid[n]=1;

@@ -53,6 +53,7 @@ public class ModelBuilder
         } else {
             bitmapBase = new BitmapRobot();
         }
+        //bitmapBase = new BitmapTest();
         bitmapBase.generate();
         bitmaps.put("bitmap", bitmapBase);
 

@@ -1,67 +1,68 @@
 package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
+import com.klinksoftware.rag.bitmaps.BitmapBase;
 import com.klinksoftware.rag.mesh.*;
-import com.klinksoftware.rag.utility.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-public class MapAltar
-{
-    private String          name;
-    private MeshList        meshList;
-    private MapRoom         room;
-    
-    public MapAltar(MeshList meshList,MapRoom room,String name)
-    {
-        this.meshList=meshList;
-        this.room=room;
-        this.name=name;
+public class MapAltar {
+    private MapBuilder mapBuilder;
+    private ArrayList<MapRoom> rooms;
+    private MeshList meshList;
+    private HashMap<String, BitmapBase> bitmaps;
+
+    public MapAltar(MapBuilder mapBuilder, ArrayList<MapRoom> rooms, MeshList meshList, HashMap<String, BitmapBase> bitmaps) {
+        this.mapBuilder = mapBuilder;
+        this.rooms = rooms;
+        this.meshList = meshList;
+        this.bitmaps = bitmaps;
     }
-    
+
         //
         // single altar
         //
 
-    public Mesh addAltar(int lx,int rx,int tz,int bz,float stepHigh)
-    {
-        /*
-        int         n,x,z,dx,dz,levelCount;
-        float       y,xMin,xMax,zMin,zMax;
-        Mesh        mesh,mesh2;
-        
-        levelCount=5+AppWindow.random.nextInt(5);
-        
-        mesh=null;
-        y=this.room.offset.y;
-        
-        for (n=0;n!=levelCount;n++) {
-            xMin=room.offset.x+(lx*MapBuilder.SEGMENT_SIZE);
-            xMax=room.offset.x+(rx*MapBuilder.SEGMENT_SIZE);
-            zMin=room.offset.z+(tz*MapBuilder.SEGMENT_SIZE);
-            zMax=room.offset.z+(bz*MapBuilder.SEGMENT_SIZE);
+    public Mesh addAltar(MapRoom room, int roomNumber, int lx, int rx, float by, int tz, int bz) {
+        int n, x, z, dx, dz, levelCount;
+        float xMin, xMax, zMin, zMax;
+        String name;
+        Mesh mesh, mesh2;
 
-            mesh2=MeshMapUtility.createCube(room,(this.name+"_altar"),"platform",xMin,xMax,y,(y+stepHigh),zMin,zMax,true,true,true,true,true,false,false,MeshMapUtility.UV_MAP);
-            
+        levelCount = 1 + AppWindow.random.nextInt(5);
+
+        mesh = null;
+
+        for (n=0;n!=levelCount;n++) {
+            xMin = (room.x + lx) * MapBuilder.SEGMENT_SIZE;
+            xMax = (room.x + rx) * MapBuilder.SEGMENT_SIZE;
+            zMin = (room.z + tz) * MapBuilder.SEGMENT_SIZE;
+            zMax = (room.z + bz) * MapBuilder.SEGMENT_SIZE;
+
+            name = "altar_" + Integer.toString(roomNumber) + "_" + Integer.toString(lx) + "x" + Integer.toString(tz);
+            mesh2 = MeshMapUtility.createCube(room, name, "platform", xMin, xMax, by, (by + MapBuilder.FLOOR_HEIGHT), zMin, zMax, true, true, true, true, true, false, false, MeshMapUtility.UV_MAP);
+
             if (mesh==null) {
                 mesh=mesh2;
             }
             else {
                 mesh.combine(mesh2);
             }
-            
+
             if (n==0) {
                 for (z=tz;z<bz;z++) {
                     for (x=lx;x<rx;x++) {
-                        room.setGrid(0,x,z,1);
+                        room.setBlockedGrid(x, z);
                     }
                 }
             }
-            
-            y+=stepHigh;
-            
+
+            by += MapBuilder.FLOOR_HEIGHT;
+
             dx=Math.abs(lx-rx);
             dz=Math.abs(tz-bz);
             if ((dx<=1) || (dz<=1)) break;
-            
+
             if (dx>dz) {
                 if (AppWindow.random.nextBoolean()) {
                     lx++;
@@ -79,54 +80,47 @@ public class MapAltar
                 }
             }
         }
-        
+
         return(mesh);
-*/
-        return(null);
     }
-            
+
         //
-        // alter
+        // altar
+        // note "platform" bitmap should always exist
         //
 
-    public void build()
-    {
-        /*
-        int         mx,mz;
-        float       stepHigh;
-        Mesh        mesh;
-        
-        stepHigh=MapBuilder.SEGMENT_SIZE*0.1f;
-        
-            // rooms with 10x10 can get half or quarter versions
-            
-        if ((room.piece.size.x>=10) && (room.piece.size.z>=10)) {
-            
-            mx=room.piece.size.x/2;
-            mz=room.piece.size.z/2;
-            
+    public void build(MapRoom room, int roomNumber, float by) {
+        int mx, mz;
+        Mesh mesh;
+
+        // rooms with 10x10 can get half or quarter versions
+
+        if ((room.piece.sizeX >= 10) && (room.piece.sizeZ >= 10)) {
+
+            mx = room.piece.sizeX / 2;
+            mz = room.piece.sizeZ / 2;
+
             switch (AppWindow.random.nextInt(3)) {
                 case 0:
-                    mesh=addAltar(2,(room.piece.size.x-2),2,(room.piece.size.z-2),stepHigh);
+                    mesh = addAltar(room, roomNumber, 2, (room.piece.sizeX - 2), by, 2, (room.piece.sizeZ - 2));
                     break;
                 case 1:
-                    mesh=addAltar(2,mx,2,(room.piece.size.z-2),stepHigh);
-                    mesh.combine(addAltar(mx,(room.piece.size.x-2),2,(room.piece.size.z-2),stepHigh));
+                    mesh = addAltar(room, roomNumber, 2, mx, by, 2, (room.piece.sizeZ - 2));
+                    mesh.combine(addAltar(room, roomNumber, mx, (room.piece.sizeX - 2), by, 2, (room.piece.sizeZ - 2)));
                     break;
                 default:
-                    mesh=addAltar(2,mx,2,mz,stepHigh);
-                    mesh.combine(addAltar(2,mx,mz,(room.piece.size.z-2),stepHigh));
-                    mesh.combine(addAltar(mx,(room.piece.size.x-2),2,mz,stepHigh));
-                    mesh.combine(addAltar(mx,(room.piece.size.x-2),mz,(room.piece.size.z-2),stepHigh));
+                    mesh = addAltar(room, roomNumber, 2, mx, by, 2, mz);
+                    mesh.combine(addAltar(room, roomNumber, 2, mx, by, mz, (room.piece.sizeZ - 2)));
+                    mesh.combine(addAltar(room, roomNumber, mx, (room.piece.sizeX - 2), by, 2, mz));
+                    mesh.combine(addAltar(room, roomNumber, mx, (room.piece.sizeX - 2), by, mz, (room.piece.sizeZ - 2)));
                     break;
             }
         }
         else {
-            mesh=addAltar(2,(room.piece.size.x-2),2,(room.piece.size.z-2),stepHigh);
+            mesh = addAltar(room, roomNumber, 2, (room.piece.sizeX - 2), by, 2, (room.piece.sizeZ - 2));
         }
-        
+
         meshList.add(mesh);
-*/
     }
 
 }

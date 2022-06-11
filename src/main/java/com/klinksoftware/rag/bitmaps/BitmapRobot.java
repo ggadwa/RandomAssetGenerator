@@ -15,8 +15,8 @@ public class BitmapRobot extends BitmapBase {
     }
 
     private void generateFaceChunkEye(int x, int y, RagColor eyeColor) {
-        drawRect(x, y, (x + 15), (y + 10), eyeColor);
-        draw3DFrameRect(x, y, (x + 15), (y + 10), 2, COLOR_BLACK, true);
+        drawRect(x, y, (x + 30), (y + 10), eyeColor);
+        draw3DFrameRect(x, y, (x + 30), (y + 10), 2, COLOR_BLACK, true);
     }
 
     private void generateAddFace() {
@@ -24,11 +24,11 @@ public class BitmapRobot extends BitmapBase {
 
         eyeColor = this.getRandomColor();
 
-        drawRect(415, 355, 445, 375, COLOR_WHITE);
-        draw3DFrameRect(415, 355, 445, 375, 2, COLOR_BLACK, true);
+        drawRect(300, 355, 385, 375, COLOR_WHITE);
+        draw3DFrameRect(300, 355, 385, 375, 2, COLOR_BLACK, true);
 
-        generateFaceChunkEye(412, 400, eyeColor);
-        generateFaceChunkEye(433, 400, eyeColor);
+        generateFaceChunkEye(300, 400, eyeColor);
+        generateFaceChunkEye(335, 400, eyeColor);
     }
 
     private void generateSingleChunk(int x, int y) {

@@ -262,7 +262,7 @@ public class SkeletonBuilder
             pnt.y += (neckLength * 0.5f);
         }
 
-            // the head bones
+        // the head bones
         headBottomBoneIdx = skeleton.addChildBone((hasNeck) ? neckTopBoneIdx : parentBoneIdx, ("head_bottom_" + Integer.toString(limbIdx)), -1, headRadius, pnt);
 
         headLength = headRadius * (0.9f + (AppWindow.random.nextFloat(0.6f)));
@@ -304,7 +304,7 @@ public class SkeletonBuilder
         // general body
         //
 
-    public void buildBody(Skeleton skeleton, int modelType, float hunchAng, float scaleFactor) {
+    public void buildBody(Skeleton skeleton, int modelType, float hunchAng, float legRadius, float scaleFactor) {
         int hipBoneIdx, waistBoneIdx, torsoBottomBoneIdx, torsoShoulderBoneIdx, torsoTopBoneIdx, buttBoneIdx;
         int axis;
         float hipHigh, hipRadius, hipAdd, torsoAdd, radius;
@@ -313,6 +313,9 @@ public class SkeletonBuilder
         RagPoint meshScale;
 
         minRadius = 0.4f + AppWindow.random.nextFloat(1.5f);
+        if (minRadius < (legRadius * 2.0f)) {
+            minRadius = legRadius * (2.0f + AppWindow.random.nextFloat(1.0f));
+        }
         extraRadius = minRadius * 0.2f;
 
         switch (modelType) {
@@ -402,7 +405,7 @@ public class SkeletonBuilder
         // arms
         //
 
-    private void buildArmsRandomSet(Skeleton skeleton, int boneIdx, int armCount, int limbNameOffset, float limbRadius, float armLength, float handRadius, int fingerCount, float fingerLength, float scaleFactor) {
+    private void buildArmsRandomSet(Skeleton skeleton, int boneIdx, int armCount, int limbNameOffset, float armRadius, float whipRadius, float armLength, float handRadius, int fingerCount, float fingerLength, float scaleFactor) {
         int n;
         float ang;
 
@@ -410,26 +413,26 @@ public class SkeletonBuilder
             ang = (float) (AppWindow.random.nextInt(4) * 90) + (25.0f - (AppWindow.random.nextFloat(50.0f)));
             ang = AppWindow.random.nextFloat(360.0f);
             if (AppWindow.random.nextFloat()<0.8f) {
-                buildLimbArm(skeleton, (n + limbNameOffset), boneIdx, limbRadius, armLength, handRadius, fingerCount, fingerLength, ang, scaleFactor);
+                buildLimbArm(skeleton, (n + limbNameOffset), boneIdx, armRadius, armLength, handRadius, fingerCount, fingerLength, ang, scaleFactor);
             }
             else {
-                buildLimbWhip(skeleton, (n + limbNameOffset), boneIdx, limbRadius, armLength, ang, scaleFactor);
+                buildLimbWhip(skeleton, (n + limbNameOffset), boneIdx, whipRadius, armLength, ang, scaleFactor);
             }
         }
     }
 
-    private void buildArmsBilateralSet(Skeleton skeleton, int boneIdx, int limbNameOffset, float limbRadius, float armLength, float handRadius, int fingerCount, float fingerLength, float scaleFactor) {
+    private void buildArmsBilateralSet(Skeleton skeleton, int boneIdx, int limbNameOffset, float armRadius, float whipRadius, float armLength, float handRadius, int fingerCount, float fingerLength, float scaleFactor) {
         if (AppWindow.random.nextFloat()<0.8f) {
-            buildLimbArm(skeleton, (limbNameOffset + 1), boneIdx, limbRadius, armLength, handRadius, fingerCount, fingerLength, 90.0f, scaleFactor);
-            buildLimbArm(skeleton, (limbNameOffset + 2), boneIdx, limbRadius, armLength, handRadius, fingerCount, fingerLength, 270.0f, scaleFactor);
+            buildLimbArm(skeleton, (limbNameOffset + 1), boneIdx, armRadius, armLength, handRadius, fingerCount, fingerLength, 90.0f, scaleFactor);
+            buildLimbArm(skeleton, (limbNameOffset + 2), boneIdx, armRadius, armLength, handRadius, fingerCount, fingerLength, 270.0f, scaleFactor);
         }
         else {
-            buildLimbWhip(skeleton, (limbNameOffset + 1), boneIdx, limbRadius, armLength, 90.0f, scaleFactor);
-            buildLimbWhip(skeleton, (limbNameOffset + 2), boneIdx, limbRadius, armLength, 270.0f, scaleFactor);
+            buildLimbWhip(skeleton, (limbNameOffset + 1), boneIdx, whipRadius, armLength, 90.0f, scaleFactor);
+            buildLimbWhip(skeleton, (limbNameOffset + 2), boneIdx, whipRadius, armLength, 270.0f, scaleFactor);
         }
     }
 
-    private void buildArms(Skeleton skeleton, int modelType, boolean bilateral, float limbRadius, float scaleFactor) {
+    private void buildArms(Skeleton skeleton, int modelType, boolean bilateral, float armRadius, float whipRadius, float scaleFactor) {
         int boneIdx, armCount, fingerCount;
         float armLength, handRadius, fingerLength;
         boolean topArms, midArms;
@@ -437,7 +440,7 @@ public class SkeletonBuilder
         // some settings
         armLength = 1.0f + AppWindow.random.nextFloat(1.5f);
         armCount = 1 + AppWindow.random.nextInt(3);
-        handRadius = limbRadius * (1.0f + (AppWindow.random.nextFloat(0.5f)));
+        handRadius = armRadius * (1.0f + (AppWindow.random.nextFloat(0.5f)));
         fingerCount = (modelType == SettingsModel.MODEL_TYPE_BLOB) ? 0 : AppWindow.random.nextInt(5);
         fingerLength = handRadius * (0.2f + AppWindow.random.nextFloat(2.5f));
 
@@ -460,10 +463,10 @@ public class SkeletonBuilder
             boneIdx = skeleton.findBoneIndex("Torso_Shoulder");
 
             if (!bilateral) {
-                buildArmsRandomSet(skeleton, boneIdx, armCount, 0, limbRadius, armLength, handRadius, fingerCount, fingerLength, scaleFactor);
+                buildArmsRandomSet(skeleton, boneIdx, armCount, 0, armRadius, whipRadius, armLength, handRadius, fingerCount, fingerLength, scaleFactor);
             }
             else {
-                buildArmsBilateralSet(skeleton, boneIdx, 0, limbRadius, armLength, handRadius, fingerCount, fingerLength, scaleFactor);
+                buildArmsBilateralSet(skeleton, boneIdx, 0, armRadius, whipRadius, armLength, handRadius, fingerCount, fingerLength, scaleFactor);
             }
         }
 
@@ -471,10 +474,10 @@ public class SkeletonBuilder
             boneIdx = skeleton.findBoneIndex("Torso_Bottom");
 
             if (!bilateral) {
-                buildArmsRandomSet(skeleton, boneIdx, armCount, armCount, limbRadius, armLength, handRadius, fingerCount, fingerLength, scaleFactor);
+                buildArmsRandomSet(skeleton, boneIdx, armCount, armCount, armRadius, whipRadius, armLength, handRadius, fingerCount, fingerLength, scaleFactor);
             }
             else {
-                buildArmsBilateralSet(skeleton, boneIdx, 2, limbRadius, armLength, handRadius, fingerCount, fingerLength, scaleFactor);
+                buildArmsBilateralSet(skeleton, boneIdx, 2, armRadius, whipRadius, armLength, handRadius, fingerCount, fingerLength, scaleFactor);
             }
         }
     }
@@ -483,7 +486,7 @@ public class SkeletonBuilder
         // legs
         //
 
-    public void buildLegs(Skeleton skeleton, int modelType, float limbRadius, float scaleFactor) {
+    public void buildLegs(Skeleton skeleton, int modelType, float legRadius, float scaleFactor) {
         int boneIdx, toeCount;
         float footRot, footLength, footRadius, toeLength, legOffset;
 
@@ -492,29 +495,26 @@ public class SkeletonBuilder
             return;
         }
 
-        // legs can be bigger than arms
-        limbRadius = limbRadius + (AppWindow.random.nextFloat(0.2f));
-
         // some settings
         footRot = AppWindow.random.nextFloat(15.0f);
-        footLength = limbRadius + (AppWindow.random.nextFloat(limbRadius * 2.0f));
-        footRadius = (limbRadius * (0.7f + AppWindow.random.nextFloat(0.4f)));
+        footLength = legRadius + (AppWindow.random.nextFloat(legRadius * 2.0f));
+        footRadius = (legRadius * (0.7f + AppWindow.random.nextFloat(0.4f)));
         toeCount = (modelType == SettingsModel.MODEL_TYPE_ROBOT) ? 0 : AppWindow.random.nextInt(5);
         toeLength = footRadius * (0.2f + AppWindow.random.nextFloat(2.5f));
-        legOffset = ((modelType == SettingsModel.MODEL_TYPE_ROBOT) ? 0.7f : 0.5f) * limbRadius;
+        legOffset = ((modelType == SettingsModel.MODEL_TYPE_ROBOT) ? 0.7f : 0.5f) * legRadius;
 
             // hip legs
 
         boneIdx=skeleton.findBoneIndex("Hip");
-        buildLimbLeg(skeleton, 1, boneIdx, limbRadius, footLength, footRadius, footRot, toeCount, toeLength, legOffset, 90.0f, scaleFactor);
-        buildLimbLeg(skeleton, 2, boneIdx, limbRadius, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, 270.0f, scaleFactor);
+        buildLimbLeg(skeleton, 1, boneIdx, legRadius, footLength, footRadius, footRot, toeCount, toeLength, legOffset, 90.0f, scaleFactor);
+        buildLimbLeg(skeleton, 2, boneIdx, legRadius, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, 270.0f, scaleFactor);
 
             // front legs
 
         if (modelType == SettingsModel.MODEL_TYPE_ANIMAL) {
             boneIdx = skeleton.findBoneIndex("Torso_Shoulder");
-            buildLimbLeg(skeleton, 3, boneIdx, limbRadius, footLength, footRadius, footRot, toeCount, toeLength, legOffset, 90.0f, scaleFactor);
-            buildLimbLeg(skeleton, 4, boneIdx, limbRadius, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, 270.0f, scaleFactor);
+            buildLimbLeg(skeleton, 3, boneIdx, legRadius, footLength, footRadius, footRot, toeCount, toeLength, legOffset, 90.0f, scaleFactor);
+            buildLimbLeg(skeleton, 4, boneIdx, legRadius, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, 270.0f, scaleFactor);
         }
     }
 
@@ -522,7 +522,7 @@ public class SkeletonBuilder
         // tails
         //
 
-    public void buildTail(Skeleton skeleton, int modelType, float limbRadius, float scaleFactor) {
+    public void buildTail(Skeleton skeleton, int modelType, float whipRadius, float scaleFactor) {
         int boneIdx;
         float whipLength;
 
@@ -536,21 +536,21 @@ public class SkeletonBuilder
         whipLength = 0.7f + AppWindow.random.nextFloat(1.0f);
 
         boneIdx=skeleton.findBoneIndex("Hip");
-        buildLimbWhip(skeleton, 5, boneIdx, limbRadius, whipLength, 180.0f, scaleFactor);
+        buildLimbWhip(skeleton, 5, boneIdx, whipRadius, whipLength, 180.0f, scaleFactor);
     }
 
         //
         // heads
         //
 
-    public void buildHead(Skeleton skeleton, int modelType, float limbRadius, float scaleFactor) {
+    public void buildHead(Skeleton skeleton, int modelType, float legRadius, float scaleFactor) {
         int boneIdx;
         float headRadius, neckRadius;
 
         headRadius = 0.5f + (AppWindow.random.nextFloat(0.8f));
         neckRadius = headRadius * (0.9f - AppWindow.random.nextFloat(0.5f));
-        if (neckRadius < limbRadius) {
-            neckRadius = limbRadius;
+        if (neckRadius < legRadius) {
+            neckRadius = legRadius;
         }
 
         boneIdx=skeleton.findBoneIndex("Torso_Top");
@@ -562,7 +562,7 @@ public class SkeletonBuilder
         //
 
     public Skeleton build(int modelType, boolean thin, boolean bilateral) {
-        float hunchAng, scaleFactor, limbRadius;
+        float hunchAng, scaleFactor, armRadius, legRadius, whipRadius;
         Skeleton skeleton;
 
         skeleton = new Skeleton();
@@ -588,16 +588,16 @@ public class SkeletonBuilder
         }
 
         // limb sizes
-        limbRadius = 0.2f + (AppWindow.random.nextFloat(0.2f));
-
-        // skeleton scale factor
+        armRadius = 0.2f + (AppWindow.random.nextFloat(0.2f));
+        legRadius = armRadius + (AppWindow.random.nextFloat(0.2f));
+        whipRadius = 0.2f + (AppWindow.random.nextFloat(0.2f));
 
         // build the skeleton
-        buildBody(skeleton, modelType, hunchAng, scaleFactor);
-        buildLegs(skeleton, modelType, limbRadius, scaleFactor);
-        buildArms(skeleton, modelType, bilateral, limbRadius, scaleFactor);
-        buildTail(skeleton, modelType, limbRadius, scaleFactor);
-        buildHead(skeleton, modelType, limbRadius, scaleFactor);
+        buildBody(skeleton, modelType, hunchAng, legRadius, scaleFactor);
+        buildLegs(skeleton, modelType, legRadius, scaleFactor);
+        buildArms(skeleton, modelType, bilateral, armRadius, whipRadius, scaleFactor);
+        buildTail(skeleton, modelType, whipRadius, scaleFactor);
+        buildHead(skeleton, modelType, legRadius, scaleFactor);
 
         // this is just so we can display it turned or not
         skeleton.standing = (modelType != SettingsModel.MODEL_TYPE_ANIMAL);

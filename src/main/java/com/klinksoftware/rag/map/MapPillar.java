@@ -9,7 +9,9 @@ import java.util.HashMap;
 
 public class MapPillar {
 
-    private boolean squareBase, squareColumn;
+    private static final int[] COLUMN_SIDE_COUNTS = {4, 8, 16};
+
+    private int columnSideCount, baseTopSideCount, baseBotSideCount;
     private float radius, baseRadius, capSize;
     private float[] cylinderSegments;
     private MeshList meshList;
@@ -19,8 +21,9 @@ public class MapPillar {
         this.meshList = meshList;
         this.bitmaps = bitmaps;
 
-        squareBase = AppWindow.random.nextBoolean();
-        squareColumn = AppWindow.random.nextBoolean();
+        columnSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
+        baseTopSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
+        baseBotSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
         capSize = MapBuilder.FLOOR_HEIGHT + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT);
         cylinderSegments = MeshMapUtility.createCylinderSegmentList(1, 4);
 
@@ -56,10 +59,10 @@ public class MapPillar {
         centerPnt = new RagPoint((((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE / 2)), ((ty + by) / 2), ((room.z + z) * MapBuilder.SEGMENT_SIZE + (MapBuilder.SEGMENT_SIZE / 2)));
 
         // create the pillar
-        mesh = MeshMapUtility.createCylinder(room, name, "pillar", (squareColumn ? 4 : 16), centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);
+        mesh = MeshMapUtility.createCylinder(room, name, "pillar", columnSideCount, centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);
 
-        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", (squareBase ? 4 : 16), centerPnt, pillarBy, by, baseRadius, true, false));
-        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", (squareBase ? 4 : 16), centerPnt, ty, pillarTy, baseRadius, false, true));
+        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", baseTopSideCount, centerPnt, pillarBy, by, baseRadius, true, false));
+        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", baseBotSideCount, centerPnt, ty, pillarTy, baseRadius, false, true));
 
         meshList.add(mesh);
     }

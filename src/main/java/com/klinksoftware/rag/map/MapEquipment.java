@@ -4,25 +4,26 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
 import com.klinksoftware.rag.bitmaps.BitmapComputer;
 import com.klinksoftware.rag.bitmaps.BitmapControlPanel;
-import com.klinksoftware.rag.bitmaps.BitmapGlass;
-import com.klinksoftware.rag.bitmaps.BitmapLiquid;
 import com.klinksoftware.rag.bitmaps.BitmapMetal;
 import com.klinksoftware.rag.bitmaps.BitmapMonitor;
 import com.klinksoftware.rag.bitmaps.BitmapPipe;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MapEquipment {
-
     private float computerWidth, computerHeight;
     private float terminalWidth, terminalHeight;
     private float junctionWidth, pipeHeight, pipeRadius, junctionHalfDepth;
-    private float tubeRadius, tubeHeight, tubeCapRadius, tubeTopCapHeight, tubeBotCapHeight;
+    private MapBuilder mapBuilder;
+    private ArrayList<MapRoom> rooms;
     private MeshList meshList;
     private HashMap<String, BitmapBase> bitmaps;
 
-    public MapEquipment(MeshList meshList, HashMap<String, BitmapBase> bitmaps) {
+    public MapEquipment(MapBuilder mapBuilder, ArrayList<MapRoom> rooms, MeshList meshList, HashMap<String, BitmapBase> bitmaps) {
+        this.mapBuilder = mapBuilder;
+        this.rooms = rooms;
         this.meshList = meshList;
         this.bitmaps = bitmaps;
 
@@ -36,12 +37,6 @@ public class MapEquipment {
         pipeHeight = (MapBuilder.SEGMENT_SIZE * 0.2f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.2f));
         pipeRadius = ((MapBuilder.SEGMENT_SIZE * 0.05f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.1f))) * 0.5f;
         junctionHalfDepth = pipeRadius * 1.1f;
-
-        tubeCapRadius = (MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f))) * 0.5f;
-        tubeRadius = tubeCapRadius * (0.7f + AppWindow.random.nextFloat(0.2f));
-        tubeHeight = (MapBuilder.SEGMENT_SIZE - MapBuilder.FLOOR_HEIGHT) * (0.7f + AppWindow.random.nextFloat(0.3f));
-        tubeTopCapHeight = tubeHeight * (0.15f + AppWindow.random.nextFloat(0.2f));
-        tubeBotCapHeight = tubeHeight * (0.15f + AppWindow.random.nextFloat(0.2f));
     }
 
         //
@@ -275,81 +270,35 @@ public class MapEquipment {
     }
 
         //
-        // lab tubes
-        //
-
-    public void addTube(MapRoom room, int roomNumber, int x, float by, int z) {
-        float dx, dz;
-        float yBotCapBy, yBotCapTy, yTopCapBy, yTopCapTy, y;
-        String name;
-        RagPoint centerPnt;
-        Mesh mesh, mesh2;
-        BitmapBase bitmap;
-
-        // bitmap
-        if (!bitmaps.containsKey("glass")) {
-            bitmap = new BitmapGlass();
-            bitmap.generate();
-            bitmaps.put("glass", bitmap);
-        }
-        if (!bitmaps.containsKey("liquid")) {
-            bitmap = new BitmapLiquid();
-            bitmap.generate();
-            bitmaps.put("liquid", bitmap);
-        }
-        if (!bitmaps.containsKey("accessory")) {
-            bitmap = new BitmapMetal();
-            bitmap.generate();
-            bitmaps.put("accessory", bitmap);
-        }
-
-        name = "tube_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-
-        // tube center
-        dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
-        dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
-
-        centerPnt = new RagPoint(dx, (by + (tubeHeight * 0.5f)), dz);
-
-        // the top and bottom caps
-        yBotCapBy = by;
-        yBotCapTy = yBotCapBy + tubeBotCapHeight;
-
-        yTopCapBy = yBotCapTy + (tubeHeight - (tubeBotCapHeight + tubeTopCapHeight));
-        yTopCapTy = yTopCapBy + tubeTopCapHeight;
-
-        mesh = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, false);
-        mesh2 = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
-        mesh.combine(mesh2);
-        meshList.add(mesh);
-
-        // the tube
-        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_glass"), "glass", 16, centerPnt, yTopCapBy, yBotCapTy, tubeRadius, false, false));
-
-        // the liquid in the tube
-        y = yBotCapTy + (AppWindow.random.nextFloat() * (yTopCapBy - yBotCapTy));
-        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_liquid"), "liquid", 16, centerPnt, y, yBotCapTy, (tubeRadius * 0.98f), true, false));
-    }
-
-        //
         // equipment build
         //
 
-    public void build(MapRoom room, int roomNumber, int x, float by, int z) {
+    public void build(MapRoom room, int roomNumber, float by, float decorations) {
+        int x, z;
 
-        switch (AppWindow.random.nextInt(4)) {
-            case 0:
-                addBank(room, roomNumber, x, by, z);
-                break;
-            case 1:
-                addTerminal(room, roomNumber, x, by, z);
-                break;
-            case 2:
-                addTube(room, roomNumber, x, by, z);
-                break;
-            case 3:
-                addJunction(room, roomNumber, x, by, z);
-                break;
+        for (z = 0; z != room.piece.sizeZ; z++) {
+            for (x = 0; x != room.piece.sizeX; x++) {
+                if (!mapBuilder.isGoodStructureDecorationPosition(rooms, room, x, z)) {
+                    continue;
+                }
+                if (AppWindow.random.nextFloat() > decorations) {
+                    continue;
+                }
+
+                switch (AppWindow.random.nextInt(3)) {
+                    case 0:
+                        addBank(room, roomNumber, x, by, z);
+                        break;
+                    case 1:
+                        addTerminal(room, roomNumber, x, by, z);
+                        break;
+                    case 2:
+                        addJunction(room, roomNumber, x, by, z);
+                        break;
+                }
+
+                room.setBlockedGrid(x, z);
+            }
         }
     }
 
