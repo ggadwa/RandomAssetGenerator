@@ -1,5 +1,7 @@
 # RandomAssetGenerator
 
+## About
+
 A Java project that will generate random game assets, like 3D maps, models, bitmaps, etc.
 
 Currently early in development.  You can run this from your java development environment,
@@ -11,3 +13,10 @@ like Blender.
 Textures are pngs.
 
 Sounds are wavs.
+
+## Credits
+
+Development: Brian Barnes
+Libraries: Apache Commons, LWJGL, Jackson, Reflections, JPackage
+
+

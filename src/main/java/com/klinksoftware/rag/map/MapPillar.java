@@ -2,7 +2,6 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
-import com.klinksoftware.rag.bitmaps.BitmapPillar;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 import java.util.HashMap;
@@ -40,14 +39,8 @@ public class MapPillar {
         String name;
         RagPoint centerPnt;
         Mesh mesh;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("pillar")) {
-            bitmap = new BitmapPillar();
-            bitmap.generate();
-            bitmaps.put("pillar", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "pillar", new String[]{"Brick", "Metal", "Mosai", "Temple", "Tile"});
 
         name = "pillar_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 

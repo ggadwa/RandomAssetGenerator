@@ -1,16 +1,14 @@
 
 
 
-- why are decorations on middle leaves with stairs
 - get pipes working again
-
-- panel dials are bad
 
 - model: body needs to be bigger than legs, head smaller than body
 
 - walls on stairs
 - fix upper/lower connections
 
+- mix existing sounds
 - monster sound effect is bad
 - more sound effects
 

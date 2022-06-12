@@ -14,6 +14,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 public class BitmapBase
@@ -2708,6 +2709,26 @@ public class BitmapBase
         if (hasEmissive) {
             writeImageData(emissiveData, false, (path + File.separator + name + "_emissive.png"));
         }
+    }
+
+    //
+    // bitmap loading helper
+    //
+    public static void mapBitmapLoader(HashMap<String, BitmapBase> bitmaps, String name, String[] classNames) {
+        BitmapBase bitmap;
+
+        if (bitmaps.containsKey(name)) {
+            return;
+        }
+
+        try {
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + classNames[AppWindow.random.nextInt(classNames.length)].replace(" ", ""))).getConstructor().newInstance();
+        } catch (Exception e) {
+            bitmap = new BitmapTest();
+        }
+
+        bitmap.generate();
+        bitmaps.put(name, bitmap);
     }
 
 }

@@ -212,6 +212,7 @@ public class BitmapComputer extends BitmapBase
         int x, y, mx, my, xCount, yCount, xMargin, yMargin;
         int margin, dx, dy, dx2, dy2, sz;
         RagColor dialColor, outlineColor;
+        RagPoint pnt;
 
         margin = 5 + AppWindow.random.nextInt(5);
 
@@ -221,11 +222,11 @@ public class BitmapComputer extends BitmapBase
         bot -= margin;
 
         if ((rgt - lft) > (bot - top)) {
-            sz = (bot - top);
+            sz = (bot - top) - (margin * 2);
             xCount = (rgt - lft) / sz;
             yCount = 1;
         } else {
-            sz = (rgt - lft);
+            sz = (rgt - lft) - (margin * 2);
             xCount = 1;
             yCount = (bot - top) / sz;
         }
@@ -237,8 +238,8 @@ public class BitmapComputer extends BitmapBase
             yCount = 1;
         }
 
-        xMargin = (((rgt - lft) - (xCount * (sz + margin))) / 2);
-        yMargin = (((bot - top) - (yCount * (sz + margin))) / 2);
+        xMargin = ((rgt - lft) - ((xCount * sz) + ((xCount - 1) * margin))) / 2;
+        yMargin = ((bot - top) - ((yCount * sz) + ((yCount - 1) * margin))) / 2;
 
         dialColor = getRandomColor();
         outlineColor = adjustColor(dialColor, 0.5f);
@@ -252,29 +253,26 @@ public class BitmapComputer extends BitmapBase
                 dx2 = dx + sz;
 
                 drawOval(dx, dy, dx2, dy2, 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.8f, outlineColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
-                drawOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.8f, dialColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+                drawOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.75f, 1.25f, 0.0f, 0.0f, 0, 0.8f, dialColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+                if (AppWindow.random.nextBoolean()) {
+                    drawRect(dx, ((dy + dy2) / 2), dx2, dy2, outlineColor);
+                    draw3DFrameRect(dx, ((dy + dy2) / 2), dx2, dy2, 2, outlineColor, true);
+                } else {
+                    drawOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.25f, 0.75f, 0.0f, 0.0f, 0, 0.8f, outlineColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+                }
 
                 mx = dx + (sz / 2);
                 my = dy + (sz / 2);
 
-                switch (AppWindow.random.nextInt(4)) {
-                    case 0:
-                        drawLineColor(mx, dy, mx, my, outlineColor);
-                        drawLineNormal(mx, dy, mx, my, NORMAL_LEFT_45);
-                        break;
-                    case 1:
-                        drawLineColor(mx, my, mx, (dy2 - 2), outlineColor);
-                        drawLineNormal(mx, my, mx, (dy2 - 2), NORMAL_RIGHT_45);
-                        break;
-                    case 2:
-                        drawLineColor(dx, my, mx, my, outlineColor);
-                        drawLineNormal(dx, my, mx, my, NORMAL_TOP_45);
-                        break;
-                    default:
-                        drawLineColor(mx, my, (dx2 - 2), my, outlineColor);
-                        drawLineNormal(mx, my, (dx2 - 2), my, NORMAL_BOTTOM_45);
-                        break;
-                }
+                drawOval((mx - margin), (my - margin), (mx + margin), (my + margin), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.8f, outlineColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+
+                pnt = new RagPoint(0, 0, (dy - my));
+                pnt.rotateY(AppWindow.random.nextFloat(180.0f) - 90.0f);
+
+                drawLineColor(mx, my, (mx + (int) pnt.x), (my + (int) pnt.z), outlineColor);
+                drawLineColor((mx + 1), my, ((mx + 1) + (int) pnt.x), (my + (int) pnt.z), outlineColor);
+                drawLineNormal(mx, my, (mx + (int) pnt.x), (my + (int) pnt.z), NORMAL_LEFT_45);
+                drawLineNormal((mx + 1), my, ((mx + 1) + (int) pnt.x), (my + (int) pnt.z), NORMAL_RIGHT_45);
             }
         }
     }

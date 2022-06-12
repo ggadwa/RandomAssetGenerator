@@ -2,8 +2,6 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
-import com.klinksoftware.rag.bitmaps.BitmapMetal;
-import com.klinksoftware.rag.bitmaps.BitmapStorage;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 import java.util.ArrayList;
@@ -39,14 +37,8 @@ public class MapStorage {
         String name;
         RagPoint rotAngle;
         Mesh mesh, mesh2;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("box")) {
-            bitmap = new BitmapStorage();
-            bitmap.generate();
-            bitmaps.put("box", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "box", new String[]{"Storage"});
 
             // box size
 
@@ -97,14 +89,8 @@ public class MapStorage {
         float dx, dz, boxWidth, boxHeight;
         String name;
         RagPoint rotAngle;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("box")) {
-            bitmap = new BitmapStorage();
-            bitmap.generate();
-            bitmaps.put("box", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "box", new String[]{"Storage"});
 
         dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
         dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
@@ -144,19 +130,9 @@ public class MapStorage {
         float dx, dz, bx, bz, origBy, tableXMin, tableXMax, tableZMin, tableZMax, boxSize;
         String boxName, shelfName;
         Mesh shelfMesh, boxMesh, mesh2;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("box")) {
-            bitmap = new BitmapStorage();
-            bitmap.generate();
-            bitmaps.put("box", bitmap);
-        }
-        if (!bitmaps.containsKey("accessory")) {
-            bitmap = new BitmapMetal();
-            bitmap.generate();
-            bitmaps.put("accessory", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "accessory", new String[]{"Metal", "Tile", "Wood"});
+        BitmapBase.mapBitmapLoader(bitmaps, "box", new String[]{"Storage"});
 
         // height and width
         stackCount = 2 + AppWindow.random.nextInt(3);

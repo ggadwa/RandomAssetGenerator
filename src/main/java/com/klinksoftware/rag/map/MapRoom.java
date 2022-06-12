@@ -53,7 +53,7 @@ public class MapRoom
     public MapRoom duplicate(int story) {
         MapRoom room;
 
-        room = new MapRoom(piece);
+        room = new MapRoom(piece.clone());
         room.x = x;
         room.z = z;
 

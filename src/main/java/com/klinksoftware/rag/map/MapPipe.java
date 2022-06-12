@@ -1,7 +1,6 @@
 package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.bitmaps.BitmapBase;
-import com.klinksoftware.rag.bitmaps.BitmapPipe;
 import com.klinksoftware.rag.mesh.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -509,14 +508,7 @@ public class MapPipe {
 */
 
     public void build(MapRoom room, int roomNumber, float by) {
-        BitmapBase bitmap;
-
-        // bitmap
-        if (!bitmaps.containsKey("pipe")) {
-            bitmap = new BitmapPipe();
-            bitmap.generate();
-            bitmaps.put("pipe", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "pipe", new String[]{"Pipe"});
         /*
         int     x,z,lx,rx,tz,bz,skipX,skipZ,
                 pieceCount;

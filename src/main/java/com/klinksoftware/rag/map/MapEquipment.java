@@ -2,11 +2,6 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
-import com.klinksoftware.rag.bitmaps.BitmapComputer;
-import com.klinksoftware.rag.bitmaps.BitmapControlPanel;
-import com.klinksoftware.rag.bitmaps.BitmapMetal;
-import com.klinksoftware.rag.bitmaps.BitmapMonitor;
-import com.klinksoftware.rag.bitmaps.BitmapPipe;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 import java.util.ArrayList;
@@ -46,14 +41,8 @@ public class MapEquipment {
     private void addPedestal(MapRoom room, int roomNumber, int x, float by, int z, float width) {
         float dx, dz, widOffset;
         String name;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("accessory")) {
-            bitmap = new BitmapMetal();
-            bitmap.generate();
-            bitmaps.put("accessory", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "accessory", new String[]{"Metal", "Tile", "Wood"});
 
         // pedestal a little bigger than equipment
         width += (MapBuilder.SEGMENT_SIZE * 0.05f);
@@ -77,14 +66,8 @@ public class MapEquipment {
     private void addBank(MapRoom room, int roomNumber, int x, float by, int z) {
         float dx, dy, dz, widOffset;
         String name;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("computer")) {
-            bitmap = new BitmapComputer();
-            bitmap.generate();
-            bitmaps.put("computer", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "computer", new String[]{"Computer"});
 
         widOffset = (MapBuilder.SEGMENT_SIZE - computerWidth) * 0.5f;
 
@@ -108,19 +91,9 @@ public class MapEquipment {
         String name;
         RagPoint rotAngle;
         Mesh mesh;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("accessory")) {
-            bitmap = new BitmapMetal();
-            bitmap.generate();
-            bitmaps.put("accessory", bitmap);
-        }
-        if (!bitmaps.containsKey("monitor")) {
-            bitmap = new BitmapMonitor();
-            bitmap.generate();
-            bitmaps.put("monitor", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "accessory", new String[]{"Metal", "Tile", "Wood"});
+        BitmapBase.mapBitmapLoader(bitmaps, "monitor", new String[]{"Monitor"});
 
             // the desk and stand
 
@@ -169,16 +142,8 @@ public class MapEquipment {
         BitmapBase bitmap;
 
         // bitmap
-        if (!bitmaps.containsKey("pipe")) {
-            bitmap = new BitmapPipe();
-            bitmap.generate();
-            bitmaps.put("pipe", bitmap);
-        }
-        if (!bitmaps.containsKey("panel")) {
-            bitmap = new BitmapControlPanel();
-            bitmap.generate();
-            bitmaps.put("panel", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "pipe", new String[]{"Pipe"});
+        BitmapBase.mapBitmapLoader(bitmaps, "panel", new String[]{"ControlPanel"});
 
         dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
         dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);

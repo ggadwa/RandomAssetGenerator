@@ -2,9 +2,6 @@ package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
-import com.klinksoftware.rag.bitmaps.BitmapGlass;
-import com.klinksoftware.rag.bitmaps.BitmapLiquid;
-import com.klinksoftware.rag.bitmaps.BitmapMetal;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.utility.*;
 import java.util.ArrayList;
@@ -49,14 +46,8 @@ public class MapLab {
         float dx, dz, tableXMin, tableXMax, tableZMin, tableZMax;
         String tableName;
         Mesh mesh;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("accessory")) {
-            bitmap = new BitmapMetal();
-            bitmap.generate();
-            bitmaps.put("accessory", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "accessory", new String[]{"Metal", "Tile", "Wood"});
 
         // some preset bounds
         dx = (room.x + x) * MapBuilder.SEGMENT_SIZE;
@@ -90,24 +81,10 @@ public class MapLab {
         String name;
         RagPoint centerPnt;
         Mesh mesh, mesh2;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("glass")) {
-            bitmap = new BitmapGlass();
-            bitmap.generate();
-            bitmaps.put("glass", bitmap);
-        }
-        if (!bitmaps.containsKey("liquid")) {
-            bitmap = new BitmapLiquid();
-            bitmap.generate();
-            bitmaps.put("liquid", bitmap);
-        }
-        if (!bitmaps.containsKey("accessory")) {
-            bitmap = new BitmapMetal();
-            bitmap.generate();
-            bitmaps.put("accessory", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "accessory", new String[]{"Metal", "Tile", "Wood"});
+        BitmapBase.mapBitmapLoader(bitmaps, "glass", new String[]{"Glass"});
+        BitmapBase.mapBitmapLoader(bitmaps, "liquid", new String[]{"Liquid"});
 
         name = "tube_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
@@ -145,14 +122,8 @@ public class MapLab {
         String name;
         RagPoint centerPnt;
         Mesh mesh;
-        BitmapBase bitmap;
 
-        // bitmap
-        if (!bitmaps.containsKey("barrel")) {
-            bitmap = new BitmapMetal();
-            bitmap.generate();
-            bitmaps.put("barrel", bitmap);
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "barrel", new String[]{"Metal"});
 
         name = "barrel_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 

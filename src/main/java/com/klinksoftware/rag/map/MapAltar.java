@@ -102,22 +102,22 @@ public class MapAltar {
 
             switch (AppWindow.random.nextInt(3)) {
                 case 0:
-                    mesh = addAltar(room, roomNumber, 2, (room.piece.sizeX - 2), by, 2, (room.piece.sizeZ - 2));
+                    mesh = addAltar(room, roomNumber, 1, (room.piece.sizeX - 1), by, 1, (room.piece.sizeZ - 1));
                     break;
                 case 1:
-                    mesh = addAltar(room, roomNumber, 2, mx, by, 2, (room.piece.sizeZ - 2));
-                    mesh.combine(addAltar(room, roomNumber, mx, (room.piece.sizeX - 2), by, 2, (room.piece.sizeZ - 2)));
+                    mesh = addAltar(room, roomNumber, 1, mx, by, 1, (room.piece.sizeZ - 1));
+                    mesh.combine(addAltar(room, roomNumber, mx, (room.piece.sizeX - 1), by, 1, (room.piece.sizeZ - 1)));
                     break;
                 default:
-                    mesh = addAltar(room, roomNumber, 2, mx, by, 2, mz);
-                    mesh.combine(addAltar(room, roomNumber, 2, mx, by, mz, (room.piece.sizeZ - 2)));
-                    mesh.combine(addAltar(room, roomNumber, mx, (room.piece.sizeX - 2), by, 2, mz));
-                    mesh.combine(addAltar(room, roomNumber, mx, (room.piece.sizeX - 2), by, mz, (room.piece.sizeZ - 2)));
+                    mesh = addAltar(room, roomNumber, 1, mx, by, 1, mz);
+                    mesh.combine(addAltar(room, roomNumber, 1, mx, by, mz, (room.piece.sizeZ - 1)));
+                    mesh.combine(addAltar(room, roomNumber, mx, (room.piece.sizeX - 1), by, 1, mz));
+                    mesh.combine(addAltar(room, roomNumber, mx, (room.piece.sizeX - 1), by, mz, (room.piece.sizeZ - 1)));
                     break;
             }
         }
         else {
-            mesh = addAltar(room, roomNumber, 2, (room.piece.sizeX - 2), by, 2, (room.piece.sizeZ - 2));
+            mesh = addAltar(room, roomNumber, 1, (room.piece.sizeX - 1), by, 1, (room.piece.sizeZ - 1));
         }
 
         meshList.add(mesh);

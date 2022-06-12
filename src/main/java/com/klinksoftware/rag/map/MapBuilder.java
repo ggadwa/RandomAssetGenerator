@@ -480,16 +480,12 @@ public class MapBuilder
             startRoom.hasUpperExtension = true;
             startFloorRoom = startRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION);
             startFloorRoom.extendedFromRoom = startRoom;
-            startFloorRoom.piece.decorateOK = false;
-            startFloorRoom.piece.structureOK = false;
             rooms.add(startFloorRoom);
 
             if (endRoom != null) {
                 endRoom.hasUpperExtension = true;
                 endFloorRoom = endRoom.duplicate(MapRoom.ROOM_STORY_UPPER_EXTENSION);
                 endFloorRoom.extendedFromRoom = endRoom;
-                startFloorRoom.piece.decorateOK = false;
-                startFloorRoom.piece.structureOK = false;
                 rooms.add(endFloorRoom);
             }
         } else {
@@ -497,7 +493,6 @@ public class MapBuilder
             startFloorRoom = startRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION);
             startFloorRoom.extendedFromRoom = startRoom;
             startFloorRoom.piece.decorateOK = true;
-            startFloorRoom.piece.structureOK = false;
             rooms.add(startFloorRoom);
 
             if (endRoom != null) {
@@ -505,7 +500,6 @@ public class MapBuilder
                 endFloorRoom = endRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION);
                 endFloorRoom.extendedFromRoom = endRoom;
                 endFloorRoom.piece.decorateOK = true;
-                startFloorRoom.piece.structureOK = false;
                 rooms.add(endFloorRoom);
             }
         }
@@ -572,49 +566,19 @@ public class MapBuilder
     // required bitmaps
     //
     public void buildRequiredBitmaps() {
-        String[] wallBitmaps = {"Brick", "Geometric", "Metal", "Mosaic", "Organic", "Plaster", "Stone", "Tile", "Wood"};
+        String[] wallBitmaps = {"Brick", "Geometric", "Metal", "Mosaic", "Organic", "Plaster", "Stone", "Temple", "Tile", "Wood"};
         String[] floorBitmaps = {"Brick", "Concrete", "Dirt", "Grass", "Metal", "Mosaic", "Tile", "Wood"};
         String[] ceilingBitmaps = {"Brick", "Concrete", "Metal", "Mosaic", "Plaster", "Tile", "Wood"};
         String[] platformBitmaps = {"Brick", "Concrete", "Metal", "Wood"};
 
-        BitmapBase bitmap;
-
-        try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("wall_main", bitmap);
-
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("wall_upper", bitmap);
-
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + wallBitmaps[AppWindow.random.nextInt(wallBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("wall_lower", bitmap);
-
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + floorBitmaps[AppWindow.random.nextInt(floorBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("floor", bitmap);
-
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + floorBitmaps[AppWindow.random.nextInt(floorBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("floor_lower", bitmap);
-
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + ceilingBitmaps[AppWindow.random.nextInt(ceilingBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("ceiling", bitmap);
-
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + ceilingBitmaps[AppWindow.random.nextInt(ceilingBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("ceiling_upper", bitmap);
-
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + platformBitmaps[AppWindow.random.nextInt(platformBitmaps.length)].replace(" ", ""))).getConstructor().newInstance();
-            bitmap.generate();
-            bitmaps.put("platform", bitmap);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
+        BitmapBase.mapBitmapLoader(bitmaps, "wall_upper", wallBitmaps);
+        BitmapBase.mapBitmapLoader(bitmaps, "wall_lower", wallBitmaps);
+        BitmapBase.mapBitmapLoader(bitmaps, "floor", floorBitmaps);
+        BitmapBase.mapBitmapLoader(bitmaps, "floor_lower", floorBitmaps);
+        BitmapBase.mapBitmapLoader(bitmaps, "ceiling", ceilingBitmaps);
+        BitmapBase.mapBitmapLoader(bitmaps, "ceiling_upper", ceilingBitmaps);
+        BitmapBase.mapBitmapLoader(bitmaps, "platform", platformBitmaps);
     }
 
         //

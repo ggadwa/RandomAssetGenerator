@@ -4,9 +4,9 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapPillar extends BitmapBase {
+public class BitmapTemple extends BitmapBase {
 
-    public BitmapPillar() {
+    public BitmapTemple() {
         super();
 
         hasNormal = true;
@@ -15,7 +15,7 @@ public class BitmapPillar extends BitmapBase {
         hasAlpha = false;
     }
 
-    private void generatePillarBlock(int lft, int top, int rgt, int bot, int margin, int edgeSize, RagColor color, RagColor altColor) {
+    private void generateTempleBlock(int lft, int top, int rgt, int bot, int margin, int edgeSize, RagColor color, RagColor altColor) {
         int mx, my;
         int halfMargin, noiseSize;
         boolean faceIn;
@@ -61,27 +61,27 @@ public class BitmapPillar extends BitmapBase {
             // one box
             case 0:
                 draw3DFrameRect(lft, top, rgt, bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, top, rgt, bot, margin, edgeSize, drawColor, altColor);
+                generateTempleBlock(lft, top, rgt, bot, margin, edgeSize, drawColor, altColor);
                 break;
 
             // horizontal boxes
             case 1:
                 mx = (lft + rgt) / 2;
                 draw3DFrameRect(lft, top, (mx - halfMargin), bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, top, (mx - halfMargin), bot, margin, edgeSize, drawColor, altColor);
+                generateTempleBlock(lft, top, (mx - halfMargin), bot, margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect((mx + halfMargin), top, rgt, bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock((mx + halfMargin), top, rgt, bot, margin, edgeSize, drawColor, altColor);
+                generateTempleBlock((mx + halfMargin), top, rgt, bot, margin, edgeSize, drawColor, altColor);
                 break;
 
             // vertical boxes
             case 2:
                 my = (top + bot) / 2;
                 draw3DFrameRect(lft, top, rgt, (my - halfMargin), edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, top, rgt, (my - halfMargin), margin, edgeSize, drawColor, altColor);
+                generateTempleBlock(lft, top, rgt, (my - halfMargin), margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect(lft, (my + halfMargin), rgt, bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, (my + halfMargin), rgt, bot, margin, edgeSize, drawColor, altColor);
+                generateTempleBlock(lft, (my + halfMargin), rgt, bot, margin, edgeSize, drawColor, altColor);
                 break;
 
             // 4 boxes
@@ -90,16 +90,16 @@ public class BitmapPillar extends BitmapBase {
                 my = (top + bot) / 2;
 
                 draw3DFrameRect(lft, top, (mx - halfMargin), (my - halfMargin), edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, top, (mx - halfMargin), (my - halfMargin), margin, edgeSize, drawColor, altColor);
+                generateTempleBlock(lft, top, (mx - halfMargin), (my - halfMargin), margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect((mx + halfMargin), top, rgt, (my - halfMargin), edgeSize, lineColor, faceIn);
-                generatePillarBlock((mx + halfMargin), top, rgt, (my - halfMargin), margin, edgeSize, drawColor, altColor);
+                generateTempleBlock((mx + halfMargin), top, rgt, (my - halfMargin), margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect(lft, (my + halfMargin), (mx - halfMargin), bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock(lft, (my + halfMargin), (mx - halfMargin), bot, margin, edgeSize, drawColor, altColor);
+                generateTempleBlock(lft, (my + halfMargin), (mx - halfMargin), bot, margin, edgeSize, drawColor, altColor);
 
                 draw3DFrameRect((mx + halfMargin), (my + halfMargin), rgt, bot, edgeSize, lineColor, faceIn);
-                generatePillarBlock((mx + halfMargin), (my + halfMargin), rgt, bot, margin, edgeSize, drawColor, altColor);
+                generateTempleBlock((mx + halfMargin), (my + halfMargin), rgt, bot, margin, edgeSize, drawColor, altColor);
                 break;
 
         }
@@ -117,7 +117,7 @@ public class BitmapPillar extends BitmapBase {
         margin = 15 + AppWindow.random.nextInt(15);
         edgeSize = 4 + AppWindow.random.nextInt(4);
 
-        generatePillarBlock(-margin, -margin, (textureSize + margin), (textureSize + margin), margin, edgeSize, color, altColor);
+        generateTempleBlock(-margin, -margin, (textureSize + margin), (textureSize + margin), margin, edgeSize, color, altColor);
 
         // finish with the metallic-roughness
         createMetallicRoughnessMap(0.35f, 0.3f);
