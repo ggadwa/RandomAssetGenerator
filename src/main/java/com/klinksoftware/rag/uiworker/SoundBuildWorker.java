@@ -38,6 +38,11 @@ public class SoundBuildWorker extends SwingWorker<Integer, Void> {
 
         generatedSound = sound;
 
+        AppWindow.soundView.setSound(sound);
+
+        appWindow.walkLabel.setGeneratedTitle("Sound", seed);
+        appWindow.switchView("soundView");
+
         return (0);
     }
 

@@ -52,6 +52,9 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         AppWindow.walkView.setCameraCenterRotate(4.0f, -25.0f, 225.0f, 0.0f, -2.0f);
         AppWindow.walkView.setIncommingMeshList(meshList, skeleton, bitmaps);
 
+        appWindow.walkLabel.setGeneratedTitle("Bitmap", seed);
+        appWindow.switchView("walkView");
+
         return (0);
     }
 

@@ -1,5 +1,6 @@
 package com.klinksoftware.rag;
 
+import com.klinksoftware.rag.sounddisplay.SoundView;
 import com.klinksoftware.rag.walkview.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -16,21 +17,20 @@ public class AppWindow implements WindowListener {
     public static final int HEADER_HEIGHT = 22;
     public static final int SETTING_WIDTH = 250;
 
-    private static final int TOOL_BUTTON_MAP = 0;
-    private static final int TOOL_BUTTON_MODEL = 1;
-    private static final int TOOL_BUTTON_BITMAP = 2;
-
     public static final int UI_TYPE_MAP = 0;
     public static final int UI_TYPE_MODEL = 1;
     public static final int UI_TYPE_BITMAPS = 2;
 
     public JFrame frame;
-    private JButton buildMapButton, buildModelButton, buildBitmapButton;
-    private GradientLabel walkLabel, settingsLabel;
+    public GradientLabel walkLabel;
+    private GradientLabel settingsLabel;
     private JTabbedPane settingsTab;
+    private JPanel displayPanel;
+    private CardLayout displayPanelCardLayout;
 
     public static Random random;
     public static WalkView walkView;
+    public static SoundView soundView;
     public static SettingsMap settingsMap;
     public static SettingsModel settingsModel;
     public static SettingsTexture settingsTexture;
@@ -70,7 +70,7 @@ public class AppWindow implements WindowListener {
     }
 
     //
-    // settings utility
+    // utility
     //
     public void enableSettings(boolean enable) {
         settingsTab.setEnabled(enable);
@@ -78,6 +78,10 @@ public class AppWindow implements WindowListener {
         settingsModel.enableAll(enable);
         settingsTexture.enableAll(enable);
         settingsSound.enableAll(enable);
+    }
+
+    public void switchView(String name) {
+        displayPanelCardLayout.show(displayPanel, name);
     }
 
     //
@@ -118,17 +122,31 @@ public class AppWindow implements WindowListener {
 
         frame.setLayout(new GridBagLayout());
 
-        // walk view
-        walkLabel = new GradientLabel("Walk Through", new Color(196, 196, 255), new Color(128, 128, 255), false);
+        // walk view label
+        walkLabel = new GradientLabel("Asset", new Color(196, 196, 255), new Color(128, 128, 255), false);
         frame.add(walkLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
+        // card layout for display
+        displayPanelCardLayout = new CardLayout();
+
+        displayPanel = new JPanel();
+        displayPanel.setLayout(displayPanelCardLayout);
+        frame.add(displayPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+
+        // walk view
         glData = new GLData();
         glData.samples = 4;
         glData.swapInterval = 0;
         walkView = new WalkView(glData);
         walkView.setFocusable(true);
 
-        frame.add(walkView, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+        displayPanel.add("walkView", walkView);
+
+        // sound display
+        soundView = new SoundView();
+        soundView.setFocusable(true);
+
+        displayPanel.add("soundView", soundView);
 
         // settings tabs
         settingsLabel = new GradientLabel("Settings", new Color(196, 196, 255), new Color(128, 128, 255), true);
@@ -210,7 +228,31 @@ public class AppWindow implements WindowListener {
                 public void keyReleased(KeyEvent e) {
                     walkView.keyRelease(e.getKeyCode());
                 }
-            });
+        });
+
+        soundView.addMouseListener(
+                new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                soundView.mouseClicked(e.getButton(), e.getX(), e.getY());
+            }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
 
         // show the window
         frame.setLocationRelativeTo(null);

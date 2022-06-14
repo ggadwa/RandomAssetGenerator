@@ -3,19 +3,17 @@ package com.klinksoftware.rag;
 import com.klinksoftware.rag.sound.SoundInterface;
 import com.klinksoftware.rag.uiworker.SoundBuildWorker;
 import com.klinksoftware.rag.uiworker.SoundExportWorker;
-import com.klinksoftware.rag.uiworker.SoundPlayAgainWorker;
 import javax.swing.JButton;
 import javax.swing.JList;
 
 public class SettingsSound extends SettingsBase {
 
     private static final int BUTTON_GENERATE_SOUND = 0;
-    private static final int BUTTON_PLAY_AGAIN = 1;
-    private static final int BUTTON_EXPORT_SOUND = 2;
+    private static final int BUTTON_EXPORT_SOUND = 1;
 
     private static final String[] SOUND_ITEMS = {"Alien", "Bang", "Explosion", "Monster"};
 
-    private JButton generateSoundButton, playAgainButton, exportSoundButton;
+    private JButton generateSoundButton, exportSoundButton;
     private JList soundTypeList;
 
     public SettingsSound(AppWindow appWindow) {
@@ -30,9 +28,6 @@ public class SettingsSound extends SettingsBase {
         generateSoundButton = addButton(y, "Generate Sound", BUTTON_GENERATE_SOUND);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        playAgainButton = addButton(y, "Play Again", BUTTON_PLAY_AGAIN);
-        y += (ROW_HEIGHT + ROW_GAP);
-
         soundTypeList = addList(y, "Sound Type", getAnnotationClasses("com.klinksoftware.rag.sound", "sound", SoundInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
@@ -44,9 +39,6 @@ public class SettingsSound extends SettingsBase {
         switch (id) {
             case BUTTON_GENERATE_SOUND:
                 (new SoundBuildWorker(appWindow, (String) soundTypeList.getModel().getElementAt(soundTypeList.getSelectedIndex()))).execute();
-                return;
-            case BUTTON_PLAY_AGAIN:
-                (new SoundPlayAgainWorker(appWindow)).execute();
                 return;
             case BUTTON_EXPORT_SOUND:
                 (new SoundExportWorker(appWindow)).execute();

@@ -93,6 +93,33 @@ public class SoundBase {
         }
     }
 
+    protected void createSquareWave(float[] data, int[] chunkLens, float amplitude) {
+        int n, idx, currentCount;
+        int chunkLen, frameCount;
+
+        chunkLen = chunkLens.length;
+        frameCount = getFrameCount();
+
+        idx = 0;
+        currentCount = chunkLens[idx];
+
+        for (n = 0; n != frameCount; n++) {
+
+            // the wave
+            data[n] = (((idx & 0x1) == 0x0) ? (-1.0f) : 1.0f) * amplitude;
+
+            // next chunk
+            currentCount--;
+            if (currentCount <= 0) {
+                idx++;
+                if (idx >= chunkLen) {
+                    idx = 0;
+                }
+                currentCount = chunkLens[idx];
+            }
+        }
+    }
+
     protected ArrayList<WaveChunk> createSimpleWaveChunks(float hzFrequency, float amplitude) {
         ArrayList<WaveChunk> chunkList;
 
@@ -394,9 +421,10 @@ public class SoundBase {
 
         // run the internal generator
         generateInternal();
+    }
 
-        // play the sound
-        play();
+    public float[] getWaveData() {
+        return (waveData);
     }
 
     public void writeToFile(String path) {

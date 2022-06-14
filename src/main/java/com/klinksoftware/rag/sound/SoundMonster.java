@@ -1,14 +1,13 @@
 package com.klinksoftware.rag.sound;
 
-import com.klinksoftware.rag.AppWindow;
-
 @SoundInterface
 public class SoundMonster extends SoundBase {
 
     public SoundMonster() {
         super();
 
-        waveMillis = 1500 + AppWindow.random.nextInt(1500);
+        waveMillis = 1000;
+        //waveMillis = 1500 + AppWindow.random.nextInt(1500);
     }
 
     @Override
@@ -20,6 +19,12 @@ public class SoundMonster extends SoundBase {
 
         frameCount = getFrameCount();
         mixData = new float[frameCount];
+
+        createSquareWave(waveData, new int[]{200, 50, 100, 100}, 0.5f);
+        //createWave(waveData, WAVE_TYPE_SQUARE, createSimpleWaveChunks(200, 0.8f));
+        //createWave(mixData, WAVE_TYPE_SINE, createSimpleWaveChunks(400, 0.5f));
+        //mixWave(waveData, mixData, 0.5f, 0.0f, 1.0f);
+/*
 
         frequencyMin = 50.0f + AppWindow.random.nextFloat(300.0f);
         frequencyMax = frequencyMin + AppWindow.random.nextFloat(300.0f);
@@ -46,6 +51,7 @@ public class SoundMonster extends SoundBase {
 
         normalize(waveData);
         fade(waveData, 0.1f, 0.2f);
+         */
     }
 
 }

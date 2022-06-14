@@ -18,5 +18,3 @@ Sounds are wavs.
 
 Development: Brian Barnes
 Libraries: Apache Commons, LWJGL, Jackson, Reflections, JPackage
-
-
