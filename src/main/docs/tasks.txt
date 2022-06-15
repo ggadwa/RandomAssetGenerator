@@ -1,6 +1,7 @@
 
 
 
+
 - get pipes working again
 
 - model: body needs to be bigger than legs, head smaller than body
@@ -8,16 +9,15 @@
 - walls on stairs
 - fix upper/lower connections
 
-- mix existing sounds
-- monster sound effect is bad
-- more sound effects
-
 - need to export tangents
 
 - metals can have dirtstreak (like brick)
 - dirt needs to not collide stones
 - more distinct control panels pieces (keyboard)
 
+sound:
+ - random silences in monster
+ - sin as it's own routine
 
 - try jpackage
 c:/Java/jdk-17.0.2/bin/jpackage --name RandomAssetGenerator --input c:\Code\RandomAssetGenerator\target --main-jar RandomAssetGenerator-1.0.jar --main-class com.klinksoftware.rag.RandomAssetGenerator --win-dir-chooser --type EXE

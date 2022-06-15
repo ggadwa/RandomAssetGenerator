@@ -63,21 +63,21 @@ public class SoundAlien extends SoundBase {
                 createWave(waveData, WAVE_TYPE_SINE, chunkList);
             } else {
                 createWave(mixData, WAVE_TYPE_SINE, chunkList);
-                mixWave(waveData, mixData, (0.4f + AppWindow.random.nextFloat(0.2f)), 0.0f, 1.0f);
+                mixWave(waveData, mixData, 0, frameCount, (0.4f + AppWindow.random.nextFloat(0.2f)));
             }
         }
 
-        normalize(waveData);
+        normalize(waveData, 0, frameCount, 1.0f);
 
         // normalize it, randomly clip, low pass, and delay it
-        clip(waveData, 0.0f, 1.0f, (-1.0f + (AppWindow.random.nextFloat(0.2f))), (1.0f - (AppWindow.random.nextFloat(0.2f))));
-        lowPassFilter(waveData, 0.0f, 1.0f, AppWindow.random.nextFloat());
+        clip(waveData, 0, frameCount, (-1.0f + (AppWindow.random.nextFloat(0.2f))), (1.0f - (AppWindow.random.nextFloat(0.2f))));
+        lowPassFilter(waveData, 0, frameCount, AppWindow.random.nextFloat());
 
-        delay(waveData, 0.0f, 1.0f, (int) (frameCount * 0.1f), (AppWindow.random.nextFloat(0.5f)));
+        delay(waveData, 0, frameCount, (int) (frameCount * 0.1f), (AppWindow.random.nextFloat(0.5f)));
 
         // finally normalize and fade
-        normalize(waveData);
-        fade(waveData, (0.1f + AppWindow.random.nextFloat(0.1f)), (0.1f + AppWindow.random.nextFloat(0.2f)));
+        normalize(waveData, 0, frameCount, 0.5f);
+        fade(waveData, (1000 + AppWindow.random.nextInt(2000)), (frameCount - (2000 + AppWindow.random.nextInt(3000))));
     }
 
 }

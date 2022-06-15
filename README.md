@@ -17,4 +17,5 @@ Sounds are wavs.
 ## Credits
 
 Development: Brian Barnes
+
 Libraries: Apache Commons, LWJGL, Jackson, Reflections, JPackage
