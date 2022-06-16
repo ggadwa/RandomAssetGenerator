@@ -33,7 +33,7 @@ public class MapStorage {
 
     private void addBoxes(MapRoom room, int roomNumber, int x, float by, int z) {
         int stackLevel, stackCount;
-        float dx, dy, dz, boxSize, boxHalfSize;
+        float dx, dy, dz, boxSize, boxSizeReduction, boxHalfSize;
         String name;
         RagPoint rotAngle;
         Mesh mesh, mesh2;
@@ -47,7 +47,7 @@ public class MapStorage {
         dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
 
         boxSize = (MapBuilder.SEGMENT_SIZE * 0.2f) + (AppWindow.random.nextFloat() * (MapBuilder.SEGMENT_SIZE * 0.2f));
-        boxHalfSize=boxSize*0.5f;
+        boxSizeReduction = 0.9f + AppWindow.random.nextFloat(0.1f);
 
         rotAngle=new RagPoint(0.0f,0.0f,0.0f);
 
@@ -61,6 +61,7 @@ public class MapStorage {
         name = "storage_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
         for (stackLevel=0;stackLevel!=stackCount;stackLevel++) {
+            boxHalfSize = boxSize * 0.5f;
             rotAngle.setFromValues(0.0f,(-10.0f+(AppWindow.random.nextFloat()*20.0f)),0.0f);
             mesh2 = MeshMapUtility.createCubeRotated(room, name, "box", (dx - boxHalfSize), (dx + boxHalfSize), (by + dy), ((by + dy) + boxSize), (dz - boxHalfSize), (dz + boxHalfSize), rotAngle, true, true, true, true, true, (stackLevel != 0), false, MeshMapUtility.UV_WHOLE);
 
@@ -77,6 +78,8 @@ public class MapStorage {
             if ((dy + boxSize) > MapBuilder.SEGMENT_SIZE) {
                 break;
             }
+
+            boxSize *= boxSizeReduction;
         }
 
         meshList.add(mesh);

@@ -12,8 +12,8 @@ public class SettingsMap extends SettingsBase {
     private static final int BUTTON_EXPORT_MAP = 1;
 
     private JButton generateMapButton, exportMapButton;
-    private JSlider sizeSlider, compactSlider, decorationSlider;
-    private JCheckBox complexCheckBox, upperFloorCheckBox, lowerFloorCheckBox, structureCheckBox;
+    private JSlider mainFloorSizeSlider, upperFloorSizeSlider, lowerFloorSizeSlider, compactSlider, structureSlider, decorationSlider;
+    private JCheckBox complexCheckBox;
 
     public SettingsMap(AppWindow appWindow) {
         super(appWindow);
@@ -27,7 +27,13 @@ public class SettingsMap extends SettingsBase {
         generateMapButton = addButton(y, "Generate Map", BUTTON_GENERATE_MAP);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        sizeSlider = addSlider(y, "Size", 0.6f);
+        mainFloorSizeSlider = addSlider(y, "Main Floor Size", 0.6f);
+        y += (ROW_HEIGHT + ROW_GAP);
+
+        upperFloorSizeSlider = addSlider(y, "Upper Floor Size", 0.2f);
+        y += (ROW_HEIGHT + ROW_GAP);
+
+        lowerFloorSizeSlider = addSlider(y, "Lower Floor Size", 0.2f);
         y += (ROW_HEIGHT + ROW_GAP);
 
         compactSlider = addSlider(y, "Compact", 0.6f);
@@ -36,16 +42,10 @@ public class SettingsMap extends SettingsBase {
         complexCheckBox = addCheckBox(y, "Complex", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        upperFloorCheckBox = addCheckBox(y, "Upper Floor", true);
+        structureSlider = addSlider(y, "Structures", 0.5f);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        lowerFloorCheckBox = addCheckBox(y, "Lower Floor", true);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        structureCheckBox = addCheckBox(y, "Structure", true);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        decorationSlider = addSlider(y, "Decorations", 0.3f);
+        decorationSlider = addSlider(y, "Decorations", 0.2f);
         y += (ROW_HEIGHT + ROW_GAP);
 
         exportMapButton = addButton(y, "Export Map", BUTTON_EXPORT_MAP);
@@ -57,12 +57,12 @@ public class SettingsMap extends SettingsBase {
             case BUTTON_GENERATE_MAP:
                 (new MapBuildWorker(
                         appWindow,
-                        ((float) sizeSlider.getValue() / 100.0f),
+                        ((float) mainFloorSizeSlider.getValue() / 100.0f),
+                        ((float) upperFloorSizeSlider.getValue() / 100.0f),
+                        ((float) lowerFloorSizeSlider.getValue() / 100.0f),
                         ((float) compactSlider.getValue() / 100.0f),
                         complexCheckBox.isSelected(),
-                        upperFloorCheckBox.isSelected(),
-                        lowerFloorCheckBox.isSelected(),
-                        structureCheckBox.isSelected(),
+                        ((float) structureSlider.getValue() / 100.0f),
                         ((float) decorationSlider.getValue() / 100.0f)
                 )).execute();
                 return;

@@ -154,7 +154,7 @@ public class MapBuilder
         return (true);
     }
 
-    private void buildStructure(ArrayList<MapRoom> rooms, HashMap<String, BitmapBase> bitmaps, MeshList meshList) {
+    private void buildStructure(ArrayList<MapRoom> rooms, HashMap<String, BitmapBase> bitmaps, MeshList meshList, float structures) {
         int n, x, z, mx, mz, roomCount;
         float by;
         boolean minX, midX, maxX, minZ, midZ, maxZ;
@@ -168,7 +168,7 @@ public class MapBuilder
             if (!room.piece.structureOK) {
                 continue;
             }
-            if (AppWindow.random.nextBoolean()) {
+            if (AppWindow.random.nextFloat() > structures) {
                 continue;
             }
 
@@ -177,13 +177,13 @@ public class MapBuilder
             // positions
             minX = AppWindow.random.nextBoolean();
             maxX = AppWindow.random.nextBoolean();
-            midX = (!minX) && (!maxX) && AppWindow.random.nextBoolean();
+            midX = (!(minX && maxX)) && AppWindow.random.nextBoolean();
 
             mx = room.piece.sizeX / 2;
 
             minZ = AppWindow.random.nextBoolean();
             maxZ = AppWindow.random.nextBoolean();
-            midZ = (!minZ) && (!maxZ) && AppWindow.random.nextBoolean();
+            midZ = (!(minZ && maxZ)) && AppWindow.random.nextBoolean();
 
             mz = room.piece.sizeZ / 2;
 
@@ -194,7 +194,7 @@ public class MapBuilder
                         continue;
                     }
 
-                    if ((minX && (x == 0)) || (maxX && (x == (room.piece.sizeX - 1))) || (midX && (x == mx)) || (minZ && (z == 0)) || (maxZ && (z == (room.piece.sizeZ - 1))) || (midZ && (z == mz))) {
+                    if ((minX && (x == 0) && ((z & 0x1) == 0)) || (maxX && (x == (room.piece.sizeX - 1)) && ((z & 0x1) == 0)) || (midX && (x == mx) && ((x & 0x1) == 0)) || (minZ && (z == 0) && ((x & 0x1) == 0)) || (maxZ && (z == (room.piece.sizeZ - 1)) && ((x & 0x1) == 0)) || (midZ && (z == mz) && ((z & 0x1) == 0))) {
                         if (mapPillar == null) {
                             mapPillar = new MapPillar(meshList, bitmaps);
                         }
@@ -228,10 +228,13 @@ public class MapBuilder
             if (!room.piece.decorateOK) {
                 continue;
             }
+            if (AppWindow.random.nextFloat() > decorations) {
+                continue;
+            }
 
             by = getStructureDecorationBottomY(room);
 
-            switch (AppWindow.random.nextInt(5)) {
+            switch (AppWindow.random.nextInt(4)) {
                 case 0:
                     if (mapStorage == null) {
                         mapStorage = new MapStorage(this, rooms, meshList, bitmaps);
@@ -256,28 +259,120 @@ public class MapBuilder
                     }
                     mapAltar.build(room, n, by);
                     break;
+                /*
                 case 4:
                     if (mapPipe == null) {
                         mapPipe = new MapPipe(this, rooms, meshList, bitmaps);
                     }
                     mapPipe.build(room, n, by);
                     break;
+                 */
             }
         }
     }
 
         //
-        // build main floor
-        //
+        // build floors
+    //
+    private MapRoom createRoomAndGravityIn(ArrayList<MapRoom> rooms, MapRoom lastRoom, int story, float mapCompactFactor, boolean complex) {
+        int failCount, placeCount, moveCount;
+        int touchIdx;
+        float xAdd, zAdd, origX, origZ;
+        MapRoom room;
+
+        // other rooms start outside around the first room
+        // room and gravity brings them in until they connect
+        room = new MapRoom(mapPieceList.getRandomPiece(mapCompactFactor, complex));
+        room.story = story;
+
+        failCount = 25;
+
+        while (failCount > 0) {
+            placeCount = 10;
+
+            while (placeCount > 0) {
+                room.x = AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE * 2) - ROOM_RANDOM_LOCATION_DISTANCE;
+                room.z = AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE * 2) - ROOM_RANDOM_LOCATION_DISTANCE;
+                if (!room.collides(rooms)) {
+                    break;
+                }
+
+                placeCount--;
+            }
+
+            if (placeCount == 0) {        // could not place this anywhere, so fail this room
+                failCount--;
+                continue;
+            }
+
+            // migrate it towards the last room
+            xAdd = lastRoom.x - Math.signum(room.x);
+            zAdd = lastRoom.z - Math.signum(room.z);
+
+            moveCount = ROOM_RANDOM_LOCATION_DISTANCE;
+
+            while (moveCount > 0) {
+                origX = room.x;
+                origZ = room.z;
+
+                // we move each chunk independently, if we can't
+                // move either x or z, then fail this room
+                // if we can move, check for a touch than a shared
+                // wall, if we have one, then the room is good
+                room.x += xAdd;
+                if (room.collides(rooms)) {
+                    room.x -= xAdd;
+                } else {
+                    touchIdx = room.touches(rooms);
+                    if (touchIdx != -1) {
+                        if (room.hasSharedWalls(rooms.get(touchIdx))) {
+                            rooms.add(room);
+                            return (room);
+                        }
+                    }
+                }
+
+                room.z += zAdd;
+                if (room.collides(rooms)) {
+                    room.z -= zAdd;
+                } else {
+                    touchIdx = room.touches(rooms);
+                    if (touchIdx != -1) {
+                        if (room.hasSharedWalls(rooms.get(touchIdx))) {
+                            rooms.add(room);
+                            return (room);
+                        }
+                    }
+                }
+
+                // if we couldn't move at all, fail this room
+                if ((room.x == origX) && (room.z == origZ)) {
+                    failCount--;
+                    break;
+                }
+
+                moveCount--;
+            }
+
+            // if we were able to get to a good place
+            // without triggering the move count, then
+            // its a good room
+            if (moveCount != 0) {
+                break;
+            }
+        }
+
+        // this room failed, don't change room
+        return (lastRoom);
+    }
 
     private void addMainFloor(ArrayList<MapRoom> rooms, int roomCount, int roomExtensionCount, float mapCompactFactor, boolean complex) {
-        int n, placeCount, moveCount, failCount, touchIdx, firstRoomIdx, endRoomIdx;
-        float origX, origZ, xAdd, zAdd;
+        int n, failCount, firstRoomIdx, endRoomIdx;
         MapRoom room, lastRoom, connectRoom;
 
         // first room is alone so it
         // always can be laid down
-        room = new MapRoom(mapPieceList.getRandomPiece(1.0f, complex));
+        room = new MapRoom(mapPieceList.getRandomPiece(1.0f, true));
         room.x = 0;
         room.z = 0;
 
@@ -285,96 +380,12 @@ public class MapBuilder
 
         lastRoom=room;
 
-            // other rooms start outside around the first room
-            // room and gravity brings them in until they connect
-
+        // other rooms start outside around the first room
+        // room and gravity brings them in until they connect
         firstRoomIdx=rooms.size();
 
-        for (n=0;n!=roomCount;n++) {
-            room = new MapRoom(mapPieceList.getRandomPiece(mapCompactFactor, complex));
-            room.story = MapRoom.ROOM_STORY_MAIN;
-
-            failCount=25;
-
-            while (failCount>0) {
-                placeCount=10;
-
-                while (placeCount>0) {
-                    room.x = AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE * 2) - ROOM_RANDOM_LOCATION_DISTANCE;
-                    room.z = AppWindow.random.nextInt(ROOM_RANDOM_LOCATION_DISTANCE * 2) - ROOM_RANDOM_LOCATION_DISTANCE;
-                    if (!room.collides(rooms)) break;
-
-                    placeCount--;
-                }
-
-                if (placeCount==0) {        // could not place this anywhere, so fail this room
-                    failCount--;
-                    continue;
-                }
-
-                    // migrate it towards the last room
-
-                xAdd=lastRoom.x-Math.signum(room.x);
-                zAdd=lastRoom.z-Math.signum(room.z);
-
-                moveCount=ROOM_RANDOM_LOCATION_DISTANCE;
-
-                while (moveCount>0) {
-                    origX=room.x;
-                    origZ=room.z;
-
-                        // we move each chunk independently, if we can't
-                        // move either x or z, then fail this room
-
-                        // if we can move, check for a touch than a shared
-                        // wall, if we have one, then the room is good
-
-                    room.x+=xAdd;
-                    if (room.collides(rooms)) {
-                        room.x-=xAdd;
-                    }
-                    else {
-                        touchIdx=room.touches(rooms);
-                        if (touchIdx!=-1) {
-                            if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                                rooms.add(room);
-                                lastRoom=room;
-                                break;
-                            }
-                        }
-                    }
-
-                    room.z+=zAdd;
-                    if (room.collides(rooms)) {
-                        room.z-=zAdd;
-                    }
-                    else {
-                        touchIdx=room.touches(rooms);
-                        if (touchIdx!=-1) {
-                            if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                                rooms.add(room);
-                                lastRoom=room;
-                                break;
-                            }
-                        }
-                    }
-
-                        // if we couldn't move at all, fail this room
-
-                    if ((room.x==origX) && (room.z==origZ)) {
-                        failCount--;
-                        break;
-                    }
-
-                    moveCount--;
-                }
-
-                    // if we were able to get to a good place
-                    // without triggering the move count, then
-                    // its a good room
-
-                if (moveCount!=0) break;
-            }
+        for (n = 0; n != roomCount; n++) {
+            lastRoom = createRoomAndGravityIn(rooms, lastRoom, MapRoom.ROOM_STORY_MAIN, mapCompactFactor, complex);
         }
 
         endRoomIdx=rooms.size();
@@ -432,10 +443,9 @@ public class MapBuilder
         }
     }
 
-    private void addUpperOrLowerFloor(ArrayList<MapRoom> rooms, boolean upper) {
-        int roomStartIdx, roomEndIdx;
-        int x, z, xDif, zDif, sizeX, sizeZ;
-        MapRoom startRoom, endRoom, startFloorRoom, endFloorRoom, room, nextRoom;
+    private void addUpperOrLowerFloor(ArrayList<MapRoom> rooms, int roomCount, boolean upper, float mapCompactFactor, boolean complex) {
+        int n, roomStartIdx, roomEndIdx, roomCount2;
+        MapRoom startRoom, endRoom, startFloorRoom, endFloorRoom;
 
         // get a start room for floor (only from main rooms)
         while (true) {
@@ -504,61 +514,19 @@ public class MapBuilder
             }
         }
 
-        if (endFloorRoom == null) {
-            return;
+        // alternate between the two rooms (if both exist)
+        // to build this floor
+        roomCount2 = (endFloorRoom == null) ? roomCount : (roomCount / 2);
+
+        for (n = 0; n < roomCount2; n++) {
+            createRoomAndGravityIn(rooms, startFloorRoom, (upper ? MapRoom.ROOM_STORY_UPPER : MapRoom.ROOM_STORY_LOWER), mapCompactFactor, complex);
         }
 
-        // walk along with rectangles until we connect
-        room = startFloorRoom;
-
-        while (true) {
-            if (room.touches(endFloorRoom)) {
-                break;
+        if (endFloorRoom != null) {
+            roomCount2 = roomCount - roomCount2;
+            for (n = 0; n < roomCount2; n++) {
+                createRoomAndGravityIn(rooms, endFloorRoom, (upper ? MapRoom.ROOM_STORY_UPPER : MapRoom.ROOM_STORY_LOWER), mapCompactFactor, complex);
             }
-
-            // walk along until we connect
-            xDif = Math.abs((room.x + (room.piece.sizeX / 2)) - (endFloorRoom.x + (endFloorRoom.piece.sizeX / 2)));
-            zDif = Math.abs((room.z + (room.piece.sizeZ / 2)) - (endFloorRoom.z + (endFloorRoom.piece.sizeZ / 2)));
-
-            if (xDif > zDif) {
-                if (endFloorRoom.x < room.x) {
-                    x = endFloorRoom.x + endFloorRoom.piece.sizeX;
-                    sizeX = room.x - x;
-                } else {
-                    x = room.x + room.piece.sizeX;
-                    sizeX = endFloorRoom.x - x;
-                }
-                z = room.z;
-                sizeZ = room.piece.sizeZ;
-            } else {
-                if (endFloorRoom.z < room.z) {
-                    z = endFloorRoom.z + endFloorRoom.piece.sizeZ;
-                    sizeZ = room.z - z;
-                } else {
-                    z = room.z + room.piece.sizeZ;
-                    sizeZ = endFloorRoom.z - z;
-                }
-                x = room.x;
-                sizeX = room.piece.sizeX;
-            }
-
-            if ((sizeX <= 0) || (sizeZ <= 0)) {
-                break;
-            }
-
-            nextRoom = new MapRoom(mapPieceList.createSpecificRectangularPiece(sizeX, sizeZ, true, true));
-            nextRoom.x = x;
-            nextRoom.z = z;
-            nextRoom.story = upper ? MapRoom.ROOM_STORY_UPPER : MapRoom.ROOM_STORY_LOWER;
-
-            // if we collide, just exit out, we can't connect
-            if (nextRoom.collides(rooms)) {
-                break;
-            }
-
-            rooms.add(nextRoom);
-
-            room = nextRoom;
         }
     }
 
@@ -585,8 +553,9 @@ public class MapBuilder
         // build a map
         //
 
-    public void build(float mapSize, float mapCompactFactor, boolean complex, boolean upperFloor, boolean lowerFloor, boolean structure, float decorations) {
-        int n, roomCount, roomExtensionCount;
+    public void build(float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, boolean complex, float structures, float decorations) {
+        int n, roomCount, mainFloorRoomCount, mainFloorRoomExtensionCount;
+        int upperFloorRoomCount, lowerFloorRoomCount;
         RagPoint centerPnt;
         MapRoom room;
         ArrayList<MapRoom> rooms;
@@ -600,17 +569,19 @@ public class MapBuilder
         meshList=new MeshList();
 
         // the main floor
-        roomCount = 1 + (int) (50.0f * mapSize);
-        roomExtensionCount = AppWindow.random.nextInt(roomCount / 10);
+        mainFloorRoomCount = 1 + (int) (50.0f * mainFloorMapSize);
+        mainFloorRoomExtensionCount = AppWindow.random.nextInt(mainFloorRoomCount / 10);
 
-        addMainFloor(rooms, roomCount, roomExtensionCount, mapCompactFactor, complex);
+        addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, mapCompactFactor, complex);
 
-        // upper floor
-        if (upperFloor) {
-            addUpperOrLowerFloor(rooms, true);
+        // upper and lower floor
+        upperFloorRoomCount = 1 + (int) (10.0f * upperFloorMapSize);
+        if (upperFloorRoomCount != 0) {
+            addUpperOrLowerFloor(rooms, upperFloorRoomCount, true, mapCompactFactor, complex);
         }
-        if (lowerFloor) {
-            addUpperOrLowerFloor(rooms, false);
+        lowerFloorRoomCount = 1 + (int) (10.0f * lowerFloorMapSize);
+        if (lowerFloorRoomCount != 0) {
+            addUpperOrLowerFloor(rooms, lowerFloorRoomCount, false, mapCompactFactor, complex);
         }
 
             // eliminate all combined walls
@@ -668,8 +639,8 @@ public class MapBuilder
         }
 
         // structure
-        if (structure) {
-            buildStructure(rooms, bitmaps, meshList);
+        if (structures > 0.0f) {
+            buildStructure(rooms, bitmaps, meshList, structures);
         }
 
         // decorations

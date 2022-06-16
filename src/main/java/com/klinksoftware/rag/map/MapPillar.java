@@ -11,7 +11,7 @@ public class MapPillar {
     private static final int[] COLUMN_SIDE_COUNTS = {4, 8, 16};
 
     private int columnSideCount, baseTopSideCount, baseBotSideCount;
-    private float radius, baseRadius, capSize;
+    private float radius, baseRadius, baseTopHeight, baseBotHeight;
     private float[] cylinderSegments;
     private MeshList meshList;
     private HashMap<String, BitmapBase> bitmaps;
@@ -23,7 +23,8 @@ public class MapPillar {
         columnSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
         baseTopSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
         baseBotSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
-        capSize = MapBuilder.FLOOR_HEIGHT + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT);
+        baseTopHeight = MapBuilder.FLOOR_HEIGHT + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT * 2);
+        baseBotHeight = MapBuilder.FLOOR_HEIGHT + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT * 2);
         cylinderSegments = MeshMapUtility.createCylinderSegmentList(1, 4);
 
         baseRadius = (MapBuilder.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.6f))) * 0.5f;
@@ -40,13 +41,13 @@ public class MapPillar {
         RagPoint centerPnt;
         Mesh mesh;
 
-        BitmapBase.mapBitmapLoader(bitmaps, "pillar", new String[]{"Brick", "Metal", "Mosai", "Temple", "Tile"});
+        BitmapBase.mapBitmapLoader(bitmaps, "pillar", new String[]{"Brick", "Metal", "Mosaic", "Temple", "Tile"});
 
         name = "pillar_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
         ty = by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT);
-        pillarTy = ty - capSize;
-        pillarBy = by + capSize;
+        pillarTy = ty - baseTopHeight;
+        pillarBy = by + baseBotHeight;
 
         // xz position
         centerPnt = new RagPoint((((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE / 2)), ((ty + by) / 2), ((room.z + z) * MapBuilder.SEGMENT_SIZE + (MapBuilder.SEGMENT_SIZE / 2)));

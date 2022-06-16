@@ -1,13 +1,11 @@
 
 
 
-
 - get pipes working again
 
 - model: body needs to be bigger than legs, head smaller than body
 
 - walls on stairs
-- fix upper/lower connections
 
 - need to export tangents
 
@@ -17,7 +15,8 @@
 
 sound:
  - random silences in monster
- - sin as it's own routine
+ - random mix in sine or sawtooth?
+ - sine as it's own routine (saw tooth, too?)
 
 - try jpackage
 c:/Java/jdk-17.0.2/bin/jpackage --name RandomAssetGenerator --input c:\Code\RandomAssetGenerator\target --main-jar RandomAssetGenerator-1.0.jar --main-class com.klinksoftware.rag.RandomAssetGenerator --win-dir-chooser --type EXE

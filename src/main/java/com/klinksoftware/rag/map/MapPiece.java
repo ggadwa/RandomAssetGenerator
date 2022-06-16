@@ -18,7 +18,7 @@ public class MapPiece
         piece.sizeX=sizeX;
         piece.sizeZ=sizeZ;
         piece.decorateOK = decorateOK;
-        this.structureOK = structureOK;
+        piece.structureOK = structureOK;
 
         piece.vertexes=vertexes.clone();        // need to make sure we are really duplicating this array
         for (n=0;n!=vertexes.length;n++) {
