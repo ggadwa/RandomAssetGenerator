@@ -187,6 +187,20 @@ public class RagPoint
         z=rz;
     }
 
+    public void rotateZ(float fx) {
+        float rd, sn, cs, ry, rx;
+
+        rd = fx * ((float) Math.PI / 180.0f);
+        sn = (float) Math.sin(rd);
+        cs = (float) Math.cos(rd);
+
+        ry = (y * cs) - (x * sn);
+        rx = (y * sn) + (x * cs);
+
+        y = ry;
+        x = rx;
+    }
+
     public void matrixMultiply(RagMatrix4f mat)
     {
         float mx=(x*mat.data[0])+(y*mat.data[4])+(z*mat.data[8])+mat.data[12];

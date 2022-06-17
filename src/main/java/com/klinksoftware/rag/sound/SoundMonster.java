@@ -8,7 +8,7 @@ public class SoundMonster extends SoundBase {
     public SoundMonster() {
         super();
 
-        waveMillis = 1500 + AppWindow.random.nextInt(1500);
+        waveMillis = 1000 + AppWindow.random.nextInt(1000);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class SoundMonster extends SoundBase {
             chunks[n] = 20 + AppWindow.random.nextInt(200);
         }
 
-        toneCount = 10 + AppWindow.random.nextInt(20);
+        toneCount = 5 + AppWindow.random.nextInt(20);
         toneFrameCount = frameCount / toneCount;
 
         offset = 0;
@@ -45,7 +45,7 @@ public class SoundMonster extends SoundBase {
                 break;
             }
 
-            toneFactor += (AppWindow.random.nextFloat(0.2f) - 0.1f);
+            toneFactor += (AppWindow.random.nextFloat(0.05f) - 0.025f);
             toneFactor = Math.min(4.0f, Math.max(toneFactor, 0.25f));
             amplitute += (AppWindow.random.nextFloat(0.1f) - 0.05f);
             amplitute = Math.min(0.8f, Math.max(amplitute, 0.3f));
@@ -60,10 +60,11 @@ public class SoundMonster extends SoundBase {
         }
 
         // smooth it out a bit
-        mixData = new float[frameCount];
-
-        createWave(mixData, WAVE_TYPE_SINE, createSimpleWaveChunks((100 + AppWindow.random.nextInt(100)), 0.5f));
-        mixWave(waveData, mixData, 0, frameCount, 0.2f);
+        if (AppWindow.random.nextBoolean()) {
+            mixData = new float[frameCount];
+            createSineWave(mixData, createSimpleWaveChunks((100 + AppWindow.random.nextInt(400)), 0.5f));
+            mixWave(waveData, mixData, 0, frameCount, 0.2f);
+        }
 
         // finalize
         lowPassFilter(waveData, 0, frameCount, AppWindow.random.nextFloat());

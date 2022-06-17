@@ -60,9 +60,9 @@ public class SoundAlien extends SoundBase {
             }
 
             if (n == 0) {
-                createWave(waveData, WAVE_TYPE_SINE, chunkList);
+                createSineWave(waveData, chunkList);
             } else {
-                createWave(mixData, WAVE_TYPE_SINE, chunkList);
+                createSineWave(mixData, chunkList);
                 mixWave(waveData, mixData, 0, frameCount, (0.4f + AppWindow.random.nextFloat(0.2f)));
             }
         }

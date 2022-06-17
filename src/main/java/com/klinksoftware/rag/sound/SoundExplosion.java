@@ -14,7 +14,7 @@ public class SoundExplosion extends SoundBase {
     @Override
     public void generateInternal() {
         int frameCount, bangIdx, fadeIdx;
-        float bangFrequency, wrapFrequency;
+        float bangFrequency, wrapFrequency, clipLine;
         float[] mixData;
 
         frameCount = getFrameCount();
@@ -41,18 +41,22 @@ public class SoundExplosion extends SoundBase {
         fade(waveData, bangIdx, fadeIdx);
 
         // tones in wave
-        createWave(mixData, WAVE_TYPE_SINE, createSimpleWaveChunks(wrapFrequency, 0.8f));
+        createSineWave(mixData, createSimpleWaveChunks(wrapFrequency, 0.5f));
         mixWave(waveData, mixData, 0, bangIdx, (0.3f + AppWindow.random.nextFloat(0.2f)));
 
-        createWave(mixData, WAVE_TYPE_SINE, createSimpleWaveChunks((bangFrequency + 1.0f), 0.8f));
+        createSineWave(mixData, createSimpleWaveChunks((bangFrequency + 1.0f), 0.5f));
         mixWave(waveData, mixData, bangIdx, fadeIdx, (0.3f + AppWindow.random.nextFloat(0.2f)));
 
-        createWave(mixData, WAVE_TYPE_SINE, createSimpleWaveChunks(wrapFrequency, 0.8f));
+        createSineWave(mixData, createSimpleWaveChunks(wrapFrequency, 0.5f));
         mixWave(waveData, mixData, fadeIdx, frameCount, (0.3f + AppWindow.random.nextFloat(0.2f)));
 
         // low pass and clip
         lowPassFilter(waveData, 0, frameCount, (0.05f + AppWindow.random.nextFloat(0.1f)));
-        clip(waveData, bangIdx, fadeIdx, -(0.95f + AppWindow.random.nextFloat(0.5f)), (0.95f + AppWindow.random.nextFloat(0.5f)));
+
+        clipLine = 0.95f + AppWindow.random.nextFloat(0.05f);
+        normalize(waveData, 0, bangIdx, clipLine);
+        clip(waveData, bangIdx, fadeIdx, -clipLine, clipLine);
+        normalize(waveData, fadeIdx, frameCount, clipLine);
 
         // one more fade
         normalize(waveData, 0, frameCount, 0.5f);

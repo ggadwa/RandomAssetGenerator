@@ -10,10 +10,6 @@ public class SoundBase {
 
     public static final float SAMPLE_RATE = 44100.0f;
 
-    public static final int WAVE_TYPE_SINE = 0;
-    public static final int WAVE_TYPE_SQUARE = 1;
-    public static final int WAVE_TYPE_SAWTOOTH = 2;
-
     protected int waveMillis;
     protected float[] waveData;
 
@@ -31,11 +27,11 @@ public class SoundBase {
     //
     // waves
     //
-    protected void createWave(float[] data, int waveType, ArrayList<WaveChunk> chunkList) {
+    protected void createSineWave(float[] data, ArrayList<WaveChunk> chunkList) {
         int n, idx, chunkFrameLen;
         int chunkLen, frameCount;
-        float rd, period;
-        float chunkSineSize, chunkPeriodSize, chunkAmplitudeSize;
+        float rd;
+        float chunkSineSize, chunkAmplitudeSize;
         WaveChunk chunk;
 
         chunkLen = chunkList.size();
@@ -49,7 +45,6 @@ public class SoundBase {
             chunk = chunkList.get(n);
             chunk.frame = (int) (chunk.timePercentage * (float) frameCount);
             chunk.sineAdd = ((float) Math.PI * (chunk.frequency * 2.0f)) / SAMPLE_RATE;
-            chunk.period = SAMPLE_RATE / chunk.frequency;
         }
 
             // run through all the sin waves
@@ -59,24 +54,12 @@ public class SoundBase {
 
         chunkFrameLen = chunkList.get(1).frame - chunkList.get(0).frame;
         chunkSineSize = chunkList.get(1).sineAdd - chunkList.get(0).sineAdd;
-        chunkPeriodSize = chunkList.get(1).period - chunkList.get(0).period;
         chunkAmplitudeSize = chunkList.get(1).amplitude - chunkList.get(0).amplitude;
 
         for (n = 0; n != frameCount; n++) {
 
             // the wave
-            switch (waveType) {
-                case WAVE_TYPE_SINE:
-                    data[n] = (float) Math.sin(rd);
-                    break;
-                case WAVE_TYPE_SQUARE:
-                    data[n] = (float) Math.signum(Math.sin(rd));
-                    break;
-                case WAVE_TYPE_SAWTOOTH:
-                    period = (chunkList.get(idx).period + ((chunkPeriodSize * (float) (n - chunkList.get(idx).frame)) / (float) chunkFrameLen));
-                    data[n] = (((float) n / period) - (float) Math.floor(((float) n / period) + 0.5f)) * 2.0f;
-                    break;
-            }
+            data[n] = (float) Math.sin(rd);
 
             // amplitude
             data[n] *= (chunkList.get(idx).amplitude + ((chunkAmplitudeSize * (float) (n - chunkList.get(idx).frame)) / (float) chunkFrameLen));
@@ -85,7 +68,6 @@ public class SoundBase {
                 if (idx<(chunkLen-2)) idx++;
                 chunkFrameLen = chunkList.get(idx + 1).frame - chunkList.get(idx).frame;
                 chunkSineSize = chunkList.get(idx + 1).sineAdd - chunkList.get(idx).sineAdd;
-                chunkPeriodSize = chunkList.get(idx + 1).period - chunkList.get(idx).period;
                 chunkAmplitudeSize = chunkList.get(idx + 1).amplitude - chunkList.get(idx).amplitude;
             }
 
@@ -118,6 +100,19 @@ public class SoundBase {
                 }
                 currentCount = (int) ((float) chunkLens[idx] * factor);
             }
+        }
+    }
+
+    protected void createSawWave(float[] data, int startIdx, int endIdx, float frequency, float amplitude) {
+        int n;
+        float period;
+
+        period = SAMPLE_RATE / frequency;
+
+        // run through all the sin waves
+        for (n = startIdx; n < endIdx; n++) {
+            data[n] = (((float) n / period) - (float) Math.floor(((float) n / period) + 0.5f)) * -2.0f;
+            data[n] *= amplitude;
         }
     }
 
@@ -406,7 +401,7 @@ public class SoundBase {
     }
 
     protected void generateInternal() {
-        createWave(waveData, WAVE_TYPE_SINE, createSimpleWaveChunks(440.0f, 0.8f));
+        createSineWave(waveData, createSimpleWaveChunks(440.0f, 0.8f));
     }
 
     public void generate() {
