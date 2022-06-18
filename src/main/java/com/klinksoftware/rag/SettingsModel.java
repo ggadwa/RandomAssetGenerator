@@ -54,7 +54,12 @@ public class SettingsModel extends SettingsBase {
     public void buttonClick(int id) {
         switch (id) {
             case BUTTON_GENERATE_MODEL:
-                (new ModelBuildWorker(appWindow, modelTypeCombo.getSelectedIndex(), thinCheckBox.isSelected(), bilateralCheckBox.isSelected(), ((float) roughSlider.getValue() / 100.0f))).execute();
+                (new ModelBuildWorker(
+                        appWindow,
+                        modelTypeCombo.getSelectedIndex(),
+                        thinCheckBox.isSelected(),
+                        bilateralCheckBox.isSelected(),
+                        ((float) roughSlider.getValue() / 100.0f))).execute();
                 return;
             case BUTTON_EXPORT_MODEL:
                 (new ModelExportWorker(appWindow)).execute();

@@ -13,6 +13,49 @@ public class MapStair {
         this.rooms = rooms;
     }
 
+    private void addSideWall(MapRoom room, int roomNumber, boolean upper, int dir, float sx, float sy, float sz) {
+        float ty;
+        String name;
+
+        ty = (sy + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT;
+        name = "stair_wall_min_" + Integer.toString(roomNumber);
+
+        switch (dir) {
+            case MeshMapUtility.STAIR_DIR_POS_Z:
+                if (AppWindow.random.nextBoolean()) {
+                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                }
+                if (AppWindow.random.nextBoolean()) {
+                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                }
+                break;
+            case MeshMapUtility.STAIR_DIR_NEG_Z:
+                if (AppWindow.random.nextBoolean()) {
+                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                }
+                if (AppWindow.random.nextBoolean()) {
+                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                }
+                break;
+            case MeshMapUtility.STAIR_DIR_POS_X:
+                if (AppWindow.random.nextBoolean()) {
+                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                }
+                if (AppWindow.random.nextBoolean()) {
+                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                }
+                break;
+            case MeshMapUtility.STAIR_DIR_NEG_X:
+                if (AppWindow.random.nextBoolean()) {
+                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                }
+                if (AppWindow.random.nextBoolean()) {
+                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                }
+                break;
+        }
+    }
+
     public void build(MapRoom room, int roomNumber, boolean upper) {
         int x, z, x2, z2, dir;
         float sx, sy, sz;
@@ -84,6 +127,9 @@ public class MapStair {
 
         name = "stair_" + Integer.toString(roomNumber);
         MeshMapUtility.buildStairs(meshList, room, name, sx, sy, sz, dir, 1.0f, true);
+
+        // random sides
+        addSideWall(room, roomNumber, upper, dir, sx, sy, sz);
 
         // save for platform calcs later
         room.stairDir = dir;

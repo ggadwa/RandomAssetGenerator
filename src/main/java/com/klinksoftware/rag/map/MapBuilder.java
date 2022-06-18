@@ -194,7 +194,7 @@ public class MapBuilder
                         continue;
                     }
 
-                    if ((minX && (x == 0) && ((z & 0x1) == 0)) || (maxX && (x == (room.piece.sizeX - 1)) && ((z & 0x1) == 0)) || (midX && (x == mx) && ((x & 0x1) == 0)) || (minZ && (z == 0) && ((x & 0x1) == 0)) || (maxZ && (z == (room.piece.sizeZ - 1)) && ((x & 0x1) == 0)) || (midZ && (z == mz) && ((z & 0x1) == 0))) {
+                    if ((minX && (x == 1) && ((z & 0x1) == 0)) || (maxX && (x == (room.piece.sizeX - 2)) && ((z & 0x1) == 0)) || (midX && (x == mx) && ((x & 0x1) == 0)) || (minZ && (z == 1) && ((x & 0x1) == 0)) || (maxZ && (z == (room.piece.sizeZ - 2)) && ((x & 0x1) == 0)) || (midZ && (z == mz) && ((z & 0x1) == 0))) {
                         if (mapPillar == null) {
                             mapPillar = new MapPillar(meshList, bitmaps);
                         }
@@ -234,7 +234,7 @@ public class MapBuilder
 
             by = getStructureDecorationBottomY(room);
 
-            switch (AppWindow.random.nextInt(4)) {
+            switch (AppWindow.random.nextInt(3)) {
                 case 0:
                     if (mapStorage == null) {
                         mapStorage = new MapStorage(this, rooms, meshList, bitmaps);
@@ -253,12 +253,14 @@ public class MapBuilder
                     }
                     mapLab.build(room, n, by, decorations);
                     break;
+                /*
                 case 3:
                     if (mapAltar == null) {
                         mapAltar = new MapAltar(this, rooms, meshList, bitmaps);
                     }
                     mapAltar.build(room, n, by);
                     break;
+                 */
                 /*
                 case 4:
                     if (mapPipe == null) {
@@ -372,7 +374,7 @@ public class MapBuilder
 
         // first room is alone so it
         // always can be laid down
-        room = new MapRoom(mapPieceList.getRandomPiece(1.0f, true));
+        room = new MapRoom(mapPieceList.getRandomPiece(1.0f, complex));
         room.x = 0;
         room.z = 0;
 
@@ -533,27 +535,33 @@ public class MapBuilder
     //
     // required bitmaps
     //
-    public void buildRequiredBitmaps() {
+    public void buildRequiredBitmaps(int mapType) {
         String[] wallBitmaps = {"Brick", "Geometric", "Metal", "Mosaic", "Organic", "Plaster", "Stone", "Temple", "Tile", "Wood"};
-        String[] floorBitmaps = {"Brick", "Concrete", "Dirt", "Grass", "Metal", "Mosaic", "Tile", "Wood"};
+        String[] insideFloorBitmaps = {"Brick", "Concrete", "Metal", "Mosaic", "Tile", "Wood"};
+        String[] outsideFloorBitmaps = {"Dirt", "Grass"};
         String[] ceilingBitmaps = {"Brick", "Concrete", "Metal", "Mosaic", "Plaster", "Tile", "Wood"};
         String[] platformBitmaps = {"Brick", "Concrete", "Metal", "Wood"};
 
-        BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
-        BitmapBase.mapBitmapLoader(bitmaps, "wall_upper", wallBitmaps);
-        BitmapBase.mapBitmapLoader(bitmaps, "wall_lower", wallBitmaps);
-        BitmapBase.mapBitmapLoader(bitmaps, "floor", floorBitmaps);
-        BitmapBase.mapBitmapLoader(bitmaps, "floor_lower", floorBitmaps);
-        BitmapBase.mapBitmapLoader(bitmaps, "ceiling", ceilingBitmaps);
-        BitmapBase.mapBitmapLoader(bitmaps, "ceiling_upper", ceilingBitmaps);
-        BitmapBase.mapBitmapLoader(bitmaps, "platform", platformBitmaps);
+        if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
+            BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "wall_upper", wallBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "wall_lower", wallBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "floor", insideFloorBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "floor_lower", insideFloorBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "ceiling", ceilingBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "ceiling_upper", ceilingBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "platform", platformBitmaps);
+        } else {
+            BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "floor", outsideFloorBitmaps);
+        }
     }
 
         //
         // build a map
         //
 
-    public void build(float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, boolean complex, float structures, float decorations) {
+    public void build(int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, boolean complex, float structures, float decorations) {
         int n, roomCount, mainFloorRoomCount, mainFloorRoomExtensionCount;
         int upperFloorRoomCount, lowerFloorRoomCount;
         RagPoint centerPnt;
@@ -568,44 +576,44 @@ public class MapBuilder
         rooms=new ArrayList<>();
         meshList=new MeshList();
 
-        // the main floor
+        // the stories
         mainFloorRoomCount = 1 + (int) (50.0f * mainFloorMapSize);
         mainFloorRoomExtensionCount = AppWindow.random.nextInt(mainFloorRoomCount / 10);
 
-        addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, mapCompactFactor, complex);
+        if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
+            addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, mapCompactFactor, complex);
 
-        // upper and lower floor
-        upperFloorRoomCount = 1 + (int) (10.0f * upperFloorMapSize);
-        if (upperFloorRoomCount != 0) {
-            addUpperOrLowerFloor(rooms, upperFloorRoomCount, true, mapCompactFactor, complex);
+            upperFloorRoomCount = 1 + (int) (10.0f * upperFloorMapSize);
+            if (upperFloorRoomCount != 0) {
+                addUpperOrLowerFloor(rooms, upperFloorRoomCount, true, mapCompactFactor, complex);
+            }
+            lowerFloorRoomCount = 1 + (int) (10.0f * lowerFloorMapSize);
+            if (lowerFloorRoomCount != 0) {
+                addUpperOrLowerFloor(rooms, lowerFloorRoomCount, false, mapCompactFactor, complex);
+            }
+        } else {
+            addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, 1.0f, false);
         }
-        lowerFloorRoomCount = 1 + (int) (10.0f * lowerFloorMapSize);
-        if (lowerFloorRoomCount != 0) {
-            addUpperOrLowerFloor(rooms, lowerFloorRoomCount, false, mapCompactFactor, complex);
-        }
 
-            // eliminate all combined walls
-
+        // eliminate all combined walls
         removeSharedWalls(rooms);
 
-            // maps always need walls, floors and ceilings
+        // required textures for map
+        buildRequiredBitmaps(mapType);
 
-        buildRequiredBitmaps();
-
-            // now create the meshes
-
+        // now create the meshes
         roomCount=rooms.size();
 
         for (n=0;n!=roomCount;n++) {
-            room=rooms.get(n);
-
+            room = rooms.get(n);
             centerPnt = new RagPoint((((room.x * SEGMENT_SIZE) + (room.piece.sizeX * SEGMENT_SIZE)) * 0.5f), ((SEGMENT_SIZE + this.FLOOR_HEIGHT) + (SEGMENT_SIZE * 0.5f)), (((room.z * SEGMENT_SIZE) + (room.piece.sizeZ * SEGMENT_SIZE)) * 0.5f));
-
-                // meshes
 
             MeshMapUtility.buildRoomWalls(meshList, room, centerPnt, n);
             MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, true);
-            MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, false);
+
+            if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
+                MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, false);
+            }
         }
 
         // setup the view center point
@@ -613,43 +621,46 @@ public class MapBuilder
         viewCenterPoint = new RagPoint(((float) (room.piece.sizeX / 2) * SEGMENT_SIZE), (SEGMENT_SIZE * 0.5f), ((float) (room.piece.sizeZ / 2) * SEGMENT_SIZE));
 
         // any steps
-        mapStair = new MapStair(meshList, rooms);
+        if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
+            mapStair = new MapStair(meshList, rooms);
 
-        for (n = 0; n != roomCount; n++) {
-            room = rooms.get(n);
-            if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
-                mapStair.build(room, n, true);
-            }
-            if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
-                mapStair.build(room, n, false);
+            for (n = 0; n != roomCount; n++) {
+                room = rooms.get(n);
+                if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
+                    mapStair.build(room, n, true);
+                }
+                if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
+                    mapStair.build(room, n, false);
+                }
             }
         }
 
         // any platforms
-        mapPlatform = new MapPlatform(meshList, rooms);
+        if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
+            mapPlatform = new MapPlatform(meshList, rooms);
 
-        for (n = 0; n != roomCount; n++) {
-            room = rooms.get(n);
-            if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
-                mapPlatform.build(room, n, true);
-            }
-            if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
-                mapPlatform.build(room, n, false);
+            for (n = 0; n != roomCount; n++) {
+                room = rooms.get(n);
+                if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
+                    mapPlatform.build(room, n, true);
+                }
+                if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
+                    mapPlatform.build(room, n, false);
+                }
             }
         }
 
         // structure
-        if (structures > 0.0f) {
+        if ((structures > 0.0f) && (mapType == SettingsMap.MAP_TYPE_INDOOR)) {
             buildStructure(rooms, bitmaps, meshList, structures);
         }
 
         // decorations
-        if (decorations > 0.0f) {
+        if ((decorations > 0.0f) && (mapType == SettingsMap.MAP_TYPE_INDOOR)) {
             buildDecorations(rooms, bitmaps, meshList, decorations);
         }
 
-            // now build the fake skeleton
-
+        // now build the fake skeleton
         skeleton=meshList.rebuildMapMeshesWithSkeleton();
     }
 

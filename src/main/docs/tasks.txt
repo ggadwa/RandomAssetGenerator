@@ -1,11 +1,12 @@
 
 
 map
- - random walls on stairs
+ - don't allow upper and lower in same room
+ - outside map
+ - get rid of altar, maybe "den" etc?
  - get pipes working again
 
 model
- - greater change in body/leg height
 
 - need to export tangents
 

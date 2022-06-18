@@ -8,13 +8,15 @@ import javax.swing.*;
 public class MapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
+    private int mapType;
     private float mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, structures, decorations;
     private boolean complex;
 
     public static MapBuilder generatedMap = null;
 
-    public MapBuildWorker(AppWindow appWindow, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompact, boolean complex, float structures, float decorations) {
+    public MapBuildWorker(AppWindow appWindow, int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompact, boolean complex, float structures, float decorations) {
         this.appWindow = appWindow;
+        this.mapType = mapType;
         this.mainFloorMapSize = mainFloorMapSize;
         this.upperFloorMapSize = upperFloorMapSize;
         this.lowerFloorMapSize = lowerFloorMapSize;
@@ -42,7 +44,7 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 
         try {
             mapBuilder = new MapBuilder();
-            mapBuilder.build(mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, complex, structures, decorations);
+            mapBuilder.build(mapType, mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, complex, structures, decorations);
         }
         catch (Exception e)
         {
