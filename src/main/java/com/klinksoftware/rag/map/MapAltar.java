@@ -40,7 +40,7 @@ public class MapAltar {
             zMax = (room.z + bz) * MapBuilder.SEGMENT_SIZE;
 
             name = "altar_" + Integer.toString(roomNumber) + "_" + Integer.toString(lx) + "x" + Integer.toString(tz);
-            mesh2 = MeshMapUtility.createCube(room, name, "platform", xMin, xMax, by, (by + MapBuilder.FLOOR_HEIGHT), zMin, zMax, true, true, true, true, true, false, false, MeshMapUtility.UV_MAP);
+            mesh2 = MeshUtility.createCube("platform", xMin, xMax, by, (by + MapBuilder.FLOOR_HEIGHT), zMin, zMax, true, true, true, true, true, false, false, MeshUtility.UV_MAP);
 
             if (mesh==null) {
                 mesh=mesh2;

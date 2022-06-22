@@ -1,27 +1,18 @@
 package com.klinksoftware.rag;
 
+import com.klinksoftware.rag.models.ModelInterface;
 import com.klinksoftware.rag.uiworker.ModelBuildWorker;
 import com.klinksoftware.rag.uiworker.ModelExportWorker;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JSlider;
+import javax.swing.JList;
 
 public class SettingsModel extends SettingsBase {
 
     private static final int BUTTON_GENERATE_MODEL = 0;
     private static final int BUTTON_EXPORT_MODEL = 1;
 
-    public static final int MODEL_TYPE_HUMANOID = 0;
-    public static final int MODEL_TYPE_ANIMAL = 1;
-    public static final int MODEL_TYPE_BLOB = 2;
-    public static final int MODEL_TYPE_ROBOT = 3;
-    private static final String[] MODEL_TYPE = {"Humanoid", "Animal", "Blob", "Robot"};
-
     private JButton generateModelButton, exportModelButton;
-    private JCheckBox thinCheckBox, bilateralCheckBox;
-    private JComboBox modelTypeCombo;
-    private JSlider roughSlider;
+    private JList modelTypeList;
 
     public SettingsModel(AppWindow appWindow) {
         super(appWindow);
@@ -35,17 +26,8 @@ public class SettingsModel extends SettingsBase {
         generateModelButton = addButton(y, "Generate Model", BUTTON_GENERATE_MODEL);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        modelTypeCombo = addComboBox(y, "Model Type", MODEL_TYPE, 0);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        thinCheckBox = addCheckBox(y, "Thin", true);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        bilateralCheckBox = addCheckBox(y, "Bilateral", true);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        roughSlider = addSlider(y, "Rough", 0.2f);
-        y += (ROW_HEIGHT + ROW_GAP);
+        modelTypeList = addList(y, "Model Type", getAnnotationClasses("com.klinksoftware.rag.models", "model", ModelInterface.class), 0);
+        y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         exportModelButton = addButton(y, "Export Model", BUTTON_EXPORT_MODEL);
     }
@@ -56,10 +38,7 @@ public class SettingsModel extends SettingsBase {
             case BUTTON_GENERATE_MODEL:
                 (new ModelBuildWorker(
                         appWindow,
-                        modelTypeCombo.getSelectedIndex(),
-                        thinCheckBox.isSelected(),
-                        bilateralCheckBox.isSelected(),
-                        ((float) roughSlider.getValue() / 100.0f))).execute();
+                        (String) modelTypeList.getModel().getElementAt(modelTypeList.getSelectedIndex()))).execute();
                 return;
             case BUTTON_EXPORT_MODEL:
                 (new ModelExportWorker(appWindow)).execute();

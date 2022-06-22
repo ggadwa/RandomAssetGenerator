@@ -97,182 +97,6 @@ public class MapBuilder
         }
     }
 
-    //
-    // structure
-    //
-    public float getStructureDecorationBottomY(MapRoom room) {
-        switch (room.story) {
-            case MapRoom.ROOM_STORY_UPPER:
-            case MapRoom.ROOM_STORY_UPPER_EXTENSION:
-                return (MapBuilder.SEGMENT_SIZE + (MapBuilder.FLOOR_HEIGHT * 2));
-            case MapRoom.ROOM_STORY_LOWER:
-            case MapRoom.ROOM_STORY_LOWER_EXTENSION:
-                return (-(MapBuilder.SEGMENT_SIZE + (MapBuilder.FLOOR_HEIGHT * 2)));
-        }
-
-        return (0.0f);
-    }
-
-    public boolean isGoodStructureDecorationPosition(ArrayList<MapRoom> rooms, MapRoom room, int x, int z) {
-        float rx, rz;
-
-        // skip if grid is blocked
-        // for floors, we avoid anything 0 (obscured) or 2 (partially obscured)
-        if ((room.getFloorGrid(x, z) != 1) || (room.getBlockedGrid(x, z))) {
-            return (false);
-        }
-
-        // skip if it's the player starting place
-        rx = (room.x + x) * MapBuilder.SEGMENT_SIZE;
-        rz = (room.z + z) * MapBuilder.SEGMENT_SIZE;
-        if ((viewCenterPoint.x >= rx) && (viewCenterPoint.x <= (rx + MapBuilder.SEGMENT_SIZE)) && (viewCenterPoint.z >= rz) && (viewCenterPoint.z <= (rz + MapBuilder.SEGMENT_SIZE))) {
-            return (false);
-        }
-
-        // skip if blocking exit to another room
-        if (x == 0) {
-            if (room.roomAtPosition(rooms, (room.x - 1), (room.z + z))) {
-                return (false);
-            }
-        }
-        if (x == (room.piece.sizeX - 1)) {
-            if (room.roomAtPosition(rooms, (room.x + room.piece.sizeX), (room.z + z))) {
-                return (false);
-            }
-        }
-        if (z == 0) {
-            if (room.roomAtPosition(rooms, (room.x + x), (room.z - 1))) {
-                return (false);
-            }
-        }
-        if (z == (room.piece.sizeZ - 1)) {
-            if (room.roomAtPosition(rooms, (room.x + x), (room.z + room.piece.sizeZ))) {
-                return (false);
-            }
-        }
-
-        return (true);
-    }
-
-    private void buildStructure(ArrayList<MapRoom> rooms, HashMap<String, BitmapBase> bitmaps, MeshList meshList, float structures) {
-        int n, x, z, mx, mz, roomCount;
-        float by;
-        boolean minX, midX, maxX, minZ, midZ, maxZ;
-        MapRoom room;
-        MapPillar mapPillar = null;
-
-        roomCount = rooms.size();
-
-        for (n = 0; n != roomCount; n++) {
-            room = rooms.get(n);
-            if (!room.piece.structureOK) {
-                continue;
-            }
-            if (AppWindow.random.nextFloat() > structures) {
-                continue;
-            }
-
-            by = getStructureDecorationBottomY(room);
-
-            // positions
-            minX = AppWindow.random.nextBoolean();
-            maxX = AppWindow.random.nextBoolean();
-            midX = (!(minX && maxX)) && AppWindow.random.nextBoolean();
-
-            mx = room.piece.sizeX / 2;
-
-            minZ = AppWindow.random.nextBoolean();
-            maxZ = AppWindow.random.nextBoolean();
-            midZ = (!(minZ && maxZ)) && AppWindow.random.nextBoolean();
-
-            mz = room.piece.sizeZ / 2;
-
-            // the pillars
-            for (z = 0; z != room.piece.sizeZ; z++) {
-                for (x = 0; x != room.piece.sizeX; x++) {
-                    if (!isGoodStructureDecorationPosition(rooms, room, x, z)) {
-                        continue;
-                    }
-
-                    if ((minX && (x == 1) && ((z & 0x1) == 0)) || (maxX && (x == (room.piece.sizeX - 2)) && ((z & 0x1) == 0)) || (midX && (x == mx) && ((x & 0x1) == 0)) || (minZ && (z == 1) && ((x & 0x1) == 0)) || (maxZ && (z == (room.piece.sizeZ - 2)) && ((x & 0x1) == 0)) || (midZ && (z == mz) && ((z & 0x1) == 0))) {
-                        if (mapPillar == null) {
-                            mapPillar = new MapPillar(meshList, bitmaps);
-                        }
-                        mapPillar.build(room, n, x, by, z);
-
-                        room.setBlockedGrid(x, z);
-                    }
-                }
-            }
-        }
-    }
-
-        //
-        // decorations
-        //
-
-    private void buildDecorations(ArrayList<MapRoom> rooms, HashMap<String, BitmapBase> bitmaps, MeshList meshList, float decorations) {
-        int n, roomCount;
-        float by;
-        MapRoom room;
-        MapStorage mapStorage = null;
-        MapEquipment mapEquipment = null;
-        MapLab mapLab = null;
-        MapAltar mapAltar = null;
-        MapPipe mapPipe = null;
-
-        roomCount = rooms.size();
-
-        for (n = 0; n != roomCount; n++) {
-            room = rooms.get(n);
-            if (!room.piece.decorateOK) {
-                continue;
-            }
-            if (AppWindow.random.nextFloat() > decorations) {
-                continue;
-            }
-
-            by = getStructureDecorationBottomY(room);
-
-            switch (AppWindow.random.nextInt(3)) {
-                case 0:
-                    if (mapStorage == null) {
-                        mapStorage = new MapStorage(this, rooms, meshList, bitmaps);
-                    }
-                    mapStorage.build(room, n, by, decorations);
-                    break;
-                case 1:
-                    if (mapEquipment == null) {
-                        mapEquipment = new MapEquipment(this, rooms, meshList, bitmaps);
-                    }
-                    mapEquipment.build(room, n, by, decorations);
-                    break;
-                case 2:
-                    if (mapLab == null) {
-                        mapLab = new MapLab(this, rooms, meshList, bitmaps);
-                    }
-                    mapLab.build(room, n, by, decorations);
-                    break;
-                /*
-                case 3:
-                    if (mapAltar == null) {
-                        mapAltar = new MapAltar(this, rooms, meshList, bitmaps);
-                    }
-                    mapAltar.build(room, n, by);
-                    break;
-                 */
-                /*
-                case 4:
-                    if (mapPipe == null) {
-                        mapPipe = new MapPipe(this, rooms, meshList, bitmaps);
-                    }
-                    mapPipe.build(room, n, by);
-                    break;
-                 */
-            }
-        }
-    }
-
         //
         // build floors
     //
@@ -624,7 +448,7 @@ public class MapBuilder
         // build a map
         //
 
-    public void build(int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, boolean complex, float structures, float decorations) {
+    public void build(int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, boolean complex) {
         int mainFloorRoomCount, mainFloorRoomExtensionCount;
         int upperFloorRoomCount, lowerFloorRoomCount;
         MapRoom room;
@@ -674,18 +498,10 @@ public class MapBuilder
             meshList.randomizeFloorVertexes(0.5f, FLOOR_HEIGHT);
         }
 
-        // steps, platforms, structures and decorations
+        // steps and platforms
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
             buildSteps(mapType, rooms);
             buildPlatforms(mapType, rooms);
-
-            if (structures > 0.0f) {
-                buildStructure(rooms, bitmaps, meshList, structures);
-            }
-
-            if (decorations > 0.0f) {
-                buildDecorations(rooms, bitmaps, meshList, decorations);
-            }
         }
 
         // now build a fake skeleton for the glTF

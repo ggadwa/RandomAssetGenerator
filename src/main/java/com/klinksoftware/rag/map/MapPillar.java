@@ -25,7 +25,7 @@ public class MapPillar {
         baseBotSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
         baseTopHeight = MapBuilder.FLOOR_HEIGHT + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT * 2);
         baseBotHeight = MapBuilder.FLOOR_HEIGHT + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT * 2);
-        cylinderSegments = MeshMapUtility.createCylinderSegmentList(1, 4);
+        cylinderSegments = MeshUtility.createCylinderSegmentList(1, 4);
 
         baseRadius = (MapBuilder.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.6f))) * 0.5f;
         radius = baseRadius * (0.7f + AppWindow.random.nextFloat(0.1f));
@@ -53,10 +53,10 @@ public class MapPillar {
         centerPnt = new RagPoint((((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE / 2)), ((ty + by) / 2), ((room.z + z) * MapBuilder.SEGMENT_SIZE + (MapBuilder.SEGMENT_SIZE / 2)));
 
         // create the pillar
-        mesh = MeshMapUtility.createCylinder(room, name, "pillar", columnSideCount, centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);
+        mesh = MeshUtility.createCylinder("pillar", columnSideCount, centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);
 
-        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", baseTopSideCount, centerPnt, pillarBy, by, baseRadius, true, false));
-        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "pillar", baseBotSideCount, centerPnt, ty, pillarTy, baseRadius, false, true));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("pillar", baseTopSideCount, centerPnt, pillarBy, by, baseRadius, true, false));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("pillar", baseBotSideCount, centerPnt, ty, pillarTy, baseRadius, false, true));
 
         meshList.add(mesh);
     }

@@ -1,8 +1,5 @@
 package com.klinksoftware.rag.mesh;
 
-import com.klinksoftware.rag.SettingsModel;
-import static com.klinksoftware.rag.mesh.MeshMapUtility.floatArrayListToFloat;
-import static com.klinksoftware.rag.mesh.MeshMapUtility.intArrayListToInt;
 import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
 
@@ -15,9 +12,7 @@ public class MeshModelUtility
     private static final int CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT = 1;
     private static final int CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT = 4;
 
-        //
-        // build a cylinder around a limb
-        //
+    // build a cylinder around a limb
     public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, RagPoint topPnt, float topRadius, int aroundCount, int acrossCount, float uOffset, float vOffset, float uSize, float vSize) {
         int n, k, rowIdx, row2Idx, vIdx, vStartIdx;
         float ang, angAdd, acrossPos, acrossAdd;
@@ -174,21 +169,18 @@ public class MeshModelUtility
         }
 
         // create the mesh
-        vertexes = floatArrayListToFloat(vertexArray);
-        normals = floatArrayListToFloat(normalArray);
-        uvs = floatArrayListToFloat(uvArray);
-        indexes = intArrayListToInt(indexArray);
-        tangents = MeshMapUtility.buildTangents(vertexes, uvs, indexes);
+        vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
+        normals = MeshUtility.floatArrayListToFloat(normalArray);
+        uvs = MeshUtility.floatArrayListToFloat(uvArray);
+        indexes = MeshUtility.intArrayListToInt(indexArray);
+        tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
         return (new Mesh(name, bitmapName, vertexes, normals, tangents, uvs, indexes));
     }
 
-    //
-        // rebuild the normal by finding the nearest bone
-        // and tracing the normal from there
-        //
-
-    private static void rebuildNormals(Mesh mesh, Bone bone1, Bone bone2)    {
+    // rebuild the normal by finding the nearest bone
+    // and tracing the normal from there
+    private static void rebuildNormals(Mesh mesh, Bone bone1, Bone bone2) {
         int n, vIdx, nVertex;
         float d, d2;
         RagPoint pnt;
@@ -219,11 +211,8 @@ public class MeshModelUtility
         }
     }
 
-        //
-        // build mesh around limb
-        //
-
-    public static Mesh buildMeshAroundBoneLimb(Skeleton skeleton, int modelType, Limb limb) {
+    // build mesh around limb
+    public static Mesh buildMeshAroundBoneLimb(Skeleton skeleton, Limb limb, boolean organic) {
         Bone bone1, bone2;
         Mesh mesh;
 
@@ -231,7 +220,7 @@ public class MeshModelUtility
         bone2 = skeleton.bones.get(limb.bone2Idx);
 
         // build the cylinder around the bones
-        if (modelType != SettingsModel.MODEL_TYPE_ROBOT) {
+        if (organic) {
             mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT, limb.uOffset, limb.vOffset, limb.uSize, limb.vSize);
         } else {
             mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT, limb.uOffset, limb.vOffset, limb.uSize, limb.vSize);

@@ -151,44 +151,44 @@ public class MapPlatform {
                 if (hasNegXWall(room, x, z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,negZ,negX,ty,posZ,negX,by,posZ,negX,by,negZ));
                     normalArray.addAll(Arrays.asList(-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f));
-                    trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
+                    trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
                 }
 
                 if (hasPosXWall(room, x, z)) {
                     vertexArray.addAll(Arrays.asList(posX,ty,negZ,posX,ty,posZ,posX,by,posZ,posX,by,negZ));
                     normalArray.addAll(Arrays.asList(1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f));
-                    trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
+                    trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
                 }
 
                     // always draw the top
 
                 vertexArray.addAll(Arrays.asList(negX,ty,negZ,negX,ty,posZ,posX,ty,posZ,posX,ty,negZ));
                 normalArray.addAll(Arrays.asList(0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f));
-                trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
 
                 vertexArray.addAll(Arrays.asList(negX, by, negZ, negX, by, posZ, posX, by, posZ, posX, by, negZ));
                 normalArray.addAll(Arrays.asList(0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f));
-                trigIdx = MeshMapUtility.addQuadToIndexes(indexArray, trigIdx);
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
 
                 if (hasNegZWall(room, x, z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,negZ,posX,ty,negZ,posX,by,negZ,negX,by,negZ));
                     normalArray.addAll(Arrays.asList(0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f,0.0f,0.0f,-1.0f));
-                    trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
+                    trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
                 }
 
                 if (hasPosZWall(room, x, z)) {
                     vertexArray.addAll(Arrays.asList(negX,ty,posZ,posX,ty,posZ,posX,by,posZ,negX,by,posZ));
                     normalArray.addAll(Arrays.asList(0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f));
-                    trigIdx=MeshMapUtility.addQuadToIndexes(indexArray,trigIdx);
+                    trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
                 }
             }
         }
 
-        vertexes=MeshMapUtility.floatArrayListToFloat(vertexArray);
-        normals=MeshMapUtility.floatArrayListToFloat(normalArray);
-        indexes=MeshMapUtility.intArrayListToInt(indexArray);
-        uvs = MeshMapUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
-        tangents = MeshMapUtility.buildTangents(vertexes, uvs, indexes);
+        vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
+        normals = MeshUtility.floatArrayListToFloat(normalArray);
+        indexes = MeshUtility.intArrayListToInt(indexArray);
+        uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
+        tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
         meshList.add(new Mesh(("platform_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
     }

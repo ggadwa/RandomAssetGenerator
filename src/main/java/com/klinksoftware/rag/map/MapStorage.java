@@ -63,7 +63,7 @@ public class MapStorage {
         for (stackLevel=0;stackLevel!=stackCount;stackLevel++) {
             boxHalfSize = boxSize * 0.5f;
             rotAngle.setFromValues(0.0f,(-10.0f+(AppWindow.random.nextFloat()*20.0f)),0.0f);
-            mesh2 = MeshMapUtility.createCubeRotated(room, name, "box", (dx - boxHalfSize), (dx + boxHalfSize), (by + dy), ((by + dy) + boxSize), (dz - boxHalfSize), (dz + boxHalfSize), rotAngle, true, true, true, true, true, (stackLevel != 0), false, MeshMapUtility.UV_WHOLE);
+            mesh2 = MeshUtility.createCubeRotated("box", (dx - boxHalfSize), (dx + boxHalfSize), (by + dy), ((by + dy) + boxSize), (dz - boxHalfSize), (dz + boxHalfSize), rotAngle, true, true, true, true, true, (stackLevel != 0), false, MeshUtility.UV_WHOLE);
 
             if (mesh==null) {
                 mesh=mesh2;
@@ -103,7 +103,7 @@ public class MapStorage {
 
         name = "storage_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
         rotAngle = new RagPoint(0.0f, (AppWindow.random.nextFloat(30.0f) - 15.0f), 0.0f);
-        meshList.add(MeshMapUtility.createCubeRotated(room, name, "box", (dx - boxWidth), (dx + boxWidth), by, (by + boxHeight), (dz - boxWidth), (dz + boxWidth), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_WHOLE));
+        meshList.add(MeshUtility.createCubeRotated("box", (dx - boxWidth), (dx + boxWidth), by, (by + boxHeight), (dz - boxWidth), (dz + boxWidth), rotAngle, true, true, true, true, true, true, false, MeshUtility.UV_WHOLE));
     }
 
         //
@@ -116,7 +116,7 @@ public class MapStorage {
 
         for (n = 0; n != boxCount; n++) {
             rotAngle = new RagPoint(0.0f, (AppWindow.random.nextFloat(30.0f) - 15.0f), 0.0f);
-            mesh2 = MeshMapUtility.createCubeRotated(room, boxName, "box", (bx - boxSize), (bx + boxSize), (by + shelfLegWidth), ((by + shelfLegWidth) + boxSize), (bz - boxSize), (bz + boxSize), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_WHOLE);
+            mesh2 = MeshUtility.createCubeRotated("box", (bx - boxSize), (bx + boxSize), (by + shelfLegWidth), ((by + shelfLegWidth) + boxSize), (bz - boxSize), (bz + boxSize), rotAngle, true, true, true, true, true, true, false, MeshUtility.UV_WHOLE);
             if (boxMesh == null) {
                 boxMesh = mesh2;
             } else {
@@ -162,7 +162,7 @@ public class MapStorage {
         for (stackLevel=0;stackLevel!=stackCount;stackLevel++) {
 
             // the table
-            mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, tableXMax, by, (by + shelfLegWidth), tableZMin, tableZMax, true, true, true, true, true, true, false, MeshMapUtility.UV_MAP);
+            mesh2 = MeshUtility.createCube("accessory", tableXMin, tableXMax, by, (by + shelfLegWidth), tableZMin, tableZMax, true, true, true, true, true, true, false, MeshUtility.UV_MAP);
             if (shelfMesh==null) {
                 shelfMesh=mesh2;
             }
@@ -172,16 +172,16 @@ public class MapStorage {
 
             // legs
             if (stackLevel != 0) {
-                mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, (tableXMin + shelfLegWidth), (by - shelfHeight), by, tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
+                mesh2 = MeshUtility.createCube("accessory", tableXMin, (tableXMin + shelfLegWidth), (by - shelfHeight), by, tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshUtility.UV_MAP);
                 shelfMesh.combine(mesh2);
 
-                mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", tableXMin, (tableXMin + shelfLegWidth), (by - shelfHeight), by, (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
+                mesh2 = MeshUtility.createCube("accessory", tableXMin, (tableXMin + shelfLegWidth), (by - shelfHeight), by, (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshUtility.UV_MAP);
                 shelfMesh.combine(mesh2);
 
-                mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", (tableXMax - shelfLegWidth), tableXMax, (by - shelfHeight), by, tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
+                mesh2 = MeshUtility.createCube("accessory", (tableXMax - shelfLegWidth), tableXMax, (by - shelfHeight), by, tableZMin, (tableZMin + shelfLegWidth), true, true, true, true, false, false, false, MeshUtility.UV_MAP);
                 shelfMesh.combine(mesh2);
 
-                mesh2 = MeshMapUtility.createCube(room, shelfName, "accessory", (tableXMax - shelfLegWidth), tableXMax, (by - shelfHeight), by, (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
+                mesh2 = MeshUtility.createCube("accessory", (tableXMax - shelfLegWidth), tableXMax, (by - shelfHeight), by, (tableZMax - shelfLegWidth), tableZMax, true, true, true, true, false, false, false, MeshUtility.UV_MAP);
                 shelfMesh.combine(mesh2);
             }
 
@@ -239,6 +239,7 @@ public class MapStorage {
         //
 
     public void build(MapRoom room, int roomNumber, float by, float decorations) {
+        /*
         int x, z;
 
         for (z = 0; z != room.piece.sizeZ; z++) {
@@ -265,6 +266,7 @@ public class MapStorage {
                 room.setBlockedGrid(x, z);
             }
         }
+         */
     }
 
 }

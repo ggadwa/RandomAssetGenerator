@@ -17,7 +17,7 @@ public class SettingsMap extends SettingsBase {
     private static final String[] MAP_TYPE = {"Indoor", "Outdoor"};
 
     private JButton generateMapButton, exportMapButton;
-    private JSlider mainFloorSizeSlider, upperFloorSizeSlider, lowerFloorSizeSlider, compactSlider, structureSlider, decorationSlider;
+    private JSlider mainFloorSizeSlider, upperFloorSizeSlider, lowerFloorSizeSlider, compactSlider;
     private JCheckBox complexCheckBox;
     private JComboBox mapTypeCombo;
 
@@ -51,12 +51,6 @@ public class SettingsMap extends SettingsBase {
         complexCheckBox = addCheckBox(y, "Complex", true);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        structureSlider = addSlider(y, "Structures", 0.5f);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        decorationSlider = addSlider(y, "Decorations", 0.2f);
-        y += (ROW_HEIGHT + ROW_GAP);
-
         exportMapButton = addButton(y, "Export Map", BUTTON_EXPORT_MAP);
     }
 
@@ -71,9 +65,7 @@ public class SettingsMap extends SettingsBase {
                         ((float) upperFloorSizeSlider.getValue() / 100.0f),
                         ((float) lowerFloorSizeSlider.getValue() / 100.0f),
                         ((float) compactSlider.getValue() / 100.0f),
-                        complexCheckBox.isSelected(),
-                        ((float) structureSlider.getValue() / 100.0f),
-                        ((float) decorationSlider.getValue() / 100.0f)
+                        complexCheckBox.isSelected()
                 )).execute();
                 return;
             case BUTTON_EXPORT_MAP:

@@ -23,34 +23,34 @@ public class MapStair {
         switch (dir) {
             case MeshMapUtility.STAIR_DIR_POS_Z:
                 if (AppWindow.random.nextBoolean()) {
-                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                    meshList.add(MeshUtility.createCube((upper ? "wall_main" : "wall_lower"), (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 }
                 if (AppWindow.random.nextBoolean()) {
-                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                    meshList.add(MeshUtility.createCube((upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 }
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_Z:
                 if (AppWindow.random.nextBoolean()) {
-                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                    meshList.add(MeshUtility.createCube((upper ? "wall_main" : "wall_lower"), (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 }
                 if (AppWindow.random.nextBoolean()) {
-                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                    meshList.add(MeshUtility.createCube((upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 }
                 break;
             case MeshMapUtility.STAIR_DIR_POS_X:
                 if (AppWindow.random.nextBoolean()) {
-                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                    meshList.add(MeshUtility.createCube((upper ? "wall_main" : "wall_lower"), sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 }
                 if (AppWindow.random.nextBoolean()) {
-                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                    meshList.add(MeshUtility.createCube((upper ? "wall_main" : "wall_lower"), sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 }
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_X:
                 if (AppWindow.random.nextBoolean()) {
-                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                    meshList.add(MeshUtility.createCube((upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 }
                 if (AppWindow.random.nextBoolean()) {
-                    meshList.add(MeshMapUtility.createCube(room, name, (upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+                    meshList.add(MeshUtility.createCube((upper ? "wall_main" : "wall_lower"), (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 }
                 break;
         }

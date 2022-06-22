@@ -9,12 +9,12 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
     private int mapType;
-    private float mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, structures, decorations;
+    private float mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact;
     private boolean complex;
 
     public static MapBuilder generatedMap = null;
 
-    public MapBuildWorker(AppWindow appWindow, int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompact, boolean complex, float structures, float decorations) {
+    public MapBuildWorker(AppWindow appWindow, int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompact, boolean complex) {
         this.appWindow = appWindow;
         this.mapType = mapType;
         this.mainFloorMapSize = mainFloorMapSize;
@@ -22,8 +22,6 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
         this.lowerFloorMapSize = lowerFloorMapSize;
         this.mapCompact = mapCompact;
         this.complex = complex;
-        this.structures = structures;
-        this.decorations = decorations;
     }
 
     @Override
@@ -44,7 +42,7 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 
         try {
             mapBuilder = new MapBuilder();
-            mapBuilder.build(mapType, mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, complex, structures, decorations);
+            mapBuilder.build(mapType, mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, complex);
         }
         catch (Exception e)
         {

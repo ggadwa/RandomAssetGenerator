@@ -158,13 +158,13 @@ public class MeshList
         indexArray.addAll(Arrays.asList(idx, (idx + 1), (idx + 2), idx, (idx + 2), (idx + 3)));
 
         // vertexes and indexes to arrays
-        vertexes = MeshMapUtility.floatArrayListToFloat(vertexArray);
-        indexes = MeshMapUtility.intArrayListToInt(indexArray);
+        vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
+        indexes = MeshUtility.intArrayListToInt(indexArray);
 
         // create the mesh
-        normals = MeshMapUtility.buildNormals(vertexes, indexes, new RagPoint(0.0f, 0.0f, 0.0f), false);
-        uvs = MeshMapUtility.floatArrayListToFloat(uvArray);
-        tangents = MeshMapUtility.buildTangents(vertexes, uvs, indexes);
+        normals = MeshUtility.buildNormals(vertexes, indexes, new RagPoint(0.0f, 0.0f, 0.0f), false);
+        uvs = MeshUtility.floatArrayListToFloat(uvArray);
+        tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
         meshes.clear();
         meshes.add(new Mesh("cube", bitmapName, vertexes, normals, tangents, uvs, indexes));

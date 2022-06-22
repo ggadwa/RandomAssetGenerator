@@ -56,7 +56,7 @@ public class MapEquipment {
         dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + widOffset;
 
         name = "pedestal_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        meshList.add(MeshMapUtility.createCube(room, name, "accessory", dx, (dx + width), by, (by + MapBuilder.FLOOR_HEIGHT), dz, (dz + width), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP));
+        meshList.add(MeshUtility.createCube("accessory", dx, (dx + width), by, (by + MapBuilder.FLOOR_HEIGHT), dz, (dz + width), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
     }
 
         //
@@ -78,7 +78,7 @@ public class MapEquipment {
         addPedestal(room, roomNumber, x, by, z, computerWidth);
 
         name = "computer_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        meshList.add(MeshMapUtility.createCube(room, name, "computer", dx, (dx + computerWidth), dy, (dy + computerHeight), dz, (dz + computerWidth), true, true, true, true, true, false, false, MeshMapUtility.UV_BOX));
+        meshList.add(MeshUtility.createCube("computer", dx, (dx + computerWidth), dy, (dy + computerHeight), dz, (dz + computerWidth), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
     }
 
         //
@@ -111,13 +111,13 @@ public class MapEquipment {
 
         rotAngle = new RagPoint(0.0f, (AppWindow.random.nextBoolean() ? 0.0f : 90.0f), 0.0f);
         name = "monitor_stand_bottom_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        mesh = MeshMapUtility.createCube(room, name, "accessory", (dx - deskHalfWid), (dx + deskHalfWid), by, (by + terminalHeight), (dz - deskShortHalfWid), (dz + deskShortHalfWid), true, true, true, true, true, false, false, MeshMapUtility.UV_MAP);
+        mesh = MeshUtility.createCube("accessory", (dx - deskHalfWid), (dx + deskHalfWid), by, (by + terminalHeight), (dz - deskShortHalfWid), (dz + deskShortHalfWid), true, true, true, true, true, false, false, MeshUtility.UV_MAP);
 
         by += terminalHeight;
 
         rotAngle.setFromValues(0.0f, (AppWindow.random.nextFloat() * 360.0f), 0.0f);
         name = "monitor_stand_top_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        mesh.combine(MeshMapUtility.createCubeRotated(room, name, "accessory", (dx - standHalfWid), (dx + standHalfWid), by, (by + standHigh), (dz - standHalfWid), (dz + standHalfWid), rotAngle, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP));
+        mesh.combine(MeshUtility.createCubeRotated("accessory", (dx - standHalfWid), (dx + standHalfWid), by, (by + standHigh), (dz - standHalfWid), (dz + standHalfWid), rotAngle, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
 
         meshList.add(mesh);
 
@@ -127,7 +127,7 @@ public class MapEquipment {
         by += standHigh;
 
         name = "monitor_stand_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        meshList.add(MeshMapUtility.createCubeRotated(room, name, "monitor", dx, (dx + terminalWidth), by, (by + ((terminalWidth * 6) / 9)), (dz - standHalfWid), (dz + standHalfWid), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_BOX));
+        meshList.add(MeshUtility.createCubeRotated("monitor", dx, (dx + terminalWidth), by, (by + ((terminalWidth * 6) / 9)), (dz - standHalfWid), (dz + standHalfWid), rotAngle, true, true, true, true, true, true, false, MeshUtility.UV_BOX));
     }
 
         //
@@ -154,7 +154,7 @@ public class MapEquipment {
 
         rotAngle = new RagPoint(0.0f, AppWindow.random.nextFloat(359.0f), 0.0f);
         name = "junction_panel_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        meshList.add(MeshMapUtility.createCubeRotated(room, name, "panel", (dx - juncHalfWid), (dx + juncHalfWid), (by + pipeHeight), ((by + pipeHeight) + junctionWidth), (dz - junctionHalfDepth), (dz + junctionHalfDepth), rotAngle, true, true, true, true, true, true, false, MeshMapUtility.UV_BOX));
+        meshList.add(MeshUtility.createCubeRotated("panel", (dx - juncHalfWid), (dx + juncHalfWid), (by + pipeHeight), ((by + pipeHeight) + junctionWidth), (dz - junctionHalfDepth), (dz + junctionHalfDepth), rotAngle, true, true, true, true, true, true, false, MeshUtility.UV_BOX));
 
             // the pipes
 
@@ -165,7 +165,7 @@ public class MapEquipment {
             pipePnt = new RagPoint(((dx - juncHalfWid) + pipeRadius), by, dz);
             pipePnt.rotateAroundPoint(centerPnt, rotAngle);
             name = "junction_upper_neg_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, ((by + pipeHeight) + junctionWidth), (by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)), pipeRadius, false, false);
+            mesh2 = MeshUtility.createMeshCylinderSimple("pipe", 16, pipePnt, ((by + pipeHeight) + junctionWidth), (by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)), pipeRadius, false, false);
             if (mesh == null) {
                 mesh = mesh2;
             } else {
@@ -176,7 +176,7 @@ public class MapEquipment {
             pipePnt = new RagPoint(dx, by, dz);
             pipePnt.rotateAroundPoint(centerPnt, rotAngle);
             name = "junction_upper_center_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, ((by + pipeHeight) + junctionWidth), (by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)), pipeRadius, false, false);
+            mesh2 = MeshUtility.createMeshCylinderSimple("pipe", 16, pipePnt, ((by + pipeHeight) + junctionWidth), (by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)), pipeRadius, false, false);
             if (mesh == null) {
                 mesh = mesh2;
             } else {
@@ -187,7 +187,7 @@ public class MapEquipment {
             pipePnt = new RagPoint(((dx + juncHalfWid) - pipeRadius), by, dz);
             pipePnt.rotateAroundPoint(centerPnt, rotAngle);
             name = "junction_upper_pos_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, ((by + pipeHeight) + junctionWidth), (by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)), pipeRadius, false, false);
+            mesh2 = MeshUtility.createMeshCylinderSimple("pipe", 16, pipePnt, ((by + pipeHeight) + junctionWidth), (by + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT)), pipeRadius, false, false);
             if (mesh == null) {
                 mesh = mesh2;
             } else {
@@ -199,7 +199,7 @@ public class MapEquipment {
             pipePnt = new RagPoint(((dx - juncHalfWid) + pipeRadius), by, dz);
             pipePnt.rotateAroundPoint(centerPnt, rotAngle);
             name = "junction_lower_neg_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, by, (by + pipeHeight), pipeRadius, false, false);
+            mesh2 = MeshUtility.createMeshCylinderSimple("pipe", 16, pipePnt, by, (by + pipeHeight), pipeRadius, false, false);
             if (mesh == null) {
                 mesh = mesh2;
             } else {
@@ -210,7 +210,7 @@ public class MapEquipment {
             pipePnt = new RagPoint(dx, by, dz);
             pipePnt.rotateAroundPoint(centerPnt, rotAngle);
             name = "junction_lower_center_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, by, (by + pipeHeight), pipeRadius, false, false);
+            mesh2 = MeshUtility.createMeshCylinderSimple("pipe", 16, pipePnt, by, (by + pipeHeight), pipeRadius, false, false);
             if (mesh == null) {
                 mesh = mesh2;
             } else {
@@ -221,7 +221,7 @@ public class MapEquipment {
             pipePnt = new RagPoint(((dx + juncHalfWid) - pipeRadius), by, dz);
             pipePnt.rotateAroundPoint(centerPnt, rotAngle);
             name = "junction_lower_pos_pipe_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-            mesh2 = MeshMapUtility.createMeshCylinderSimple(room, name, "pipe", 16, pipePnt, by, (by + pipeHeight), pipeRadius, false, false);
+            mesh2 = MeshUtility.createMeshCylinderSimple("pipe", 16, pipePnt, by, (by + pipeHeight), pipeRadius, false, false);
             if (mesh == null) {
                 mesh = mesh2;
             } else {
@@ -239,6 +239,7 @@ public class MapEquipment {
         //
 
     public void build(MapRoom room, int roomNumber, float by, float decorations) {
+        /*
         int x, z;
 
         for (z = 0; z != room.piece.sizeZ; z++) {
@@ -265,6 +266,7 @@ public class MapEquipment {
                 room.setBlockedGrid(x, z);
             }
         }
+         */
     }
 
 }

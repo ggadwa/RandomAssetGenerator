@@ -1,26 +1,24 @@
 
 
-- walkthrough
-   - gravity and collision
-   - global mouse (probably not, the jhook thing seems crashy)
+
+- move all the models
 
 outside changes
- - outdoor random is bad at moving similiar vertexes
+ - outdoor random is bad at moving same vertexes
 
 
 
 map
  - don't allow upper and lower in same room
- - get rid of altar, maybe "den" etc?
- - get pipes working again
 
 model
- - make textures one or two eye
+ 
 
 - need to export tangents
 
 bitmaps
  - more distinct control panels pieces (keyboard)
+ - make textures one or two eye
 
 sound
  - random silences in monster?

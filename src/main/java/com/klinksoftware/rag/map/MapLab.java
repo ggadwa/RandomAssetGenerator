@@ -61,13 +61,13 @@ public class MapLab {
         // the stacked shelves
         tableName = "table_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
 
-        mesh = MeshMapUtility.createCube(room, tableName, "accessory", tableXMin, (tableXMin + tableLegWidth), by, (by + tableHeight), tableZMin, (tableZMin + tableLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP);
-        mesh.combine(MeshMapUtility.createCube(room, tableName, "accessory", tableXMin, (tableXMin + tableLegWidth), by, (by + tableHeight), (tableZMax - tableLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP));
-        mesh.combine(MeshMapUtility.createCube(room, tableName, "accessory", (tableXMax - tableLegWidth), tableXMax, by, (by + tableHeight), tableZMin, (tableZMin + tableLegWidth), true, true, true, true, false, false, false, MeshMapUtility.UV_MAP));
-        mesh.combine(MeshMapUtility.createCube(room, tableName, "accessory", (tableXMax - tableLegWidth), tableXMax, by, (by + tableHeight), (tableZMax - tableLegWidth), tableZMax, true, true, true, true, false, false, false, MeshMapUtility.UV_MAP));
+        mesh = MeshUtility.createCube("accessory", tableXMin, (tableXMin + tableLegWidth), by, (by + tableHeight), tableZMin, (tableZMin + tableLegWidth), true, true, true, true, false, false, false, MeshUtility.UV_MAP);
+        mesh.combine(MeshUtility.createCube("accessory", tableXMin, (tableXMin + tableLegWidth), by, (by + tableHeight), (tableZMax - tableLegWidth), tableZMax, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
+        mesh.combine(MeshUtility.createCube("accessory", (tableXMax - tableLegWidth), tableXMax, by, (by + tableHeight), tableZMin, (tableZMin + tableLegWidth), true, true, true, true, false, false, false, MeshUtility.UV_MAP));
+        mesh.combine(MeshUtility.createCube("accessory", (tableXMax - tableLegWidth), tableXMax, by, (by + tableHeight), (tableZMax - tableLegWidth), tableZMax, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
 
         // the table
-        mesh.combine(MeshMapUtility.createCube(room, tableName, "accessory", tableXMin, tableXMax, (by + tableHeight), ((by + tableHeight) + tableLegWidth), tableZMin, tableZMax, true, true, true, true, true, true, false, MeshMapUtility.UV_MAP));
+        mesh.combine(MeshUtility.createCube("accessory", tableXMin, tableXMax, (by + tableHeight), ((by + tableHeight) + tableLegWidth), tableZMin, tableZMax, true, true, true, true, true, true, false, MeshUtility.UV_MAP));
 
         meshList.add(mesh);
     }
@@ -101,17 +101,17 @@ public class MapLab {
         yTopCapBy = yBotCapTy + (tubeHeight - (tubeBotCapHeight + tubeTopCapHeight));
         yTopCapTy = yTopCapBy + tubeTopCapHeight;
 
-        mesh = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, false);
-        mesh2 = MeshMapUtility.createMeshCylinderSimple(room, (name + "_top"), "accessory", 16, centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
+        mesh = MeshUtility.createMeshCylinderSimple("accessory", 16, centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, false);
+        mesh2 = MeshUtility.createMeshCylinderSimple("accessory", 16, centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
         mesh.combine(mesh2);
         meshList.add(mesh);
 
         // the tube
-        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_glass"), "glass", 16, centerPnt, yTopCapBy, yBotCapTy, tubeRadius, false, false));
+        meshList.add(MeshUtility.createMeshCylinderSimple("glass", 16, centerPnt, yTopCapBy, yBotCapTy, tubeRadius, false, false));
 
         // the liquid in the tube
         y = yBotCapTy + (AppWindow.random.nextFloat() * (yTopCapBy - yBotCapTy));
-        meshList.add(MeshMapUtility.createMeshCylinderSimple(room, (name + "_liquid"), "liquid", 16, centerPnt, y, yBotCapTy, (tubeRadius * 0.98f), true, false));
+        meshList.add(MeshUtility.createMeshCylinderSimple("liquid", 16, centerPnt, y, yBotCapTy, (tubeRadius * 0.98f), true, false));
     }
 
     //
@@ -134,23 +134,23 @@ public class MapLab {
         //barrelRadius,barrelRingHeight,barrelSectionHeight
         // barrel parts
         centerPnt = new RagPoint(dx, (by + (barrelRingHeight * 0.5f)), dz);
-        mesh = MeshMapUtility.createMeshCylinderSimple(room, name, "barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, false, true);
+        mesh = MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, false, true);
 
         by += barrelRingHeight;
         centerPnt = new RagPoint(dx, (by + (barrelSectionHeight * 0.5f)), dz);
-        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "barrel", 16, centerPnt, by, (by + barrelSectionHeight), barrelSectionRadius, false, false));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelSectionHeight), barrelSectionRadius, false, false));
 
         by += barrelSectionHeight;
         centerPnt = new RagPoint(dx, (by + (barrelRingHeight * 0.5f)), dz);
-        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
 
         by += barrelRingHeight;
         centerPnt = new RagPoint(dx, (by + (barrelSectionHeight * 0.5f)), dz);
-        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "barrel", 16, centerPnt, by, (by + barrelSectionHeight), barrelSectionRadius, false, false));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelSectionHeight), barrelSectionRadius, false, false));
 
         by += barrelSectionHeight;
         centerPnt = new RagPoint(dx, (by + (barrelRingHeight * 0.5f)), dz);
-        mesh.combine(MeshMapUtility.createMeshCylinderSimple(room, name, "barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
 
         meshList.add(mesh);
     }
@@ -159,6 +159,7 @@ public class MapLab {
     // lab build
     //
     public void build(MapRoom room, int roomNumber, float by, float decorations) {
+        /*
         int x, z;
 
         for (z = 0; z != room.piece.sizeZ; z++) {
@@ -185,6 +186,7 @@ public class MapLab {
                 room.setBlockedGrid(x, z);
             }
         }
+         */
     }
 
 }
