@@ -187,20 +187,127 @@ public class Mesh
 
             // check for equal vertexes to move
             for (Mesh mesh : meshes) {
-                if (mesh == this) {
-                    continue;
-                }
-
                 nCheckVertex = mesh.vertexes.length / 3;
 
                 vIdx = 0;
 
                 for (k = 0; k != nCheckVertex; k++) {
+                    if ((mesh == this) && (k == n)) {
+                        continue;
+                    }
                     checkVertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
                     if (checkVertex.isCloseEqual(origVertex)) {
                         mesh.vertexes[vIdx] = vertex.x;
                         mesh.vertexes[vIdx + 1] = vertex.y;
                         mesh.vertexes[vIdx + 2] = vertex.z;
+                    }
+                    vIdx += 3;
+                }
+            }
+        }
+    }
+
+    public void randomizeWallVertexesFromCenter(float percentMove, float moveFactor, RagPoint centerPnt, ArrayList<Mesh> meshes) {
+        int n, k, vIdx, nVertex, nCheckVertex;
+        RagPoint normal, vertex, origVertex, checkVertex;
+
+        normal = new RagPoint(0.0f, 0.0f, 0.0f);
+        vertex = new RagPoint(0.0f, 0.0f, 0.0f);
+        origVertex = new RagPoint(0.0f, 0.0f, 0.0f);
+        checkVertex = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        nVertex = vertexes.length / 3;
+
+        for (n = 0; n != nVertex; n++) {
+            if (AppWindow.random.nextFloat() > percentMove) {
+                continue;
+            }
+
+            vIdx = n * 3;
+
+            // if normals face up, then it's not a wall, skip it
+            if (normals[vIdx + 1] != 0.0f) {
+                continue;
+            }
+
+            // remember the original to compare
+            origVertex.setFromValues(vertexes[vIdx], vertexes[vIdx + 1], vertexes[vIdx + 2]);
+
+            // move away from center
+            normal.setFromSubPoint(origVertex, centerPnt);
+            normal.normalize();
+            normal.scale(AppWindow.random.nextFloat(moveFactor));   // always move outwards
+
+            vertex.setFromPoint(origVertex);
+            vertex.addPoint(normal);
+            vertexes[vIdx] = vertex.x;
+            vertexes[vIdx + 1] = vertex.y;
+            vertexes[vIdx + 2] = vertex.z;
+
+            // check for equal vertexes to move, we ignore the Y so we
+            // catch all parts of the wall segment at once
+            for (Mesh mesh : meshes) {
+                nCheckVertex = mesh.vertexes.length / 3;
+
+                vIdx = 0;
+
+                for (k = 0; k != nCheckVertex; k++) {
+                    if ((mesh == this) && (k == n)) {
+                        continue;
+                    }
+                    checkVertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
+                    if (checkVertex.isCloseEqualIgnoreY(origVertex)) {
+                        mesh.vertexes[vIdx] = vertex.x;
+                        mesh.vertexes[vIdx + 2] = vertex.z;
+                    }
+                    vIdx += 3;
+                }
+            }
+        }
+    }
+
+    public void randomizeFloorVertexes(float percentMove, float moveFactor, ArrayList<Mesh> meshes) {
+        int n, k, vIdx, nVertex, nCheckVertex;
+        float y;
+        RagPoint origVertex, checkVertex;
+
+        origVertex = new RagPoint(0.0f, 0.0f, 0.0f);
+        checkVertex = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        nVertex = vertexes.length / 3;
+
+        for (n = 0; n != nVertex; n++) {
+            if (AppWindow.random.nextFloat() > percentMove) {
+                continue;
+            }
+
+            vIdx = n * 3;
+
+            // skip anything not a floor
+            if (normals[vIdx + 1] == 0.0f) {
+                continue;
+            }
+
+            // remember the original to compare
+            origVertex.setFromValues(vertexes[vIdx], vertexes[vIdx + 1], vertexes[vIdx + 2]);
+
+            // move up randomly
+            y = vertexes[vIdx + 1] + (AppWindow.random.nextFloat(moveFactor));
+            vertexes[vIdx + 1] = y;
+
+            // check for equal vertexes to move
+            for (Mesh mesh : meshes) {
+                nCheckVertex = mesh.vertexes.length / 3;
+
+                vIdx = 0;
+
+                for (k = 0; k != nCheckVertex; k++) {
+                    if ((mesh == this) && (k == n)) {
+                        continue;
+                    }
+                    checkVertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
+                    if (checkVertex.isCloseEqual(origVertex)) {
+                        mesh.vertexes[vIdx + 1] = y;
                     }
                     vIdx += 3;
                 }

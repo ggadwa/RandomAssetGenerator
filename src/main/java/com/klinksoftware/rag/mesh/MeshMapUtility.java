@@ -471,7 +471,7 @@ public class MeshMapUtility
         }
     }
 
-    public static void buildRoomWalls(MeshList meshList, MapRoom room, RagPoint centerPnt, int roomNumber) {
+    public static void buildRoomIndoorWalls(MeshList meshList, MapRoom room, RagPoint centerPnt, int roomNumber) {
         int n, n2, trigIdx, vertexCount;
         float y;
         int[] indexes;
@@ -601,6 +601,53 @@ public class MeshMapUtility
                     meshList.add(new Mesh(("platform_lower_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
                     break;
             }
+        }
+    }
+
+    public static void buildRoomOutdoorWalls(MeshList meshList, MapRoom room, RagPoint centerPnt, int roomNumber) {
+        int n, n2, trigIdx, vertexCount;
+        int[] indexes;
+        float[] vertexes, normals, tangents, uvs;
+        ArrayList<Float> vertexArray;
+        ArrayList<Integer> indexArray;
+        MapPiece piece;
+
+        piece = room.piece;
+        vertexCount = piece.vertexes.length;
+
+        // regular walls
+        vertexArray = new ArrayList<>();
+        indexArray = new ArrayList<>();
+
+        trigIdx = 0;
+        vertexCount = piece.vertexes.length;
+
+        for (n = 0; n != vertexCount; n++) {
+
+            n2 = n + 1;
+            if (n2 == vertexCount) {
+                n2 = 0;
+            }
+
+            if (room.isWallHidden(n)) {
+                continue;
+            }
+
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (MapBuilder.SEGMENT_SIZE * 2.0f), ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (MapBuilder.SEGMENT_SIZE * 2.0f), ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), 0.0f, ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), 0.0f, ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            trigIdx = addQuadToIndexes(indexArray, trigIdx);
+        }
+
+        if (trigIdx != 0) {
+            vertexes = floatArrayListToFloat(vertexArray);
+            indexes = intArrayListToInt(indexArray);
+            normals = MeshMapUtility.buildNormals(vertexes, indexes, centerPnt, true);
+            uvs = MeshMapUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
+            tangents = MeshMapUtility.buildTangents(vertexes, uvs, indexes);
+
+            meshList.add(new Mesh(("wall_main_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
         }
     }
 

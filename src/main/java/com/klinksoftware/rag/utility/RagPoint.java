@@ -220,4 +220,8 @@ public class RagPoint
     public boolean isCloseEqual(RagPoint pnt) {
         return (((int) (pnt.x * 100.0f) == (int) (x * 100.0f)) && ((int) (pnt.y * 100.0f) == (int) (y * 100.0f)) && ((int) (pnt.z * 100.0f) == (int) (z * 100.0f)));
     }
+
+    public boolean isCloseEqualIgnoreY(RagPoint pnt) {
+        return (((int) (pnt.x * 100.0f) == (int) (x * 100.0f)) && ((int) (pnt.z * 100.0f) == (int) (z * 100.0f)));
+    }
 }

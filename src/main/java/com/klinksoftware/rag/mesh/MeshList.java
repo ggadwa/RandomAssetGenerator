@@ -176,4 +176,16 @@ public class MeshList
         }
     }
 
+    public void randomizeWallVertexesFromCenter(float percentMove, float moveFactor, RagPoint centerPnt) {
+        for (Mesh mesh : meshes) {
+            mesh.randomizeWallVertexesFromCenter(percentMove, moveFactor, centerPnt, meshes);
+        }
+    }
+
+    public void randomizeFloorVertexes(float percentMove, float moveFactor) {
+        for (Mesh mesh : meshes) {
+            mesh.randomizeFloorVertexes(percentMove, moveFactor, meshes);
+        }
+    }
+
 }

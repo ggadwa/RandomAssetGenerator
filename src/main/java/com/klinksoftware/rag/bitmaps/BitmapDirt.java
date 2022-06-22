@@ -2,6 +2,8 @@ package com.klinksoftware.rag.bitmaps;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
+import java.awt.Rectangle;
+import java.util.ArrayList;
 
 @BitmapInterface
 public class BitmapDirt extends BitmapBase {
@@ -17,11 +19,14 @@ public class BitmapDirt extends BitmapBase {
 
     @Override
     public void generateInternal() {
-        int n, stoneCount, maxStoneSize;
+        int n, k, stoneCount, maxStoneSize, failCount;
         int lft, rgt, top, bot, edgeSize;
         float xRoundFactor, yRoundFactor, normalZFactor;
         float[] backgroundData, stoneCopyData;
+        boolean hit;
         RagColor dirtColor, stoneColor, drawStoneColor, outlineColor;
+        Rectangle testRect;
+        ArrayList<Rectangle> rects;
 
         // background is always brownish
         dirtColor = new RagColor((0.4f + AppWindow.random.nextFloat(0.2f)), (0.2f + AppWindow.random.nextFloat(0.2f)), (0.0f + AppWindow.random.nextFloat(0.1f)));
@@ -46,19 +51,45 @@ public class BitmapDirt extends BitmapBase {
         backgroundData = colorData.clone();
         stoneCopyData = colorData.clone();
 
-        stoneCount = AppWindow.random.nextInt(10);
+        stoneCount = 3 + AppWindow.random.nextInt(8);
         maxStoneSize = textureSize / 5;
 
         createPerlinNoiseData(32, 32);
         createNormalNoiseData(5.0f, 0.3f);
 
+        rects = new ArrayList<>();
+
         for (n = 0; n != stoneCount; n++) {
             drawStoneColor = adjustColorRandom(stoneColor, 0.7f, 1.2f);
 
-            lft = AppWindow.random.nextInt(textureSize - maxStoneSize);
-            rgt = lft + ((maxStoneSize / 2) + AppWindow.random.nextInt(maxStoneSize / 2));
-            top = AppWindow.random.nextInt(textureSize - maxStoneSize);
-            bot = top + ((maxStoneSize / 2) + AppWindow.random.nextInt(maxStoneSize / 2));
+            failCount = 0;
+            lft = rgt = top = bot = 0;
+            testRect = null;
+
+            while (failCount < 10) {
+                lft = AppWindow.random.nextInt(textureSize - maxStoneSize);
+                rgt = lft + ((maxStoneSize / 4) + AppWindow.random.nextInt((maxStoneSize * 3) / 4));
+                top = AppWindow.random.nextInt(textureSize - maxStoneSize);
+                bot = top + ((maxStoneSize / 4) + AppWindow.random.nextInt((maxStoneSize * 3) / 4));
+
+                hit = false;
+
+                testRect = new Rectangle(lft, top, (rgt - lft), (bot - top));
+                for (k = 0; k != rects.size(); k++) {
+                    if (testRect.intersects(rects.get(k))) {
+                        hit = true;
+                        break;
+                    }
+                }
+
+                if (!hit) {
+                    break;
+                }
+
+                failCount++;
+            }
+
+            rects.add(testRect);
 
             edgeSize = (int) ((AppWindow.random.nextFloat() * ((float) textureSize * 0.1f)) + (AppWindow.random.nextFloat() * ((float) textureSize * 0.2f))); // new edge size as stones aren't the same
             xRoundFactor = 0.02f + (AppWindow.random.nextFloat() * 0.05f);

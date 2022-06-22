@@ -268,8 +268,9 @@ public class BitmapMetal extends BitmapBase
 
     private void generateMetalTreads(RagColor metalColor, int edgeSize, int screwSize) {
         int n, ty, by, yAdd, treadCount;
+        int streakWid, sx, ex;
         boolean alternateScrews;
-        RagColor color, altMetalColor, frameColor, outlineColor;
+        RagColor color, altMetalColor, frameColor, outlineColor, streakColor;
 
         alternateScrews = AppWindow.random.nextBoolean();
         altMetalColor = adjustColorRandom(metalColor, 0.7f, 1.1f);
@@ -291,6 +292,17 @@ public class BitmapMetal extends BitmapBase
             drawPerlinNoiseRect(0, ty, textureSize, by, 0.8f, 1.0f);
             drawMetalShine(0, ty, textureSize, by, color);
             draw3DFrameRect(0, ty, textureSize, by, edgeSize, frameColor, true);
+
+            // any dirt streaks
+            if (AppWindow.random.nextFloat() < 0.3f) {
+                streakWid = 25 + AppWindow.random.nextInt(25);
+
+                sx = AppWindow.random.nextInt(textureSize - streakWid);
+                ex = sx + streakWid;
+
+                streakColor = adjustColorRandom(metalColor, 0.65f, 0.75f);
+                drawStreakDirt(sx, ty, ex, by, 5, 0.25f, 0.45f, streakColor);
+            }
 
             // any screws
             if ((!alternateScrews) || ((n & 0x1) == 0)) {

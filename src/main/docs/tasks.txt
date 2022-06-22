@@ -1,18 +1,25 @@
 
 
+- walkthrough
+   - gravity and collision
+   - global mouse (probably not, the jhook thing seems crashy)
+
+outside changes
+ - outdoor random is bad at moving similiar vertexes
+
+
+
 map
  - don't allow upper and lower in same room
- - outside map
  - get rid of altar, maybe "den" etc?
  - get pipes working again
 
 model
+ - make textures one or two eye
 
 - need to export tangents
 
 bitmaps
- - metals can have dirtstreak (like brick)
- - dirt needs to not collide stones
  - more distinct control panels pieces (keyboard)
 
 sound
