@@ -8,6 +8,7 @@ import com.klinksoftware.rag.mesh.MeshList;
 import com.klinksoftware.rag.mesh.MeshModelUtility;
 import com.klinksoftware.rag.skeleton.Limb;
 import com.klinksoftware.rag.skeleton.Skeleton;
+import com.klinksoftware.rag.utility.RagPoint;
 import java.util.HashMap;
 
 public class ModelBase {
@@ -62,7 +63,33 @@ public class ModelBase {
         }
     }
 
-    // override
+    // overrides
+    public float getCameraDistance() {
+        return (8.0f);
+    }
+
+    public float getCameraLightDistance() {
+        return (2.0f);
+    }
+
+    public float getCameraRotateX() {
+        return (0.0f);
+    }
+
+    public float getCameraRotateY() {
+        return (0.0f);
+    }
+
+    public float getCameraOffsetY() {
+        RagPoint min, max;
+
+        min = new RagPoint(0.0f, 0.0f, 0.0f);
+        max = new RagPoint(0.0f, 0.0f, 0.0f);
+        meshList.getMixMaxVertex(min, max);
+
+        return ((max.y - min.y) / 2.0f);
+    }
+
     public void buildInternal() {
     }
 

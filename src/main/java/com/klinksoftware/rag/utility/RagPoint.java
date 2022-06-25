@@ -53,6 +53,30 @@ public class RagPoint
         this.z-=p.z;
     }
 
+    public void setIfMin(RagPoint p) {
+        if (p.x < this.x) {
+            this.x = p.x;
+        }
+        if (p.y < this.y) {
+            this.y = p.y;
+        }
+        if (p.z < this.z) {
+            this.z = p.z;
+        }
+    }
+
+    public void setIfMax(RagPoint p) {
+        if (p.x > this.x) {
+            this.x = p.x;
+        }
+        if (p.y > this.y) {
+            this.y = p.y;
+        }
+        if (p.z > this.z) {
+            this.z = p.z;
+        }
+    }
+
     public void scale(float f)
     {
         x*=f;

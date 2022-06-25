@@ -667,8 +667,8 @@ public class MeshUtility {
             for (n = 0; n != sideCount; n++) {
                 rd = ang * ((float) Math.PI / 180.0f);
 
-                u1 = (ang * (float) segCount) / 360.0f;
-                vt = 1.0f - (ty * vScale);
+                u1 = (topRad * (float) Math.cos(rd)) * (1.0f / MapBuilder.SEGMENT_SIZE);
+                vt = (topRad * (float) Math.sin(rd)) * (1.0f / MapBuilder.SEGMENT_SIZE);
 
                 tx = centerPnt.x + (topRad * (float) Math.cos(rd));
                 tz = centerPnt.z + (topRad * (float) Math.sin(rd));
@@ -697,8 +697,8 @@ public class MeshUtility {
             for (n = 0; n != sideCount; n++) {
                 rd = ang * ((float) Math.PI / 180.0f);
 
-                u1 = (ang * (float) segCount) / 360.0f;
-                vb = 1.0f - (by * vScale);
+                u1 = (botRad * (float) Math.cos(rd)) * (1.0f / MapBuilder.SEGMENT_SIZE);
+                vb = (botRad * (float) Math.sin(rd)) * (1.0f / MapBuilder.SEGMENT_SIZE);
 
                 bx = centerPnt.x + (botRad * (float) Math.cos(rd));
                 bz = centerPnt.z + (botRad * (float) Math.sin(rd));

@@ -27,7 +27,7 @@ public class BitmapGlass extends BitmapBase
 
         // default glass to random gray
 
-        drawRect(0, 0, textureSize, textureSize, this.getRandomGray(0.2f, 0.8f));
+        drawRect(0, 0, textureSize, textureSize, this.getRandomGray(0.6f, 0.9f));
 
             // back noise and blur
 

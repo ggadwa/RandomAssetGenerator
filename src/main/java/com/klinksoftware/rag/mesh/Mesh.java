@@ -103,25 +103,27 @@ public class Mesh
     public void combine(Mesh mesh) {
         int n, idx, indexOffset;
         int[] indexes2;
-        float[] vertexes2, normals2, uvs2;
+        float[] vertexes2, uvs2, normals2, tangents2;
 
-            // combine the arrays
-
+        // combine the arrays
         vertexes2=new float[vertexes.length+mesh.vertexes.length];
         System.arraycopy(vertexes,0,vertexes2,0,vertexes.length);
-        System.arraycopy(mesh.vertexes,0,vertexes2,vertexes.length,mesh.vertexes.length);
+        System.arraycopy(mesh.vertexes, 0, vertexes2, vertexes.length, mesh.vertexes.length);
+
+        uvs2 = new float[uvs.length + mesh.uvs.length];
+        System.arraycopy(uvs, 0, uvs2, 0, uvs.length);
+        System.arraycopy(mesh.uvs, 0, uvs2, uvs.length, mesh.uvs.length);
 
         normals2=new float[normals.length+mesh.normals.length];
         System.arraycopy(normals,0,normals2,0,normals.length);
         System.arraycopy(mesh.normals,0,normals2,normals.length,mesh.normals.length);
 
-        uvs2=new float[uvs.length+mesh.uvs.length];
-        System.arraycopy(uvs,0,uvs2,0,uvs.length);
-        System.arraycopy(mesh.uvs,0,uvs2,uvs.length,mesh.uvs.length);
+        tangents2 = new float[tangents.length + mesh.tangents.length];
+        System.arraycopy(tangents, 0, tangents2, 0, tangents.length);
+        System.arraycopy(mesh.tangents, 0, tangents2, tangents.length, mesh.tangents.length);
 
-            // new indexes need to be offset from
-            // this meshes vertexes
-
+        // new indexes need to be offset from
+        // this meshes vertexes
         indexes2=new int[indexes.length+mesh.indexes.length];
         System.arraycopy(indexes,0,indexes2,0,indexes.length);
 
@@ -132,11 +134,11 @@ public class Mesh
             indexes2[idx++]=mesh.indexes[n]+indexOffset;
         }
 
-            // and move over new arrays
-
-        vertexes=vertexes2;
-        normals=normals2;
-        uvs=uvs2;
+        // and move over new arrays
+        vertexes = vertexes2;
+        uvs = uvs2;
+        normals = normals2;
+        tangents = tangents2;
         indexes=indexes2;
     }
 

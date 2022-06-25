@@ -10,6 +10,11 @@ import com.klinksoftware.rag.utility.RagPoint;
 public class ModelLabTube extends ModelBase {
 
     @Override
+    public float getCameraRotateY() {
+        return (10.0f);
+    }
+
+    @Override
     public void buildInternal() {
         float yBotCapBy, yBotCapTy, yTopCapBy, yTopCapTy, y;
         float tubeCapRadius, tubeRadius, tubeHeight, tubeTopCapHeight, tubeBotCapHeight;
@@ -22,9 +27,9 @@ public class ModelLabTube extends ModelBase {
 
         tubeCapRadius = (MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f))) * 0.5f;
         tubeRadius = tubeCapRadius * (0.7f + AppWindow.random.nextFloat(0.2f));
-        tubeHeight = (MapBuilder.SEGMENT_SIZE - MapBuilder.FLOOR_HEIGHT) * (0.7f + AppWindow.random.nextFloat(0.3f));
-        tubeTopCapHeight = tubeHeight * (0.15f + AppWindow.random.nextFloat(0.2f));
-        tubeBotCapHeight = tubeHeight * (0.15f + AppWindow.random.nextFloat(0.2f));
+        tubeHeight = (MapBuilder.SEGMENT_SIZE - MapBuilder.FLOOR_HEIGHT) * (0.7f + AppWindow.random.nextFloat(0.5f));
+        tubeTopCapHeight = tubeHeight * (0.05f + AppWindow.random.nextFloat(0.2f));
+        tubeBotCapHeight = tubeHeight * (0.05f + AppWindow.random.nextFloat(0.2f));
 
         // tube center
         centerPnt = new RagPoint(0, (tubeHeight * 0.5f), 0);
@@ -36,7 +41,7 @@ public class ModelLabTube extends ModelBase {
         yTopCapBy = yBotCapTy + (tubeHeight - (tubeBotCapHeight + tubeTopCapHeight));
         yTopCapTy = yTopCapBy + tubeTopCapHeight;
 
-        mesh = MeshUtility.createMeshCylinderSimple("accessory", 16, centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, false);
+        mesh = MeshUtility.createMeshCylinderSimple("accessory", 16, centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, true);
         mesh2 = MeshUtility.createMeshCylinderSimple("accessory", 16, centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
         mesh.combine(mesh2);
         meshList.add(mesh);

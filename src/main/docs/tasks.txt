@@ -6,7 +6,9 @@
 outside changes
  - outdoor random is bad at moving same vertexes
 
-
+model
+ table: bars on legs
+ lab tube: extra pipes, maybe base, maybe control unit
 
 map
  - don't allow upper and lower in same room

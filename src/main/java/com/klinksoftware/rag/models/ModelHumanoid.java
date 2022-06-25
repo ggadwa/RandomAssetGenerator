@@ -18,7 +18,7 @@ public class ModelHumanoid extends ModelBase {
 
         // any randomization
         if (AppWindow.random.nextBoolean()) {
-            meshList.randomizeVertexes((0.6f + AppWindow.random.nextFloat(1.0f)), (0.05f + AppWindow.random.nextFloat(0.15f)));
+            meshList.randomizeVertexes((0.6f + AppWindow.random.nextFloat(1.0f)), (0.025f + AppWindow.random.nextFloat(0.05f)));
         }
 
         // skeletons and meshes are created with absolute

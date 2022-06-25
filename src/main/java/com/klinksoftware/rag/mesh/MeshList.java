@@ -188,4 +188,20 @@ public class MeshList
         }
     }
 
+    public void getMixMaxVertex(RagPoint min, RagPoint max) {
+        RagPoint meshMin, meshMax;
+
+        meshMin = new RagPoint(0.0f, 0.0f, 0.0f);
+        meshMax = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        min.setFromValues(0.0f, 0.0f, 0.0f);
+        max.setFromValues(0.0f, 0.0f, 0.0f);
+
+        for (Mesh mesh : meshes) {
+            mesh.getMinMaxVertex(meshMin, meshMax);
+            min.setIfMin(meshMin);
+            max.setIfMax(meshMax);
+        }
+    }
+
 }

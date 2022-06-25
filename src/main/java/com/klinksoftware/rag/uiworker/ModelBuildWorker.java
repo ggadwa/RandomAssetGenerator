@@ -43,7 +43,7 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
         generatedModel = model;
 
         // and set the walk view
-        AppWindow.walkView.setCameraCenterRotate(8.0f, 0.0f, (model.skeleton.standing ? 0.0f : 90.0f), (model.skeleton.standing ? 4.5f : 4.5f), 2.0f);
+        AppWindow.walkView.setCameraCenterRotate(model.getCameraDistance(), model.getCameraRotateX(), model.getCameraRotateY(), model.getCameraOffsetY(), model.getCameraLightDistance());
         AppWindow.walkView.setIncommingMeshList(model.meshList, model.skeleton, model.bitmaps);
 
         appWindow.walkLabel.setGeneratedTitle("Model", seed);
