@@ -1,4 +1,4 @@
-#version 460
+#version 330
 
 uniform lowp sampler2D baseTex;
 uniform lowp sampler2D normalTex;

@@ -1,4 +1,4 @@
-#version 460
+#version 330
 
 in highp vec3 vertexPosition;
 in highp vec3 vertexNormal;

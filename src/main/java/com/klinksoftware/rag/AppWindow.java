@@ -92,7 +92,7 @@ public class AppWindow implements WindowListener {
         Image image;
         GLData glData;
         Runnable glLoop;
-
+        
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -135,6 +135,10 @@ public class AppWindow implements WindowListener {
 
         // walk view
         glData = new GLData();
+        glData.majorVersion = 3;
+        glData.minorVersion = 3;
+        glData.profile=GLData.Profile.CORE;
+        glData.forwardCompatible=true;
         glData.samples = 4;
         glData.swapInterval = 0;
         walkView = new WalkView(glData);
@@ -272,7 +276,7 @@ public class AppWindow implements WindowListener {
                 }
             }
         };
-
+        
         SwingUtilities.invokeLater(glLoop);
     }
 

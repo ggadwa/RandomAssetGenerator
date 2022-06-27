@@ -9,6 +9,8 @@ import java.nio.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.opengl.ARBFramebufferObject.*;
 import static org.lwjgl.opengl.GL.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -119,7 +121,7 @@ public class WalkView extends AWTGLCanvas {
         glViewport(0,0,wid,high);
         glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
         glEnable(GL_DEPTH_TEST);
-
+        
             // no shader yet
 
         vertexShaderId=-1;
