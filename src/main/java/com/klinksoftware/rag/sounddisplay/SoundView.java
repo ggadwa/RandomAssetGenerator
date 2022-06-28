@@ -4,6 +4,8 @@ import com.klinksoftware.rag.sound.SoundBase;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.JPanel;
 
 public class SoundView extends JPanel {
@@ -18,6 +20,32 @@ public class SoundView extends JPanel {
 
     public SoundView() {
         sound = null;
+
+        setFocusable(true);
+
+        addMouseListener(
+                new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        eventMouseClicked(e.getButton(), e.getX(), e.getY());
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                    }
+        });
     }
 
     private void drawSingleWave(Graphics2D g2d, int width, int my, float amplitude, int offset, boolean sizeToFit) {
@@ -103,7 +131,7 @@ public class SoundView extends JPanel {
         repaint();
     }
 
-    public void mouseClicked(int button, int x, int y) {
+    public void eventMouseClicked(int button, int x, int y) {
         int width, height;
         int waveClipTopY, waveClipBotY, waveAllTopY, waveAllBotY;
 

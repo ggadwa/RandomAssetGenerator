@@ -1,40 +1,28 @@
 package com.klinksoftware.rag;
 
-import java.io.File;
+import java.awt.*;
+import java.net.*;
+import javassist.bytecode.stackmap.TypeData.ClassName;
+import javax.swing.*;
 
 public class RandomAssetGenerator {
 
-    private static final Object mainLock;
-    private static final AppWindow appWindow;
-
-    static {
-        mainLock = new Object();
-        appWindow = new AppWindow();
-    }
-
-    public static void stop() {
-        synchronized (mainLock) {
-            mainLock.notify();
-        }
-    }
-
     public static void main(String[] args) {
-        // start the window
-        appWindow.start();
+        URL iconURL;
+        Image image;
+        AppWindow appWindow;
 
-        // lock the main thread until it's time
-        // to quit
-        synchronized (mainLock) {
-            try {
-                mainLock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        // window icon
+        iconURL = ClassName.class.getResource("/Graphics/icon.png");
+        image = new ImageIcon(iconURL).getImage();
+
+        // look and feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            Taskbar.getTaskbar().setIconImage(image);
+        } catch (Exception e) {
         }
 
-        appWindow.stop();
-
-        System.exit(0);
+        appWindow = new AppWindow(image);
     }
-
 }

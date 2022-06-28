@@ -19,7 +19,7 @@ public class ModelExportWorker extends SwingWorker<Integer, Void> {
 
         // skip if nothing generated
         if (ModelBuildWorker.generatedModel == null) {
-            JOptionPane.showMessageDialog(appWindow.frame, "Generate a model first.");
+            JOptionPane.showMessageDialog(appWindow, "Generate a model first.");
             return (0);
         }
 
@@ -28,7 +28,7 @@ public class ModelExportWorker extends SwingWorker<Integer, Void> {
         // pick folder to save too
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        if (fileChooser.showSaveDialog(appWindow.frame) == JFileChooser.APPROVE_OPTION) {
+        if (fileChooser.showSaveDialog(appWindow) == JFileChooser.APPROVE_OPTION) {
             file = fileChooser.getSelectedFile();
             ModelBuildWorker.generatedModel.writeToFile(file.getAbsolutePath());
         }

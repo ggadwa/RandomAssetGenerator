@@ -19,7 +19,7 @@ public class MapExportWorker extends SwingWorker<Integer, Void> {
 
         // skip if nothing generated
         if (MapBuildWorker.generatedMap == null) {
-            JOptionPane.showMessageDialog(appWindow.frame, "Generate a map first.");
+            JOptionPane.showMessageDialog(appWindow, "Generate a map first.");
             return (0);
         }
 
@@ -28,7 +28,7 @@ public class MapExportWorker extends SwingWorker<Integer, Void> {
         // pick folder to save too
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        if (fileChooser.showSaveDialog(appWindow.frame) == JFileChooser.APPROVE_OPTION) {
+        if (fileChooser.showSaveDialog(appWindow) == JFileChooser.APPROVE_OPTION) {
             file = fileChooser.getSelectedFile();
             MapBuildWorker.generatedMap.writeToFile(file.getAbsolutePath());
         }

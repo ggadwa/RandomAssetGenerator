@@ -5,12 +5,14 @@ import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.Skeleton;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.nio.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.opengl.ARBFramebufferObject.*;
 import static org.lwjgl.opengl.GL.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -25,7 +27,7 @@ public class WalkView extends AWTGLCanvas {
     private static final float RAG_NEAR_Z=1.0f;
     private static final float RAG_FAR_Z=500.0f;
     private static final float RAG_FOV=55.0f;
-    private static final float RAG_MOVE_SPEED = 0.01f;
+    private static final float RAG_MOVE_SPEED = 0.2f;
     private static final float RAG_SPEED_MULTIPLIER = 3.0f;
     private static final long RAG_PAINT_TICK=33;
     private static final float RAG_LIGHT_LOW_INTENSITY = 100.0f;
@@ -54,12 +56,71 @@ public class WalkView extends AWTGLCanvas {
 
     public WalkView(GLData glData) {
         super(glData);
+
+        setFocusable(true);
+
+        addMouseMotionListener(
+                new MouseMotionListener() {
+                    @Override
+                    public void mouseMoved(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseDragged(MouseEvent e) {
+                        eventMouseDrag(e.getX(), e.getY());
+                    }
+        });
+
+        addMouseListener(
+                new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        eventMousePressed(e.getButton(), e.getX(), e.getY());
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        eventMouseRelease(e.getButton());
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                    }
+        });
+
+        addKeyListener(
+                new KeyListener() {
+                    @Override
+                    public void keyTyped(KeyEvent e) {
+                    }
+
+                     @Override
+                     public void keyPressed(KeyEvent e) {
+                         eventKeyPress(e.getKeyCode());
+                     }
+
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+                        eventKeyRelease(e.getKeyCode());
+                    }
+        });
     }
 
+    // start up and shutdown
     @Override
     public void initGL() {
         String vertexSource, fragmentSource;
         String errorStr;
+
+        System.out.println("gl: " + effective.majorVersion + "." + effective.minorVersion + ">" + effective.profile);
 
             // screen sizes
 
@@ -121,7 +182,7 @@ public class WalkView extends AWTGLCanvas {
         glViewport(0,0,wid,high);
         glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
         glEnable(GL_DEPTH_TEST);
-        
+
             // no shader yet
 
         vertexShaderId=-1;
@@ -205,6 +266,24 @@ public class WalkView extends AWTGLCanvas {
 
         // redraw timing
         nextPaintTick=System.currentTimeMillis();
+    }
+
+    @Override
+    public void disposeCanvas() {
+    }
+
+    public void doDisposeCanvas() {
+        if (vertexShaderId != -1) {
+            glDeleteShader(vertexShaderId);
+        }
+        if (fragmentShaderId != -1) {
+            glDeleteShader(fragmentShaderId);
+        }
+        if (programId != -1) {
+            glDeleteProgram(programId);
+        }
+
+        super.disposeCanvas();
     }
 
     //
@@ -430,12 +509,6 @@ public class WalkView extends AWTGLCanvas {
         incommingMeshList=null;
         incommingSkeleton=null;
         incommingBitmaps = null;
-    }
-
-    public void shutdown() {
-        if (vertexShaderId!=-1) glDeleteShader(vertexShaderId);
-        if (fragmentShaderId!=-1) glDeleteShader(fragmentShaderId);
-        if (programId!=-1) glDeleteProgram(programId);
     }
 
     //
@@ -791,15 +864,15 @@ public class WalkView extends AWTGLCanvas {
     // events
     //
 
-    public void mousePressed(int button,int x,int y) {
+    public void eventMousePressed(int button, int x, int y) {
         lastMouseX=x;
         lastMouseY=y;
     }
 
-    public void mouseRelease(int button) {
+    public void eventMouseRelease(int button) {
     }
 
-    public void mouseDrag(int x,int y) {
+    public void eventMouseDrag(int x, int y) {
         if (lastMouseX!=x) {
             cameraAngle.y-=((float)(x-lastMouseX)*0.5f);
             if (cameraAngle.y<0) cameraAngle.y=360.0f+cameraAngle.y;
@@ -815,7 +888,7 @@ public class WalkView extends AWTGLCanvas {
         }
     }
 
-    public void keyPress(int keyCode) {
+    public void eventKeyPress(int keyCode) {
         switch (keyCode) {
             case KeyEvent.VK_SHIFT:
                 speedMultiplier = RAG_SPEED_MULTIPLIER;
@@ -841,7 +914,7 @@ public class WalkView extends AWTGLCanvas {
         }
     }
 
-    public void keyRelease(int keyCode) {
+    public void eventKeyRelease(int keyCode) {
         switch (keyCode) {
             case KeyEvent.VK_SHIFT:
                 speedMultiplier = 1.0f;

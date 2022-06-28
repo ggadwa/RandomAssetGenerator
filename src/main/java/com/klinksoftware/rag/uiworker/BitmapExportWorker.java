@@ -19,7 +19,7 @@ public class BitmapExportWorker extends SwingWorker<Integer, Void> {
 
         // skip if nothing generated
         if (BitmapBuildWorker.generatedBitmap == null) {
-            JOptionPane.showMessageDialog(appWindow.frame, "Generate a texture first.");
+            JOptionPane.showMessageDialog(appWindow, "Generate a texture first.");
             return (0);
         }
 
@@ -28,7 +28,7 @@ public class BitmapExportWorker extends SwingWorker<Integer, Void> {
         // pick folder to save too
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        if (fileChooser.showSaveDialog(appWindow.frame) == JFileChooser.APPROVE_OPTION) {
+        if (fileChooser.showSaveDialog(appWindow) == JFileChooser.APPROVE_OPTION) {
             file = fileChooser.getSelectedFile();
             BitmapBuildWorker.generatedBitmap.writeToFile(file.getAbsolutePath(), null);
         }
