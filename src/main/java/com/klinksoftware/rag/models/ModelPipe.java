@@ -1,30 +1,9 @@
-package com.klinksoftware.rag.map;
+package com.klinksoftware.rag.models;
 
-import com.klinksoftware.rag.bitmaps.BitmapBase;
-import com.klinksoftware.rag.mesh.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-public class MapPipe {
-    private static final int PIPE_SIDE_COUNT=12;
-    private static final int PIPE_CURVE_SEGMENT_COUNT=5;
-
-    private MapBuilder mapBuilder;
-    private ArrayList<MapRoom> rooms;
-    private MeshList meshList;
-    private HashMap<String, BitmapBase> bitmaps;
-
-    public MapPipe(MapBuilder mapBuilder, ArrayList<MapRoom> rooms, MeshList meshList, HashMap<String, BitmapBase> bitmaps) {
-        this.mapBuilder = mapBuilder;
-        this.rooms = rooms;
-        this.meshList = meshList;
-        this.bitmaps = bitmaps;
-    }
+@ModelInterface
+public class ModelPipe extends ModelBase {
 
     /*
-        //
-        // pieces of pipes
-        //
 
     addPipeStraightChunk(pnt,len,radius,pipeAng)
     {
@@ -74,18 +53,18 @@ public class MapPipe {
             if (n==(PIPE_SIDE_COUNT-1)) ang2=0.0;
 
             rd=ang*constants.DEGREE_TO_RAD;
-            tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-            tz=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+            tx=nextPnt.x+(radius*Math.cos(rd));
+            tz=nextPnt.z+(radius*Math.sin(rd));
 
-            bx=pnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-            bz=pnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+            bx=pnt.x+(radius*Math.cos(rd));
+            bz=pnt.z+(radius*Math.sin(rd));
 
             rd=ang2*constants.DEGREE_TO_RAD;
-            tx2=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-            tz2=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+            tx2=nextPnt.x+((radius*Math.cos(rd));
+            tz2=nextPnt.z+(radius*Math.sin(rd));
 
-            bx2=pnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-            bz2=pnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+            bx2=pnt.x+(radius*Math.cos(rd));
+            bz2=pnt.z+(radius*Math.sin(rd));
 
                 // the points
 
@@ -213,18 +192,18 @@ public class MapPipe {
                 if (n==(constants.PIPE_SIDE_COUNT-1)) ang2=0.0;
 
                 rd=ang*constants.DEGREE_TO_RAD;
-                tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-                tz=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+                tx=nextPnt.x+(radius*Math.cos(rd));
+                tz=nextPnt.z+(radius*Math.sin(rd));
 
-                bx=pnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-                bz=pnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+                bx=pnt.x+(radius*Math.cos(rd));
+                bz=pnt.z+(radius*Math.sin(rd));
 
                 rd=ang2*constants.DEGREE_TO_RAD;
-                tx2=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-                tz2=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+                tx2=nextPnt.x+(radius*Math.cos(rd));
+                tz2=nextPnt.z+(radius*Math.sin(rd));
 
-                bx2=pnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-                bz2=pnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+                bx2=pnt.x+(radius*Math.cos(rd));
+                bz2=pnt.z+(radius*Math.sin(rd));
 
                     // the points
 
@@ -505,62 +484,13 @@ public class MapPipe {
             }
         }
     }
-*/
+     */
+    @Override
+    public void buildInternal() {
 
-    public void build(MapRoom room, int roomNumber, float by) {
-        BitmapBase.mapBitmapLoader(bitmaps, "pipe", new String[]{"Pipe"});
-        /*
-        int     x,z,lx,rx,tz,bz,skipX,skipZ,
-                pieceCount;
+        addBitmap("pipe", new String[]{"Pipe"});
 
-            // bounds with margins
-
-        lx=room.piece.margins[0];
-        rx=room.piece.size.x-(room.piece.margins[2]);
-        if (!room.requiredStairs.isEmpty()) {
-            if (lx<3) lx=3;
-            if (rx>(room.piece.size.x-3)) rx=room.piece.size.x-3;
-        }
-        if (rx<=lx) return;
-
-        tz=this.room.piece.margins[1];
-        bz=this.room.piece.size.z-(room.piece.margins[3]);
-        if (!room.requiredStairs.isEmpty()) {
-            if (tz<3) tz=3;
-            if (bz>(room.piece.size.z-3)) bz=room.piece.size.z-3;
-        }
-        if (bz<=tz) return;
-
-            // sizes
-
-
-            // if enough room, make a path
-            // through the equipment
-
-        skipX=-1;
-        if ((rx-lx)>2) skipX=(lx+1)+AppWindow.random.nextInt((rx-lx)-2);
-        skipZ=-1;
-        if ((bz-tz)>2) skipZ=(tz+1)+AppWindow.random.nextInt((bz-tz)-2);
-
-            // the pieces
-
-        pieceCount=0;
-
-        for (z=tz;z<bz;z++) {
-            if (z==skipZ) continue;
-
-            for (x=lx;x<rx;x++) {
-                if (x==skipX) continue;
-
-                if (AppWindow.random.nextBoolean()) {
-                    //addPipeSet(room,x,z);
-                }
-
-                pieceCount++;
-
-                this.room.setGrid(0,x,z,1);
-            }
-        }
-*/
+        // now build a fake skeleton for the glTF
+        skeleton = meshList.rebuildMapMeshesWithSkeleton();
     }
 }

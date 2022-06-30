@@ -120,8 +120,6 @@ public class WalkView extends AWTGLCanvas {
         String vertexSource, fragmentSource;
         String errorStr;
 
-        System.out.println("gl: " + effective.majorVersion + "." + effective.minorVersion + ">" + effective.profile);
-
             // screen sizes
 
         wid=getWidth();

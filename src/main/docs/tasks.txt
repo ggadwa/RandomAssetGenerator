@@ -2,9 +2,9 @@
 
 
 - move all the models
-
-outside changes
- - outdoor random is bad at moving same vertexes
+  - terminal
+  - junction
+  - pipe
 
 model
  table: bars on legs
@@ -12,9 +12,6 @@ model
 
 map
  - don't allow upper and lower in same room (1656351972126)
-
-model
- 
 
 - need to export tangents
 

@@ -191,19 +191,19 @@ public class Mesh
             for (Mesh mesh : meshes) {
                 nCheckVertex = mesh.vertexes.length / 3;
 
-                vIdx = 0;
-
                 for (k = 0; k != nCheckVertex; k++) {
                     if ((mesh == this) && (k == n)) {
                         continue;
                     }
+
+                    vIdx = k * 3;
+
                     checkVertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
                     if (checkVertex.isCloseEqual(origVertex)) {
                         mesh.vertexes[vIdx] = vertex.x;
                         mesh.vertexes[vIdx + 1] = vertex.y;
                         mesh.vertexes[vIdx + 2] = vertex.z;
                     }
-                    vIdx += 3;
                 }
             }
         }
@@ -243,7 +243,6 @@ public class Mesh
             vertex.setFromPoint(origVertex);
             vertex.addPoint(normal);
             vertexes[vIdx] = vertex.x;
-            vertexes[vIdx + 1] = vertex.y;
             vertexes[vIdx + 2] = vertex.z;
 
             // check for equal vertexes to move, we ignore the Y so we
@@ -257,12 +256,14 @@ public class Mesh
                     if ((mesh == this) && (k == n)) {
                         continue;
                     }
+
+                    vIdx = k * 3;
+
                     checkVertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
                     if (checkVertex.isCloseEqualIgnoreY(origVertex)) {
                         mesh.vertexes[vIdx] = vertex.x;
                         mesh.vertexes[vIdx + 2] = vertex.z;
                     }
-                    vIdx += 3;
                 }
             }
         }
@@ -301,17 +302,23 @@ public class Mesh
             for (Mesh mesh : meshes) {
                 nCheckVertex = mesh.vertexes.length / 3;
 
-                vIdx = 0;
-
                 for (k = 0; k != nCheckVertex; k++) {
                     if ((mesh == this) && (k == n)) {
                         continue;
                     }
+
+                    vIdx = k * 3;
+
+                    // skip anything not a floor
+                    if (mesh.normals[vIdx + 1] == 0.0f) {
+                        continue;
+                    }
+
+                    // compare vertexes
                     checkVertex.setFromValues(mesh.vertexes[vIdx], mesh.vertexes[vIdx + 1], mesh.vertexes[vIdx + 2]);
                     if (checkVertex.isCloseEqual(origVertex)) {
                         mesh.vertexes[vIdx + 1] = y;
                     }
-                    vIdx += 3;
                 }
             }
         }

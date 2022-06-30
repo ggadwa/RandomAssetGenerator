@@ -494,7 +494,7 @@ public class MapBuilder
 
         // outdoor maps randomization
         if (mapType == SettingsMap.MAP_TYPE_OUTDOOR) {
-            meshList.randomizeWallVertexesFromCenter(0.5f, (SEGMENT_SIZE / 4), viewCenterPoint);
+            meshList.randomizeWallVertexesFromCenter(0.5f, (SEGMENT_SIZE / 3.0f), viewCenterPoint);
             meshList.randomizeFloorVertexes(0.5f, FLOOR_HEIGHT);
         }
 
