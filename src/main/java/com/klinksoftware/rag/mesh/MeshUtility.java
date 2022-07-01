@@ -10,7 +10,8 @@ public class MeshUtility {
 
     public static final int UV_WHOLE = 0;
     public static final int UV_BOX = 1;
-    public static final int UV_MAP = 2;
+    public static final int UV_BOX_ONE_FRONT = 2;
+    public static final int UV_MAP = 3;
 
     // build UVs for vertex lists
     public static float[] buildUVs(float[] vertexes, float[] normals, float uvScale) {
@@ -379,6 +380,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
                     break;
                 case MeshUtility.UV_BOX:
+                case MeshUtility.UV_BOX_ONE_FRONT:
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 0.499f, 0.499f, 0.499f, 0.499f, 0.0f));
                     break;
             }
@@ -399,6 +401,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
                     break;
                 case MeshUtility.UV_BOX:
+                case MeshUtility.UV_BOX_ONE_FRONT:
                     uvArray.addAll(Arrays.asList(0.0f, 0.499f, 0.0f, 0.0f, 0.499f, 0.0f, 0.499f, 0.499f));
                     break;
             }
@@ -419,6 +422,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
                     break;
                 case MeshUtility.UV_BOX:
+                case MeshUtility.UV_BOX_ONE_FRONT:
                     uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 0.499f, 0.5f, 0.499f, 0.5f, 0.0f));
                     break;
             }
@@ -441,6 +445,9 @@ public class MeshUtility {
                 case MeshUtility.UV_BOX:
                     uvArray.addAll(Arrays.asList(0.5f, 0.0f, 0.5f, 0.499f, 1.0f, 0.499f, 1.0f, 0.0f));
                     break;
+                case MeshUtility.UV_BOX_ONE_FRONT:
+                    uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 0.499f, 0.499f, 0.499f, 0.499f, 0.0f));
+                    break;
             }
 
             indexArray.addAll(Arrays.asList(idx, (idx + 1), (idx + 2), idx, (idx + 2), (idx + 3)));
@@ -459,6 +466,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f));
                     break;
                 case MeshUtility.UV_BOX:
+                case MeshUtility.UV_BOX_ONE_FRONT:
                     uvArray.addAll(Arrays.asList(0.0f, 0.499f, 0.0f, 1.0f, 0.499f, 1.0f, 0.499f, 0.499f));
                     break;
             }
@@ -479,6 +487,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
                     break;
                 case MeshUtility.UV_BOX:
+                case MeshUtility.UV_BOX_ONE_FRONT:
                     uvArray.addAll(Arrays.asList(0.0f, 0.499f, 0.0f, 1.0f, 0.499f, 1.0f, 0.499f, 0.499f));
                     break;
             }

@@ -3,6 +3,7 @@ package com.klinksoftware.rag.models;
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
 import com.klinksoftware.rag.mesh.Mesh;
+import com.klinksoftware.rag.mesh.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
 @ModelInterface
@@ -25,20 +26,12 @@ public class ModelJunction extends ModelBase {
         pipeRadius = ((MapBuilder.SEGMENT_SIZE * 0.05f) + AppWindow.random.nextFloat((MapBuilder.SEGMENT_SIZE * 0.1f))) * 0.5f;
         junctionHalfDepth = pipeRadius * 1.1f;
 
-        /*
-
-
-        dx = ((room.x + x) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
-        dz = ((room.z + z) * MapBuilder.SEGMENT_SIZE) + (MapBuilder.SEGMENT_SIZE * 0.5f);
-
-            // the junction
+        // the junction
 
         juncHalfWid = junctionWidth * 0.5f;
 
-        rotAngle = new RagPoint(0.0f, AppWindow.random.nextFloat(359.0f), 0.0f);
-        name = "junction_panel_" + Integer.toString(roomNumber) + "_" + Integer.toString(x) + "x" + Integer.toString(z);
-        meshList.add(MeshUtility.createCubeRotated("panel", (dx - juncHalfWid), (dx + juncHalfWid), (by + pipeHeight), ((by + pipeHeight) + junctionWidth), (dz - junctionHalfDepth), (dz + junctionHalfDepth), rotAngle, true, true, true, true, true, true, false, MeshUtility.UV_BOX));
-
+        meshList.add(MeshUtility.createCube("panel", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, true, true, true, true, true, true, false, MeshUtility.UV_BOX));
+        /*
             // the pipes
 
         mesh = null;

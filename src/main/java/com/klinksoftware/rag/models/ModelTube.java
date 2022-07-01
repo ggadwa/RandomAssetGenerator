@@ -7,7 +7,7 @@ import com.klinksoftware.rag.mesh.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
 @ModelInterface
-public class ModelLabTube extends ModelBase {
+public class ModelTube extends ModelBase {
 
     @Override
     public float getCameraRotateY() {
