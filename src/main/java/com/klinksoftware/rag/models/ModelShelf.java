@@ -51,7 +51,7 @@ public class ModelShelf extends ModelBase {
         boolean hasBack;
         Mesh shelfMesh, boxMesh, mesh2;
 
-        addBitmap("shelf", new String[]{"Metal", "Wood"});
+        addBitmap("shelf", new String[]{"Metal", "MetalPlank", "Wood"});
         addBitmap("box", new String[]{"Storage"});
 
         shelfHeight = MapBuilder.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.35f));

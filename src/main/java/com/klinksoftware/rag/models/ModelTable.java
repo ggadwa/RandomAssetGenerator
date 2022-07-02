@@ -29,7 +29,7 @@ public class ModelTable extends ModelBase {
         float tableXMin, tableXMax, tableZMin, tableZMax;
         Mesh mesh;
 
-        addBitmap("table", new String[]{"Metal", "Tile", "Wood"});
+        addBitmap("table", new String[]{"Metal", "MetalPlank", "Wood"});
 
         tableHeight = MapBuilder.SEGMENT_SIZE * (0.2f + AppWindow.random.nextFloat(0.15f));
         tableLegWidth = MapBuilder.SEGMENT_SIZE * (0.03f + AppWindow.random.nextFloat(0.05f));

@@ -6,9 +6,9 @@
   - pipe
 
 bitmaps
+ - metal corrugated is bad
+ - metal tread needs to be divisible by 2
  - more wood -> boards, wood is just like plywood
- - metal is plain, need different ones for MetalPlates, Hexagon
- - use these plain ones for desks, shelves, etc
 
 model
  table: bars on legs
