@@ -6,9 +6,7 @@
   - pipe
 
 bitmaps
- - metal corrugated is bad
- - metal tread needs to be divisible by 2
- - more wood -> boards, wood is just like plywood
+ - need rock like windwaker (rock with cracks) "cave"
 
 model
  table: bars on legs

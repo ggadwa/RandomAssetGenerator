@@ -423,11 +423,11 @@ public class MapBuilder
     // required bitmaps
     //
     public void buildRequiredBitmaps(int mapType) {
-        String[] wallBitmaps = {"Brick", "Geometric", "MetalHeagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "Stone", "Temple", "Tile", "Wood"};
-        String[] insideFloorBitmaps = {"Brick", "Concrete", "MetalHexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "Wood"};
+        String[] wallBitmaps = {"Brick", "Geometric", "MetalHeagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "Stone", "Temple", "Tile", "WoodBoard"};
+        String[] insideFloorBitmaps = {"Brick", "Concrete", "MetalHexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "WoodBoard"};
         String[] outsideFloorBitmaps = {"Dirt", "Grass"};
-        String[] ceilingBitmaps = {"Brick", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "Wood"};
-        String[] platformBitmaps = {"Brick", "Concrete", "MetalPlank", "MetalPlate", "Wood"};
+        String[] ceilingBitmaps = {"Brick", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "WoodBoard"};
+        String[] platformBitmaps = {"Brick", "Concrete", "MetalPlank", "MetalPlate", "WoodBoard"};
 
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
             BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);

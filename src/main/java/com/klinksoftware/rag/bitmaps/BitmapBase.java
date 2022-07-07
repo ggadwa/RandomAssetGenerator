@@ -1811,7 +1811,7 @@ public class BitmapBase
 
             // the waves
 
-        waveAdd=(rgt-lft)/waveCount;
+        waveAdd = ((rgt - lft) / waveCount) / 4;
         waveIdx=0;
         wavePos=0;
 
@@ -1826,6 +1826,7 @@ public class BitmapBase
                     nz=(NORMAL_RIGHT_45.z+1.0f)*0.5f;
                     break;
                 case 1:
+                case 3:
                     nx=(NORMAL_CLEAR.x+1.0f)*0.5f;
                     ny=(NORMAL_CLEAR.y+1.0f)*0.5f;
                     nz=(NORMAL_CLEAR.z+1.0f)*0.5f;
@@ -1847,22 +1848,16 @@ public class BitmapBase
             wavePos++;
             if (wavePos>=waveAdd) {
                 wavePos=0;
-                waveIdx=(waveIdx+1)%3;
+                waveIdx = (waveIdx + 1) & 0b11;
             }
         }
 
             // extra lines
 
-        waveAdd*=3;
-
-        for (x=lft;x<rgt;x+=waveAdd) {
+        for (x = lft; x < rgt; x += waveAdd) {
             for (y=top;y!=bot;y++) {
                 idx=((y*textureSize)+x)*4;
-                normalData[idx]=(NORMAL_CLEAR.x+1.0f)*0.5f;
-                normalData[idx+1]=(NORMAL_CLEAR.y+1.0f)*0.5f;
-                normalData[idx+2]=(NORMAL_CLEAR.z+1.0f)*0.5f;
-
-                colorData[idx]=lineColor.r;
+                colorData[idx] = lineColor.r;
                 colorData[idx+1]=lineColor.g;
                 colorData[idx+2]=lineColor.b;
             }
@@ -1879,7 +1874,7 @@ public class BitmapBase
 
             // the waves
 
-        waveAdd=(bot-top)/waveCount;
+        waveAdd = ((bot - top) / waveCount) / 4;
         waveIdx=0;
         wavePos=0;
 
@@ -1915,22 +1910,16 @@ public class BitmapBase
             wavePos++;
             if (wavePos>=waveAdd) {
                 wavePos=0;
-                waveIdx=(waveIdx+1)%3;
+                waveIdx = (waveIdx + 1) & 0b11;
             }
         }
 
             // extra lines
 
-        waveAdd*=3;
-
-        for (y=top;y<bot;y+=waveAdd) {
+        for (y = top; y < bot; y += waveAdd) {
             for (x=lft;x!=rgt;x++) {
                 idx=((y*textureSize)+x)*4;
-                normalData[idx]=(NORMAL_CLEAR.x+1.0f)*0.5f;
-                normalData[idx+1]=(NORMAL_CLEAR.y+1.0f)*0.5f;
-                normalData[idx+2]=(NORMAL_CLEAR.z+1.0f)*0.5f;
-
-                colorData[idx]=lineColor.r;
+                colorData[idx] = lineColor.r;
                 colorData[idx+1]=lineColor.g;
                 colorData[idx+2]=lineColor.b;
             }

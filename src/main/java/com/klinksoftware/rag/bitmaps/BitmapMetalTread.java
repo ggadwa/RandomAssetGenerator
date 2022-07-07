@@ -44,7 +44,7 @@ public class BitmapMetalTread extends BitmapBase {
         // treads
         metalCorrColor = adjustColorRandom(metalColor, 0.6f, 0.7f);
 
-        corrCount = 5 + AppWindow.random.nextInt(20);
+        corrCount = (4 + AppWindow.random.nextInt(20)) & 0b11111110;
         corrWid = textureSize / corrCount;
         corrHigh = textureSize / corrCount;
 

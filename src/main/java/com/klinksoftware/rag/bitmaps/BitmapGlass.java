@@ -20,10 +20,9 @@ public class BitmapGlass extends BitmapBase
         //
 
     @Override
-    public void generateInternal()    {
-        int         n,x,y,x2,y2,lineCount,
-                    startWid;
-        RagColor    color;
+    public void generateInternal() {
+        int n, x, y, x2, y2, lineCount, startWid;
+        RagColor color;
 
         // default glass to random gray
 
