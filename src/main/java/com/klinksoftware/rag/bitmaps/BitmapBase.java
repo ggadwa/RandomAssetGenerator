@@ -208,17 +208,29 @@ public class BitmapBase
         //
         // block copy
         //
-
-    protected void blockCopy(float[] fromData, int lft, int top, int rgt, int bot, float[] toData) {
-        int x, y, idx, xCount;
-
-        xCount = (rgt - lft) * 4;
+    protected void blockCopy(float[] fromColor, float[] fromNormal, int lft, int top, int rgt, int bot, float[] toColor, float[] toNormal) {
+        int x, y, idx;
 
         for (y = top; y != bot; y++) {
-            idx = ((y * textureSize) + lft) * 4;
+            if ((y < 0) || (y >= textureSize)) {
+                continue;
+            }
 
-            for (x = 0; x != xCount; x++) {
-                toData[idx] = fromData[idx++];
+            for (x = lft; x != rgt; x++) {
+                if ((x < 0) || (x >= textureSize)) {
+                    continue;
+                }
+
+                idx = ((y * textureSize) + x) * 4;
+                if (fromColor[idx + 3] == 0.0f) {
+                    toColor[idx] = fromColor[idx];
+                    toColor[idx + 1] = fromColor[idx + 1];
+                    toColor[idx + 2] = fromColor[idx + 2];
+
+                    toNormal[idx] = fromNormal[idx];
+                    toNormal[idx + 1] = fromNormal[idx + 1];
+                    toNormal[idx + 2] = fromNormal[idx + 2];
+                }
             }
         }
     }
@@ -814,8 +826,15 @@ public class BitmapBase
 
                 // distort bitmap
 
-            for (y=top;y!=bot;y++) {
-                for (x=lft;x!=rgt;x++) {
+            for (y = top; y != bot; y++) {
+                if ((y < 0) || (y >= textureSize)) {
+                    continue;
+                }
+
+                for (x = lft; x != rgt; x++) {
+                    if ((x < 0) || (x >= textureSize)) {
+                        continue;
+                    }
 
                     sx=x;
                     sy=y;
@@ -841,7 +860,8 @@ public class BitmapBase
 
                     colorData[idx]=colorDataCopy[idx2];
                     colorData[idx+1]=colorDataCopy[idx2+1];
-                    colorData[idx+2]=colorDataCopy[idx2+2];
+                    colorData[idx + 2] = colorDataCopy[idx2 + 2];
+                    colorData[idx + 3] = colorDataCopy[idx2 + 3];
 
                     normalData[idx]=normalDataCopy[idx2];
                     normalData[idx+1]=normalDataCopy[idx2+1];
@@ -876,6 +896,27 @@ public class BitmapBase
                 normalData[idx]=(NORMAL_CLEAR.x+1.0f)*0.5f;
                 normalData[idx+1]=(NORMAL_CLEAR.y+1.0f)*0.5f;
                 normalData[idx+2]=(NORMAL_CLEAR.z+1.0f)*0.5f;
+            }
+        }
+    }
+
+    protected void drawRectAlpha(int lft, int top, int rgt, int bot, float a) {
+        int x, y;
+
+        if ((lft >= rgt) || (top >= bot)) {
+            return;
+        }
+
+        for (y = top; y <= bot; y++) {
+            if ((y < 0) || (y >= textureSize)) {
+                continue;
+            }
+
+            for (x = lft; x <= rgt; x++) {
+                if ((x < 0) || (x >= textureSize)) {
+                    continue;
+                }
+                colorData[(((y * textureSize) + x) * 4) + 3] = a;
             }
         }
     }
@@ -1047,7 +1088,8 @@ public class BitmapBase
 
                 colorData[idx]=col.r;
                 colorData[idx+1]=col.g;
-                colorData[idx+2]=col.b;
+                colorData[idx + 2] = col.b;
+                colorData[idx + 3] = 0.0f;
 
                     // get a normal for the pixel change
                     // if we are outside the edge, gradually fade it
@@ -1123,7 +1165,8 @@ public class BitmapBase
 
                 colorData[idx]=outlineColor.r;
                 colorData[idx+1]=outlineColor.g;
-                colorData[idx+2]=outlineColor.b;
+                colorData[idx + 2] = outlineColor.b;
+                colorData[idx + 3] = 0.0f;
             }
         }
 

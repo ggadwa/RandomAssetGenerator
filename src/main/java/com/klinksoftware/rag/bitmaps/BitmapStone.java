@@ -23,7 +23,7 @@ public class BitmapStone extends BitmapBase
     public void generateInternal() {
         int y, yCount, yAdd, xOff, yOff, edgeSize, lft, rgt, top, bot;
         float xRoundFactor, yRoundFactor, normalZFactor;
-        float[] backgroundData, stoneCopyData;
+        float[] backgroundData, stoneColorData, stoneNormalData;
         RagColor stoneColor, altStoneColor, drawStoneColor, groutColor, outlineColor;
 
         stoneColor=getRandomColor();
@@ -42,17 +42,13 @@ public class BitmapStone extends BitmapBase
         drawNormalNoiseRect(0,0,textureSize,textureSize);
         blur(normalData,0,0,textureSize,textureSize,1,false);
 
-            // noise for stones
-
-        createPerlinNoiseData(32,32);
-        createNormalNoiseData(5.0f,0.3f);
-
-            // we draw the stones all alone on the noise
+        // we draw the stones all alone on the noise
             // background so we can distort the stones and
             // only catch the background
 
         backgroundData=colorData.clone();
-        stoneCopyData=colorData.clone();
+        stoneColorData = colorData.clone();
+        stoneNormalData = normalData.clone();
 
             // draw the stones
 
@@ -83,14 +79,21 @@ public class BitmapStone extends BitmapBase
                 xOff=(int)(AppWindow.random.nextFloat()*((float)textureSize*0.01f));
                 yOff=(int)(AppWindow.random.nextFloat()*((float)textureSize*0.01f));
 
-                edgeSize=(int)((AppWindow.random.nextFloat()*((float)textureSize*0.1f))+(AppWindow.random.nextFloat()*((float)textureSize*0.2f)));     // new edge size as stones aren't the same
-                xRoundFactor=0.02f+(AppWindow.random.nextFloat()*0.05f);
-                yRoundFactor=0.02f+(AppWindow.random.nextFloat()*0.05f);
-                normalZFactor=(AppWindow.random.nextFloat()*0.2f);           // different z depths
+                edgeSize = 30 + AppWindow.random.nextInt(80);
+                xRoundFactor = 0.02f + (AppWindow.random.nextFloat(0.05f));
+                yRoundFactor = 0.02f + (AppWindow.random.nextFloat(0.05f));
+                normalZFactor = 0.2f + (AppWindow.random.nextFloat(0.2f));
+
+                if (AppWindow.random.nextBoolean()) {
+                    createPerlinNoiseData(16, 16);
+                } else {
+                    createPerlinNoiseData(32, 32);
+                }
+                createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
 
                     // draw on the background
 
-                colorData=backgroundData.clone();
+                colorData = backgroundData.clone();
 
                 outlineColor=adjustColor(drawStoneColor,0.5f);
                 drawOval((lft+xOff),(top+yOff),rgt,bot,0.0f,1.0f,xRoundFactor,yRoundFactor,edgeSize,0.5f,drawStoneColor,outlineColor,normalZFactor,false,true,0.4f,1.2f);
@@ -101,7 +104,7 @@ public class BitmapStone extends BitmapBase
 
                     // and copy over
 
-                blockCopy(colorData, (lft + xOff), (top + yOff), rgt, bot, stoneCopyData);
+                blockCopy(colorData, normalData, (lft + xOff), (top + yOff), rgt, bot, stoneColorData, stoneNormalData);
 
                 lft=rgt;
                 if (rgt==(textureSize-1)) break;
@@ -112,7 +115,8 @@ public class BitmapStone extends BitmapBase
 
             // finally push over the stone copy version
 
-        colorData=stoneCopyData;
+        colorData = stoneColorData;
+        normalData = stoneNormalData;
 
             // finish with the metallic-roughness
 

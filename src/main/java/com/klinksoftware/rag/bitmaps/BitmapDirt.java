@@ -21,10 +21,10 @@ public class BitmapDirt extends BitmapBase {
     public void generateInternal() {
         int n, k, stoneCount, maxStoneSize, failCount;
         int lft, rgt, top, bot, edgeSize;
-        float xRoundFactor, yRoundFactor, normalZFactor;
-        float[] backgroundData, stoneCopyData;
+        float f, xRoundFactor, yRoundFactor, normalZFactor;
+        float[] backgroundData, stoneColorData, stoneNormalData;
         boolean hit;
-        RagColor dirtColor, stoneColor, drawStoneColor, outlineColor;
+        RagColor dirtColor, stoneColor, outlineColor;
         Rectangle testRect;
         ArrayList<Rectangle> rects;
 
@@ -35,32 +35,31 @@ public class BitmapDirt extends BitmapBase {
         drawRect(0, 0, textureSize, textureSize, dirtColor);
 
         createPerlinNoiseData(16, 16);
-        drawPerlinNoiseRect(0, 0, textureSize, textureSize, 0.8f, 1.0f);
+        f = 0.5f + AppWindow.random.nextFloat(0.2f);
+        drawPerlinNoiseRect(0, 0, textureSize, textureSize, f, (f + 0.2f));
         createPerlinNoiseData(16, 16);
-        drawPerlinNoiseRect(0, 0, textureSize, textureSize, 0.8f, 1.0f);
+        f = 0.5f + AppWindow.random.nextFloat(0.2f);
+        drawPerlinNoiseRect(0, 0, textureSize, textureSize, f, (f + 0.2f));
         createPerlinNoiseData(32, 32);
-        drawPerlinNoiseRect(0, 0, textureSize, textureSize, 0.8f, 1.0f);
+        f = 0.5f + AppWindow.random.nextFloat(0.2f);
+        drawPerlinNoiseRect(0, 0, textureSize, textureSize, f, (f + 0.2f));
 
         createNormalNoiseData(2.5f, 0.5f);
         drawNormalNoiseRect(0, 0, textureSize, textureSize);
-        blur(colorData, 0, 0, textureSize, textureSize, 5, true);
+        blur(colorData, 0, 0, textureSize, textureSize, (1 + AppWindow.random.nextInt(4)), true);
 
         // stones
-        stoneColor = this.getRandomGray(0.5f, 0.8f);
-
         backgroundData = colorData.clone();
-        stoneCopyData = colorData.clone();
+        stoneColorData = colorData.clone();
+        stoneNormalData = normalData.clone();
 
         stoneCount = 3 + AppWindow.random.nextInt(8);
-        maxStoneSize = textureSize / 5;
-
-        createPerlinNoiseData(32, 32);
-        createNormalNoiseData(5.0f, 0.3f);
+        maxStoneSize = textureSize / 4;
 
         rects = new ArrayList<>();
 
         for (n = 0; n != stoneCount; n++) {
-            drawStoneColor = adjustColorRandom(stoneColor, 0.7f, 1.2f);
+            stoneColor = getRandomColorDull(0.8f);
 
             failCount = 0;
             lft = rgt = top = bot = 0;
@@ -68,9 +67,9 @@ public class BitmapDirt extends BitmapBase {
 
             while (failCount < 10) {
                 lft = AppWindow.random.nextInt(textureSize - maxStoneSize);
-                rgt = lft + ((maxStoneSize / 4) + AppWindow.random.nextInt((maxStoneSize * 3) / 4));
+                rgt = lft + ((maxStoneSize / 5) + AppWindow.random.nextInt((maxStoneSize * 4) / 5));
                 top = AppWindow.random.nextInt(textureSize - maxStoneSize);
-                bot = top + ((maxStoneSize / 4) + AppWindow.random.nextInt((maxStoneSize * 3) / 4));
+                bot = top + ((maxStoneSize / 5) + AppWindow.random.nextInt((maxStoneSize * 4) / 5));
 
                 hit = false;
 
@@ -91,50 +90,36 @@ public class BitmapDirt extends BitmapBase {
 
             rects.add(testRect);
 
-            edgeSize = (int) ((AppWindow.random.nextFloat() * ((float) textureSize * 0.1f)) + (AppWindow.random.nextFloat() * ((float) textureSize * 0.2f))); // new edge size as stones aren't the same
-            xRoundFactor = 0.02f + (AppWindow.random.nextFloat() * 0.05f);
-            yRoundFactor = 0.02f + (AppWindow.random.nextFloat() * 0.05f);
-            normalZFactor = (AppWindow.random.nextFloat() * 0.2f); // different z depths
+            edgeSize = 50 + AppWindow.random.nextInt(60);
+            xRoundFactor = 0.02f + (AppWindow.random.nextFloat(0.1f));
+            yRoundFactor = 0.02f + (AppWindow.random.nextFloat(0.1f));
+            normalZFactor = 0.2f + AppWindow.random.nextFloat(0.2f);
+
+            if (AppWindow.random.nextBoolean()) {
+                createPerlinNoiseData(16, 16);
+            } else {
+                createPerlinNoiseData(32, 32);
+            }
+            createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
 
             // draw on the background
             colorData = backgroundData.clone();
-            outlineColor = adjustColor(drawStoneColor, 0.5f);
-            drawOval(lft, top, rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, 0.5f, drawStoneColor, outlineColor, normalZFactor, false, true, 0.4f, 1.2f);
+            drawRectAlpha(0, 0, textureSize, textureSize, 1.0f);
+
+            outlineColor = adjustColor(stoneColor, 0.5f);
+            drawOval(lft, top, rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, 0.5f, stoneColor, outlineColor, normalZFactor, false, true, 0.4f, 1.2f);
 
             // gravity distortions to make stones unique
             gravityDistortEdges(lft, top, rgt, bot, 10, 35, 5);
 
             // and copy over
-            blockCopy(colorData, lft, top, rgt, bot, stoneCopyData);
+            blockCopy(colorData, normalData, lft, top, rgt, bot, stoneColorData, stoneNormalData);
         }
 
         // push over the stones
-        colorData = stoneCopyData;
+        colorData = stoneColorData;
+        normalData = stoneNormalData;
 
-        /*
-            // vegetation=
-
-        halfHigh=textureSize/2;
-
-        for (x=0;x<textureSize;x++) {
-
-                // vegetation color
-
-            lineColor=adjustColorRandom(groundColor,0.7f,1.3f);
-
-                // line half from top
-
-            y=halfHigh+AppWindow.random.nextInt(halfHigh);
-            drawRandomLine(x,0,x,(y+5),0,0,textureSize,textureSize,10,lineColor,false);
-            drawLineNormal(x,0,x,(y+5),((x&0x1)==0x0)?NORMAL_BOTTOM_RIGHT_45:NORMAL_TOP_LEFT_45);
-
-                // line half from bottom
-
-            y=textureSize-(halfHigh+AppWindow.random.nextInt(halfHigh));
-            drawRandomLine(x,(y-5),x,textureSize,0,0,textureSize,textureSize,10,lineColor,false);
-            drawLineNormal(x,0,x,(y+5),((x&0x1)==0x0)?NORMAL_TOP_LEFT_45:NORMAL_BOTTOM_RIGHT_45);
-        }
-         */
         // finish with the metallic-roughness
         createMetallicRoughnessMap(0.5f, 0.4f);
     }

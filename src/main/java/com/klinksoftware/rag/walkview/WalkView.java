@@ -24,6 +24,11 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class WalkView extends AWTGLCanvas {
 
+    public static final int WV_DISPLAY_COLOR = 0;
+    public static final int WV_DISPLAY_NORMAL = 1;
+    public static final int WV_DISPLAY_METALLIC_ROUGHNESS = 2;
+    public static final int WV_DISPLAY_EMISSIVE = 3;
+
     private static final float RAG_NEAR_Z=1.0f;
     private static final float RAG_FAR_Z=500.0f;
     private static final float RAG_FOV=55.0f;
@@ -37,7 +42,8 @@ public class WalkView extends AWTGLCanvas {
     private int vertexShaderId,fragmentShaderId,programId;
     private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
     private int perspectiveMatrixUniformId, viewMatrixUniformId, normalMatrixUniformId, lightPositionIntensityUniformId;
-    private int hasEmissiveUniformId, emissiveFactorUniformId;
+    private int displayTypeUniformId, hasEmissiveUniformId, emissiveFactorUniformId;
+    private int displayType;
     private long nextPaintTick;
     private float aspectRatio;
     private float moveX, moveY, moveZ, speedMultiplier;
@@ -157,6 +163,8 @@ public class WalkView extends AWTGLCanvas {
         incommingSkeleton=null;
         incommingBitmaps = null;
 
+        displayType = WV_DISPLAY_COLOR;
+
             // no dragging
 
         lastMouseX=-1;
@@ -238,7 +246,9 @@ public class WalkView extends AWTGLCanvas {
         // get locations of uniforms and attributes
         perspectiveMatrixUniformId=glGetUniformLocation(programId,"perspectiveMatrix");
         viewMatrixUniformId=glGetUniformLocation(programId,"viewMatrix");
-        normalMatrixUniformId=glGetUniformLocation(programId,"normalMatrix");
+        normalMatrixUniformId = glGetUniformLocation(programId, "normalMatrix");
+
+        displayTypeUniformId = glGetUniformLocation(programId, "displayType");
 
         lightPositionIntensityUniformId = glGetUniformLocation(programId, "lightPositionIntensity");
 
@@ -282,6 +292,17 @@ public class WalkView extends AWTGLCanvas {
         }
 
         super.disposeCanvas();
+    }
+
+    //
+    // display settings
+    //
+    public void toggleLightView() {
+        currentLightIntensity = (currentLightIntensity == RAG_LIGHT_LOW_INTENSITY) ? RAG_LIGHT_HIGH_INTENSITY : RAG_LIGHT_LOW_INTENSITY;
+    }
+
+    public void setDisplayType(int displayType) {
+        this.displayType = displayType;
     }
 
     //
@@ -783,7 +804,9 @@ public class WalkView extends AWTGLCanvas {
             }
             buf=stack.mallocFloat(4);
             buf.put(lightEyePoint.x).put(lightEyePoint.y).put(lightEyePoint.z).put(currentLightIntensity).flip();
-            glUniform4fv(lightPositionIntensityUniformId,buf);
+            glUniform4fv(lightPositionIntensityUniformId, buf);
+
+            glUniform1i(displayTypeUniformId, displayType);
         }
 
         // setup culling frustum
@@ -929,9 +952,6 @@ public class WalkView extends AWTGLCanvas {
             case KeyEvent.VK_E:
                 moveY = 0.0f;
                 return;
-            case KeyEvent.VK_T:
-                currentLightIntensity = (currentLightIntensity == RAG_LIGHT_LOW_INTENSITY) ? RAG_LIGHT_HIGH_INTENSITY : RAG_LIGHT_LOW_INTENSITY;
-                break;
         }
     }
 }

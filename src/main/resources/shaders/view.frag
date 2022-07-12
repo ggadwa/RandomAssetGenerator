@@ -5,6 +5,8 @@ uniform lowp sampler2D normalTex;
 uniform lowp sampler2D metallicRoughnessTex;
 uniform lowp sampler2D emissiveTex;
 
+uniform int displayType;
+
 uniform highp vec4 lightPositionIntensity;   // xyz = position, w = intensity
 
 uniform bool hasEmissive;
@@ -23,6 +25,32 @@ void main(void)
     highp vec3 lightVector,lightVertexVector;
     lowp vec3 bumpMap,metallicRoughnessMap;
     lowp vec4 pixel,tex;
+
+        // some specific display types outside
+        // of normal processing
+
+    if (displayType==1) {   // normals
+        outputPixel.rgb=texture(normalTex,fragUV).rgb;
+        outputPixel.a=1.0;
+        return;
+    }
+
+    if (displayType==2) {   // metallic-roughness
+        outputPixel.rgb=texture(metallicRoughnessTex,fragUV).rgb;
+        outputPixel.a=1.0;
+        return;
+    }
+
+    if (displayType==3) {   // emissive
+        if (hasEmissive) {
+            outputPixel.rgb=texture(emissiveTex,fragUV).rgb;
+        }
+        else {
+            outputPixel.rgb=vec3(0,0,0);
+        }
+        outputPixel.a=1.0;
+        return;
+    }
 
         // the texture fragment
 

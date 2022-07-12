@@ -7,6 +7,9 @@
 
 bitmaps
  - need rock like windwaker (rock with cracks) "cave"
+ - tile triangles need normals
+ - gravel (like dirt)
+ - glass alpha needs to be more complex, and have lines have less alpha
 
 model
  table: bars on legs

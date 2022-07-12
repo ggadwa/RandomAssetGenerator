@@ -22,7 +22,7 @@ import org.lwjgl.opengl.awt.GLData;
 public class AppWindow extends JFrame {
 
     public static final int WINDOW_WIDTH = 1250;
-    public static final int WINDOW_HEIGHT = 600;
+    public static final int WINDOW_HEIGHT = 700;
     public static final int TOOLBAR_HEIGHT = 38;
     public static final int HEADER_HEIGHT = 22;
     public static final int SETTING_WIDTH = 250;
@@ -43,6 +43,7 @@ public class AppWindow extends JFrame {
     public static SettingsModel settingsModel;
     public static SettingsTexture settingsTexture;
     public static SettingsSound settingsSound;
+    public static ToolBar toolBar;
 
     private Thread renderThread;
 
@@ -61,16 +62,20 @@ public class AppWindow extends JFrame {
 
         setLayout(new GridBagLayout());
 
+        // toolbar
+        toolBar = new ToolBar();
+        add(toolBar, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+
         // walk view label
         walkLabel = new GradientLabel("Asset", new Color(196, 196, 255), new Color(128, 128, 255), false);
-        add(walkLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+        add(walkLabel, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
         // card layout for display
         displayPanelCardLayout = new CardLayout();
 
         displayPanel = new JPanel();
         displayPanel.setLayout(displayPanelCardLayout);
-        add(displayPanel, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+        add(displayPanel, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
         // walk view
         GLData glData = new GLData();
@@ -91,14 +96,14 @@ public class AppWindow extends JFrame {
 
         // settings tabs
         settingsLabel = new GradientLabel("Settings", new Color(196, 196, 255), new Color(128, 128, 255), true);
-        add(settingsLabel, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+        add(settingsLabel, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
         settingsTab = new JTabbedPane();
         settingsTab.setPreferredSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
         settingsTab.setMinimumSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
         settingsTab.setMaximumSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
         settingsTab.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.black));
-        add(settingsTab, new GridBagConstraints(1, 1, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+        add(settingsTab, new GridBagConstraints(1, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
         // map pane
         settingsMap = new SettingsMap(this);
