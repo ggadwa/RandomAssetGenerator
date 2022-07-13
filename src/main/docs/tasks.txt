@@ -7,9 +7,12 @@
 
 bitmaps
  - need rock like windwaker (rock with cracks) "cave"
+ - add brickwood, brickrandom (random boxes), stonewood
  - tile triangles need normals
  - gravel (like dirt)
  - glass alpha needs to be more complex, and have lines have less alpha
+ - more distinct control panels pieces (keyboard)
+ - make face textures 1, 2, or 3 eye
 
 model
  table: bars on legs
@@ -20,10 +23,6 @@ map
  - don't allow upper and lower in same room (1656351972126)
 
 - need to export tangents
-
-bitmaps
- - more distinct control panels pieces (keyboard)
- - make textures one or two eye
 
 sound
  - random silences in monster?

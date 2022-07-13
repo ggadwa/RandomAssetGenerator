@@ -423,8 +423,7 @@ public class MapBuilder
     // required bitmaps
     //
     public void buildRequiredBitmaps(int mapType) {
-        //String[] wallBitmaps = {"Brick", "Geometric", "MetalHeagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "Stone", "Temple", "Tile", "WoodBoard"};
-        String[] wallBitmaps = {"Stone"};
+        String[] wallBitmaps = {"Brick", "Cave", "Geometric", "MetalHeagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "Stone", "Temple", "Tile", "WoodBoard"};
         String[] insideFloorBitmaps = {"Brick", "Concrete", "MetalHexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "WoodBoard"};
         String[] outsideFloorBitmaps = {"Dirt", "Grass"};
         String[] ceilingBitmaps = {"Brick", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "WoodBoard"};

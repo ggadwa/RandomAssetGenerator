@@ -24,10 +24,11 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class WalkView extends AWTGLCanvas {
 
-    public static final int WV_DISPLAY_COLOR = 0;
-    public static final int WV_DISPLAY_NORMAL = 1;
-    public static final int WV_DISPLAY_METALLIC_ROUGHNESS = 2;
-    public static final int WV_DISPLAY_EMISSIVE = 3;
+    public static final int WV_DISPLAY_RENDER = 0;
+    public static final int WV_DISPLAY_COLOR = 1;
+    public static final int WV_DISPLAY_NORMAL = 2;
+    public static final int WV_DISPLAY_METALLIC_ROUGHNESS = 3;
+    public static final int WV_DISPLAY_EMISSIVE = 4;
 
     private static final float RAG_NEAR_Z=1.0f;
     private static final float RAG_FAR_Z=500.0f;
@@ -163,7 +164,7 @@ public class WalkView extends AWTGLCanvas {
         incommingSkeleton=null;
         incommingBitmaps = null;
 
-        displayType = WV_DISPLAY_COLOR;
+        displayType = WV_DISPLAY_RENDER;
 
             // no dragging
 

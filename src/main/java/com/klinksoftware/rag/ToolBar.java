@@ -13,7 +13,8 @@ import javax.swing.JToolBar;
 
 public class ToolBar extends JToolBar {
 
-    private JToggleButton lightButton, colorButton, normalButton, MetallicRoughnessButton, emissiveButton;
+    private JToggleButton lightButton;
+    private JToggleButton renderButton, colorButton, normalButton, MetallicRoughnessButton, emissiveButton;
 
     public ToolBar() {
         ButtonGroup bg;
@@ -30,16 +31,19 @@ public class ToolBar extends JToolBar {
 
         bg = new ButtonGroup();
 
-        colorButton = addButton("tool_color", "Show Texture Colors", true, bg, (e) -> {
+        renderButton = addButton("tool_render", "Show Rendering", true, bg, (e) -> {
+            AppWindow.walkView.setDisplayType(WalkView.WV_DISPLAY_RENDER);
+        });
+        colorButton = addButton("tool_color", "Show Color Only", false, bg, (e) -> {
             AppWindow.walkView.setDisplayType(WalkView.WV_DISPLAY_COLOR);
         });
-        normalButton = addButton("tool_normal", "Show Texture Normals", false, bg, (e) -> {
+        normalButton = addButton("tool_normal", "Show Normal Only", false, bg, (e) -> {
             AppWindow.walkView.setDisplayType(WalkView.WV_DISPLAY_NORMAL);
         });
-        MetallicRoughnessButton = addButton("tool_metal_rough", "Show Texture Metallic-Roughness", false, bg, (e) -> {
+        MetallicRoughnessButton = addButton("tool_metal_rough", "Show Metallic-Roughness Only", false, bg, (e) -> {
             AppWindow.walkView.setDisplayType(WalkView.WV_DISPLAY_METALLIC_ROUGHNESS);
         });
-        emissiveButton = addButton("tool_emissive", "Show Emissive", false, bg, (e) -> {
+        emissiveButton = addButton("tool_emissive", "Show Emissive Only", false, bg, (e) -> {
             AppWindow.walkView.setDisplayType(WalkView.WV_DISPLAY_EMISSIVE);
         });
     }

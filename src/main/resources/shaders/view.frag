@@ -30,18 +30,24 @@ void main(void)
         // of normal processing
 
     if (displayType==1) {   // normals
+        outputPixel.rgb=texture(baseTex,fragUV).rgb;
+        outputPixel.a=1.0;
+        return;
+    }
+
+    if (displayType==2) {   // normals
         outputPixel.rgb=texture(normalTex,fragUV).rgb;
         outputPixel.a=1.0;
         return;
     }
 
-    if (displayType==2) {   // metallic-roughness
+    if (displayType==3) {   // metallic-roughness
         outputPixel.rgb=texture(metallicRoughnessTex,fragUV).rgb;
         outputPixel.a=1.0;
         return;
     }
 
-    if (displayType==3) {   // emissive
+    if (displayType==4) {   // emissive
         if (hasEmissive) {
             outputPixel.rgb=texture(emissiveTex,fragUV).rgb;
         }
@@ -52,7 +58,7 @@ void main(void)
         return;
     }
 
-        // the texture fragment
+        // regular rendering
 
     tex=texture(baseTex,fragUV);
 
