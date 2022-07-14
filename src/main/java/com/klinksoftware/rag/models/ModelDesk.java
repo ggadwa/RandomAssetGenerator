@@ -79,9 +79,9 @@ public class ModelDesk extends ModelBase {
         RagPoint rotAngle;
 
         addBitmap("monitor", new String[]{"Monitor"});
-        addBitmap("desk", new String[]{"Metal", "MetalPlank", "Wood"});
-        addBitmap("stand", new String[]{"Metal", "MetalPlank", "Wood"});
-        addBitmap("drawer", new String[]{"Metal", "Wood"});
+        addBitmap("desk", new String[]{"Metal", "MetalPlank", "WoodPanel"});
+        addBitmap("stand", new String[]{"Metal", "MetalPlank", "WoodPanel"});
+        addBitmap("drawer", new String[]{"Metal", "WoodPanel"});
 
         // sizes
         deskLength = MapBuilder.SEGMENT_SIZE * (0.6f + AppWindow.random.nextFloat(0.4f));

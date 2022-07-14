@@ -21,7 +21,7 @@ public class ModelTube extends ModelBase {
         RagPoint centerPnt;
         Mesh mesh, mesh2;
 
-        addBitmap("accessory", new String[]{"Metal", "Wood"});
+        addBitmap("accessory", new String[]{"Metal", "WoodPanel"});
         addBitmap("glass", new String[]{"Glass"});
         addBitmap("liquid", new String[]{"Liquid"});
 

@@ -30,8 +30,8 @@ public class ModelPillar extends ModelBase {
         RagPoint centerPnt;
         Mesh mesh, mesh2;
 
-        addBitmap("pillar", new String[]{"Brick", "Metal", "Mosaic", "Temple", "Tile"});
-        addBitmap("cap", new String[]{"Brick", "Metal", "Mosaic", "Temple", "Tile"});
+        addBitmap("pillar", new String[]{"BrickIlregular", "BrickRegular", "Metal", "Mosaic", "Temple", "Tile"});
+        addBitmap("cap", new String[]{"BrickIlregular", "BrickRegular", "Metal", "Mosaic", "Temple", "Tile"});
 
         columnSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
         baseTopSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];

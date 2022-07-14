@@ -4,9 +4,8 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapBrick extends BitmapBase
-{
-    public BitmapBrick()    {
+public class BitmapBrickRegular extends BitmapBase {
+    public BitmapBrickRegular() {
         super();
 
         hasNormal=true;
@@ -19,8 +18,7 @@ public class BitmapBrick extends BitmapBase
         // brick bitmaps
         //
 
-    private void generateSingleBrick(int lft,int top,int rgt,int bot,int edgeSize,int paddingSize,RagColor brickColor,RagColor altBrickColor,boolean isHalf,boolean isSmall,boolean isLarge)
-    {
+    protected void generateSingleBrick(int lft, int top, int rgt, int bot, int edgeSize, int paddingSize, RagColor brickColor, RagColor altBrickColor, boolean isHalf, boolean isSmall, boolean isLarge)    {
         int         sx,ex,streakWid;
         float       f;
         RagColor    drawBrickColor,drawFrameColor,lineColor,streakColor;
@@ -98,8 +96,8 @@ public class BitmapBrick extends BitmapBase
         altBrickColor=getRandomColor();
         groutColor=getRandomGray(0.4f,0.6f);
 
-        edgeSize=(int)(((float)textureSize*0.005f)+(AppWindow.random.nextFloat()*((float)textureSize*0.0125f)));
-        paddingSize=(int)(((float)textureSize*0.005f)+(AppWindow.random.nextFloat()*((float)textureSize*0.0125f)));
+        edgeSize = 3 + AppWindow.random.nextInt(7);
+        paddingSize = 3 + AppWindow.random.nextInt(5);
 
             // create noise data
 

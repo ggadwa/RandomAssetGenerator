@@ -18,7 +18,7 @@ public class ModelComputer extends ModelBase {
         float pedestalWidth, pedestalHeight;
 
         addBitmap("computer", new String[]{"Computer"});
-        addBitmap("pedestal", new String[]{"MetalHexagon", "MetalPlank", "MetalPlate", "Mosaic", "Wood"});
+        addBitmap("pedestal", new String[]{"MetalHexagon", "MetalPlank", "MetalPlate", "Mosaic", "WoodPanel"});
 
         // computer size
         computerWidth = MapBuilder.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.3f));

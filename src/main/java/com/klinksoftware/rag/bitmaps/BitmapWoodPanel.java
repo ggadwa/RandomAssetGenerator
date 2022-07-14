@@ -4,9 +4,9 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapWood extends BitmapBase
+public class BitmapWoodPanel extends BitmapBase
 {
-    public BitmapWood()    {
+    public BitmapWoodPanel()    {
         super();
 
         hasNormal=true;
