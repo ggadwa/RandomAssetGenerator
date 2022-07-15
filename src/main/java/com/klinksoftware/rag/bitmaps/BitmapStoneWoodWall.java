@@ -64,7 +64,7 @@ public class BitmapStoneWoodWall extends BitmapStoneWall {
             } else {
                 // need to copy this over because how stones are drawn
                 edgeSize = 3 + AppWindow.random.nextInt(10);
-                generateWoodDrawBoard(-edgeSize, top, textureSize + edgeSize, bot, edgeSize, woodColor);
+                generateWoodDrawBoard(0, top, textureSize, bot, edgeSize, woodColor);
                 drawRectAlpha(0, top, textureSize, bot, 0.0f);
                 blockCopy(colorData, normalData, 0, top, textureSize, bot, stoneColorData, stoneNormalData);
                 wasBoard = true;

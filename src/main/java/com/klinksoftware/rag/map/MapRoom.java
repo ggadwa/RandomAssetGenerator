@@ -11,6 +11,8 @@ public class MapRoom
     public static final int ROOM_STORY_LOWER = 2;
     public static final int ROOM_STORY_UPPER_EXTENSION = 3;
     public static final int ROOM_STORY_LOWER_EXTENSION = 4;
+    public static final int ROOM_STORY_TALL_EXTENSION = 5;
+    public static final int ROOM_STORY_SUNKEN_EXTENSION = 6;
 
     public int x, z, story;
     public int stairDir, stairX, stairZ;
@@ -37,7 +39,7 @@ public class MapRoom
         this.hasLowerExtension = false;
         this.extendedFromRoom = null;
 
-            // need a copy of floor grid
+        // need a copy of floor grid
 
         floorGrid = piece.floorGrid.clone();
 
@@ -91,16 +93,22 @@ public class MapRoom
         if ((story == ROOM_STORY_MAIN) && (room.story == ROOM_STORY_MAIN)) {
             return (true);
         }
-        if ((story == ROOM_STORY_UPPER) && ((room.story == ROOM_STORY_UPPER) || (room.story == ROOM_STORY_UPPER_EXTENSION))) {
+        if ((story == ROOM_STORY_UPPER) && ((room.story == ROOM_STORY_UPPER) || (room.story == ROOM_STORY_UPPER_EXTENSION) || (room.story == ROOM_STORY_TALL_EXTENSION))) {
             return (true);
         }
-        if ((story == ROOM_STORY_UPPER_EXTENSION) && ((room.story == ROOM_STORY_UPPER) || (room.story == ROOM_STORY_UPPER_EXTENSION))) {
+        if ((story == ROOM_STORY_UPPER_EXTENSION) && ((room.story == ROOM_STORY_UPPER) || (room.story == ROOM_STORY_UPPER_EXTENSION) || (room.story == ROOM_STORY_TALL_EXTENSION))) {
             return (true);
         }
-        if ((story == ROOM_STORY_LOWER) && ((room.story == ROOM_STORY_LOWER) || (room.story == ROOM_STORY_LOWER_EXTENSION))) {
+        if ((story == ROOM_STORY_TALL_EXTENSION) && ((room.story == ROOM_STORY_UPPER) || (room.story == ROOM_STORY_UPPER_EXTENSION) || (room.story == ROOM_STORY_TALL_EXTENSION))) {
             return (true);
         }
-        if ((story == ROOM_STORY_LOWER_EXTENSION) && ((room.story == ROOM_STORY_LOWER) || (room.story == ROOM_STORY_LOWER_EXTENSION))) {
+        if ((story == ROOM_STORY_LOWER) && ((room.story == ROOM_STORY_LOWER) || (room.story == ROOM_STORY_LOWER_EXTENSION) || (room.story == ROOM_STORY_SUNKEN_EXTENSION))) {
+            return (true);
+        }
+        if ((story == ROOM_STORY_LOWER_EXTENSION) && ((room.story == ROOM_STORY_LOWER) || (room.story == ROOM_STORY_LOWER_EXTENSION) || (room.story == ROOM_STORY_SUNKEN_EXTENSION))) {
+            return (true);
+        }
+        if ((story == ROOM_STORY_SUNKEN_EXTENSION) && ((room.story == ROOM_STORY_LOWER) || (room.story == ROOM_STORY_LOWER_EXTENSION) || (room.story == ROOM_STORY_SUNKEN_EXTENSION))) {
             return (true);
         }
 
@@ -158,6 +166,74 @@ public class MapRoom
         }
 
         return(-1);
+    }
+
+    public int roomAbove(ArrayList<MapRoom> rooms) {
+        int n;
+        MapRoom checkRoom;
+
+        for (n = 0; n != rooms.size(); n++) {
+            checkRoom = rooms.get(n);
+            if (checkRoom.story != ROOM_STORY_UPPER) {
+                continue;
+            }
+
+            if ((x == (checkRoom.x + checkRoom.piece.sizeX)) || ((x + piece.sizeX) == checkRoom.x)) {
+                if (z >= (checkRoom.z + checkRoom.piece.sizeZ)) {
+                    continue;
+                }
+                if ((z + piece.sizeZ) <= checkRoom.z) {
+                    continue;
+                }
+                return (n);
+            }
+
+            if ((z == (checkRoom.z + checkRoom.piece.sizeZ)) || ((z + piece.sizeZ) == checkRoom.z)) {
+                if (x >= (checkRoom.x + checkRoom.piece.sizeX)) {
+                    continue;
+                }
+                if ((x + piece.sizeX) <= checkRoom.x) {
+                    continue;
+                }
+                return (n);
+            }
+        }
+
+        return (-1);
+    }
+
+    public int roomBelow(ArrayList<MapRoom> rooms) {
+        int n;
+        MapRoom checkRoom;
+
+        for (n = 0; n != rooms.size(); n++) {
+            checkRoom = rooms.get(n);
+            if (checkRoom.story != ROOM_STORY_LOWER) {
+                continue;
+            }
+
+            if ((x == (checkRoom.x + checkRoom.piece.sizeX)) || ((x + piece.sizeX) == checkRoom.x)) {
+                if (z >= (checkRoom.z + checkRoom.piece.sizeZ)) {
+                    continue;
+                }
+                if ((z + piece.sizeZ) <= checkRoom.z) {
+                    continue;
+                }
+                return (n);
+            }
+
+            if ((z == (checkRoom.z + checkRoom.piece.sizeZ)) || ((z + piece.sizeZ) == checkRoom.z)) {
+                if (x >= (checkRoom.x + checkRoom.piece.sizeX)) {
+                    continue;
+                }
+                if ((x + piece.sizeX) <= checkRoom.x) {
+                    continue;
+                }
+                return (n);
+            }
+        }
+
+        return (-1);
     }
 
     public boolean roomAtPosition(ArrayList<MapRoom> rooms, int cx, int cz) {

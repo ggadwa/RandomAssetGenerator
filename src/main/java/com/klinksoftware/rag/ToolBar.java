@@ -13,7 +13,7 @@ import javax.swing.JToolBar;
 
 public class ToolBar extends JToolBar {
 
-    private JToggleButton lightButton;
+    private JToggleButton lightButton, flyButton;
     private JToggleButton renderButton, colorButton, normalButton, MetallicRoughnessButton, emissiveButton;
 
     public ToolBar() {
@@ -25,6 +25,12 @@ public class ToolBar extends JToolBar {
 
         lightButton = addButton("tool_light", "Min or Max Light", false, null, (e) -> {
             AppWindow.walkView.toggleLightView();
+        });
+
+        addSeparator();
+
+        flyButton = addButton("tool_fly", "Fly Mode", false, null, (e) -> {
+            //AppWindow.walkView.toggleLightView();
         });
 
         addSeparator();

@@ -294,7 +294,7 @@ public class MapBuilder
                 }
 
                 endRoom = rooms.get(roomEndIdx);
-                if ((endRoom.story == MapRoom.ROOM_STORY_MAIN) && (!startRoom.hasLowerExtension) && (!startRoom.hasUpperExtension) && (endRoom.piece.sizeX >= 5) && (endRoom.piece.sizeZ >= 5)) {
+                if ((endRoom.story == MapRoom.ROOM_STORY_MAIN) && (!endRoom.hasLowerExtension) && (!endRoom.hasUpperExtension) && (endRoom.piece.sizeX >= 5) && (endRoom.piece.sizeZ >= 5)) {
                     if (startRoom.distance(endRoom) < UPPER_LOWER_FLOOR_MAX_DISTANCE) {
                         break;
                     }
@@ -357,6 +357,47 @@ public class MapBuilder
     }
 
     //
+    // additional non-extra story extensions
+    //
+    private void addAdditionalRoomExtensions(ArrayList<MapRoom> rooms, float tallRoom, float sunkenRoom) {
+        int n, nRoom;
+        MapRoom room, addRoom;
+
+        nRoom = rooms.size();
+
+        for (n = 0; n != nRoom; n++) {
+            room = rooms.get(n);
+
+            // only check for main story rooms
+            if (room.story != MapRoom.ROOM_STORY_MAIN) {
+                continue;
+            }
+
+            // skip anything already having an extension
+            if ((room.hasUpperExtension) || (room.hasLowerExtension)) {
+                continue;
+            }
+
+            // tall rooms
+            if (room.roomAbove(rooms) == -1) {
+                if (AppWindow.random.nextFloat() < tallRoom) {
+                    room.hasUpperExtension = true;
+                    addRoom = room.duplicate(MapRoom.ROOM_STORY_TALL_EXTENSION);
+                    addRoom.extendedFromRoom = room;
+                    rooms.add(addRoom);
+                }
+            }
+
+            // sunken rooms
+            if (room.roomBelow(rooms) == -1) {
+                if (AppWindow.random.nextFloat() < sunkenRoom) {
+                    //room.isSunken = (AppWindow.random.nextFloat() < 0.2f);
+                }
+            }
+        }
+    }
+
+    //
     // meshes
     //
     public void createRoomMeshes(int mapType, ArrayList<MapRoom> rooms) {
@@ -368,7 +409,7 @@ public class MapBuilder
 
         for (n = 0; n != roomCount; n++) {
             room = rooms.get(n);
-            centerPnt = new RagPoint((((room.x * SEGMENT_SIZE) + (room.piece.sizeX * SEGMENT_SIZE)) * 0.5f), ((SEGMENT_SIZE + this.FLOOR_HEIGHT) + (SEGMENT_SIZE * 0.5f)), (((room.z * SEGMENT_SIZE) + (room.piece.sizeZ * SEGMENT_SIZE)) * 0.5f));
+            centerPnt = new RagPoint((((room.x * SEGMENT_SIZE) + (room.piece.sizeX * SEGMENT_SIZE)) * 0.5f), ((SEGMENT_SIZE + FLOOR_HEIGHT) + (SEGMENT_SIZE * 0.5f)), (((room.z * SEGMENT_SIZE) + (room.piece.sizeZ * SEGMENT_SIZE)) * 0.5f));
 
             if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
                 MeshMapUtility.buildRoomIndoorWalls(meshList, room, centerPnt, n);
@@ -423,11 +464,11 @@ public class MapBuilder
     // required bitmaps
     //
     public void buildRequiredBitmaps(int mapType) {
-        String[] wallBitmaps = {"BrickIlregular", "BrickRegular", "Geometric", "MetalHeagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StoneWoodWall", "StoneWall", "Temple", "Tile", "WoodBoard"};
-        String[] insideFloorBitmaps = {"BrickIlregular", "BrickRegular", "Concrete", "MetalHexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "WoodBoard"};
+        String[] wallBitmaps = {"BrickPattern", "BrickRow", "Geometric", "MetalHexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StoneWoodWall", "StoneWall", "Temple", "Tile", "WoodBoard"};
+        String[] insideFloorBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalHexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "WoodBoard"};
         String[] outsideFloorBitmaps = {"Dirt", "Grass"};
-        String[] ceilingBitmaps = {"BrickIlregular", "BrickRegular", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "WoodBoard"};
-        String[] platformBitmaps = {"BrickIlregular", "BrickRegular", "Concrete", "MetalPlank", "MetalPlate", "WoodBoard"};
+        String[] ceilingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "WoodBoard"};
+        String[] platformBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "WoodBoard"};
 
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
             BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
@@ -448,7 +489,7 @@ public class MapBuilder
         // build a map
         //
 
-    public void build(int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, boolean complex) {
+    public void build(int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, float tallRoom, float sunkenRoom, boolean complex) {
         int mainFloorRoomCount, mainFloorRoomExtensionCount;
         int upperFloorRoomCount, lowerFloorRoomCount;
         MapRoom room;
@@ -460,7 +501,7 @@ public class MapBuilder
         rooms=new ArrayList<>();
         meshList=new MeshList();
 
-        // the stories
+        // the main rooms, stories, extensions
         mainFloorRoomCount = 1 + (int) (50.0f * mainFloorMapSize);
         mainFloorRoomExtensionCount = AppWindow.random.nextInt(mainFloorRoomCount / 10);
 
@@ -478,6 +519,9 @@ public class MapBuilder
         } else {
             addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, 1.0f, false);
         }
+
+        // any additional room extensions
+        addAdditionalRoomExtensions(rooms, tallRoom, sunkenRoom);
 
         // eliminate all combined walls
         removeSharedWalls(rooms);

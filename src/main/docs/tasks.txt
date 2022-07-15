@@ -1,27 +1,26 @@
 
 map
- - don't allow upper and lower in same room (1656351972126)
- - allow 2 stories randomly on rooms with nothing over
  - allow walk down randomly on rooms with nothing underneath
-
-- move all the models
-  - junction
-  - pipe
+ - implement gravity and fly-mode
 
 bitmaps
  - tile triangles need normals
+ - cracked rocks need non-single segment horizontal, and one that goes between first and last vertical crack
  - gravel (like dirt)
  - glass alpha needs to be more complex, and have lines have less alpha
  - more distinct control panels pieces (keyboard)
  - make face textures 1, 2, or 3 eye
 
 model
- table: bars on legs
- lab tube: extra pipes, maybe base, maybe control unit
- humanoid / etc - more items (spikes, etc.)
+ - finish junction
+ - finish pipes
+ - put bilateral and roughness back as controls
+ - table: bars on legs
+ - lab tube: extra pipes, maybe base, maybe control unit
+ - humanoid / etc - more items (spikes, etc.)
 
-
-- need to export tangents
+all
+ - need to export tangents
 
 sound
  - random silences in monster?

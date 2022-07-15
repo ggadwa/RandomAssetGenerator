@@ -4,9 +4,9 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapBrickIlregular extends BitmapBrickRegular {
+public class BitmapBrickPattern extends BitmapBrickRow {
 
-    public BitmapBrickIlregular() {
+    public BitmapBrickPattern() {
         super();
 
         hasNormal = true;

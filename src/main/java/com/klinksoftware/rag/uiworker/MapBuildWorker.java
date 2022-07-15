@@ -9,18 +9,20 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
     private int mapType;
-    private float mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact;
+    private float mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, tallRoom, sunkenRoom;
     private boolean complex;
 
     public static MapBuilder generatedMap = null;
 
-    public MapBuildWorker(AppWindow appWindow, int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompact, boolean complex) {
+    public MapBuildWorker(AppWindow appWindow, int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompact, float tallRoom, float sunkenRoom, boolean complex) {
         this.appWindow = appWindow;
         this.mapType = mapType;
         this.mainFloorMapSize = mainFloorMapSize;
         this.upperFloorMapSize = upperFloorMapSize;
         this.lowerFloorMapSize = lowerFloorMapSize;
         this.mapCompact = mapCompact;
+        this.tallRoom = tallRoom;
+        this.sunkenRoom = sunkenRoom;
         this.complex = complex;
     }
 
@@ -36,13 +38,13 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 
         seed=Calendar.getInstance().getTimeInMillis();
         AppWindow.random.setSeed(seed);
-        //AppWindow.random.setSeed(1655305584342L);
+        //AppWindow.random.setSeed(1657815680896L);
 
             // run the map builder
 
         try {
             mapBuilder = new MapBuilder();
-            mapBuilder.build(mapType, mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, complex);
+            mapBuilder.build(mapType, mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, tallRoom, sunkenRoom, complex);
         }
         catch (Exception e)
         {

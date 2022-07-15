@@ -4,6 +4,7 @@ import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.Skeleton;
+import java.awt.Cursor;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -50,7 +51,7 @@ public class WalkView extends AWTGLCanvas {
     private float moveX, moveY, moveZ, speedMultiplier;
     private float cameraRotateDistance, cameraRotateOffsetY;
     private float currentLightIntensity;
-    private boolean cameraCenterRotate;
+    private boolean mouseMovementOn, cameraCenterRotate;
     private MeshList meshList, incommingMeshList;
     private Skeleton incommingSkeleton;
     private HashMap<String, BitmapBase> incommingBitmaps;
@@ -65,60 +66,8 @@ public class WalkView extends AWTGLCanvas {
         super(glData);
 
         setFocusable(true);
-
-        addMouseMotionListener(
-                new MouseMotionListener() {
-                    @Override
-                    public void mouseMoved(MouseEvent e) {
-                    }
-
-                    @Override
-                    public void mouseDragged(MouseEvent e) {
-                        eventMouseDrag(e.getX(), e.getY());
-                    }
-        });
-
-        addMouseListener(
-                new MouseListener() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                    }
-
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        eventMousePressed(e.getButton(), e.getX(), e.getY());
-                    }
-
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        eventMouseRelease(e.getButton());
-                    }
-
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                    }
-
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                    }
-        });
-
-        addKeyListener(
-                new KeyListener() {
-                    @Override
-                    public void keyTyped(KeyEvent e) {
-                    }
-
-                     @Override
-                     public void keyPressed(KeyEvent e) {
-                         eventKeyPress(e.getKeyCode());
-                     }
-
-                    @Override
-                    public void keyReleased(KeyEvent e) {
-                        eventKeyRelease(e.getKeyCode());
-                    }
-        });
+        addMouseEvents(this);
+        addKeyboardEvents();
     }
 
     // start up and shutdown
@@ -175,6 +124,8 @@ public class WalkView extends AWTGLCanvas {
         moveZ=0;
         movePoint = new RagPoint(0.0f, 0.0f, 0.0f);
         speedMultiplier = 1.0f;
+
+        mouseMovementOn = false;
 
         cameraCenterRotate=false;
         cameraRotateDistance=0.0f;
@@ -885,74 +836,136 @@ public class WalkView extends AWTGLCanvas {
     //
     // events
     //
+    private void addMouseEvents(AWTGLCanvas view) {
+        addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int x = e.getX();
+                int y = e.getY();
 
-    public void eventMousePressed(int button, int x, int y) {
-        lastMouseX=x;
-        lastMouseY=y;
+                if (!mouseMovementOn) {
+                    return;
+                }
+
+                if (lastMouseX != x) {
+                    cameraAngle.y -= ((float) (x - lastMouseX) * 0.5f);
+                    if (cameraAngle.y < 0) {
+                        cameraAngle.y = 360.0f + cameraAngle.y;
+                    }
+                    if (cameraAngle.y >= 360) {
+                        cameraAngle.y = cameraAngle.y - 360.0f;
+                    }
+                    lastMouseX = x;
+                }
+
+                if (lastMouseY != y) {
+                    cameraAngle.x += ((float) (y - lastMouseY) * 0.2f);
+                    if (cameraAngle.x < -89.0f) {
+                        cameraAngle.x = -89.0f;
+                    }
+                    if (cameraAngle.x > 89.0f) {
+                        cameraAngle.x = 89.0f;
+                    }
+                    lastMouseY = y;
+                }
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+            }
+        });
+
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (!mouseMovementOn) {
+                    mouseMovementOn = true;
+                    lastMouseX = e.getX();
+                    lastMouseY = e.getY();
+                    view.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                } else {
+                    mouseMovementOn = false;
+                    view.setCursor(Cursor.getDefaultCursor());
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                mouseMovementOn = false;
+                view.setCursor(Cursor.getDefaultCursor());
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                mouseMovementOn = false;
+                view.setCursor(Cursor.getDefaultCursor());
+            }
+        });
+
     }
 
-    public void eventMouseRelease(int button) {
-    }
+    private void addKeyboardEvents() {
+        addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
 
-    public void eventMouseDrag(int x, int y) {
-        if (lastMouseX!=x) {
-            cameraAngle.y-=((float)(x-lastMouseX)*0.5f);
-            if (cameraAngle.y<0) cameraAngle.y=360.0f+cameraAngle.y;
-            if (cameraAngle.y>=360) cameraAngle.y=cameraAngle.y-360.0f;
-            lastMouseX=x;
-        }
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_SHIFT:
+                        speedMultiplier = RAG_SPEED_MULTIPLIER;
+                        return;
+                    case KeyEvent.VK_W:
+                        moveZ = RAG_MOVE_SPEED;
+                        return;
+                    case KeyEvent.VK_S:
+                        moveZ = -RAG_MOVE_SPEED;
+                        return;
+                    case KeyEvent.VK_A:
+                        moveX = RAG_MOVE_SPEED;
+                        return;
+                    case KeyEvent.VK_D:
+                        moveX = -RAG_MOVE_SPEED;
+                        return;
+                    case KeyEvent.VK_Q:
+                        moveY = RAG_MOVE_SPEED;
+                        return;
+                    case KeyEvent.VK_E:
+                        moveY = -RAG_MOVE_SPEED;
+                        return;
+                }
+            }
 
-        if (lastMouseY!=y) {
-            cameraAngle.x+=((float)(y-lastMouseY)*0.2f);
-            if (cameraAngle.x<-89.0f) cameraAngle.x=-89.0f;
-            if (cameraAngle.x>89.0f) cameraAngle.x=89.0f;
-            lastMouseY=y;
-        }
-    }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_SHIFT:
+                        speedMultiplier = 1.0f;
+                        return;
+                    case KeyEvent.VK_W:
+                    case KeyEvent.VK_S:
+                        moveZ = 0.0f;
+                        return;
+                    case KeyEvent.VK_A:
+                    case KeyEvent.VK_D:
+                        moveX = 0.0f;
+                        return;
+                    case KeyEvent.VK_Q:
+                    case KeyEvent.VK_E:
+                        moveY = 0.0f;
+                        return;
+                }
+            }
+        });
 
-    public void eventKeyPress(int keyCode) {
-        switch (keyCode) {
-            case KeyEvent.VK_SHIFT:
-                speedMultiplier = RAG_SPEED_MULTIPLIER;
-                return;
-            case KeyEvent.VK_W:
-                moveZ = RAG_MOVE_SPEED;
-                return;
-            case KeyEvent.VK_S:
-                moveZ = -RAG_MOVE_SPEED;
-                return;
-            case KeyEvent.VK_A:
-                moveX = RAG_MOVE_SPEED;
-                return;
-            case KeyEvent.VK_D:
-                moveX = -RAG_MOVE_SPEED;
-                return;
-            case KeyEvent.VK_Q:
-                moveY = RAG_MOVE_SPEED;
-                return;
-            case KeyEvent.VK_E:
-                moveY = -RAG_MOVE_SPEED;
-                return;
-        }
-    }
-
-    public void eventKeyRelease(int keyCode) {
-        switch (keyCode) {
-            case KeyEvent.VK_SHIFT:
-                speedMultiplier = 1.0f;
-                return;
-            case KeyEvent.VK_W:
-            case KeyEvent.VK_S:
-                moveZ = 0.0f;
-                return;
-            case KeyEvent.VK_A:
-            case KeyEvent.VK_D:
-                moveX = 0.0f;
-                return;
-            case KeyEvent.VK_Q:
-            case KeyEvent.VK_E:
-                moveY = 0.0f;
-                return;
-        }
     }
 }

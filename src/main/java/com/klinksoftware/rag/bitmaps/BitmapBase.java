@@ -2756,6 +2756,7 @@ public class BitmapBase
         try {
             bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + classNames[AppWindow.random.nextInt(classNames.length)].replace(" ", ""))).getConstructor().newInstance();
         } catch (Exception e) {
+            e.printStackTrace();
             bitmap = new BitmapTest();
         }
 

@@ -47,12 +47,14 @@ public class MeshMapUtility
                 py = floor ? -(MapBuilder.SEGMENT_SIZE + (MapBuilder.FLOOR_HEIGHT * 2)) : -(MapBuilder.FLOOR_HEIGHT * 1);
                 break;
             case MapRoom.ROOM_STORY_UPPER_EXTENSION:
+            case MapRoom.ROOM_STORY_TALL_EXTENSION:
                 if (floor) {
                     return;
                 }
                 py = (MapBuilder.SEGMENT_SIZE * 2) + (MapBuilder.FLOOR_HEIGHT * 3);
                 break;
             case MapRoom.ROOM_STORY_LOWER_EXTENSION:
+            case MapRoom.ROOM_STORY_SUNKEN_EXTENSION:
                 if (!floor) {
                     return;
                 }
@@ -122,10 +124,12 @@ public class MeshMapUtility
         switch (room.story) {
             case MapRoom.ROOM_STORY_UPPER:
             case MapRoom.ROOM_STORY_UPPER_EXTENSION:
+            case MapRoom.ROOM_STORY_TALL_EXTENSION:
                 y = (MapBuilder.SEGMENT_SIZE + (MapBuilder.FLOOR_HEIGHT * 2));
                 break;
             case MapRoom.ROOM_STORY_LOWER:
             case MapRoom.ROOM_STORY_LOWER_EXTENSION:
+            case MapRoom.ROOM_STORY_SUNKEN_EXTENSION:
                 y = -(MapBuilder.SEGMENT_SIZE + (MapBuilder.FLOOR_HEIGHT * 2));
                 break;
         }
@@ -170,9 +174,15 @@ public class MeshMapUtility
                 case MapRoom.ROOM_STORY_UPPER_EXTENSION:
                     meshList.add(new Mesh(("wall_upper_" + Integer.toString(roomNumber)), "wall_upper", vertexes, normals, tangents, uvs, indexes));
                     break;
+                case MapRoom.ROOM_STORY_TALL_EXTENSION:
+                    meshList.add(new Mesh(("wall_tall_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
+                    break;
                 case MapRoom.ROOM_STORY_LOWER:
                 case MapRoom.ROOM_STORY_LOWER_EXTENSION:
                     meshList.add(new Mesh(("wall_lower_" + Integer.toString(roomNumber)), "wall_lower", vertexes, normals, tangents, uvs, indexes));
+                    break;
+                case MapRoom.ROOM_STORY_SUNKEN_EXTENSION:
+                    meshList.add(new Mesh(("wall_sunken_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
                     break;
             }
         }
@@ -195,7 +205,7 @@ public class MeshMapUtility
             }
 
             // extra small bottom wall for upper extension rooms
-            if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
+            if ((room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) || (room.story == MapRoom.ROOM_STORY_TALL_EXTENSION)) {
                 vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y - MapBuilder.FLOOR_HEIGHT), ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
                 vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y - MapBuilder.FLOOR_HEIGHT), ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
                 vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), y, ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
@@ -204,7 +214,7 @@ public class MeshMapUtility
             }
 
             // extra small top wall for lower rooms
-            if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
+            if ((room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) || (room.story == MapRoom.ROOM_STORY_SUNKEN_EXTENSION)) {
                 vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), ((y + MapBuilder.SEGMENT_SIZE) + (MapBuilder.FLOOR_HEIGHT * 2)), ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
                 vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), ((y + MapBuilder.SEGMENT_SIZE) + (MapBuilder.FLOOR_HEIGHT * 2)), ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
                 vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), ((y + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
@@ -224,8 +234,14 @@ public class MeshMapUtility
                 case MapRoom.ROOM_STORY_UPPER_EXTENSION:
                     meshList.add(new Mesh(("platform_upper_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
                     break;
+                case MapRoom.ROOM_STORY_TALL_EXTENSION:
+                    meshList.add(new Mesh(("platform_upper_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
+                    break;
                 case MapRoom.ROOM_STORY_LOWER_EXTENSION:
                     meshList.add(new Mesh(("platform_lower_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
+                    break;
+                case MapRoom.ROOM_STORY_SUNKEN_EXTENSION:
+                    meshList.add(new Mesh(("platform_lower_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
                     break;
             }
         }
