@@ -1,16 +1,16 @@
-package com.klinksoftware.rag.walkview;
+package com.klinksoftware.rag.collision;
 
 import com.klinksoftware.rag.utility.RagBound;
 import com.klinksoftware.rag.utility.RagPoint;
 
-public class WalkViewTrig {
+public class CollisionTrig {
 
     private RagPoint v0, v1, v2;
     private RagPoint normal;
     private RagPoint vct1, vct2, perpVector, lineToTrigPointVector, lineToTrigPerpVector;
     private RagBound xBound, yBound, zBound;
 
-    public WalkViewTrig(RagPoint v0, RagPoint v1, RagPoint v2, RagPoint normal) {
+    public CollisionTrig(RagPoint v0, RagPoint v1, RagPoint v2, RagPoint normal) {
         this.v0 = v0;
         this.v1 = v1;
         this.v2 = v2;

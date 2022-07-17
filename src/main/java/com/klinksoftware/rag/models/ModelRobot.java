@@ -10,7 +10,7 @@ public class ModelRobot extends ModelBase {
         addBitmap("bitmap", new String[]{"Robot"});
 
         // build the skeleton
-        skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_ROBOT);
+        skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_ROBOT, bilateral);
 
         // build the meshes around the limbs
         wrapLimbs(false);

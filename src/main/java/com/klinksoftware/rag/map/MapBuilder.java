@@ -14,7 +14,8 @@ public class MapBuilder
     public static final int ROOM_RANDOM_LOCATION_DISTANCE = 100;
     public static final int UPPER_LOWER_FLOOR_MAX_DISTANCE = 20;
     public static final float SEGMENT_SIZE=10.0f;
-    public static final float FLOOR_HEIGHT=1.0f;
+    public static final float FLOOR_HEIGHT = 1.0f;
+    public static final float SUNKEN_HEIGHT = 3.0f;
 
     public static final int FC_MARK_EMPTY=0;
     public static final int FC_MARK_FILL_INSIDE=1;
@@ -391,7 +392,10 @@ public class MapBuilder
             // sunken rooms
             if (room.roomBelow(rooms) == -1) {
                 if (AppWindow.random.nextFloat() < sunkenRoom) {
-                    //room.isSunken = (AppWindow.random.nextFloat() < 0.2f);
+                    room.hasLowerExtension = true;
+                    addRoom = room.duplicate(MapRoom.ROOM_STORY_SUNKEN_EXTENSION);
+                    addRoom.extendedFromRoom = room;
+                    rooms.add(addRoom);
                 }
             }
         }
@@ -499,7 +503,7 @@ public class MapBuilder
         mapPieceList=new MapPieceList();
 
         rooms=new ArrayList<>();
-        meshList=new MeshList();
+        meshList = new MeshList();
 
         // the main rooms, stories, extensions
         mainFloorRoomCount = 1 + (int) (50.0f * mainFloorMapSize);

@@ -2,14 +2,10 @@ package com.klinksoftware.rag.walkview;
 
 import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.bitmaps.*;
+import com.klinksoftware.rag.collision.Collision;
 import com.klinksoftware.rag.mesh.*;
 import com.klinksoftware.rag.skeleton.Skeleton;
 import java.awt.Cursor;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.nio.*;
 import java.nio.charset.*;
 import java.nio.file.*;
@@ -34,13 +30,11 @@ public class WalkView extends AWTGLCanvas {
     private static final float RAG_NEAR_Z=1.0f;
     private static final float RAG_FAR_Z=500.0f;
     private static final float RAG_FOV=55.0f;
-    private static final float RAG_MOVE_SPEED = 0.2f;
-    private static final float RAG_SPEED_MULTIPLIER = 3.0f;
-    private static final long RAG_PAINT_TICK=33;
+    private static final long RAG_PAINT_TICK = 33;
     private static final float RAG_LIGHT_LOW_INTENSITY = 100.0f;
     private static final float RAG_LIGHT_HIGH_INTENSITY = 500.0f;
 
-    private int wid,high,lastMouseX,lastMouseY;
+    public int wid, high;
     private int vertexShaderId,fragmentShaderId,programId;
     private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
     private int perspectiveMatrixUniformId, viewMatrixUniformId, normalMatrixUniformId, lightPositionIntensityUniformId;
@@ -48,14 +42,16 @@ public class WalkView extends AWTGLCanvas {
     private int displayType;
     private long nextPaintTick;
     private float aspectRatio;
-    private float moveX, moveY, moveZ, speedMultiplier;
+    public float moveX, moveY, moveZ, speedMultiplier;
     private float cameraRotateDistance, cameraRotateOffsetY;
     private float currentLightIntensity;
-    private boolean mouseMovementOn, cameraCenterRotate;
+    public boolean cameraCenterRotate;
     private MeshList meshList, incommingMeshList;
     private Skeleton incommingSkeleton;
     private HashMap<String, BitmapBase> incommingBitmaps;
-    private RagPoint eyePoint, cameraPoint, cameraAngle, lightEyePoint, lookAtUpVector, movePoint, fixedLightPoint;
+    private Collision collision;
+    public RagPoint cameraAngle;
+    public RagPoint eyePoint, cameraPoint, lightEyePoint, lookAtUpVector, movePoint, fixedLightPoint;
     private RagMatrix4f perspectiveMatrix,viewMatrix,rotMatrix,rotMatrix2;
     private RagMatrix3f normalMatrix;
     private float[] clipPlane;
@@ -66,8 +62,17 @@ public class WalkView extends AWTGLCanvas {
         super(glData);
 
         setFocusable(true);
-        addMouseEvents(this);
-        addKeyboardEvents();
+
+        // mouse events
+        WalkViewMouseMotionListener mouseMotionListener = new WalkViewMouseMotionListener(this);
+        addMouseMotionListener(mouseMotionListener);
+        addMouseListener(new WalkViewMouseListener(mouseMotionListener));
+
+        // keyboard events
+        addKeyListener(new WalkViewKeyListener(this, mouseMotionListener));
+
+        // move cursor
+        setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
     }
 
     // start up and shutdown
@@ -108,6 +113,7 @@ public class WalkView extends AWTGLCanvas {
 
         meshList = null;
         textures = null;
+        collision = null;
 
         incommingMeshList=null;
         incommingSkeleton=null;
@@ -117,17 +123,13 @@ public class WalkView extends AWTGLCanvas {
 
             // no dragging
 
-        lastMouseX=-1;
-        lastMouseY=-1;
-        moveX=0;
+        moveX = 0;
         moveY=0;
         moveZ=0;
         movePoint = new RagPoint(0.0f, 0.0f, 0.0f);
         speedMultiplier = 1.0f;
 
-        mouseMovementOn = false;
-
-        cameraCenterRotate=false;
+        cameraCenterRotate = false;
         cameraRotateDistance=0.0f;
         cameraRotateOffsetY = 0.0f;
         fixedLightPoint = null;
@@ -425,7 +427,7 @@ public class WalkView extends AWTGLCanvas {
             }
         }
 
-            // setup the new mesh
+        // setup the new mesh
 
         tempPnt=new RagPoint(0.0f,0.0f,0.0f);
         textures = new HashMap<>();
@@ -480,6 +482,10 @@ public class WalkView extends AWTGLCanvas {
         incommingMeshList=null;
         incommingSkeleton=null;
         incommingBitmaps = null;
+
+        // collision
+        collision = new Collision();
+        collision.buildFromMeshList(meshList);
     }
 
     //
@@ -833,139 +839,4 @@ public class WalkView extends AWTGLCanvas {
         swapBuffers();
     }
 
-    //
-    // events
-    //
-    private void addMouseEvents(AWTGLCanvas view) {
-        addMouseMotionListener(new MouseMotionListener() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                int x = e.getX();
-                int y = e.getY();
-
-                if (!mouseMovementOn) {
-                    return;
-                }
-
-                if (lastMouseX != x) {
-                    cameraAngle.y -= ((float) (x - lastMouseX) * 0.5f);
-                    if (cameraAngle.y < 0) {
-                        cameraAngle.y = 360.0f + cameraAngle.y;
-                    }
-                    if (cameraAngle.y >= 360) {
-                        cameraAngle.y = cameraAngle.y - 360.0f;
-                    }
-                    lastMouseX = x;
-                }
-
-                if (lastMouseY != y) {
-                    cameraAngle.x += ((float) (y - lastMouseY) * 0.2f);
-                    if (cameraAngle.x < -89.0f) {
-                        cameraAngle.x = -89.0f;
-                    }
-                    if (cameraAngle.x > 89.0f) {
-                        cameraAngle.x = 89.0f;
-                    }
-                    lastMouseY = y;
-                }
-            }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-            }
-        });
-
-        addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (!mouseMovementOn) {
-                    mouseMovementOn = true;
-                    lastMouseX = e.getX();
-                    lastMouseY = e.getY();
-                    view.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-                } else {
-                    mouseMovementOn = false;
-                    view.setCursor(Cursor.getDefaultCursor());
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                mouseMovementOn = false;
-                view.setCursor(Cursor.getDefaultCursor());
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                mouseMovementOn = false;
-                view.setCursor(Cursor.getDefaultCursor());
-            }
-        });
-
-    }
-
-    private void addKeyboardEvents() {
-        addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_SHIFT:
-                        speedMultiplier = RAG_SPEED_MULTIPLIER;
-                        return;
-                    case KeyEvent.VK_W:
-                        moveZ = RAG_MOVE_SPEED;
-                        return;
-                    case KeyEvent.VK_S:
-                        moveZ = -RAG_MOVE_SPEED;
-                        return;
-                    case KeyEvent.VK_A:
-                        moveX = RAG_MOVE_SPEED;
-                        return;
-                    case KeyEvent.VK_D:
-                        moveX = -RAG_MOVE_SPEED;
-                        return;
-                    case KeyEvent.VK_Q:
-                        moveY = RAG_MOVE_SPEED;
-                        return;
-                    case KeyEvent.VK_E:
-                        moveY = -RAG_MOVE_SPEED;
-                        return;
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_SHIFT:
-                        speedMultiplier = 1.0f;
-                        return;
-                    case KeyEvent.VK_W:
-                    case KeyEvent.VK_S:
-                        moveZ = 0.0f;
-                        return;
-                    case KeyEvent.VK_A:
-                    case KeyEvent.VK_D:
-                        moveX = 0.0f;
-                        return;
-                    case KeyEvent.VK_Q:
-                    case KeyEvent.VK_E:
-                        moveY = 0.0f;
-                        return;
-                }
-            }
-        });
-
-    }
 }

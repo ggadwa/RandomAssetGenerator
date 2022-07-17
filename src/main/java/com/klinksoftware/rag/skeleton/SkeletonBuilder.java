@@ -598,15 +598,14 @@ public class SkeletonBuilder
         // build skeleton bones
         //
 
-    public Skeleton build(int modelType) {
+    public Skeleton build(int modelType, boolean bilateral) {
         float hunchAng, scaleFactor, armRadius, legRadius, whipRadius;
-        boolean thin, bilateral;
+        boolean thin;
         Skeleton skeleton;
 
         skeleton = new Skeleton();
 
         thin = (AppWindow.random.nextFloat() < 0.75f);
-        bilateral = (AppWindow.random.nextFloat() < 0.75f);
 
         // skeleton hunch angle
         switch (modelType) {

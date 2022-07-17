@@ -11,14 +11,14 @@ public class ModelBlob extends ModelBase {
         addBitmap("bitmap", new String[]{"Monster"});
 
         // build the skeleton
-        skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_BLOB);
+        skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_BLOB, bilateral);
 
         // build the meshes around the limbs
         wrapLimbs(true);
 
         // any randomization
-        if (AppWindow.random.nextBoolean()) {
-            meshList.randomizeVertexes((0.6f + AppWindow.random.nextFloat(1.0f)), (0.025f + AppWindow.random.nextFloat(0.07f)));
+        if (roughness != 0.0f) {
+            meshList.randomizeVertexes(roughness, (0.025f + AppWindow.random.nextFloat(0.05f)));
         }
 
         // skeletons and meshes are created with absolute

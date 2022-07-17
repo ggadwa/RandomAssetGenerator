@@ -1,6 +1,5 @@
 
 map
- - allow walk down randomly on rooms with nothing underneath
  - implement gravity and fly-mode
 
 bitmaps
@@ -14,7 +13,6 @@ bitmaps
 model
  - finish junction
  - finish pipes
- - put bilateral and roughness back as controls
  - table: bars on legs
  - lab tube: extra pipes, maybe base, maybe control unit
  - humanoid / etc - more items (spikes, etc.)

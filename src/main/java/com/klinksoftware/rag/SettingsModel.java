@@ -4,7 +4,9 @@ import com.klinksoftware.rag.models.ModelInterface;
 import com.klinksoftware.rag.uiworker.ModelBuildWorker;
 import com.klinksoftware.rag.uiworker.ModelExportWorker;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JList;
+import javax.swing.JSlider;
 
 public class SettingsModel extends SettingsBase {
 
@@ -13,6 +15,8 @@ public class SettingsModel extends SettingsBase {
 
     private JButton generateModelButton, exportModelButton;
     private JList modelTypeList;
+    private JSlider roughnessSlider;
+    private JCheckBox bilateralCheckBox;
 
     public SettingsModel(AppWindow appWindow) {
         super(appWindow);
@@ -29,6 +33,12 @@ public class SettingsModel extends SettingsBase {
         modelTypeList = addList(y, "Model Type", getAnnotationClasses("com.klinksoftware.rag.models", "model", ModelInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
+        bilateralCheckBox = addCheckBox(y, "Bilateral", true);
+        y += (ROW_HEIGHT + ROW_GAP);
+
+        roughnessSlider = addSlider(y, "Roughness", 0.2f);
+        y += (ROW_HEIGHT + ROW_GAP);
+
         exportModelButton = addButton(y, "Export Model", BUTTON_EXPORT_MODEL);
     }
 
@@ -38,7 +48,10 @@ public class SettingsModel extends SettingsBase {
             case BUTTON_GENERATE_MODEL:
                 (new ModelBuildWorker(
                         appWindow,
-                        (String) modelTypeList.getModel().getElementAt(modelTypeList.getSelectedIndex()))).execute();
+                        (String) modelTypeList.getModel().getElementAt(modelTypeList.getSelectedIndex()),
+                        bilateralCheckBox.isSelected(),
+                        ((float) roughnessSlider.getValue() / 100.0f)
+                )).execute();
                 return;
             case BUTTON_EXPORT_MODEL:
                 (new ModelExportWorker(appWindow)).execute();

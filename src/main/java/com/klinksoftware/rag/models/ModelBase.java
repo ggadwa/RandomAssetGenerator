@@ -17,6 +17,9 @@ public class ModelBase {
     public MeshList meshList;
     public HashMap<String, BitmapBase> bitmaps;
 
+    public boolean bilateral;
+    public float roughness;
+
     // limb wrapping (for humanoid, etc models)
     public void wrapLimbs(boolean organic) {
         int n, meshIdx;
@@ -94,7 +97,10 @@ public class ModelBase {
     }
 
     // build a model
-    public void build() {
+    public void build(boolean bilateral, float roughness) {
+        this.bilateral = bilateral;
+        this.roughness = roughness;
+
         meshList = new MeshList();
         bitmaps = new HashMap<>();
 

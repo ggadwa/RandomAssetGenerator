@@ -9,12 +9,16 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
     private String modelName;
+    private boolean bilateral;
+    private float roughness;
 
     public static ModelBase generatedModel = null;
 
-    public ModelBuildWorker(AppWindow appWindow, String modelName) {
+    public ModelBuildWorker(AppWindow appWindow, String modelName, boolean bilateral, float roughness) {
         this.appWindow = appWindow;
         this.modelName = modelName;
+        this.bilateral = bilateral;
+        this.roughness = roughness;
     }
 
     @Override
@@ -34,7 +38,7 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
         // run the model builder
         try {
             model = (ModelBase) (Class.forName("com.klinksoftware.rag.models.Model" + modelName.replace(" ", ""))).getConstructor().newInstance();
-            model.build();
+            model.build(bilateral, roughness);
         } catch (Exception e) {
             e.printStackTrace();
             return (0);
