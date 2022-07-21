@@ -15,10 +15,8 @@ public class MapStair {
 
     private void addSideWall(MapRoom room, int roomNumber, boolean upper, int dir, float sx, float sy, float sz) {
         float ty;
-        String name;
 
         ty = (sy + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT;
-        name = "stair_wall_min_" + Integer.toString(roomNumber);
 
         switch (dir) {
             case MeshMapUtility.STAIR_DIR_POS_Z:

@@ -42,16 +42,16 @@ public class WalkView extends AWTGLCanvas {
     private int displayType;
     private long nextPaintTick;
     private float aspectRatio;
-    public float moveX, moveY, moveZ, speedMultiplier;
-    private float cameraRotateDistance, cameraRotateOffsetY;
+    public float speedMultiplier;
+    private float cameraRotateDistance, cameraRotateOffsetY, cameraFeetOffsetY;
     private float currentLightIntensity;
-    public boolean cameraCenterRotate;
+    public boolean cameraCenterRotate, runPhysics;
     private MeshList meshList, incommingMeshList;
     private Skeleton incommingSkeleton;
     private HashMap<String, BitmapBase> incommingBitmaps;
     private Collision collision;
-    public RagPoint cameraAngle;
-    public RagPoint eyePoint, cameraPoint, lightEyePoint, lookAtUpVector, movePoint, fixedLightPoint;
+    public RagPoint cameraAngle, movePoint;
+    public RagPoint eyePoint, cameraPoint, lightEyePoint, lookAtUpVector, fixedLightPoint;
     private RagMatrix4f perspectiveMatrix,viewMatrix,rotMatrix,rotMatrix2;
     private RagMatrix3f normalMatrix;
     private float[] clipPlane;
@@ -123,16 +123,15 @@ public class WalkView extends AWTGLCanvas {
 
             // no dragging
 
-        moveX = 0;
-        moveY=0;
-        moveZ=0;
         movePoint = new RagPoint(0.0f, 0.0f, 0.0f);
         speedMultiplier = 1.0f;
 
         cameraCenterRotate = false;
         cameraRotateDistance=0.0f;
         cameraRotateOffsetY = 0.0f;
+        cameraFeetOffsetY = 0.0f;
         fixedLightPoint = null;
+        runPhysics = true;
 
         currentLightIntensity = RAG_LIGHT_LOW_INTENSITY;
 
@@ -345,19 +344,23 @@ public class WalkView extends AWTGLCanvas {
     // set the view cameras
     //
 
-    public void setCameraWalkView(float x,float y,float z) {
+    public void setCameraWalkView(float x, float y, float z, float feetOffsetY) {
         cameraPoint.setFromValues(x, y, z);
         cameraAngle.setFromValues(0.0f, 0.0f, 0.0f);
+        cameraFeetOffsetY = feetOffsetY;
         cameraCenterRotate = false;
         fixedLightPoint = null;
+        runPhysics = true;
     }
 
     public void setCameraCenterRotate(float dist, float rotateX, float rotateY, float offsetY, float lightDistance) {
         cameraRotateDistance=dist;
         cameraRotateOffsetY = offsetY;
         cameraAngle.setFromValues(rotateX, rotateY, 0.0f);
+        cameraFeetOffsetY = 0.0f;
         cameraCenterRotate = true;
         fixedLightPoint = new RagPoint(-1.5f, offsetY, lightDistance);
+        runPhysics = false;
     }
 
     //
@@ -475,17 +478,15 @@ public class WalkView extends AWTGLCanvas {
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
-            // switch to new mesh list
-            // and clear incomming
+        // collision
+        collision = new Collision();
+        collision.buildFromMeshList(incommingMeshList, incommingSkeleton);
 
+        // switch to new mesh list and clear incomming
         this.meshList=incommingMeshList;
         incommingMeshList=null;
         incommingSkeleton=null;
         incommingBitmaps = null;
-
-        // collision
-        collision = new Collision();
-        collision.buildFromMeshList(meshList);
     }
 
     //
@@ -493,24 +494,36 @@ public class WalkView extends AWTGLCanvas {
     //
 
     private void setupCameraWalkView() {
-        // any movement
+        RagPoint walkPoint;
+        RagPoint rotMovePoint;
 
-        if ((moveX != 0.0f) || (moveZ != 0.0f)) {
-            movePoint.setFromValues((moveX * speedMultiplier), 0, (moveZ * speedMultiplier));
+        // any movement
+        if (movePoint.hasXZValues()) {
+            rotMovePoint = new RagPoint(0.0f, 0.0f, 0.0f);
+            rotMovePoint.setFromScaleNoY(movePoint, speedMultiplier);
+
+            //movePoint.setFromValues((moveX * speedMultiplier), 0, (moveZ * speedMultiplier));
             rotMatrix.setRotationFromYAngle(cameraAngle.y);
             rotMatrix2.setRotationFromXAngle(cameraAngle.x);
             rotMatrix.multiply(rotMatrix2);
-            movePoint.matrixMultiply(rotMatrix);
+            rotMovePoint.matrixMultiply(rotMatrix);
 
-            cameraPoint.addPoint(movePoint);
+            cameraPoint.addPoint(rotMovePoint);
         }
 
-        if (moveY != 0.0f) {
-            cameraPoint.y += (moveY * speedMultiplier);
+        if (movePoint.y != 0.0f) {
+            cameraPoint.y += (movePoint.y * speedMultiplier);
         }
 
-            // setup the eye point
+        // any gravity
+        // we run it at the feet offset so the camera is at eye level
+        if (runPhysics) {
+            walkPoint = new RagPoint(cameraPoint.x, (cameraPoint.y - cameraFeetOffsetY), cameraPoint.z);
+            collision.collideWithFloor(walkPoint);
+            cameraPoint.y = walkPoint.y + cameraFeetOffsetY;
+        }
 
+        // setup the eye point
         eyePoint.setFromValues(0,0,-RAG_NEAR_Z);
         rotMatrix.setTranslationFromPoint(cameraPoint);
         rotMatrix2.setRotationFromYAngle(cameraAngle.y);
@@ -523,7 +536,7 @@ public class WalkView extends AWTGLCanvas {
     private void setupCameraCenterRotate() {
             // any movement
 
-       cameraRotateDistance-=moveZ;
+        cameraRotateDistance -= movePoint.z;
 
             // camera at center
 

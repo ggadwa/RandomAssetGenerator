@@ -1,6 +1,9 @@
 
 map
  - implement gravity and fly-mode
+ - jumping
+ - more gravity longer falling
+ - need real floors and ceilings
 
 bitmaps
  - tile triangles need normals

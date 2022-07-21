@@ -27,22 +27,22 @@ public class WalkViewKeyListener implements KeyListener {
                 view.speedMultiplier = RAG_SPEED_MULTIPLIER;
                 return;
             case KeyEvent.VK_W:
-                view.moveZ = RAG_MOVE_SPEED;
+                view.movePoint.z = RAG_MOVE_SPEED;
                 return;
             case KeyEvent.VK_S:
-                view.moveZ = -RAG_MOVE_SPEED;
+                view.movePoint.z = -RAG_MOVE_SPEED;
                 return;
             case KeyEvent.VK_A:
-                view.moveX = RAG_MOVE_SPEED;
+                view.movePoint.x = RAG_MOVE_SPEED;
                 return;
             case KeyEvent.VK_D:
-                view.moveX = -RAG_MOVE_SPEED;
+                view.movePoint.x = -RAG_MOVE_SPEED;
                 return;
             case KeyEvent.VK_Q:
-                view.moveY = RAG_MOVE_SPEED;
+                view.movePoint.y = RAG_MOVE_SPEED;
                 return;
             case KeyEvent.VK_E:
-                view.moveY = -RAG_MOVE_SPEED;
+                view.movePoint.y = -RAG_MOVE_SPEED;
                 return;
             case KeyEvent.VK_ESCAPE:
                 mouseMotionListener.turnMotionOff();
@@ -58,15 +58,15 @@ public class WalkViewKeyListener implements KeyListener {
                 return;
             case KeyEvent.VK_W:
             case KeyEvent.VK_S:
-                view.moveZ = 0.0f;
+                view.movePoint.z = 0.0f;
                 return;
             case KeyEvent.VK_A:
             case KeyEvent.VK_D:
-                view.moveX = 0.0f;
+                view.movePoint.x = 0.0f;
                 return;
             case KeyEvent.VK_Q:
             case KeyEvent.VK_E:
-                view.moveY = 0.0f;
+                view.movePoint.y = 0.0f;
                 return;
         }
     }
