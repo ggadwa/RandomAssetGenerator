@@ -24,13 +24,13 @@ public class ToolBar extends JToolBar {
         this.setBackground(new Color(0.9f, 0.9f, 1.0f));
 
         lightButton = addButton("tool_light", "Min or Max Light", false, null, (e) -> {
-            AppWindow.walkView.toggleLightView();
+            AppWindow.walkView.setLightIntensity(((JToggleButton) e.getSource()).isSelected());
         });
 
         addSeparator();
 
         flyButton = addButton("tool_fly", "Fly Mode", false, null, (e) -> {
-            //AppWindow.walkView.toggleLightView();
+            AppWindow.walkView.setFlyMode(((JToggleButton) e.getSource()).isSelected());
         });
 
         addSeparator();

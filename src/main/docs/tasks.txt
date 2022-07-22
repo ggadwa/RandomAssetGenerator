@@ -1,13 +1,12 @@
 
 map
- - implement gravity and fly-mode
- - jumping
- - more gravity longer falling
  - need real floors and ceilings
 
 bitmaps
+ - draw 3d rect just darkens instead of color so bricks retain their background
+ - same problem above with boards
  - tile triangles need normals
- - cracked rocks need non-single segment horizontal, and one that goes between first and last vertical crack
+ - cracked rocks need one background to start (so it wraps) and then have left and right cracks close to edges, also horizontal cracks are bad
  - gravel (like dirt)
  - glass alpha needs to be more complex, and have lines have less alpha
  - more distinct control panels pieces (keyboard)

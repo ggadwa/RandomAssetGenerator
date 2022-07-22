@@ -4,10 +4,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class WalkViewKeyListener implements KeyListener {
-
-    private static final float RAG_MOVE_SPEED = 0.2f;
-    private static final float RAG_SPEED_MULTIPLIER = 3.0f;
-
     private WalkView view;
     private WalkViewMouseMotionListener mouseMotionListener;
 
@@ -24,25 +20,25 @@ public class WalkViewKeyListener implements KeyListener {
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_SHIFT:
-                view.speedMultiplier = RAG_SPEED_MULTIPLIER;
+                view.physics.speedFast = true;
                 return;
             case KeyEvent.VK_W:
-                view.movePoint.z = RAG_MOVE_SPEED;
+                view.physics.moveVector.z = 1.0f;
                 return;
             case KeyEvent.VK_S:
-                view.movePoint.z = -RAG_MOVE_SPEED;
+                view.physics.moveVector.z = -1.0f;
                 return;
             case KeyEvent.VK_A:
-                view.movePoint.x = RAG_MOVE_SPEED;
+                view.physics.moveVector.x = 1.0f;
                 return;
             case KeyEvent.VK_D:
-                view.movePoint.x = -RAG_MOVE_SPEED;
+                view.physics.moveVector.x = -1.0f;
                 return;
             case KeyEvent.VK_Q:
-                view.movePoint.y = RAG_MOVE_SPEED;
+                view.physics.moveVector.y = 1.0f;
                 return;
             case KeyEvent.VK_E:
-                view.movePoint.y = -RAG_MOVE_SPEED;
+                view.physics.moveVector.y = -1.0f;
                 return;
             case KeyEvent.VK_ESCAPE:
                 mouseMotionListener.turnMotionOff();
@@ -54,19 +50,19 @@ public class WalkViewKeyListener implements KeyListener {
     public void keyReleased(KeyEvent e) {
         switch (e.getKeyCode()) {
             case KeyEvent.VK_SHIFT:
-                view.speedMultiplier = 1.0f;
+                view.physics.speedFast = false;
                 return;
             case KeyEvent.VK_W:
             case KeyEvent.VK_S:
-                view.movePoint.z = 0.0f;
+                view.physics.moveVector.z = 0.0f;
                 return;
             case KeyEvent.VK_A:
             case KeyEvent.VK_D:
-                view.movePoint.x = 0.0f;
+                view.physics.moveVector.x = 0.0f;
                 return;
             case KeyEvent.VK_Q:
             case KeyEvent.VK_E:
-                view.movePoint.y = 0.0f;
+                view.physics.moveVector.y = 0.0f;
                 return;
         }
     }

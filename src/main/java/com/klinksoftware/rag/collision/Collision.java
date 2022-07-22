@@ -64,14 +64,10 @@ public class Collision {
         for (n = 0; n != nMesh; n++) {
             addMeshTrigsToCollision(meshList, skeleton, n);
         }
-
-        System.out.println("trig count=" + floorTrigs.size());
     }
 
     public void collideWithFloor(RagPoint pnt) {
         RagPoint rayPnt, rayVct, hitPnt;
-
-        pnt.y -= 0.05f;
 
         // we go two floor height above, and check one below
         rayPnt = new RagPoint(pnt.x, (pnt.y + (MapBuilder.FLOOR_HEIGHT * 2.0f)), pnt.z);
