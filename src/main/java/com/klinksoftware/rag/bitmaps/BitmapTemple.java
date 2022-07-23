@@ -19,7 +19,7 @@ public class BitmapTemple extends BitmapBase {
         int mx, my;
         int halfMargin, noiseSize;
         boolean faceIn;
-        RagColor drawColor, lineColor;
+        RagColor drawColor;
 
         lft += margin;
         top += margin;
@@ -32,7 +32,6 @@ public class BitmapTemple extends BitmapBase {
 
         // random color
         drawColor = (AppWindow.random.nextFloat() < 0.75f) ? color : altColor;
-        lineColor = adjustColor(drawColor, 0.75f);
 
         // the stone background
         // new for each iteration so it doesn't look like it's outside the 3d effects
@@ -60,28 +59,28 @@ public class BitmapTemple extends BitmapBase {
 
             // one box
             case 0:
-                draw3DFrameRect(lft, top, rgt, bot, edgeSize, lineColor, faceIn);
                 generateTempleBlock(lft, top, rgt, bot, margin, edgeSize, drawColor, altColor);
+                draw3DDarkenFrameRect(lft, top, rgt, bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), faceIn);
                 break;
 
             // horizontal boxes
             case 1:
                 mx = (lft + rgt) / 2;
-                draw3DFrameRect(lft, top, (mx - halfMargin), bot, edgeSize, lineColor, faceIn);
                 generateTempleBlock(lft, top, (mx - halfMargin), bot, margin, edgeSize, drawColor, altColor);
+                draw3DDarkenFrameRect(lft, top, (mx - halfMargin), bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), faceIn);
 
-                draw3DFrameRect((mx + halfMargin), top, rgt, bot, edgeSize, lineColor, faceIn);
                 generateTempleBlock((mx + halfMargin), top, rgt, bot, margin, edgeSize, drawColor, altColor);
+                draw3DDarkenFrameRect((mx + halfMargin), top, rgt, bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), faceIn);
                 break;
 
             // vertical boxes
             case 2:
                 my = (top + bot) / 2;
-                draw3DFrameRect(lft, top, rgt, (my - halfMargin), edgeSize, lineColor, faceIn);
                 generateTempleBlock(lft, top, rgt, (my - halfMargin), margin, edgeSize, drawColor, altColor);
+                draw3DDarkenFrameRect(lft, top, rgt, (my - halfMargin), edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), faceIn);
 
-                draw3DFrameRect(lft, (my + halfMargin), rgt, bot, edgeSize, lineColor, faceIn);
                 generateTempleBlock(lft, (my + halfMargin), rgt, bot, margin, edgeSize, drawColor, altColor);
+                draw3DDarkenFrameRect(lft, (my + halfMargin), rgt, bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), faceIn);
                 break;
 
             // 4 boxes
@@ -89,17 +88,17 @@ public class BitmapTemple extends BitmapBase {
                 mx = (lft + rgt) / 2;
                 my = (top + bot) / 2;
 
-                draw3DFrameRect(lft, top, (mx - halfMargin), (my - halfMargin), edgeSize, lineColor, faceIn);
                 generateTempleBlock(lft, top, (mx - halfMargin), (my - halfMargin), margin, edgeSize, drawColor, altColor);
+                draw3DDarkenFrameRect(lft, top, (mx - halfMargin), (my - halfMargin), edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), faceIn);
 
-                draw3DFrameRect((mx + halfMargin), top, rgt, (my - halfMargin), edgeSize, lineColor, faceIn);
                 generateTempleBlock((mx + halfMargin), top, rgt, (my - halfMargin), margin, edgeSize, drawColor, altColor);
+                draw3DDarkenFrameRect((mx + halfMargin), top, rgt, (my - halfMargin), edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), faceIn);
 
-                draw3DFrameRect(lft, (my + halfMargin), (mx - halfMargin), bot, edgeSize, lineColor, faceIn);
                 generateTempleBlock(lft, (my + halfMargin), (mx - halfMargin), bot, margin, edgeSize, drawColor, altColor);
+                draw3DDarkenFrameRect(lft, (my + halfMargin), (mx - halfMargin), bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), faceIn);
 
-                draw3DFrameRect((mx + halfMargin), (my + halfMargin), rgt, bot, edgeSize, lineColor, faceIn);
                 generateTempleBlock((mx + halfMargin), (my + halfMargin), rgt, bot, margin, edgeSize, drawColor, altColor);
+                draw3DDarkenFrameRect((mx + halfMargin), (my + halfMargin), rgt, bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), faceIn);
                 break;
 
         }

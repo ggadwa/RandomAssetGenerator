@@ -91,25 +91,21 @@ public class MapStair {
             case MeshMapUtility.STAIR_DIR_POS_Z:
                 for (z2 = (z + 1); z2 >= (smallStairHole ? z : 0); z2--) {
                     room.setPlatformGrid(x, z2);
-                    room.setBlockedGrid(x, z2);
                 }
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_Z:
                 for (z2 = (z - 1); z2 <= (smallStairHole ? z : (room.piece.sizeZ - 1)); z2++) {
                     room.setPlatformGrid(x, z2);
-                    room.setBlockedGrid(x, z2);
                 }
                 break;
             case MeshMapUtility.STAIR_DIR_POS_X:
                 for (x2 = (x + 1); x2 >= (smallStairHole ? x : 0); x2--) {
                     room.setPlatformGrid(x2, z);
-                    room.setBlockedGrid(x2, z);
                 }
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_X:
                 for (x2 = (x - 1); x2 <= (smallStairHole ? x : (room.piece.sizeX - 1)); x2++) {
                     room.setPlatformGrid(x2, z);
-                    room.setBlockedGrid(x2, z);
                 }
                 break;
         }

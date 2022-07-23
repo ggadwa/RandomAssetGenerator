@@ -1,16 +1,14 @@
 
 map
  - need real floors and ceilings
+ - remove floorGrid after that (maybe)
 
 bitmaps
- - draw 3d rect just darkens instead of color so bricks retain their background
- - same problem above with boards
- - tile triangles need normals
- - cracked rocks need one background to start (so it wraps) and then have left and right cracks close to edges, also horizontal cracks are bad
  - gravel (like dirt)
  - glass alpha needs to be more complex, and have lines have less alpha
  - more distinct control panels pieces (keyboard)
  - make face textures 1, 2, or 3 eye
+ - brick walls with boards on them
 
 model
  - finish junction

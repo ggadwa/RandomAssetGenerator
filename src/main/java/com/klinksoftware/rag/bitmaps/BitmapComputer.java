@@ -550,12 +550,8 @@ public class BitmapComputer extends BitmapBase
     }
 
     protected void drawBlankPanel(int lft, int top, int rgt, int bot, int panelEdgeSize, RagColor panelColor) {
-        RagColor panelEdgeColor;
-
-        panelEdgeColor = adjustColor(panelColor, 0.9f);
-
         drawMetalShine(lft, top, rgt, bot, panelColor);
-        draw3DFrameRect(lft, top, rgt, bot, panelEdgeSize, panelEdgeColor, true);
+        draw3DDarkenFrameRect(lft, top, rgt, bot, panelEdgeSize, (0.8f + AppWindow.random.nextFloat(0.1f)), true);
     }
 
         //

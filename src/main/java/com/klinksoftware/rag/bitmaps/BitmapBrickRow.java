@@ -19,9 +19,9 @@ public class BitmapBrickRow extends BitmapBase {
         //
 
     protected void generateSingleBrick(int lft, int top, int rgt, int bot, int edgeSize, int paddingSize, RagColor brickColor, RagColor altBrickColor, boolean isHalf, boolean isSmall, boolean isLarge)    {
-        int         sx,ex,streakWid;
-        float       f;
-        RagColor    drawBrickColor,drawFrameColor,lineColor,streakColor;
+        int sx, ex, streakWid;
+        float f;
+        RagColor drawBrickColor, lineColor, streakColor;
 
             // the brick
 
@@ -31,20 +31,18 @@ public class BitmapBrickRow extends BitmapBase {
         }
 
         if (isLarge) {
-            drawBrickColor=adjustColor(altBrickColor,f);
-            drawFrameColor=adjustColorRandom(drawBrickColor,0.85f,0.95f);
+            drawBrickColor = adjustColor(altBrickColor, f);
             drawRect(0,top,textureSize,(bot-paddingSize),drawBrickColor);
-            draw3DFrameRect(-edgeSize,top,(textureSize+edgeSize),(bot-paddingSize),edgeSize,drawFrameColor,true);
-            drawPerlinNoiseRect(0,(top+edgeSize),textureSize,(bot-(edgeSize+paddingSize)),0.8f,1.3f);
-            drawNormalNoiseRect(0,(top+edgeSize),textureSize,(bot-(edgeSize+paddingSize)));
+            drawPerlinNoiseRect(0, top, textureSize, (bot - paddingSize), 0.8f, 1.3f);
+            drawNormalNoiseRect(0, top, textureSize, (bot - paddingSize));
+            draw3DDarkenFrameRect(-edgeSize, top, (textureSize + edgeSize), (bot - paddingSize), edgeSize, (0.85f + AppWindow.random.nextFloat(0.1f)), true);
         }
         else {
-            drawBrickColor=adjustColor((isSmall?altBrickColor:brickColor),f);
-            drawFrameColor=adjustColorRandom(drawBrickColor,0.85f,0.95f);
+            drawBrickColor = adjustColor((isSmall ? altBrickColor : brickColor), f);
             drawRect(lft,top,(rgt-paddingSize),(bot-paddingSize),drawBrickColor);
-            draw3DFrameRect(lft,top,(rgt-paddingSize),(bot-paddingSize),edgeSize,drawFrameColor,true);
-            drawPerlinNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-(edgeSize+paddingSize)),(bot-(edgeSize+paddingSize)),0.8f,1.3f);
-            drawNormalNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-(edgeSize+paddingSize)),(bot-(edgeSize+paddingSize)));
+            drawPerlinNoiseRect(lft, top, (rgt - paddingSize), (bot - paddingSize), 0.8f, 1.3f);
+            drawNormalNoiseRect(lft, top, (rgt - paddingSize), (bot - paddingSize));
+            draw3DDarkenFrameRect(lft, top, (rgt - paddingSize), (bot - paddingSize), edgeSize, (0.85f + AppWindow.random.nextFloat(0.1f)), true);
         }
 
             // any streaks/stains/cracks
@@ -87,14 +85,13 @@ public class BitmapBrickRow extends BitmapBase {
 
     @Override
     public void generateInternal()    {
-        int                 x,y,xCount,xAdd,yCount,yAdd,
-                            halfWid,lft,top,edgeSize,paddingSize;
-        boolean             halfBrick;
-        RagColor            brickColor,altBrickColor,groutColor;
+        int x, y, xCount, xAdd, yCount, yAdd, halfWid, lft, top, edgeSize, paddingSize;
+        boolean halfBrick;
+        RagColor brickColor, altBrickColor, groutColor;
 
         brickColor=getRandomColor();
         altBrickColor=getRandomColor();
-        groutColor=getRandomGray(0.4f,0.6f);
+        groutColor = getRandomGray(0.3f, 0.5f);
 
         edgeSize = 3 + AppWindow.random.nextInt(7);
         paddingSize = 3 + AppWindow.random.nextInt(5);

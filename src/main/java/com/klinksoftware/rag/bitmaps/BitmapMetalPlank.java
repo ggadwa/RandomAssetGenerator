@@ -17,16 +17,15 @@ public class BitmapMetalPlank extends BitmapBase {
 
     private void generatePlank(int lx, int ty, int rx, int by, int edgeSize, int screwSize, int lineNumber, boolean alternateScrews, RagColor metalColor, RagColor altMetalColor) {
         int streakWid, sx, ex;
-        RagColor color, frameColor, streakColor, outlineColor;
+        RagColor color, streakColor, outlineColor;
 
         color = ((lineNumber & 0x1) == 0) ? metalColor : altMetalColor;
-        frameColor = adjustColor(color, 0.7f);
 
         createPerlinNoiseData(16, 16);
         drawRect(lx, ty, rx, by, color);
         drawPerlinNoiseRect(lx, ty, rx, by, 0.8f, 1.0f);
         drawMetalShine(lx, ty, rx, by, color);
-        draw3DFrameRect(lx, ty, rx, by, edgeSize, frameColor, true);
+        draw3DDarkenFrameRect(lx, ty, rx, by, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), true);
 
         // any dirt streaks
         if (AppWindow.random.nextFloat() < 0.3f) {

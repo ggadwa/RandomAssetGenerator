@@ -6,7 +6,7 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapTile extends BitmapBase
 {
-    public BitmapTile()    {
+    public BitmapTile() {
         super();
 
         hasNormal=true;
@@ -19,14 +19,12 @@ public class BitmapTile extends BitmapBase
         // tile bitmaps
         //
 
-    private void generateTilePiece(int lft,int top,int rgt,int bot,RagColor[] tileColor,RagColor designColor,int splitCount,boolean complex)
-    {
-        int         x,y,sx,sy,ex,ey,mx,
-                    dLft,dRgt,dTop,dBot,padding,
-                    crackSegCount,crackXVarient,crackYVarient,
-                    tileStyle,tileContent,edgeSize,tileWid,tileHigh;
-        boolean     tileDirty;
-        RagColor    col,frameCol;
+    private void generateTilePiece(int lft, int top, int rgt, int bot, RagColor[] tileColor, RagColor designColor, int splitCount, boolean complex) {
+        int x, y, sx, sy, ex, ey, mx, dLft, dRgt, dTop, dBot, padding;
+        int crackSegCount, crackXVarient, crackYVarient;
+        int tileStyle, tileContent, edgeSize, tileWid, tileHigh;
+        boolean tileDirty;
+        RagColor col, crackCol;
 
             // tile style
 
@@ -83,10 +81,8 @@ public class BitmapTile extends BitmapBase
 
                 }
 
-                frameCol=adjustColorRandom(col,0.85f,0.95f);
-
-                drawRect(dLft,dTop,dRgt,dBot,col);
-                draw3DFrameRect(dLft,dTop,dRgt,dBot,edgeSize,frameCol,true);
+                drawRect(dLft, dTop, dRgt, dBot, col);
+                draw3DDarkenFrameRect(dLft, dTop, dRgt, dBot, edgeSize, (0.85f + AppWindow.random.nextFloat(0.1f)), true);
 
                     // possible design
                     // 0 = nothing
@@ -156,19 +152,20 @@ public class BitmapTile extends BitmapBase
                             break;
                     }
 
-                    crackSegCount=2+AppWindow.random.nextInt(2);
-                    drawSimpleCrack(sx,sy,ex,ey,crackSegCount,crackXVarient,crackYVarient,frameCol);
+                    crackSegCount = 2 + AppWindow.random.nextInt(2);
+                    crackCol = adjustColorRandom(col, 0.85f, 0.95f);
+                    drawSimpleCrack(sx, sy, ex, ey, crackSegCount, crackXVarient, crackYVarient, crackCol);
                 }
             }
         }
     }
 
     @Override
-    public void generateInternal()    {
-        int             splitCount;
-        boolean         complex,small;
-        RagColor[]      tileColor;
-        RagColor        designColor;
+    public void generateInternal() {
+        int splitCount;
+        boolean complex, small;
+        RagColor[] tileColor;
+        RagColor designColor;
 
             // get splits
 

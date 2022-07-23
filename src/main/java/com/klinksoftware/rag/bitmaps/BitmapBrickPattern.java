@@ -27,7 +27,7 @@ public class BitmapBrickPattern extends BitmapBrickRow {
 
         brickColor = getRandomColor();
         altBrickColor = getRandomColor();
-        groutColor = getRandomGray(0.4f, 0.6f);
+        groutColor = getRandomGray(0.3f, 0.5f);
 
         edgeSize = 3 + AppWindow.random.nextInt(7);
         paddingSize = 3 + AppWindow.random.nextInt(5);
@@ -79,7 +79,6 @@ public class BitmapBrickPattern extends BitmapBrickRow {
                     bot = top + (gridPixelSize * sz[1]);
 
                     generateSingleBrick(lft, top, rgt, bot, edgeSize, paddingSize, brickColor, altBrickColor, false, false, false);
-
                 }
 
                 tryCount++;

@@ -27,7 +27,7 @@ public class BitmapMosaic extends BitmapBase
 
             // some random values
 
-        splitCount=15+AppWindow.random.nextInt(10);
+        splitCount = AppWindow.random.nextBoolean() ? 16 : 32;
 
         groutColor=getRandomGray(0.4f,0.6f);
         mosaicColor=getRandomColor();
@@ -82,7 +82,7 @@ public class BitmapMosaic extends BitmapBase
                     // draw
 
                 drawRect(lft,top,rgt,bot,col);
-                draw3DFrameRect(lft,top,rgt,bot,1,col,true);
+                draw3DDarkenFrameRect(lft, top, rgt, bot, 1, (0.95f + AppWindow.random.nextFloat(0.05f)), true);
 
                     // noise and blur
 

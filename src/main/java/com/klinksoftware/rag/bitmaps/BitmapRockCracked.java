@@ -17,7 +17,7 @@ public class BitmapRockCracked extends BitmapBase {
         hasAlpha = false;
     }
 
-    protected ArrayList<Pair<Integer, Integer>> drawCaveWallVerticalCut(int sx, int sy, int ex, int ey, int segCount, int cutVarient) {
+    private ArrayList<Pair<Integer, Integer>> drawCaveWallVerticalCut(int sx, int sy, int ex, int ey, int segCount, int cutVarient) {
         int n, k, x, y, dx, dy, dx2, dy2;
         int wid, sWid, dWid, dWid2;
         int idx;
@@ -111,7 +111,7 @@ public class BitmapRockCracked extends BitmapBase {
         return (pnts);
     }
 
-    protected void drawCaveWallHorizontalCut(int sx, int sy, int ex, int ey, int segCount, int cutVarient) {
+    private void drawCaveWallHorizontalCut(int sx, int sy, int ex, int ey, int segCount, int cutVarient) {
         int n, k, x, y, dx, dy, dx2, dy2;
         int wid, sWid, dWid, dWid2;
         int idx;
@@ -160,6 +160,27 @@ public class BitmapRockCracked extends BitmapBase {
                     colorData[idx + 2] = colorData[idx + 2] * nFactor;
 
                     normal.x = normalData[idx];
+                    normal.y = 0.45f + (normalData[idx] * 0.5f);
+                    normal.z = normalData[idx + 2];
+
+                    normal.normalize();
+                    normalData[idx] = normal.x;
+                    normalData[idx + 1] = normal.y;
+                    normalData[idx + 2] = normal.z;
+
+                    idx += (textureSize * 4);
+                }
+
+                idx = (((y - wid) * textureSize) + x) * 4;
+
+                for (k = 0; k != wid; k++) {
+
+                    nFactor = 0.7f + (((float) k / (float) wid) * 0.3f);
+                    colorData[idx] = colorData[idx] * nFactor;
+                    colorData[idx + 1] = colorData[idx + 1] * nFactor;
+                    colorData[idx + 2] = colorData[idx + 2] * nFactor;
+
+                    normal.x = normalData[idx];
                     normal.y = -(0.45f + (normalData[idx] * 0.5f));
                     normal.z = normalData[idx + 2];
 
@@ -176,6 +197,20 @@ public class BitmapRockCracked extends BitmapBase {
             dy = dy2;
             dWid = dWid2;
         }
+    }
+
+    private void drawSingleStripeBackground(int lx, int rx, RagColor caveColor) {
+        drawRect(lx, 0, rx, textureSize, adjustColorRandom(caveColor, 0.9f, 1.0f));
+
+        if (AppWindow.random.nextBoolean()) {
+            createPerlinNoiseData(8, 8);
+        } else {
+            createPerlinNoiseData(16, 16);
+        }
+        drawPerlinNoiseRect(lx, 0, rx, textureSize, (0.75f + AppWindow.random.nextFloat(0.1f)), 1.0f);
+
+        createNormalNoiseData((1.0f + AppWindow.random.nextFloat(0.2f)), (0.1f + AppWindow.random.nextFloat(0.2f)));
+        drawNormalNoiseRect(lx, 0, rx, textureSize);
     }
 
     @Override
@@ -195,8 +230,8 @@ public class BitmapRockCracked extends BitmapBase {
         xs.add(0);
 
         while (true) {
-            x += (((cutVarient + 10) * 2) + AppWindow.random.nextInt(100));
-            if (x < (textureSize - (cutVarient + 20))) {
+            x += (cutVarient + AppWindow.random.nextInt(100));
+            if (x < (textureSize - cutVarient)) {
                 xs.add(x);
             } else {
                 xs.add(textureSize);
@@ -204,22 +239,12 @@ public class BitmapRockCracked extends BitmapBase {
             }
         }
 
+        // start with one background so left and right stripe can wrap
+        drawSingleStripeBackground(0, textureSize, caveColor);
+
         // different background for each stripe
-        for (n = 0; n < (xs.size() - 1); n++) {
-            lx = xs.get(n);
-            rx = xs.get(n + 1);
-
-            drawRect(lx, 0, rx, textureSize, adjustColorRandom(caveColor, 0.9f, 1.0f));
-
-            if (AppWindow.random.nextBoolean()) {
-                createPerlinNoiseData(8, 8);
-            } else {
-                createPerlinNoiseData(16, 16);
-            }
-            drawPerlinNoiseRect(lx, 0, rx, textureSize, (0.75f + AppWindow.random.nextFloat(0.1f)), 1.0f);
-
-            createNormalNoiseData((1.0f + AppWindow.random.nextFloat(0.2f)), (0.1f + AppWindow.random.nextFloat(0.2f)));
-            drawNormalNoiseRect(lx, 0, rx, textureSize);
+        for (n = 1; n < (xs.size() - 2); n++) {
+            drawSingleStripeBackground(xs.get(n), xs.get(n + 1), caveColor);
         }
 
         // the stripe edges
@@ -241,7 +266,7 @@ public class BitmapRockCracked extends BitmapBase {
                     pIdx2 = pnts2.size() - 1;
                 }
 
-                drawCaveWallHorizontalCut(pnts2.get(pIdx2).getFirst(), pnts2.get(pIdx2).getSecond(), pnts1.get(pIdx).getFirst(), pnts1.get(pIdx).getSecond(), (1 + AppWindow.random.nextInt(3)), (cutVarient * 2));
+                drawCaveWallHorizontalCut(pnts2.get(pIdx2).getFirst(), pnts2.get(pIdx2).getSecond(), pnts1.get(pIdx).getFirst(), pnts1.get(pIdx).getSecond(), (2 + AppWindow.random.nextInt(2)), (cutVarient * 2));
             }
         }
 

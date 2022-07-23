@@ -29,9 +29,9 @@ public class BitmapMonitor extends BitmapComputer {
         panelColor.b *= (1.0f + AppWindow.random.nextFloat(0.2f));
 
         drawRect(0, 0, textureSize, textureSize, panelColor);
-        draw3DFrameRect(0, 0, offset, offset, panelEdgeSize, panelColor, true);                       // left and right
-        generateComputerComponentScreen(offset, 0, textureSize, offset, panelInsideEdgeSize);       // front and back
-        draw3DFrameRect(offset, 0, textureSize, offset, panelEdgeSize, panelColor, true);             // top and bottom
+        draw3DDarkenFrameRect(0, 0, offset, offset, panelEdgeSize, (0.9f + AppWindow.random.nextFloat(0.1f)), true); // left and right
+        generateComputerComponentScreen(offset, 0, textureSize, offset, panelInsideEdgeSize); // front and back
+        draw3DDarkenFrameRect(offset, 0, textureSize, offset, panelEdgeSize, (0.9f + AppWindow.random.nextFloat(0.1f)), true); // top and bottom
 
         // set the emissive
         emissiveFactor = new RagPoint(1.0f, 1.0f, 1.0f);

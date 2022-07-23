@@ -46,7 +46,7 @@ public class BitmapMetalPlate extends BitmapBase {
 
     public void generateMetalPanel(int lft, int top, int rgt, int bot, RagColor metalColor, RagColor altMetalColor, int edgeSize, int screwSize, boolean isBox) {
         int lft2, rgt2, top2, bot2, sz;
-        RagColor color, screwColor, frameColor;
+        RagColor color, screwColor;
 
         // colors
         if (AppWindow.random.nextBoolean()) {
@@ -57,23 +57,20 @@ public class BitmapMetalPlate extends BitmapBase {
             screwColor = metalColor;
         }
 
-        frameColor = adjustColorRandom(color, 0.85f, 0.95f);
-
         // the plate
         createPerlinNoiseData(16, 16);
         drawRect(lft, top, rgt, bot, color);
         drawPerlinNoiseRect(lft, top, rgt, bot, 0.8f, 1.0f);
 
         drawMetalShine(lft, top, rgt, bot, color);
-        draw3DFrameRect(lft, top, rgt, bot, edgeSize, frameColor, true);
+        draw3DDarkenFrameRect(lft, top, rgt, bot, edgeSize, (0.85f + AppWindow.random.nextFloat(0.1f)), true);
 
         sz = ((edgeSize + screwSize) * 2) + (AppWindow.random.nextInt(edgeSize * 3));
         lft2 = lft + sz;
         rgt2 = rgt - sz;
         top2 = top + sz;
         bot2 = bot - sz;
-        frameColor = adjustColorRandom(color, 0.75f, 0.85f);
-        draw3DFrameRect(lft2, top2, rgt2, bot2, edgeSize, frameColor, false);
+        draw3DDarkenFrameRect(lft2, top2, rgt2, bot2, edgeSize, (0.85f + AppWindow.random.nextFloat(0.1f)), false);
         drawMetalShine((lft2 + edgeSize), (top2 + edgeSize), (rgt2 - edgeSize), (bot2 - edgeSize), color);
 
         sz = edgeSize + screwSize;

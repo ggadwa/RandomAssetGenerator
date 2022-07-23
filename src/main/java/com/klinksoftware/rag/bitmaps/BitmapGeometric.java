@@ -176,8 +176,7 @@ public class BitmapGeometric extends BitmapBase {
         }
 
         // frame
-        color = adjustColor(color, (0.6f + AppWindow.random.nextFloat(0.2f)));
-        draw3DFrameRect(0, 0, textureSize, textureSize, (2 + AppWindow.random.nextInt(8)), color, true);
+        draw3DDarkenFrameRect(0, 0, textureSize, textureSize, (2 + AppWindow.random.nextInt(8)), (0.6f + AppWindow.random.nextFloat(0.2f)), true);
 
         // finish with metallic roughness
         createMetallicRoughnessMap((0.1f + AppWindow.random.nextFloat(0.6f)), 0.5f);

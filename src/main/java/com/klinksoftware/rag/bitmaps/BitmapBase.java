@@ -1012,6 +1012,80 @@ public class BitmapBase
         }
     }
 
+    protected void draw3DDarkenFrameRect(int lft, int top, int rgt, int bot, int size, float darken, boolean faceOut) {
+        int n, x, y, idx;
+
+        if ((lft >= rgt) || (top >= bot)) {
+            return;
+        }
+
+        // draw the edges
+        for (n = 0; n <= size; n++) {
+
+            for (x = lft; x <= rgt; x++) {
+                if ((x < 0) || (x >= textureSize)) {
+                    continue;
+                }
+
+                if ((top >= 0) && (top < textureSize)) {
+                    idx = ((top * textureSize) + x) * 4;
+                    colorData[idx] = colorData[idx] * darken;
+                    colorData[idx + 1] = colorData[idx + 1] * darken;
+                    colorData[idx + 2] = colorData[idx + 2] * darken;
+
+                    normalData[idx] = (normalData[idx] * 0.3f) + ((((faceOut ? NORMAL_TOP_45.x : NORMAL_BOTTOM_45.x) + 1.0f) * 0.5f) * 0.7f);
+                    normalData[idx + 1] = (normalData[idx + 1] * 0.3f) + ((((faceOut ? NORMAL_TOP_45.y : NORMAL_BOTTOM_45.y) + 1.0f) * 0.5f) * 0.7f);
+                    normalData[idx + 2] = (normalData[idx + 2] * 0.3f) + ((((faceOut ? NORMAL_TOP_45.z : NORMAL_BOTTOM_45.z) + 1.0f) * 0.5f) * 0.7f);
+                }
+
+                if ((bot >= 0) && (bot < textureSize)) {
+                    idx = ((bot * textureSize) + x) * 4;
+                    colorData[idx] = colorData[idx] * darken;
+                    colorData[idx + 1] = colorData[idx + 1] * darken;
+                    colorData[idx + 2] = colorData[idx + 2] * darken;
+
+                    normalData[idx] = (normalData[idx] * 0.3f) + ((((faceOut ? NORMAL_BOTTOM_45.x : NORMAL_TOP_45.x) + 1.0f) * 0.5f) * 0.7f);
+                    normalData[idx + 1] = (normalData[idx + 1] * 0.3f) + ((((faceOut ? NORMAL_BOTTOM_45.y : NORMAL_TOP_45.y) + 1.0f) * 0.5f) * 0.7f);
+                    normalData[idx + 2] = (normalData[idx + 2] * 0.3f) + ((((faceOut ? NORMAL_BOTTOM_45.z : NORMAL_TOP_45.z) + 1.0f) * 0.5f) * 0.7f);
+                }
+            }
+
+            for (y = top; y <= bot; y++) {
+                if ((y < 0) || (y >= textureSize)) {
+                    continue;
+                }
+
+                if ((lft >= 0) && (lft < textureSize)) {
+                    idx = ((y * textureSize) + lft) * 4;
+                    colorData[idx] = colorData[idx] * darken;
+                    colorData[idx + 1] = colorData[idx + 1] * darken;
+                    colorData[idx + 2] = colorData[idx + 2] * darken;
+
+                    normalData[idx] = (normalData[idx] * 0.3f) + ((((faceOut ? NORMAL_LEFT_45.x : NORMAL_RIGHT_45.x) + 1.0f) * 0.5f) * 0.7f);
+                    normalData[idx + 1] = (normalData[idx + 1] * 0.3f) + ((((faceOut ? NORMAL_LEFT_45.y : NORMAL_RIGHT_45.y) + 1.0f) * 0.5f) * 0.7f);
+                    normalData[idx + 2] = (normalData[idx + 2] * 0.3f) + ((((faceOut ? NORMAL_LEFT_45.z : NORMAL_RIGHT_45.z) + 1.0f) * 0.5f) * 0.7f);
+                }
+
+                if ((rgt >= 0) && (rgt < textureSize)) {
+                    idx = ((y * textureSize) + rgt) * 4;
+                    colorData[idx] = colorData[idx] * darken;
+                    colorData[idx + 1] = colorData[idx + 1] * darken;
+                    colorData[idx + 2] = colorData[idx + 2] * darken;
+
+                    normalData[idx] = (normalData[idx] * 0.3f) + ((((faceOut ? NORMAL_RIGHT_45.x : NORMAL_LEFT_45.x) + 1.0f) * 0.5f) * 0.7f);
+                    normalData[idx + 1] = (normalData[idx + 1] * 0.3f) + ((((faceOut ? NORMAL_RIGHT_45.y : NORMAL_LEFT_45.y) + 1.0f) * 0.5f) * 0.7f);
+                    normalData[idx + 2] = (normalData[idx + 2] * 0.3f) + ((((faceOut ? NORMAL_RIGHT_45.z : NORMAL_LEFT_45.z) + 1.0f) * 0.5f) * 0.7f);
+                }
+            }
+
+            // next edge
+            lft++;
+            rgt--;
+            top++;
+            bot--;
+        }
+    }
+
     protected void drawOval(int lft,int top,int rgt,int bot,float startArc,float endArc,float xRoundFactor,float yRoundFactor,int edgeSize,float edgeColorFactor,RagColor color,RagColor outlineColor,float normalZFactor,boolean flipNormals,boolean addNoise,float colorFactorMin,float colorFactorMax)
     {
         int         n,x,y,mx,my,wid,high,idx,
@@ -1287,9 +1361,8 @@ public class BitmapBase
         drawLineNormal(rgt,my,mx,bot,NORMAL_TOP_RIGHT_45);
     }
 
-    protected void drawTriangle(int x0,int y0,int x1,int y1,int x2,int y2,RagColor color)
-    {
-        int         x,y,lx,rx,ty,my,by,tyX,myX,byX,idx;
+    protected void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, RagColor color) {
+        int x, y, lx, rx, ty, my, by, tyX, myX, byX, idx;
 
         if ((y0<=y1) && (y0<=y2)) {
             ty=y0;
@@ -1407,6 +1480,11 @@ public class BitmapBase
                 idx+=4;
             }
         }
+
+        // normals
+        drawLineNormal(x0, y0, x1, y1, NORMAL_LEFT_45);
+        drawLineNormal(x0, y0, x2, y2, NORMAL_RIGHT_45);
+        drawLineNormal(x1, y1, x2, y2, NORMAL_BOTTOM_45);
     }
 
     protected void drawHexagon(int lft,int top,int rgt,int bot,int pointSize,int edgeSize,RagColor color)
@@ -2380,14 +2458,13 @@ public class BitmapBase
     // planks
     //
     protected void generateWoodDrawBoard(int lft, int top, int rgt, int bot, int edgeSize, RagColor woodColor) {
-        RagColor col, frameColor;
+        int n, stainCount, lx, ty, rx, by, sz;
+        RagColor col;
 
         col = adjustColorRandom(woodColor, 0.7f, 1.2f);
-        frameColor = adjustColorRandom(col, 0.65f, 0.75f);
 
-        // the board edge
+        // board background
         drawRect(lft, top, rgt, bot, col);
-        draw3DFrameRect(lft, top, rgt, bot, edgeSize, frameColor, true);
 
         // stripes and a noise overlay
         if ((bot - top) > (rgt - lft)) {
@@ -2399,9 +2476,27 @@ public class BitmapBase
         drawPerlinNoiseRect((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 0.8f, 1.2f);
         drawStaticNoiseRect((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 0.9f, 1.0f);
 
+        // stains
+        stainCount = AppWindow.random.nextInt(10);
+
+        for (n = 0; n != stainCount; n++) {
+            sz = 10 + AppWindow.random.nextInt((rgt - lft) / 10);
+            lx = lft + AppWindow.random.nextInt((rgt - lft) - sz);
+            rx = lx + sz;
+
+            sz = 10 + AppWindow.random.nextInt((bot - top) / 10);
+            ty = top + AppWindow.random.nextInt((bot - top) - sz);
+            by = ty + sz;
+
+            drawOvalStain(lx, ty, rx, by, (0.01f + AppWindow.random.nextFloat(0.01f)), (0.15f + AppWindow.random.nextFloat(0.05f)), (0.6f + AppWindow.random.nextFloat(0.2f)));
+        }
+
         // blur both the color and the normal
         blur(colorData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 2, true);
         blur(normalData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 5, true);
+
+        // the board edge
+        draw3DDarkenFrameRect(lft, top, rgt, bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), true);
     }
 
     //

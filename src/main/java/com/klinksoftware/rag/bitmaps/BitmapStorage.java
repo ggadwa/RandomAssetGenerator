@@ -37,15 +37,11 @@ public class BitmapStorage extends BitmapBase {
     }
 
     private void generateMetalTread(int lx, int ty, int rx, int by, int edgeSize, RagColor color) {
-        RagColor frameColor;
-
-        frameColor = adjustColor(color, 0.7f);
-
         createPerlinNoiseData(16, 16);
         drawRect(lx, ty, rx, by, color);
         drawPerlinNoiseRect(lx, ty, rx, by, 0.8f, 1.0f);
         drawMetalShine(lx, ty, rx, by, color);
-        draw3DFrameRect(lx, ty, rx, by, edgeSize, frameColor, true);
+        draw3DDarkenFrameRect(lx, ty, rx, by, edgeSize, (0.6f + AppWindow.random.nextFloat(0.1f)), true);
     }
 
     private void generateMetalTreads(int edgeSize, RagColor metalColor) {

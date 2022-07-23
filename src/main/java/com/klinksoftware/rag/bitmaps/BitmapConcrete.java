@@ -93,7 +93,7 @@ public class BitmapConcrete extends BitmapBase
                 bot=top+ySize;
                 if (bot>=textureSize) bot=textureSize-1;
 
-                drawOvalStain(lft,top,rgt,bot,0.01f,0.15f,0.85f);
+                drawOvalStain(lft, top, rgt, bot, (0.01f + AppWindow.random.nextFloat(0.01f)), (0.15f + AppWindow.random.nextFloat(0.05f)), (0.7f + AppWindow.random.nextFloat(0.2f)));
 
                 lft+=(AppWindow.random.nextBoolean())?(-(xSize/3)):(xSize/3);
                 top+=(AppWindow.random.nextBoolean())?(-(ySize/3)):(ySize/3);
