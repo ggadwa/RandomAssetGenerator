@@ -2,8 +2,7 @@ package com.klinksoftware.rag.map;
 
 public class MapPiece
 {
-    public int sizeX,sizeZ;
-    public int[] floorGrid;
+    public int sizeX, sizeZ;
     public float[][] vertexes;
     public float[][] floorQuads;
     public float[][] floorTrigs;
@@ -28,13 +27,15 @@ public class MapPiece
             piece.vertexes[n]=vertexes[n].clone();
         }
 
-        /*
         piece.floorQuads = floorQuads.clone();
         for (n = 0; n != floorQuads.length; n++) {
             piece.floorQuads[n] = floorQuads[n].clone();
         }
-        */
-        piece.floorGrid = floorGrid.clone();
+
+        piece.floorTrigs = floorTrigs.clone();
+        for (n = 0; n != floorTrigs.length; n++) {
+            piece.floorTrigs[n] = floorTrigs[n].clone();
+        }
 
         return (piece);
     }

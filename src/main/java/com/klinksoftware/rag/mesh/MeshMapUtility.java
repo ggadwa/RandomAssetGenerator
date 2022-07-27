@@ -18,7 +18,7 @@ public class MeshMapUtility
 
     // room floor and ceilings
     public static void buildRoomFloorCeiling(MeshList meshList, MapRoom room, RagPoint centerPnt, int roomNumber, boolean floor) {
-        int x, z, trigIdx;
+        int n, k, x, z, trigIdx, idx;
         float px, py, pz;
         ArrayList<Float> vertexArray;
         ArrayList<Integer> indexArray;
@@ -70,26 +70,32 @@ public class MeshMapUtility
         vertexArray = new ArrayList<>();
         indexArray=new ArrayList<>();
 
-        trigIdx=0;
+        trigIdx = 0;
+        idx = 0;
 
-        for (z=0;z!=piece.sizeZ;z++) {
-            pz=(room.z+z)*MapBuilder.SEGMENT_SIZE;
-            for (x=0;x!=piece.sizeX;x++) {
-                if (piece.floorGrid[(z * piece.sizeX) + x] == 0) {
-                    continue;
-                }
-
-                px = (room.x + x) * MapBuilder.SEGMENT_SIZE;
-                vertexArray.addAll(Arrays.asList(px,py,pz));
-                vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,pz));
-                vertexArray.addAll(Arrays.asList((px+MapBuilder.SEGMENT_SIZE),py,(pz+MapBuilder.SEGMENT_SIZE)));
-                vertexArray.addAll(Arrays.asList(px,py,(pz+MapBuilder.SEGMENT_SIZE)));
-
-                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+        for (n = 0; n != (piece.floorQuads.length / 4); n++) {
+            for (k = 0; k != 4; k++) {
+                vertexArray.addAll(Arrays.asList(((room.x + piece.floorQuads[idx][0]) * MapBuilder.SEGMENT_SIZE), py, ((room.z + piece.floorQuads[idx][1]) * MapBuilder.SEGMENT_SIZE)));
+                idx++;
             }
+
+            trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
         }
 
-        if (trigIdx==0) return;
+        idx = 0;
+
+        for (n = 0; n != (piece.floorTrigs.length / 3); n++) {
+            for (k = 0; k != 3; k++) {
+                vertexArray.addAll(Arrays.asList(((room.x + piece.floorTrigs[idx][0]) * MapBuilder.SEGMENT_SIZE), py, ((room.z + piece.floorTrigs[idx][1]) * MapBuilder.SEGMENT_SIZE)));
+                idx++;
+            }
+
+            trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+        }
+
+        if (trigIdx == 0) {
+            return;
+        }
 
         vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
         indexes = MeshUtility.intArrayListToInt(indexArray);

@@ -1,7 +1,8 @@
 
 map
  - need real floors and ceilings
- - remove floorGrid after that (maybe)
+ - short stairs or ramps
+ - rename pieces vertexes into wallVertexes
 
 bitmaps
  - gravel (like dirt)

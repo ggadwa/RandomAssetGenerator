@@ -46,19 +46,7 @@ public class MapPieceList {
 
             // flip and rotate
 
-        if (rotate) {
-            k=piece.sizeX;
-            piece.sizeX=piece.sizeZ;
-            piece.sizeZ=k;
-
-            for (z=0;z!=piece.sizeZ;z++) {
-                for (x=0;x!=piece.sizeX;x++) {
-                    piece.floorGrid[(z*piece.sizeX)+x]=origPiece.floorGrid[(x*origPiece.sizeX)+z];
-                }
-            }
-        }
-
-        for (n=0;n!=piece.vertexes.length;n++) {
+        for (n = 0; n != piece.vertexes.length; n++) {
             if (rotate) {
                 f=piece.vertexes[n][0];
                 piece.vertexes[n][0]=piece.vertexes[n][1];
@@ -68,29 +56,31 @@ public class MapPieceList {
             if (flipZ) piece.vertexes[n][1]=piece.sizeZ-piece.vertexes[n][1];
         }
 
-        if (flipX) {
-            tempGrid=new int[piece.sizeX];
-
-            for (z=0;z!=piece.sizeZ;z++) {
-                for (x=0;x!=piece.sizeX;x++) {
-                    tempGrid[x]=piece.floorGrid[(z*piece.sizeX)+x];
-                }
-                for (x=0;x!=piece.sizeX;x++) {
-                    piece.floorGrid[(z*piece.sizeX)+x]=tempGrid[(piece.sizeX-x)-1];
-                }
+        for (n = 0; n != piece.floorQuads.length; n++) {
+            if (rotate) {
+                f = piece.floorQuads[n][0];
+                piece.floorQuads[n][0] = piece.floorQuads[n][1];
+                piece.floorQuads[n][1] = f;
+            }
+            if (flipX) {
+                piece.floorQuads[n][0] = piece.sizeX - piece.floorQuads[n][0];
+            }
+            if (flipZ) {
+                piece.floorQuads[n][1] = piece.sizeZ - piece.floorQuads[n][1];
             }
         }
 
-        if (flipZ) {
-            tempGrid=new int[piece.sizeZ];
-
-            for (x=0;x!=piece.sizeX;x++) {
-                for (z=0;z!=piece.sizeZ;z++) {
-                    tempGrid[z]=piece.floorGrid[(z*piece.sizeX)+x];
-                }
-                for (z=0;z!=piece.sizeZ;z++) {
-                    piece.floorGrid[(z*piece.sizeX)+x]=tempGrid[(piece.sizeZ-z)-1];
-                }
+        for (n = 0; n != piece.floorTrigs.length; n++) {
+            if (rotate) {
+                f = piece.floorTrigs[n][0];
+                piece.floorTrigs[n][0] = piece.floorTrigs[n][1];
+                piece.floorTrigs[n][1] = f;
+            }
+            if (flipX) {
+                piece.floorTrigs[n][0] = piece.sizeX - piece.floorTrigs[n][0];
+            }
+            if (flipZ) {
+                piece.floorTrigs[n][1] = piece.sizeZ - piece.floorTrigs[n][1];
             }
         }
 
@@ -99,6 +89,10 @@ public class MapPieceList {
 
     public MapPiece getRandomPiece(float mapCompactFactor, boolean complex) {
         int idx;
+
+        return (this.dupTransformPiece(this.pieces.get(10), AppWindow.random.nextBoolean(), AppWindow.random.nextBoolean(), AppWindow.random.nextBoolean()));
+
+        /*
 
         // compact factor determines how many hallways there ends up
         // being (less hallways = more compact)
@@ -119,10 +113,11 @@ public class MapPieceList {
 
         // non-complex are always rectangles
         return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (4 + AppWindow.random.nextInt(6)), true, true));
+         */
     }
 
     public MapPiece createSpecificRectangularPiece(int sizeX, int sizeZ, boolean decorateOK, boolean structureOK) {
-        int n,x,z,idx;
+        int x, z, idx;
         MapPiece piece;
 
         piece = new MapPiece();
@@ -133,10 +128,6 @@ public class MapPieceList {
 
         piece.decorateOK = decorateOK;
         piece.structureOK = structureOK;
-        piece.floorGrid=new int[piece.sizeX*piece.sizeZ];
-        for (n=0;n!=(piece.sizeX*piece.sizeZ);n++) {
-            piece.floorGrid[n]=1;
-        }
 
         piece.vertexes=new float[((piece.sizeX*2)+(piece.sizeZ*2))+1][2];
 
@@ -157,6 +148,25 @@ public class MapPieceList {
             piece.vertexes[idx][0]=0;
             piece.vertexes[idx++][1]=z;
         }
+
+        piece.floorQuads = new float[(piece.sizeX * piece.sizeZ) * 4][2];
+
+        idx = 0;
+
+        for (x = 0; x != piece.sizeX; x++) {
+            for (z = 0; z != piece.sizeZ; z++) {
+                piece.floorQuads[idx][0] = x;
+                piece.floorQuads[idx++][1] = z;
+                piece.floorQuads[idx][0] = x + 1;
+                piece.floorQuads[idx++][1] = z;
+                piece.floorQuads[idx][0] = x + 1;
+                piece.floorQuads[idx++][1] = z + 1;
+                piece.floorQuads[idx][0] = x;
+                piece.floorQuads[idx++][1] = z + 1;
+            }
+        }
+
+        piece.floorTrigs = new float[0][2];
 
         return(piece);
     }
