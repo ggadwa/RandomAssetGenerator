@@ -5,7 +5,6 @@ import java.io.*;
 import java.nio.file.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.core.type.*;
-import com.klinksoftware.rag.AppWindow;
 
 public class MapPieceList {
 
@@ -90,7 +89,7 @@ public class MapPieceList {
     public MapPiece getRandomPiece(float mapCompactFactor, boolean complex) {
         int idx;
 
-        return (this.dupTransformPiece(this.pieces.get(10), AppWindow.random.nextBoolean(), AppWindow.random.nextBoolean(), AppWindow.random.nextBoolean()));
+        return (this.dupTransformPiece(this.pieces.get(18), false, false, false));
 
         /*
 
@@ -116,7 +115,7 @@ public class MapPieceList {
          */
     }
 
-    public MapPiece createSpecificRectangularPiece(int sizeX, int sizeZ, boolean decorateOK, boolean structureOK) {
+    public MapPiece createSpecificRectangularPiece(int sizeX, int sizeZ) {
         int x, z, idx;
         MapPiece piece;
 
@@ -126,10 +125,7 @@ public class MapPieceList {
         piece.sizeX = sizeX;
         piece.sizeZ = sizeZ;
 
-        piece.decorateOK = decorateOK;
-        piece.structureOK = structureOK;
-
-        piece.vertexes=new float[((piece.sizeX*2)+(piece.sizeZ*2))+1][2];
+        piece.vertexes = new float[((piece.sizeX * 2) + (piece.sizeZ * 2)) + 1][2];
 
         idx=0;
         for (x=0;x!=(piece.sizeX+1);x++) {

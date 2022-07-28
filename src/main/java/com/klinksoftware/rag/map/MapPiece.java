@@ -6,8 +6,6 @@ public class MapPiece
     public float[][] vertexes;
     public float[][] floorQuads;
     public float[][] floorTrigs;
-    public boolean decorateOK;
-    public boolean structureOK;
     public String name;
 
     public MapPiece clone() {
@@ -18,8 +16,6 @@ public class MapPiece
         piece.name=name;
         piece.sizeX=sizeX;
         piece.sizeZ=sizeZ;
-        piece.decorateOK = decorateOK;
-        piece.structureOK = structureOK;
 
         // we have to deep clone these
         piece.vertexes = vertexes.clone();

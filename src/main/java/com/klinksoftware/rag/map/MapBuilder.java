@@ -187,6 +187,8 @@ public class MapBuilder
             if (moveCount != 0) {
                 break;
             }
+
+            failCount--;
         }
 
         // this room failed, don't change room
@@ -224,7 +226,7 @@ public class MapBuilder
             room = new MapRoom(mapPieceList.getRandomPiece(1.0f, complex));
             room.story = MapRoom.ROOM_STORY_MAIN;
 
-            failCount=25;
+            failCount = 25;
 
             while (failCount>0) {
                 connectRoom=rooms.get(firstRoomIdx+AppWindow.random.nextInt(endRoomIdx-firstRoomIdx));
@@ -305,9 +307,9 @@ public class MapBuilder
 
         // need to switch rooms with rectangular rooms
         // so they are eaiser to connect and add stairs
-        startRoom.changePiece(mapPieceList.createSpecificRectangularPiece(startRoom.piece.sizeX, startRoom.piece.sizeZ, false, false));
+        startRoom.changePiece(mapPieceList.createSpecificRectangularPiece(startRoom.piece.sizeX, startRoom.piece.sizeZ));
         if (endRoom != null) {
-            endRoom.changePiece(mapPieceList.createSpecificRectangularPiece(endRoom.piece.sizeX, endRoom.piece.sizeZ, false, false));
+            endRoom.changePiece(mapPieceList.createSpecificRectangularPiece(endRoom.piece.sizeX, endRoom.piece.sizeZ));
         }
 
         // add the new rooms
@@ -329,14 +331,12 @@ public class MapBuilder
             startRoom.hasLowerExtension = true;
             startFloorRoom = startRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION);
             startFloorRoom.extendedFromRoom = startRoom;
-            startFloorRoom.piece.decorateOK = true;
             rooms.add(startFloorRoom);
 
             if (endRoom != null) {
                 endRoom.hasLowerExtension = true;
                 endFloorRoom = endRoom.duplicate(MapRoom.ROOM_STORY_LOWER_EXTENSION);
                 endFloorRoom.extendedFromRoom = endRoom;
-                endFloorRoom.piece.decorateOK = true;
                 rooms.add(endFloorRoom);
             }
         }
