@@ -13,14 +13,16 @@ public class MapBuilder
 {
     public static final int ROOM_RANDOM_LOCATION_DISTANCE = 100;
     public static final int UPPER_LOWER_FLOOR_MAX_DISTANCE = 20;
-    public static final float SEGMENT_SIZE=10.0f;
+    public static final float SEGMENT_SIZE = 10.0f;
     public static final float FLOOR_HEIGHT = 1.0f;
     public static final float SUNKEN_HEIGHT = 3.0f;
 
-    public static final int FC_MARK_EMPTY=0;
-    public static final int FC_MARK_FILL_INSIDE=1;
-    public static final int FC_MARK_FILL_OUTSIDE=2;
-    public static final int FC_MARK_FILL_PLATFORM=3;
+    public static final int FC_MARK_EMPTY = 0;
+    public static final int FC_MARK_FILL_INSIDE = 1;
+    public static final int FC_MARK_FILL_OUTSIDE = 2;
+    public static final int FC_MARK_FILL_PLATFORM = 3;
+
+    public static final int FAIL_COUNT = 50;
 
     public MeshList meshList;
     public Skeleton skeleton;
@@ -112,7 +114,7 @@ public class MapBuilder
         room = new MapRoom(mapPieceList.getRandomPiece(mapCompactFactor, complex));
         room.story = story;
 
-        failCount = 25;
+        failCount = FAIL_COUNT;
 
         while (failCount > 0) {
             placeCount = 10;
@@ -226,7 +228,7 @@ public class MapBuilder
             room = new MapRoom(mapPieceList.getRandomPiece(1.0f, complex));
             room.story = MapRoom.ROOM_STORY_MAIN;
 
-            failCount = 25;
+            failCount = FAIL_COUNT;
 
             while (failCount>0) {
                 connectRoom=rooms.get(firstRoomIdx+AppWindow.random.nextInt(endRoomIdx-firstRoomIdx));
@@ -273,24 +275,37 @@ public class MapBuilder
     }
 
     private void addUpperOrLowerFloor(ArrayList<MapRoom> rooms, int roomCount, boolean upper, float mapCompactFactor, boolean complex) {
-        int n, roomStartIdx, roomEndIdx, roomCount2;
+        int n, roomStartIdx, roomEndIdx, roomCount2, failCount;
         MapRoom startRoom, endRoom, startFloorRoom, endFloorRoom;
 
         // get a start room for floor (only from main rooms)
-        while (true) {
+        roomStartIdx = -1;
+        failCount = FAIL_COUNT;
+
+        while (failCount > 0) {
             roomStartIdx = AppWindow.random.nextInt(rooms.size());
             startRoom = rooms.get(roomStartIdx);
             if ((startRoom.story == MapRoom.ROOM_STORY_MAIN) && (!startRoom.hasLowerExtension) && (!startRoom.hasUpperExtension) && (startRoom.piece.sizeX >= 5) && (startRoom.piece.sizeZ >= 5)) {
                 break;
             }
+
+            failCount--;
         }
+
+        if (roomStartIdx == -1) {
+            return;
+        }
+        startRoom = rooms.get(roomStartIdx);
 
         // find an end room that's close and only a main room
         // sometimes we don't have one, and just a single room
         endRoom = null;
 
         if (AppWindow.random.nextFloat() > 0.25f) {
-            while (true) {
+            roomEndIdx = -1;
+            failCount = FAIL_COUNT;
+
+            while (failCount > 0) {
                 roomEndIdx = AppWindow.random.nextInt(rooms.size());
                 if (roomEndIdx == roomStartIdx) {
                     continue;
@@ -302,6 +317,12 @@ public class MapBuilder
                         break;
                     }
                 }
+
+                failCount--;
+            }
+
+            if (roomEndIdx == -1) {
+                return;
             }
         }
 

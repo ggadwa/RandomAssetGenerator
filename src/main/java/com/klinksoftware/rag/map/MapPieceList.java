@@ -89,7 +89,7 @@ public class MapPieceList {
     public MapPiece getRandomPiece(float mapCompactFactor, boolean complex) {
         int idx;
 
-        return (this.dupTransformPiece(this.pieces.get(18), false, false, false));
+        return (this.dupTransformPiece(this.pieces.get(22), false, false, false));
 
         /*
 
