@@ -51,11 +51,11 @@ public class MapBuilder
 
         for (n=0;n!=roomCount;n++) {
             room=rooms.get(n);
-            vertexCount=room.piece.vertexes.length;
+            vertexCount = room.piece.wallLines.length;
 
             for (k=(n+1);k<roomCount;k++) {
                 room2=rooms.get(k);
-                vertexCount2=room2.piece.vertexes.length;
+                vertexCount2 = room2.piece.wallLines.length;
 
                 vIdx=0;
 
@@ -63,11 +63,11 @@ public class MapBuilder
                     nextIdx=vIdx+1;
                     if (nextIdx==vertexCount) nextIdx=0;
 
-                    ax=room.x+room.piece.vertexes[vIdx][0];
-                    az=room.z+room.piece.vertexes[vIdx][1];
+                    ax = room.x + room.piece.wallLines[vIdx][0];
+                    az = room.z + room.piece.wallLines[vIdx][1];
 
-                    ax2=room.x+room.piece.vertexes[nextIdx][0];
-                    az2=room.z+room.piece.vertexes[nextIdx][1];
+                    ax2 = room.x + room.piece.wallLines[nextIdx][0];
+                    az2 = room.z + room.piece.wallLines[nextIdx][1];
 
                     vIdx2=0;
 
@@ -75,11 +75,11 @@ public class MapBuilder
                         nextIdx2=vIdx2+1;
                         if (nextIdx2==vertexCount2) nextIdx2=0;
 
-                        bx=room2.x+room2.piece.vertexes[vIdx2][0];
-                        bz=room2.z+room2.piece.vertexes[vIdx2][1];
+                        bx = room2.x + room2.piece.wallLines[vIdx2][0];
+                        bz = room2.z + room2.piece.wallLines[vIdx2][1];
 
-                        bx2=room2.x+room2.piece.vertexes[nextIdx2][0];
-                        bz2=room2.z+room2.piece.vertexes[nextIdx2][1];
+                        bx2 = room2.x + room2.piece.wallLines[nextIdx2][0];
+                        bz2 = room2.z + room2.piece.wallLines[nextIdx2][1];
 
                         if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) {
 

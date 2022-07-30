@@ -3,7 +3,7 @@ package com.klinksoftware.rag.map;
 public class MapPiece
 {
     public int sizeX, sizeZ;
-    public float[][] vertexes;
+    public float[][] wallLines;
     public float[][] floorQuads;
     public float[][] floorTrigs;
     public String name;
@@ -18,9 +18,9 @@ public class MapPiece
         piece.sizeZ=sizeZ;
 
         // we have to deep clone these
-        piece.vertexes = vertexes.clone();
-        for (n=0;n!=vertexes.length;n++) {
-            piece.vertexes[n]=vertexes[n].clone();
+        piece.wallLines = wallLines.clone();
+        for (n = 0; n != wallLines.length; n++) {
+            piece.wallLines[n] = wallLines[n].clone();
         }
 
         piece.floorQuads = floorQuads.clone();

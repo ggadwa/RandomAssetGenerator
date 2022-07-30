@@ -121,14 +121,14 @@ public class MeshMapUtility
         MapPiece piece;
 
         piece=room.piece;
-        vertexCount=piece.vertexes.length;
+        vertexCount = piece.wallLines.length;
 
         // regular walls
         vertexArray = new ArrayList<>();
         indexArray = new ArrayList<>();
 
         trigIdx = 0;
-        vertexCount = piece.vertexes.length;
+        vertexCount = piece.wallLines.length;
 
         switch (room.story) {
             case MapRoom.ROOM_STORY_UPPER:
@@ -163,17 +163,17 @@ public class MeshMapUtility
                 continue;
             }
 
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), y2, ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), y2, ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), y, ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), y, ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), y2, ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), y2, ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), y, ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), y, ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
             trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
 
             // small top wall (all versions have this, for doorway overheads)
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + MapBuilder.FLOOR_HEIGHT), ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + MapBuilder.FLOOR_HEIGHT), ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), y2, ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), y2, ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + MapBuilder.FLOOR_HEIGHT), ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + MapBuilder.FLOOR_HEIGHT), ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), y2, ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), y2, ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
             trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
         }
 
@@ -224,19 +224,19 @@ public class MeshMapUtility
 
             // extra small bottom wall for upper extension rooms
             if ((room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) || (room.story == MapRoom.ROOM_STORY_TALL_EXTENSION)) {
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y - MapBuilder.FLOOR_HEIGHT), ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y - MapBuilder.FLOOR_HEIGHT), ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), y, ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), y, ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y - MapBuilder.FLOOR_HEIGHT), ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y - MapBuilder.FLOOR_HEIGHT), ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), y, ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), y, ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
                 trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
             }
 
             // extra small top wall for lower rooms
             if ((room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) || (room.story == MapRoom.ROOM_STORY_SUNKEN_EXTENSION)) {
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + (MapBuilder.FLOOR_HEIGHT * 2)), ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + (MapBuilder.FLOOR_HEIGHT * 2)), ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + MapBuilder.FLOOR_HEIGHT), ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-                vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + MapBuilder.FLOOR_HEIGHT), ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + (MapBuilder.FLOOR_HEIGHT * 2)), ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + (MapBuilder.FLOOR_HEIGHT * 2)), ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + MapBuilder.FLOOR_HEIGHT), ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (y2 + MapBuilder.FLOOR_HEIGHT), ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
                 trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
             }
         }
@@ -275,14 +275,14 @@ public class MeshMapUtility
         MapPiece piece;
 
         piece = room.piece;
-        vertexCount = piece.vertexes.length;
+        vertexCount = piece.wallLines.length;
 
         // regular walls
         vertexArray = new ArrayList<>();
         indexArray = new ArrayList<>();
 
         trigIdx = 0;
-        vertexCount = piece.vertexes.length;
+        vertexCount = piece.wallLines.length;
 
         for (n = 0; n != vertexCount; n++) {
 
@@ -295,10 +295,10 @@ public class MeshMapUtility
                 continue;
             }
 
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (MapBuilder.SEGMENT_SIZE * 2.0f), ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (MapBuilder.SEGMENT_SIZE * 2.0f), ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), 0.0f, ((piece.vertexes[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.vertexes[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), 0.0f, ((piece.vertexes[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), (MapBuilder.SEGMENT_SIZE * 2.0f), ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), (MapBuilder.SEGMENT_SIZE * 2.0f), ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBuilder.SEGMENT_SIZE), 0.0f, ((piece.wallLines[n2][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
+            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBuilder.SEGMENT_SIZE), 0.0f, ((piece.wallLines[n][1] + room.z) * MapBuilder.SEGMENT_SIZE)));
             trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
         }
 

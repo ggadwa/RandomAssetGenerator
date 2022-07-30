@@ -5,6 +5,7 @@ import java.io.*;
 import java.nio.file.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.core.type.*;
+import com.klinksoftware.rag.AppWindow;
 
 public class MapPieceList {
 
@@ -45,14 +46,18 @@ public class MapPieceList {
 
             // flip and rotate
 
-        for (n = 0; n != piece.vertexes.length; n++) {
+        for (n = 0; n != piece.wallLines.length; n++) {
             if (rotate) {
-                f=piece.vertexes[n][0];
-                piece.vertexes[n][0]=piece.vertexes[n][1];
-                piece.vertexes[n][1]=f;
+                f = piece.wallLines[n][0];
+                piece.wallLines[n][0] = piece.wallLines[n][1];
+                piece.wallLines[n][1] = f;
             }
-            if (flipX) piece.vertexes[n][0]=piece.sizeX-piece.vertexes[n][0];
-            if (flipZ) piece.vertexes[n][1]=piece.sizeZ-piece.vertexes[n][1];
+            if (flipX) {
+                piece.wallLines[n][0] = piece.sizeX - piece.wallLines[n][0];
+            }
+            if (flipZ) {
+                piece.wallLines[n][1] = piece.sizeZ - piece.wallLines[n][1];
+            }
         }
 
         for (n = 0; n != piece.floorQuads.length; n++) {
@@ -89,17 +94,13 @@ public class MapPieceList {
     public MapPiece getRandomPiece(float mapCompactFactor, boolean complex) {
         int idx;
 
-        return (this.dupTransformPiece(this.pieces.get(22), false, false, false));
-
-        /*
-
         // compact factor determines how many hallways there ends up
         // being (less hallways = more compact)
         if (AppWindow.random.nextFloat() > mapCompactFactor) {
             if (AppWindow.random.nextBoolean()) {
-                return (createSpecificRectangularPiece((1 + AppWindow.random.nextInt(1)), (4 + AppWindow.random.nextInt(6)), false, false));
+                return (createSpecificRectangularPiece((1 + AppWindow.random.nextInt(1)), (4 + AppWindow.random.nextInt(6))));
             } else {
-                return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (1 + AppWindow.random.nextInt(1)), false, false));
+                return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (1 + AppWindow.random.nextInt(1))));
             }
         }
 
@@ -111,8 +112,7 @@ public class MapPieceList {
         }
 
         // non-complex are always rectangles
-        return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (4 + AppWindow.random.nextInt(6)), true, true));
-         */
+        return (createSpecificRectangularPiece((4 + AppWindow.random.nextInt(6)), (4 + AppWindow.random.nextInt(6))));
     }
 
     public MapPiece createSpecificRectangularPiece(int sizeX, int sizeZ) {
@@ -125,24 +125,24 @@ public class MapPieceList {
         piece.sizeX = sizeX;
         piece.sizeZ = sizeZ;
 
-        piece.vertexes = new float[((piece.sizeX * 2) + (piece.sizeZ * 2)) + 1][2];
+        piece.wallLines = new float[((piece.sizeX * 2) + (piece.sizeZ * 2)) + 1][2];
 
         idx=0;
         for (x=0;x!=(piece.sizeX+1);x++) {
-            piece.vertexes[idx][0]=x;
-            piece.vertexes[idx++][1]=0;
+            piece.wallLines[idx][0] = x;
+            piece.wallLines[idx++][1] = 0;
         }
         for (z=1;z!=(piece.sizeZ+1);z++) {
-            piece.vertexes[idx][0]=piece.sizeX;
-            piece.vertexes[idx++][1]=z;
+            piece.wallLines[idx][0] = piece.sizeX;
+            piece.wallLines[idx++][1] = z;
         }
         for (x=(piece.sizeX-1);x>=0;x--) {
-            piece.vertexes[idx][0]=x;
-            piece.vertexes[idx++][1]=piece.sizeZ;
+            piece.wallLines[idx][0] = x;
+            piece.wallLines[idx++][1] = piece.sizeZ;
         }
         for (z=(piece.sizeZ-1);z>=1;z--) {
-            piece.vertexes[idx][0]=0;
-            piece.vertexes[idx++][1]=z;
+            piece.wallLines[idx][0] = 0;
+            piece.wallLines[idx++][1] = z;
         }
 
         piece.floorQuads = new float[(piece.sizeX * piece.sizeZ) * 4][2];

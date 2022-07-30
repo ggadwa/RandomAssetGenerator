@@ -1,8 +1,6 @@
 
 map
- - need real floors and ceilings
  - short stairs or ramps
- - rename pieces vertexes into wallVertexes
 
 bitmaps
  - gravel (like dirt)

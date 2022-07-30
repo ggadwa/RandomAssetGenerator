@@ -38,7 +38,7 @@ public class MapRoom
         this.extendedFromRoom = null;
 
         // wall hiding
-        wallHideArray=new byte[piece.vertexes.length];
+        wallHideArray = new byte[piece.wallLines.length];
 
         // grids for blocking off platforms and decorations
         platformGrid = new boolean[piece.sizeX * piece.sizeZ];
@@ -60,7 +60,7 @@ public class MapRoom
         room.hasLowerExtension = false;
         room.extendedFromRoom = null;
 
-        room.wallHideArray = new byte[piece.vertexes.length];
+        room.wallHideArray = new byte[piece.wallLines.length];
         room.platformGrid = new boolean[piece.sizeX * piece.sizeZ];
 
         return (room);
@@ -69,7 +69,7 @@ public class MapRoom
     public void changePiece(MapPiece piece) {
         this.piece = piece;
 
-        wallHideArray = new byte[piece.vertexes.length];
+        wallHideArray = new byte[piece.wallLines.length];
         platformGrid = new boolean[piece.sizeX * piece.sizeZ];
     }
 
@@ -373,8 +373,8 @@ public class MapRoom
 
             // check to see if two rooms share a wall segment
 
-        vertexCount=piece.vertexes.length;
-        vertexCount2=checkRoom.piece.vertexes.length;
+        vertexCount = piece.wallLines.length;
+        vertexCount2 = checkRoom.piece.wallLines.length;
 
         vIdx=0;
 
@@ -382,11 +382,11 @@ public class MapRoom
             nextIdx=vIdx+1;
             if (nextIdx==vertexCount) nextIdx=0;
 
-            ax=x+piece.vertexes[vIdx][0];
-            az=z+piece.vertexes[vIdx][1];
+            ax = x + piece.wallLines[vIdx][0];
+            az = z + piece.wallLines[vIdx][1];
 
-            ax2=x+piece.vertexes[nextIdx][0];
-            az2=z+piece.vertexes[nextIdx][1];
+            ax2 = x + piece.wallLines[nextIdx][0];
+            az2 = z + piece.wallLines[nextIdx][1];
 
             vIdx2=0;
 
@@ -394,11 +394,11 @@ public class MapRoom
                 nextIdx2=vIdx2+1;
                 if (nextIdx2==vertexCount2) nextIdx2=0;
 
-                bx=checkRoom.x+checkRoom.piece.vertexes[vIdx2][0];
-                bz=checkRoom.z+checkRoom.piece.vertexes[vIdx2][1];
+                bx = checkRoom.x + checkRoom.piece.wallLines[vIdx2][0];
+                bz = checkRoom.z + checkRoom.piece.wallLines[vIdx2][1];
 
-                bx2=checkRoom.x+checkRoom.piece.vertexes[nextIdx2][0];
-                bz2=checkRoom.z+checkRoom.piece.vertexes[nextIdx2][1];
+                bx2 = checkRoom.x + checkRoom.piece.wallLines[nextIdx2][0];
+                bz2 = checkRoom.z + checkRoom.piece.wallLines[nextIdx2][1];
 
                 if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) return(true);
 
@@ -427,8 +427,8 @@ public class MapRoom
 
             // find all the touching wall segements
 
-        vertexCount=piece.vertexes.length;
-        vertexCount2=checkRoom.piece.vertexes.length;
+        vertexCount = piece.wallLines.length;
+        vertexCount2 = checkRoom.piece.wallLines.length;
 
         vIdx=0;
 
@@ -436,11 +436,11 @@ public class MapRoom
             nextIdx=vIdx+1;
             if (nextIdx==vertexCount) nextIdx=0;
 
-            ax=x+piece.vertexes[vIdx][0];
-            az=z+piece.vertexes[vIdx][1];
+            ax = x + piece.wallLines[vIdx][0];
+            az = z + piece.wallLines[vIdx][1];
 
-            ax2=x+piece.vertexes[nextIdx][0];
-            az2=z+piece.vertexes[nextIdx][1];
+            ax2 = x + piece.wallLines[nextIdx][0];
+            az2 = z + piece.wallLines[nextIdx][1];
 
             vIdx2=0;
 
@@ -448,18 +448,18 @@ public class MapRoom
                 nextIdx2=vIdx2+1;
                 if (nextIdx2==vertexCount2) nextIdx2=0;
 
-                bx=checkRoom.x+checkRoom.piece.vertexes[vIdx2][0];
-                bz=checkRoom.z+checkRoom.piece.vertexes[vIdx2][1];
+                bx = checkRoom.x + checkRoom.piece.wallLines[vIdx2][0];
+                bz = checkRoom.z + checkRoom.piece.wallLines[vIdx2][1];
 
-                bx2=checkRoom.x+checkRoom.piece.vertexes[nextIdx2][0];
-                bz2=checkRoom.z+checkRoom.piece.vertexes[nextIdx2][1];
+                bx2 = checkRoom.x + checkRoom.piece.wallLines[nextIdx2][0];
+                bz2 = checkRoom.z + checkRoom.piece.wallLines[nextIdx2][1];
 
                 if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) {
                     if (xRun) {
-                        touchPoints.add(Math.min(piece.vertexes[vIdx][0],piece.vertexes[nextIdx][0]));   // always use the min, as stairs draw from there
+                        touchPoints.add(Math.min(piece.wallLines[vIdx][0], piece.wallLines[nextIdx][0]));   // always use the min, as stairs draw from there
                     }
                     else {
-                         touchPoints.add(Math.min(piece.vertexes[vIdx][1],piece.vertexes[nextIdx][1]));
+                        touchPoints.add(Math.min(piece.wallLines[vIdx][1], piece.wallLines[nextIdx][1]));
                     }
                 }
 

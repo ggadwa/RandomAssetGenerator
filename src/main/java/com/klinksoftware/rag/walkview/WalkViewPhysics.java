@@ -26,7 +26,7 @@ public class WalkViewPhysics {
     public WalkViewPhysics(WalkView view) {
         this.view = view;
 
-        flyMode = true;// supergumba temp
+        flyMode = false;
         speedFast = false;
         gravity = INITIAL_GRAVITY;
         cameraFeetOffsetY = 0.0f;
