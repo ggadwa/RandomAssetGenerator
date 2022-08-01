@@ -379,9 +379,9 @@ public class MapBuilder
     }
 
     //
-    // additional non-extra story extensions
+    // set some random rooms to tall or sunken
     //
-    private void addAdditionalRoomExtensions(ArrayList<MapRoom> rooms, float tallRoom, float sunkenRoom) {
+    private void setTallOrSunkenRooms(ArrayList<MapRoom> rooms, float tallRoom, float sunkenRoom) {
         int n, nRoom;
         MapRoom room, addRoom;
 
@@ -545,8 +545,8 @@ public class MapBuilder
             addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, 1.0f, false);
         }
 
-        // any additional room extensions
-        addAdditionalRoomExtensions(rooms, tallRoom, sunkenRoom);
+        // tall or sunken rooms
+        setTallOrSunkenRooms(rooms, tallRoom, sunkenRoom);
 
         // eliminate all combined walls
         removeSharedWalls(rooms);

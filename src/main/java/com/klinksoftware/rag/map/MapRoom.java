@@ -165,25 +165,20 @@ public class MapRoom
                 continue;
             }
 
-            if ((x == (checkRoom.x + checkRoom.piece.sizeX)) || ((x + piece.sizeX) == checkRoom.x)) {
-                if (z >= (checkRoom.z + checkRoom.piece.sizeZ)) {
-                    continue;
-                }
-                if ((z + piece.sizeZ) <= checkRoom.z) {
-                    continue;
-                }
-                return (n);
+            if (x >= (checkRoom.x + checkRoom.piece.sizeX)) {
+                continue;
+            }
+            if ((x + piece.sizeX) <= checkRoom.x) {
+                continue;
+            }
+            if (z >= (checkRoom.z + checkRoom.piece.sizeZ)) {
+                continue;
+            }
+            if ((z + piece.sizeZ) <= checkRoom.z) {
+                continue;
             }
 
-            if ((z == (checkRoom.z + checkRoom.piece.sizeZ)) || ((z + piece.sizeZ) == checkRoom.z)) {
-                if (x >= (checkRoom.x + checkRoom.piece.sizeX)) {
-                    continue;
-                }
-                if ((x + piece.sizeX) <= checkRoom.x) {
-                    continue;
-                }
-                return (n);
-            }
+            return (n);
         }
 
         return (-1);
@@ -199,25 +194,20 @@ public class MapRoom
                 continue;
             }
 
-            if ((x == (checkRoom.x + checkRoom.piece.sizeX)) || ((x + piece.sizeX) == checkRoom.x)) {
-                if (z >= (checkRoom.z + checkRoom.piece.sizeZ)) {
-                    continue;
-                }
-                if ((z + piece.sizeZ) <= checkRoom.z) {
-                    continue;
-                }
-                return (n);
+            if (x >= (checkRoom.x + checkRoom.piece.sizeX)) {
+                continue;
+            }
+            if ((x + piece.sizeX) <= checkRoom.x) {
+                continue;
+            }
+            if (z >= (checkRoom.z + checkRoom.piece.sizeZ)) {
+                continue;
+            }
+            if ((z + piece.sizeZ) <= checkRoom.z) {
+                continue;
             }
 
-            if ((z == (checkRoom.z + checkRoom.piece.sizeZ)) || ((z + piece.sizeZ) == checkRoom.z)) {
-                if (x >= (checkRoom.x + checkRoom.piece.sizeX)) {
-                    continue;
-                }
-                if ((x + piece.sizeX) <= checkRoom.x) {
-                    continue;
-                }
-                return (n);
-            }
+            return (n);
         }
 
         return (-1);
