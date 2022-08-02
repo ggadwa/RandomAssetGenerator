@@ -9,17 +9,15 @@ import java.util.*;
 
 public class MeshMapUtility
 {
-    public static final int STAIR_STEP_COUNT=10;
-
-    public static final int STAIR_DIR_POS_Z=0;
+    public static final int STAIR_DIR_POS_Z = 0;
     public static final int STAIR_DIR_NEG_Z=1;
     public static final int STAIR_DIR_POS_X=2;
     public static final int STAIR_DIR_NEG_X=3;
 
     // room floor and ceilings
     public static void buildRoomFloorCeiling(MeshList meshList, MapRoom room, RagPoint centerPnt, int roomNumber, boolean floor) {
-        int n, k, x, z, trigIdx, idx;
-        float px, py, pz;
+        int n, k, trigIdx, idx;
+        float py;
         ArrayList<Float> vertexArray;
         ArrayList<Integer> indexArray;
         int[] indexes;
@@ -314,19 +312,20 @@ public class MeshMapUtility
     }
 
     // staircases
-    public static void buildStairs(MeshList meshList, MapRoom room, String name, float x, float y, float z, int dir, float stepWidth, boolean sides) {
+    public static void buildStairs(MeshList meshList, MapRoom room, String name, float x, float y, float z, int dir, int stepCount, float stepWidth, float stepTotalHeight, float stepSize, boolean sides, boolean back) {
         int n, trigIdx;
-        float sx, sx2, sy, sz, sz2, stepSize, stepHigh;
+        float sx, sx2, sy, sz, sz2, stepHigh;
         ArrayList<Float> vertexArray;
         ArrayList<Integer> indexArray;
         int[] indexes;
         float[] vertexes, normals, tangents, uvs;
         RagPoint centerPnt;
 
-            // step sizes
+        // add in room ofsets
+        x = (x + room.x) * MapBuilder.SEGMENT_SIZE;
+        z = (z + room.z) * MapBuilder.SEGMENT_SIZE;
 
-        stepSize=(MapBuilder.SEGMENT_SIZE*2.0f)/(float)STAIR_STEP_COUNT;
-        stepHigh = (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT) / (float) STAIR_STEP_COUNT;
+        stepHigh = stepTotalHeight / (float) stepCount;
 
         centerPnt=null;
 
@@ -361,7 +360,7 @@ public class MeshMapUtility
 
         sy=y+stepHigh;
 
-        for (n=0;n!=STAIR_STEP_COUNT;n++) {
+        for (n = 0; n != stepCount; n++) {
 
                 // step top
 
@@ -427,28 +426,28 @@ public class MeshMapUtility
 
             // step back
 
-        if (sides) {
+        if (back) {
             sy = y + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT);
 
             switch (dir) {
                 case STAIR_DIR_POS_Z:
-                    sx=x+(MapBuilder.SEGMENT_SIZE*stepWidth);
+                    sx = x + (((float) stepCount) * stepWidth);
                     sz=z+(MapBuilder.SEGMENT_SIZE*2.0f);
                     vertexArray.addAll(Arrays.asList(x,y,sz,sx,y,sz,sx,sy,sz,x,sy,sz));
                     break;
                 case STAIR_DIR_NEG_Z:
-                    sx=x+(MapBuilder.SEGMENT_SIZE*stepWidth);
+                    sx = x + (((float) stepCount) * stepWidth);
                     sz=z-MapBuilder.SEGMENT_SIZE;
                     vertexArray.addAll(Arrays.asList(x,y,sz,sx,y,sz,sx,sy,sz,x,sy,sz));
                     break;
                 case STAIR_DIR_POS_X:
                     sx=x+(MapBuilder.SEGMENT_SIZE*2.0f);
-                    sz=z+(MapBuilder.SEGMENT_SIZE*stepWidth);
+                    sz = z + (((float) stepCount) * stepWidth);
                     vertexArray.addAll(Arrays.asList(sx,y,z,sx,y,sz,sx,sy,sz,sx,sy,z));
                     break;
                 case STAIR_DIR_NEG_X:
                     sx=x-MapBuilder.SEGMENT_SIZE;
-                    sz=z+(MapBuilder.SEGMENT_SIZE*stepWidth);
+                    sz = z + (((float) stepCount) * stepWidth);
                     vertexArray.addAll(Arrays.asList(sx,y,z,sx,y,sz,sx,sy,sz,sx,sy,z));
                     break;
             }
@@ -464,7 +463,7 @@ public class MeshMapUtility
         uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
-        meshList.add(new Mesh(name, "platform", vertexes, normals, tangents, uvs, indexes));
+        meshList.add(new Mesh(name, "stair", vertexes, normals, tangents, uvs, indexes));
     }
 
 }

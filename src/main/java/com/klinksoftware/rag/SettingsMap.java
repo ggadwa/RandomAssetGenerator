@@ -51,7 +51,7 @@ public class SettingsMap extends SettingsBase {
         tallRoomSlider = addSlider(y, "Tall Room", 0.4f);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        sunkenRoomSlider = addSlider(y, "Sunken Room", 0.2f);
+        sunkenRoomSlider = addSlider(y, "Sunken Room", 0.4f);
         y += (ROW_HEIGHT + ROW_GAP);
 
         complexCheckBox = addCheckBox(y, "Complex", true);

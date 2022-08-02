@@ -382,8 +382,9 @@ public class MapBuilder
     // set some random rooms to tall or sunken
     //
     private void setTallOrSunkenRooms(ArrayList<MapRoom> rooms, float tallRoom, float sunkenRoom) {
-        int n, nRoom;
-        MapRoom room, addRoom;
+        int n, k, nRoom;
+        boolean badRoom;
+        MapRoom room, addRoom, checkRoom;
 
         nRoom = rooms.size();
 
@@ -412,6 +413,33 @@ public class MapBuilder
 
             // sunken rooms
             if (room.roomBelow(rooms) == -1) {
+
+                // sunken rooms have stairs, so they need to be bigger
+                if ((room.piece.sizeX < 5) || (room.piece.sizeZ < 5)) {
+                    continue;
+                }
+
+                // extra check to skip touching any room with a lower
+                // extension so we don't have to deal with shared walls
+                badRoom = false;
+
+                for (k = 0; k != nRoom; k++) {
+                    if (k != n) {
+                        checkRoom = rooms.get(k);
+                        if (room.touches(checkRoom)) {
+                            if (checkRoom.hasLowerExtension) {
+                                badRoom = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (badRoom) {
+                    continue;
+                }
+
+                // sink the room
                 if (AppWindow.random.nextFloat() < sunkenRoom) {
                     room.hasLowerExtension = true;
                     addRoom = room.duplicate(MapRoom.ROOM_STORY_SUNKEN_EXTENSION);
@@ -449,19 +477,28 @@ public class MapBuilder
 
     public void buildSteps(int mapType, ArrayList<MapRoom> rooms) {
         int n, roomCount;
-        MapRoom room;
         MapStair mapStair;
+        MapRoom room;
 
         roomCount = rooms.size();
         mapStair = new MapStair(meshList, rooms);
 
+        // stairs when changing to upper or lower
         for (n = 0; n != roomCount; n++) {
             room = rooms.get(n);
             if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
-                mapStair.build(room, n, true);
+                mapStair.buildPlatformStair(room, n, true);
             }
             if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
-                mapStair.build(room, n, false);
+                mapStair.buildPlatformStair(room, n, false);
+            }
+        }
+
+        // stairs for sunken rooms
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+            if (room.story == MapRoom.ROOM_STORY_SUNKEN_EXTENSION) {
+                mapStair.buildSunkenStairs(room, n);
             }
         }
     }
@@ -494,6 +531,7 @@ public class MapBuilder
         String[] outsideFloorBitmaps = {"Dirt", "Grass"};
         String[] ceilingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "WoodBoard"};
         String[] platformBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "WoodBoard"};
+        String[] stairBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "WoodBoard"};
 
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
             BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
@@ -504,6 +542,7 @@ public class MapBuilder
             BitmapBase.mapBitmapLoader(bitmaps, "ceiling", ceilingBitmaps);
             BitmapBase.mapBitmapLoader(bitmaps, "ceiling_upper", ceilingBitmaps);
             BitmapBase.mapBitmapLoader(bitmaps, "platform", platformBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "stair", stairBitmaps);
         } else {
             BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
             BitmapBase.mapBitmapLoader(bitmaps, "floor", outsideFloorBitmaps);
@@ -533,11 +572,11 @@ public class MapBuilder
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
             addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, mapCompactFactor, complex);
 
-            upperFloorRoomCount = 1 + (int) (10.0f * upperFloorMapSize);
+            upperFloorRoomCount = (int) (10.0f * upperFloorMapSize);
             if (upperFloorRoomCount != 0) {
                 addUpperOrLowerFloor(rooms, upperFloorRoomCount, true, mapCompactFactor, complex);
             }
-            lowerFloorRoomCount = 1 + (int) (10.0f * lowerFloorMapSize);
+            lowerFloorRoomCount = (int) (10.0f * lowerFloorMapSize);
             if (lowerFloorRoomCount != 0) {
                 addUpperOrLowerFloor(rooms, lowerFloorRoomCount, false, mapCompactFactor, complex);
             }

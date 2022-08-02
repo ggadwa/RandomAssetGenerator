@@ -271,6 +271,20 @@ public class MapRoom
         return (false);
     }
 
+    public boolean touchesNegativeX(MapRoom checkRoom) {
+        if (x != (checkRoom.x + checkRoom.piece.sizeX)) {
+            return (false);
+        }
+        return ((z < (checkRoom.z + checkRoom.piece.sizeZ)) && ((z + piece.sizeZ) > checkRoom.z));
+    }
+
+    public boolean touchesPositiveX(MapRoom checkRoom) {
+        if ((x + piece.sizeX) != checkRoom.x) {
+            return (false);
+        }
+        return ((z < (checkRoom.z + checkRoom.piece.sizeZ)) && ((z + piece.sizeZ) > checkRoom.z));
+    }
+
     public boolean touchesNegativeZ(ArrayList<MapRoom> rooms) {
         int n;
         MapRoom checkRoom;
@@ -319,6 +333,22 @@ public class MapRoom
         return (false);
     }
 
+    public boolean touchesNegativeZ(MapRoom checkRoom) {
+        if (z != (checkRoom.z + checkRoom.piece.sizeZ)) {
+            return (false);
+        }
+        return ((x < (checkRoom.x + checkRoom.piece.sizeX)) && ((x + piece.sizeX) > checkRoom.x));
+
+    }
+
+    public boolean touchesPositiveZ(MapRoom checkRoom) {
+        if ((z + piece.sizeZ) != checkRoom.z) {
+            return (false);
+        }
+        return ((x < (checkRoom.x + checkRoom.piece.sizeX)) && ((x + piece.sizeX) > checkRoom.x));
+
+    }
+
     public boolean touches(MapRoom room) {
         if (!storyEqual(room)) {
             return (false);
@@ -361,8 +391,7 @@ public class MapRoom
             return (false);
         }
 
-            // check to see if two rooms share a wall segment
-
+        // check to see if two rooms share a wall segment
         vertexCount = piece.wallLines.length;
         vertexCount2 = checkRoom.piece.wallLines.length;
 
@@ -409,14 +438,11 @@ public class MapRoom
                             touchMin,touchMax;
         ArrayList<Float>    touchPoints;
 
-        if (!storyEqual(checkRoom)) {
-            return (null);
-        }
+        // we don't care about story equal here as this can be used
+        // to connect rooms on different stories
+        touchPoints = new ArrayList<>();
 
-        touchPoints=new ArrayList<>();
-
-            // find all the touching wall segements
-
+        // find all the touching wall segements
         vertexCount = piece.wallLines.length;
         vertexCount2 = checkRoom.piece.wallLines.length;
 
@@ -458,9 +484,15 @@ public class MapRoom
 
             vIdx++;
         }
+        /*
+        if (xRun) {
+            return (new RagBound(piece.sizeX / 2, piece.sizeX / 2));
+        } else {
+            return (new RagBound(piece.sizeZ / 2, piece.sizeZ / 2));
+        }
+        */
 
-            // now convert into x or z runs
-
+        // now convert into x or z runs
         if (touchPoints.isEmpty()) return(null);
 
         touchMin=touchMax=touchPoints.get(0);
@@ -471,7 +503,7 @@ public class MapRoom
             if (f>touchMax) touchMax=f;
         }
 
-        return(new RagBound(touchMin,touchMax));
+        return (new RagBound(touchMin, touchMax));
     }
 
         //
