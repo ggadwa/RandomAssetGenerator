@@ -139,6 +139,7 @@ public class MapStair {
     public void buildSunkenStairs(MapRoom room, int roomNumber) {
         int n, roomCount;
         float y, high;
+        boolean ramp;
         String name;
         RagBound touchBound;
         MapRoom checkRoom;
@@ -161,29 +162,60 @@ public class MapStair {
                 continue;
             }
 
+            // stairs or ramps
+            ramp = AppWindow.random.nextBoolean();
+
             // build stairs to any touching room
             if (room.touchesNegativeX(checkRoom)) {
                 touchBound = room.getTouchWallRange(checkRoom, false);
+                if (touchBound == null) {
+                    continue;
+                }
                 name = "sunk_stair_nx_" + Integer.toString(roomNumber);
-                MeshMapUtility.buildStairs(meshList, room, name, 0.0f, y, touchBound.min, MeshMapUtility.STAIR_DIR_NEG_X, STAIR_SUNKEN_STEP_COUNT, (touchBound.getSize() + 1.0f), high, 2.0f, true, false);
+                if (!ramp) {
+                    MeshMapUtility.buildStairs(meshList, room, name, 0.0f, y, touchBound.min, MeshMapUtility.STAIR_DIR_NEG_X, STAIR_SUNKEN_STEP_COUNT, (touchBound.getSize() + 1.0f), high, 2.0f, true, false);
+                } else {
+                    MeshMapUtility.buildRamp(meshList, room, name, 0.0f, y, touchBound.min, MeshMapUtility.STAIR_DIR_NEG_X, (touchBound.getSize() + 1.0f), high, 1.0f);
+                }
                 continue;
             }
             if (room.touchesPositiveX(checkRoom)) {
                 touchBound = room.getTouchWallRange(checkRoom, false);
+                if (touchBound == null) {
+                    continue;
+                }
                 name = "sunk_stair_px_" + Integer.toString(roomNumber);
-                MeshMapUtility.buildStairs(meshList, room, name, (room.piece.sizeX - 1.0f), y, touchBound.min, MeshMapUtility.STAIR_DIR_POS_X, STAIR_SUNKEN_STEP_COUNT, (touchBound.getSize() + 1.0f), high, 2.0f, true, false);
+                if (!ramp) {
+                    MeshMapUtility.buildStairs(meshList, room, name, (room.piece.sizeX - 1.0f), y, touchBound.min, MeshMapUtility.STAIR_DIR_POS_X, STAIR_SUNKEN_STEP_COUNT, (touchBound.getSize() + 1.0f), high, 2.0f, true, false);
+                } else {
+                    MeshMapUtility.buildRamp(meshList, room, name, (room.piece.sizeX - 1.0f), y, touchBound.min, MeshMapUtility.STAIR_DIR_POS_X, (touchBound.getSize() + 1.0f), high, 1.0f);
+                }
                 continue;
             }
             if (room.touchesNegativeZ(checkRoom)) {
                 touchBound = room.getTouchWallRange(checkRoom, true);
+                if (touchBound == null) {
+                    continue;
+                }
                 name = "sunk_stair_pz_" + Integer.toString(roomNumber);
-                MeshMapUtility.buildStairs(meshList, room, name, touchBound.min, y, 0.0f, MeshMapUtility.STAIR_DIR_NEG_Z, STAIR_SUNKEN_STEP_COUNT, (touchBound.getSize() + 1.0f), high, 2.0f, true, false);
+                if (!ramp) {
+                    MeshMapUtility.buildStairs(meshList, room, name, touchBound.min, y, 0.0f, MeshMapUtility.STAIR_DIR_NEG_Z, STAIR_SUNKEN_STEP_COUNT, (touchBound.getSize() + 1.0f), high, 2.0f, true, false);
+                } else {
+                    MeshMapUtility.buildRamp(meshList, room, name, touchBound.min, y, 0.0f, MeshMapUtility.STAIR_DIR_NEG_Z, (touchBound.getSize() + 1.0f), high, 1.0f);
+                }
                 continue;
             }
             if (room.touchesPositiveZ(checkRoom)) {
                 touchBound = room.getTouchWallRange(checkRoom, true);
+                if (touchBound == null) {
+                    continue;
+                }
                 name = "sunk_stair_nz_" + Integer.toString(roomNumber);
-                MeshMapUtility.buildStairs(meshList, room, name, touchBound.min, y, (room.piece.sizeZ - 1.0f), MeshMapUtility.STAIR_DIR_POS_Z, STAIR_SUNKEN_STEP_COUNT, (touchBound.getSize() + 1.0f), high, 2.0f, true, false);
+                if (!ramp) {
+                    MeshMapUtility.buildStairs(meshList, room, name, touchBound.min, y, (room.piece.sizeZ - 1.0f), MeshMapUtility.STAIR_DIR_POS_Z, STAIR_SUNKEN_STEP_COUNT, (touchBound.getSize() + 1.0f), high, 2.0f, true, false);
+                } else {
+                    MeshMapUtility.buildRamp(meshList, room, name, touchBound.min, y, (room.piece.sizeZ - 1.0f), MeshMapUtility.STAIR_DIR_POS_Z, (touchBound.getSize() + 1.0f), high, 1.0f);
+                }
                 continue;
             }
 

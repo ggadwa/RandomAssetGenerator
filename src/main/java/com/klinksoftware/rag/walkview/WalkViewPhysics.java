@@ -57,7 +57,11 @@ public class WalkViewPhysics {
             rotMatrix.multiply(rotMatrix2);
             rotMovePoint.matrixMultiply(rotMatrix);
 
-            view.cameraPoint.addPoint(rotMovePoint);
+            //if (!flyMode) {
+            //    collision.slideWithWall(view.cameraPoint, rotMovePoint);
+            //} else {
+                view.cameraPoint.addPoint(rotMovePoint);
+            //}
         }
 
         // y movement
@@ -77,7 +81,7 @@ public class WalkViewPhysics {
             origY = view.cameraPoint.y;
 
             // move down with gravity
-            walkPoint = new RagPoint(view.cameraPoint.x, (view.cameraPoint.y - cameraFeetOffsetY), view.cameraPoint.z);
+            walkPoint.setFromValues(view.cameraPoint.x, (view.cameraPoint.y - cameraFeetOffsetY), view.cameraPoint.z);
             walkPoint.y -= gravity;
 
             // collide with floor

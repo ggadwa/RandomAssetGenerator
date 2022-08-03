@@ -329,13 +329,11 @@ public class MeshMapUtility
 
         centerPnt=null;
 
-            // allocate proper buffers
-
+        // allocate proper buffers
         vertexArray=new ArrayList<>();
         indexArray=new ArrayList<>();
 
-            // initial locations
-
+        // initial locations
         sx=sz=0.0f;
         sx2=sz2=0.0f;
 
@@ -354,8 +352,7 @@ public class MeshMapUtility
                 break;
         }
 
-            // the steps
-
+        // the steps
         trigIdx=0;
 
         sy=y+stepHigh;
@@ -386,8 +383,7 @@ public class MeshMapUtility
             vertexArray.addAll(Arrays.asList(sx,sy,sz,sx2,sy,sz,sx2,sy,sz2,sx,sy,sz2));
             trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
 
-                // step front
-
+            // step front
             switch (dir) {
                 case STAIR_DIR_POS_Z:
                 case STAIR_DIR_NEG_Z:
@@ -401,8 +397,7 @@ public class MeshMapUtility
 
             trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
 
-                // step sides
-
+            // step sides
             if (sides) {
                 switch (dir) {
                     case STAIR_DIR_POS_Z:
@@ -424,8 +419,7 @@ public class MeshMapUtility
             sy+=stepHigh;
         }
 
-            // step back
-
+        // step back
         if (back) {
             sy = y + (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT);
 
@@ -455,8 +449,93 @@ public class MeshMapUtility
             trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
         }
 
-            // create the mesh
+        // create the mesh
+        vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
+        indexes = MeshUtility.intArrayListToInt(indexArray);
+        normals = MeshUtility.buildNormals(vertexes, indexes, centerPnt, false);
+        uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
+        tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
+        meshList.add(new Mesh(name, "stair", vertexes, normals, tangents, uvs, indexes));
+    }
+
+    // ramp
+    public static void buildRamp(MeshList meshList, MapRoom room, String name, float x, float y, float z, int dir, float rampWidth, float rampHeight, float rampLength) {
+        int trigIdx;
+        float x2, y2, z2;
+        ArrayList<Float> vertexArray;
+        ArrayList<Integer> indexArray;
+        int[] indexes;
+        float[] vertexes, normals, tangents, uvs;
+        RagPoint centerPnt;
+
+        // add in room ofsets
+        x = (x + room.x) * MapBuilder.SEGMENT_SIZE;
+        z = (z + room.z) * MapBuilder.SEGMENT_SIZE;
+
+        centerPnt = null;
+
+        // allocate proper buffers
+        vertexArray = new ArrayList<>();
+        indexArray = new ArrayList<>();
+
+        // ramp
+        trigIdx = 0;
+
+        x2 = x;
+        y2 = y;
+        z2 = z;
+
+        switch (dir) {
+            case STAIR_DIR_POS_Z:
+                x2 = x + (MapBuilder.SEGMENT_SIZE * rampWidth);
+                y2 = y + rampHeight;
+                z2 = z + (MapBuilder.SEGMENT_SIZE * rampLength);
+                vertexArray.addAll(Arrays.asList(x, y, z, x2, y, z, x2, y2, z2, x, y2, z2));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x, y, z, x, y, z2, x, y2, z2));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x2, y, z, x2, y, z2, x2, y2, z2));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                break;
+            case STAIR_DIR_NEG_Z:
+                x2 = x + (MapBuilder.SEGMENT_SIZE * rampWidth);
+                y2 = y + rampHeight;
+                z2 = z + (MapBuilder.SEGMENT_SIZE * rampLength);
+                vertexArray.addAll(Arrays.asList(x, y2, z, x2, y2, z, x2, y, z2, x, y, z2));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x, y, z2, x, y, z, x, y2, z));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x2, y, z2, x2, y, z, x2, y2, z));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                break;
+            case STAIR_DIR_POS_X:
+                x2 = x + (MapBuilder.SEGMENT_SIZE * rampLength);
+                y2 = y + rampHeight;
+                z2 = z + (MapBuilder.SEGMENT_SIZE * rampWidth);
+                vertexArray.addAll(Arrays.asList(x, y, z, x, y, z2, x2, y2, z2, x2, y2, z));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x, y, z, x2, y, z, x2, y2, z));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x, y, z2, x2, y, z2, x2, y2, z2));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                break;
+            case STAIR_DIR_NEG_X:
+                x2 = x + (MapBuilder.SEGMENT_SIZE * rampLength);
+                y2 = y + rampHeight;
+                z2 = z + (MapBuilder.SEGMENT_SIZE * rampWidth);
+                vertexArray.addAll(Arrays.asList(x, y2, z, x, y2, z2, x2, y, z2, x2, y, z));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x2, y, z, x, y, z, x, y2, z));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x2, y, z2, x, y, z2, x, y2, z2));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                break;
+        }
+
+        centerPnt = new RagPoint(((x + x2) * 0.5f), ((y + y2) * 0.5f), ((z + z2) * 0.5f));
+
+        // create the mesh
         vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
         indexes = MeshUtility.intArrayListToInt(indexArray);
         normals = MeshUtility.buildNormals(vertexes, indexes, centerPnt, false);

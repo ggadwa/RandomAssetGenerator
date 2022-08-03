@@ -1,7 +1,6 @@
 package com.klinksoftware.rag.bitmaps;
 
 import com.klinksoftware.rag.*;
-import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
 public class BitmapGlass extends BitmapBase
@@ -21,46 +20,34 @@ public class BitmapGlass extends BitmapBase
 
     @Override
     public void generateInternal() {
-        int n, x, y, x2, y2, lineCount, startWid;
-        RagColor color;
+        int n, x, y, x2, y2, lineCount;
 
-        // default glass to random gray
+        // default glass to dull color
+        drawRect(0, 0, textureSize, textureSize, getRandomColorDull(0.5f));
 
-        drawRect(0, 0, textureSize, textureSize, this.getRandomGray(0.6f, 0.9f));
+        // back noise and blur
+        drawStaticNoiseRect(0, 0, textureSize, textureSize, 0.95f, 0.99f);
+        blur(colorData, 0, 0, textureSize, textureSize, 10, false);
 
-            // back noise and blur
-
-        drawStaticNoiseRect(0,0,textureSize,textureSize,0.9f,0.95f);
-        blur(colorData,0,0,textureSize,textureSize,10,false);
-
-            // reflection lines
+        // reflection lines in alpha
+        setImageAlpha(0.75f);
 
         lineCount=5+AppWindow.random.nextInt(20);
 
-        startWid=(int)((float)textureSize*0.4f);
-
-        for (n=0;n!=lineCount;n++) {
-            color=getRandomGray(0.7f,0.9f);
-            x=AppWindow.random.nextInt(startWid);
+        for (n = 0; n != lineCount; n++) {
+            x = AppWindow.random.nextInt(textureSize / 2);
             x2=(x+1)+AppWindow.random.nextInt(textureSize-x);
             y=textureSize-AppWindow.random.nextInt(textureSize-(x2-x));
             y2=y-((x2-x)/2);
 
-            drawLineColor(x,y,x2,y2,color);
+            drawLineAlpha(x, y, x2, y2, (0.7f + AppWindow.random.nextFloat(0.2f)));
             drawLineNormal(x,y,x2,y2,((n&0x1)==0x0)?NORMAL_BOTTOM_RIGHT_45:NORMAL_TOP_LEFT_45);
         }
 
-            // front noise and blur
+        // blur the lines
+        blurAlpha(colorData, 0, 0, textureSize, textureSize, 5, false);
 
-        drawStaticNoiseRect(0,0,textureSize,textureSize,0.95f,1.0f);
-        blur(colorData,0,0,textureSize,textureSize,5,false);
-
-            // the alpha
-
-        setImageAlpha(0.75f);
-
-            // finish with the metallic-roughness
-
+        // finish with the metallic-roughness
         createMetallicRoughnessMap(0.5f,0.6f);
     }
 }

@@ -1,6 +1,9 @@
 
 map
- - short stairs or ramps
+ - going up ramps is sometimes broken
+ - need normals display
+ - X/Z collisions
+ - sort transparent triangles (do it simple, just closest vertex)
 
 bitmaps
  - gravel (like dirt)

@@ -9,10 +9,33 @@ import java.util.ArrayList;
 
 public class Collision {
 
+    private static final float COLLISION_WIDTH = 1.4f;
+
+    private ArrayList<CollisionTrig> wallTrigs;
     private ArrayList<CollisionTrig> floorTrigs;
+    private ArrayList<RagPoint> wallCollideSpokes;
+
+    private RagPoint slidePnt;
 
     public Collision() {
+        int ang;
+        RagPoint vct;
+
+        // wall and floor trigs
+        wallTrigs = new ArrayList<>();
         floorTrigs = new ArrayList<>();
+
+        // xz collision spokes
+        wallCollideSpokes = new ArrayList<>();
+
+        for (ang = 0; ang != 360; ang += 10) {
+            vct = new RagPoint(0.0f, 0.0f, COLLISION_WIDTH);
+            vct.rotateY(ang);
+            wallCollideSpokes.add(vct);
+        }
+
+        // some preallocates
+        slidePnt = new RagPoint(0.0f, 0.0f, 0.0f);
     }
 
     private void addMeshTrigsToCollision(MeshList meshList, Skeleton skeleton, int meshIdx) {
@@ -51,6 +74,8 @@ public class Collision {
             // is this a floor?
             if (normal.y > 0.75f) {
                 floorTrigs.add(new CollisionTrig(v0, v1, v2, normal));
+            } else {
+                wallTrigs.add(new CollisionTrig(v0, v1, v2, normal));
             }
         }
     }
@@ -63,6 +88,56 @@ public class Collision {
         nMesh = meshList.count();
         for (n = 0; n != nMesh; n++) {
             addMeshTrigsToCollision(meshList, skeleton, n);
+        }
+    }
+
+    public boolean collideWithWall(RagPoint rayPnt) {
+        RagPoint hitPnt;
+
+        hitPnt = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        for (CollisionTrig trig : wallTrigs) {
+            for (RagPoint rayVct : wallCollideSpokes) {
+                if (trig.rayOverlapBounds(rayPnt, rayVct)) {
+                    if (trig.rayTrace(rayPnt, rayVct, hitPnt)) {
+                        return (true);
+                    }
+                }
+            }
+        }
+
+        return (false);
+    }
+
+    public void slideWithWall(RagPoint rayPnt, RagPoint moveVct) {
+
+        // check regular move
+        slidePnt.setFromPoint(rayPnt);
+        slidePnt.x += moveVct.x;
+        slidePnt.z += moveVct.z;
+
+        if (!collideWithWall(rayPnt)) {
+            rayPnt.x += moveVct.x;
+            rayPnt.z += moveVct.z;
+            return;
+        }
+
+        // now x
+        slidePnt.setFromPoint(rayPnt);
+        slidePnt.x += moveVct.x;
+
+        if (!collideWithWall(slidePnt)) {
+            rayPnt.x += moveVct.x;
+            return;
+        }
+
+        // now z
+        slidePnt.setFromPoint(rayPnt);
+        slidePnt.z += moveVct.z;
+
+        if (!collideWithWall(slidePnt)) {
+            rayPnt.z += moveVct.z;
+            return;
         }
     }
 

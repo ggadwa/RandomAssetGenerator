@@ -284,7 +284,7 @@ public class BitmapBase
 
                         // get blur from 8 surrounding pixels
 
-                    r=g=b=0;
+                    r = g = b = 0.0f;
 
                     cxs=x-1;
                     cxe=x+2;
@@ -342,6 +342,96 @@ public class BitmapBase
                     data[idx+1]=blurData[idx+1];
                     data[idx+2]=blurData[idx+2];
                     idx+=4;
+                }
+            }
+        }
+    }
+
+    protected void blurAlpha(float[] data, int lft, int top, int rgt, int bot, int blurCount, boolean clamp) {
+        int n, x, y, idx, cx, cy, cxs, cxe, cys, cye, dx, dy;
+        float alpha;
+        float[] blurData;
+
+        if ((lft >= rgt) || (top >= bot)) {
+            return;
+        }
+
+        blurData = new float[data.length];
+
+        // blur pixels to count
+        for (n = 0; n != blurCount; n++) {
+
+            for (y = top; y != bot; y++) {
+
+                cys = y - 1;
+                cye = y + 2;
+
+                for (x = lft; x != rgt; x++) {
+
+                    // get blur from 8 surrounding pixels
+                    alpha = 0.0f;
+
+                    cxs = x - 1;
+                    cxe = x + 2;
+
+                    for (cy = cys; cy != cye; cy++) {
+
+                        dy = cy;
+                        if (!clamp) {
+                            if (dy < top) {
+                                dy = bot + (top - dy);
+                            }
+                            if (dy >= bot) {
+                                dy = top + (dy - bot);
+                            }
+                        } else {
+                            if (dy < top) {
+                                dy = top;
+                            }
+                            if (dy >= bot) {
+                                dy = bot - 1;
+                            }
+                        }
+
+                        for (cx = cxs; cx != cxe; cx++) {
+                            if ((cy == y) && (cx == x)) {
+                                continue;       // ignore self
+                            }
+                            dx = cx;
+                            if (!clamp) {
+                                if (dx < lft) {
+                                    dx = rgt + (lft - dx);
+                                }
+                                if (dx >= rgt) {
+                                    dx = lft + (dx - rgt);
+                                }
+                            } else {
+                                if (dx < lft) {
+                                    dx = lft;
+                                }
+                                if (dx >= rgt) {
+                                    dx = rgt - 1;
+                                }
+                            }
+
+                            // add up blur from the
+                            // original pixels
+                            idx = ((dy * textureSize) + dx) * 4;
+                            alpha += data[idx + 3];
+                        }
+                    }
+
+                    idx = ((y * textureSize) + x) * 4;
+                    blurData[idx + 3] = alpha * 0.125f;     // divide by 8.0f
+                }
+            }
+
+            // transfer over the changed pixels
+            for (y = top; y != bot; y++) {
+                idx = ((y * textureSize) + lft) * 4;
+                for (x = lft; x != rgt; x++) {
+                    data[idx + 3] = blurData[idx + 3];
+                    idx += 4;
                 }
             }
         }
@@ -2146,6 +2236,94 @@ public class BitmapBase
                 }
 
                 f+=slope;
+            }
+        }
+    }
+
+    protected void drawLineAlpha(int x, int y, int x2, int y2, float alpha) {
+        int xLen, yLen, sp, ep, dx, dy, idx,
+                prevX, prevY;
+        float f, slope;
+
+        // the line
+        xLen = Math.abs(x2 - x);
+        yLen = Math.abs(y2 - y);
+
+        if ((xLen == 0) && (yLen == 0)) {
+            return;
+        }
+
+        if (xLen > yLen) {
+            slope = (float) yLen / (float) xLen;
+
+            if (x < x2) {
+                sp = x;
+                ep = x2;
+                f = y;
+                slope *= (float) Math.signum(y2 - y);
+            } else {
+                sp = x2;
+                ep = x;
+                f = y2;
+                slope *= (float) Math.signum(y - y2);
+            }
+
+            prevY = -1;
+
+            for (dx = sp; dx < ep; dx++) {
+                dy = (int) f;
+                if ((dx >= 0) && (dx < textureSize) && (dy >= 0) && (dy < textureSize)) {
+
+                    idx = ((dy * textureSize) + dx) * 4;
+                    colorData[idx + 3] = alpha;
+
+                    if (prevY != -1) {
+                        if (dy != prevY) {
+                            idx = ((prevY * textureSize) + dx) * 4;
+                            colorData[idx + 3] = (colorData[idx + 3] * 0.5f) + (alpha * 0.5f);
+                        }
+                    }
+
+                    prevY = dy;
+                }
+
+                f += slope;
+            }
+        } else {
+            slope = (float) xLen / (float) yLen;
+
+            if (y < y2) {
+                sp = y;
+                ep = y2;
+                f = x;
+                slope *= (float) Math.signum(x2 - x);
+            } else {
+                sp = y2;
+                ep = y;
+                f = x2;
+                slope *= (float) Math.signum(x - x2);
+            }
+
+            prevX = -1;
+
+            for (dy = sp; dy < ep; dy++) {
+                dx = (int) f;
+                if ((dx >= 0) && (dx < textureSize) && (dy >= 0) && (dy < textureSize)) {
+
+                    idx = ((dy * textureSize) + dx) * 4;
+                    colorData[idx + 3] = alpha;
+
+                    if (prevX != -1) {
+                        if (dx != prevX) {
+                            idx = ((dy * textureSize) + prevX) * 4;
+                            colorData[idx + 3] = (colorData[idx + 3] * 0.5f) + (alpha * 0.5f);
+                        }
+                    }
+
+                    prevX = dx;
+                }
+
+                f += slope;
             }
         }
     }
