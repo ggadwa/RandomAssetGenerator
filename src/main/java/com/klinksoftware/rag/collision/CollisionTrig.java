@@ -83,7 +83,7 @@ public class CollisionTrig {
         return (!((pnt.z > zBound.max) && (k > zBound.max)));
     }
 
-    public boolean rayTrace(RagPoint pnt, RagPoint rayVct, RagPoint hitPnt) {
+    public boolean rayTrace(RagPoint rayPnt, RagPoint rayVct, RagPoint hitPnt) {
         float det, invDet, t, u, v;
 
         // calculate the cross product and
@@ -107,9 +107,9 @@ public class CollisionTrig {
         // using the vector from spt to tpt_0
         // and the inner product of that result and
         // the perpVector
-        lineToTrigPointVector.x = pnt.x - v0.x;
-        lineToTrigPointVector.y = pnt.y - v0.y;
-        lineToTrigPointVector.z = pnt.z - v0.z;
+        lineToTrigPointVector.x = rayPnt.x - v0.x;
+        lineToTrigPointVector.y = rayPnt.y - v0.y;
+        lineToTrigPointVector.z = rayPnt.z - v0.z;
 
         u = invDet * ((lineToTrigPointVector.x * perpVector.x) + (lineToTrigPointVector.y * perpVector.y) + (lineToTrigPointVector.z * perpVector.z));
         if ((u < 0.0f) || (u > 1.0f)) {
@@ -136,10 +136,15 @@ public class CollisionTrig {
             return (false);
         }
 
+        // if past ray, ignore
+        if (t >= 1.0f) {
+            return (false);
+        }
+
         // get point on line of intersection
-        hitPnt.x = pnt.x + (rayVct.x * t);
-        hitPnt.y = pnt.y + (rayVct.y * t);
-        hitPnt.z = pnt.z + (rayVct.z * t);
+        hitPnt.x = rayPnt.x + (rayVct.x * t);
+        hitPnt.y = rayPnt.y + (rayVct.y * t);
+        hitPnt.z = rayPnt.z + (rayVct.z * t);
 
         return (true);
     }

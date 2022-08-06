@@ -57,11 +57,11 @@ public class WalkViewPhysics {
             rotMatrix.multiply(rotMatrix2);
             rotMovePoint.matrixMultiply(rotMatrix);
 
-            //if (!flyMode) {
-            //    collision.slideWithWall(view.cameraPoint, rotMovePoint);
-            //} else {
+            if (!flyMode) {
+                collision.slideWithWall(view.cameraPoint, rotMovePoint);
+            } else {
                 view.cameraPoint.addPoint(rotMovePoint);
-            //}
+            }
         }
 
         // y movement

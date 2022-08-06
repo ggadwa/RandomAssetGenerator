@@ -1,16 +1,17 @@
 
 map
  - going up ramps is sometimes broken
- - need normals display
- - X/Z collisions
  - sort transparent triangles (do it simple, just closest vertex)
+ - do something about stair sides, (1) none (2) both sides (3) triangle sides
+ - open ceiling
 
 bitmaps
+ - hexagon has lines through it
  - gravel (like dirt)
- - glass alpha needs to be more complex, and have lines have less alpha
  - more distinct control panels pieces (keyboard)
  - make face textures 1, 2, or 3 eye
  - brick walls with boards on them
+ - sky boxes?
 
 model
  - finish junction
@@ -18,6 +19,7 @@ model
  - table: bars on legs
  - lab tube: extra pipes, maybe base, maybe control unit
  - humanoid / etc - more items (spikes, etc.)
+ - oil tank
 
 all
  - need to export tangents

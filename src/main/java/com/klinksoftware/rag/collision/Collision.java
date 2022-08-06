@@ -13,9 +13,9 @@ public class Collision {
 
     private ArrayList<CollisionTrig> wallTrigs;
     private ArrayList<CollisionTrig> floorTrigs;
-    private ArrayList<RagPoint> wallCollideSpokes;
+    private ArrayList<RagPoint> wallCollideSpokeVcts;
 
-    private RagPoint slidePnt;
+    private RagPoint slidePnt, fallPnt, fallVct, hitPnt;
 
     public Collision() {
         int ang;
@@ -26,16 +26,19 @@ public class Collision {
         floorTrigs = new ArrayList<>();
 
         // xz collision spokes
-        wallCollideSpokes = new ArrayList<>();
+        wallCollideSpokeVcts = new ArrayList<>();
 
         for (ang = 0; ang != 360; ang += 10) {
             vct = new RagPoint(0.0f, 0.0f, COLLISION_WIDTH);
             vct.rotateY(ang);
-            wallCollideSpokes.add(vct);
+            wallCollideSpokeVcts.add(vct);
         }
 
         // some preallocates
         slidePnt = new RagPoint(0.0f, 0.0f, 0.0f);
+        fallPnt = new RagPoint(0.0f, 0.0f, 0.0f);
+        fallVct = new RagPoint(0.0f, 0.0f, 0.0f);
+        hitPnt = new RagPoint(0.0f, 0.0f, 0.0f);
     }
 
     private void addMeshTrigsToCollision(MeshList meshList, Skeleton skeleton, int meshIdx) {
@@ -92,12 +95,8 @@ public class Collision {
     }
 
     public boolean collideWithWall(RagPoint rayPnt) {
-        RagPoint hitPnt;
-
-        hitPnt = new RagPoint(0.0f, 0.0f, 0.0f);
-
         for (CollisionTrig trig : wallTrigs) {
-            for (RagPoint rayVct : wallCollideSpokes) {
+            for (RagPoint rayVct : wallCollideSpokeVcts) {
                 if (trig.rayOverlapBounds(rayPnt, rayVct)) {
                     if (trig.rayTrace(rayPnt, rayVct, hitPnt)) {
                         return (true);
@@ -110,6 +109,7 @@ public class Collision {
     }
 
     public void slideWithWall(RagPoint rayPnt, RagPoint moveVct) {
+        boolean xMove;
 
         // check regular move
         slidePnt.setFromPoint(rayPnt);
@@ -122,13 +122,15 @@ public class Collision {
             return;
         }
 
-        // now x
+        // slide first on X
+        xMove = false;
+
         slidePnt.setFromPoint(rayPnt);
         slidePnt.x += moveVct.x;
 
         if (!collideWithWall(slidePnt)) {
             rayPnt.x += moveVct.x;
-            return;
+            xMove = true;
         }
 
         // now z
@@ -137,21 +139,27 @@ public class Collision {
 
         if (!collideWithWall(slidePnt)) {
             rayPnt.z += moveVct.z;
-            return;
+        }
+
+        // one more x try
+        if (!xMove) {
+            slidePnt.setFromPoint(rayPnt);
+            slidePnt.x += moveVct.x;
+
+            if (!collideWithWall(slidePnt)) {
+                rayPnt.x += moveVct.x;
+            }
         }
     }
 
     public void collideWithFloor(RagPoint pnt) {
-        RagPoint rayPnt, rayVct, hitPnt;
-
         // we go two floor height above, and check one below
-        rayPnt = new RagPoint(pnt.x, (pnt.y + (MapBuilder.FLOOR_HEIGHT * 2.0f)), pnt.z);
-        rayVct = new RagPoint(0.0f, -(MapBuilder.FLOOR_HEIGHT * 3.0f), 0.0f);
-        hitPnt = new RagPoint(0.0f, 0.0f, 0.0f);
+        fallPnt.setFromValues(pnt.x, (pnt.y + (MapBuilder.FLOOR_HEIGHT * 2.0f)), pnt.z);
+        fallVct.setFromValues(0.0f, -(MapBuilder.FLOOR_HEIGHT * 3.0f), 0.0f);
 
         for (CollisionTrig trig : floorTrigs) {
-            if (trig.rayOverlapBounds(rayPnt, rayVct)) {
-                if (trig.rayTrace(rayPnt, rayVct, hitPnt)) {
+            if (trig.rayOverlapBounds(fallPnt, fallVct)) {
+                if (trig.rayTrace(fallPnt, fallVct, hitPnt)) {
                     if (hitPnt.y > pnt.y) {
                         pnt.y = hitPnt.y;
                     }
