@@ -2,7 +2,6 @@ package com.klinksoftware.rag.mesh;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.utility.*;
-import java.nio.*;
 import java.util.ArrayList;
 
 public class Mesh
@@ -11,8 +10,7 @@ public class Mesh
     public String name,bitmapName;
     public int[] indexes;
     public float[] vertexes, normals, tangents, uvs;
-    public int vboVertexId,vboNormalId,vboTangentId,vboUVId;
-    public IntBuffer indexBuf;
+    public int vboVertexId, vboNormalId, vboTangentId, vboUVId;
     public RagBound xBound, yBound, zBound;
     public boolean hasAlpha;
 

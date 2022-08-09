@@ -56,6 +56,7 @@ public class WalkView extends AWTGLCanvas {
     private RagPlane frustumLeftPlane, frustumRightPlane, frustumTopPlane, frustumBottomPlane, frustumNearPlane, frustumFarPlane;
     private HashMap<String, WalkViewTexture> textures;
     public WalkViewPhysics physics;
+    public WalkViewTrigSort trigSort;
 
     public WalkView(GLData glData) {
         super(glData);
@@ -64,6 +65,9 @@ public class WalkView extends AWTGLCanvas {
 
         // physics
         physics = new WalkViewPhysics(this);
+
+        // trig sorter of transperent trigs
+        trigSort = new WalkViewTrigSort();
 
         // mouse events
         WalkViewMouseMotionListener mouseMotionListener = new WalkViewMouseMotionListener(this);
@@ -308,10 +312,6 @@ public class WalkView extends AWTGLCanvas {
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        // indexes
-        mesh.indexBuf=MemoryUtil.memAllocInt(mesh.indexes.length);
-        mesh.indexBuf.put(mesh.indexes).flip();
-
         // setup the bounds for culling
         mesh.setGlobalBounds(bonePoint);
     }
@@ -321,8 +321,6 @@ public class WalkView extends AWTGLCanvas {
         glDeleteBuffers(mesh.vboUVId);
         glDeleteBuffers(mesh.vboNormalId);
         glDeleteBuffers(mesh.vboTangentId);
-
-        memFree(mesh.indexBuf);
     }
 
     //
@@ -646,7 +644,7 @@ public class WalkView extends AWTGLCanvas {
         }
     }
 
-    private void drawSingleMesh(Mesh mesh) {
+    private void setupMeshBuffers(Mesh mesh) {
         glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
         glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
 
@@ -658,8 +656,6 @@ public class WalkView extends AWTGLCanvas {
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh.vboTangentId);
         glVertexAttribPointer(vertexTangentAttribute, 3, GL_FLOAT, false, 0, 0);
-
-        glDrawElements(GL_TRIANGLES, mesh.indexBuf);
     }
 
     //
@@ -668,10 +664,11 @@ public class WalkView extends AWTGLCanvas {
 
     @Override
     public void paintGL() {
-        int n,nMesh;
+        int n, nMesh, trigIndexIdx;
         long tick;
         FloatBuffer buf;
-        Mesh mesh;
+        IntBuffer intBuf;
+        Mesh mesh, curMesh;
         WalkViewTexture texture,curTexture;
 
         // do we have an incomming meshlist?
@@ -767,16 +764,18 @@ public class WalkView extends AWTGLCanvas {
             }
 
             // draw the mesh
-            drawSingleMesh(mesh);
+            setupMeshBuffers(mesh);
+
+            intBuf = MemoryUtil.memAllocInt(mesh.indexes.length);
+            intBuf.put(mesh.indexes).flip();
+
+            glDrawElements(GL_TRIANGLES, intBuf);
+
+            memFree(intBuf);
         }
 
-        // draw the transparent meshes
-        curTexture = null;
-
-        glEnable(GL_BLEND);
-        glDepthMask(false);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        // add transparent trigs to sortable array
+        trigSort.clearTrigs();
 
         for (n = 0; n != nMesh; n++) {
             mesh = meshList.get(n);
@@ -789,15 +788,44 @@ public class WalkView extends AWTGLCanvas {
                 continue;
             }
 
-            // new texture?
-            texture = textures.get(mesh.bitmapName);
-            if (texture != curTexture) {
-                curTexture = texture;
-                switchTexture(texture, tick);
+            // add to sort array
+            trigSort.addTrigsFromMesh(meshList, cameraPoint, n);
+        }
+
+        // draw the transparent meshes
+        curTexture = null;
+        curMesh = null;
+
+        glEnable(GL_BLEND);
+        glDepthMask(false);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        for (n = 0; n != trigSort.trigCount; n++) {
+            mesh = meshList.get(trigSort.trigArray[n].meshIdx);
+
+            // new mesh?
+            if (curMesh != mesh) {
+                curMesh = mesh;
+                setupMeshBuffers(mesh);
+
+                // new texture?
+                texture = textures.get(mesh.bitmapName);
+                if (texture != curTexture) {
+                    curTexture = texture;
+                    switchTexture(texture, tick);
+                }
             }
 
-            // draw the mesh
-            drawSingleMesh(mesh);
+            // draw the trig
+            trigIndexIdx = trigSort.trigArray[n].trigIdx * 3;
+
+            intBuf = MemoryUtil.memAllocInt(3);
+            intBuf.put(mesh.indexes[trigIndexIdx++]).put(mesh.indexes[trigIndexIdx++]).put(mesh.indexes[trigIndexIdx++]).flip();
+
+            glDrawElements(GL_TRIANGLES, intBuf);
+
+            memFree(intBuf);
         }
 
         glDepthMask(true);

@@ -1,9 +1,9 @@
 
 map
  - going up ramps is sometimes broken
- - sort transparent triangles (do it simple, just closest vertex)
  - do something about stair sides, (1) none (2) both sides (3) triangle sides
  - open ceiling
+ - windows
 
 bitmaps
  - hexagon has lines through it

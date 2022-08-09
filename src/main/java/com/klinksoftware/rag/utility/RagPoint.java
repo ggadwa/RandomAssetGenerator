@@ -22,6 +22,12 @@ public class RagPoint
         this.z=z;
     }
 
+    public void addFromValues(float x, float y, float z) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+    }
+
     public void setFromSubPoint(RagPoint p1, RagPoint p2) {
         this.x=p1.x-p2.x;
         this.y=p1.y-p2.y;
