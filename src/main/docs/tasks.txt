@@ -1,7 +1,6 @@
 
 map
  - going up ramps is sometimes broken
- - do something about stair sides, (1) none (2) both sides (3) triangle sides
  - open ceiling
  - windows
 

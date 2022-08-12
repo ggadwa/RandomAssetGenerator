@@ -13,6 +13,11 @@ public class MeshUtility {
     public static final int UV_BOX_ONE_FRONT = 2;
     public static final int UV_MAP = 3;
 
+    public static final int RAMP_DIR_POS_Z = 0;
+    public static final int RAMP_DIR_NEG_Z = 1;
+    public static final int RAMP_DIR_POS_X = 2;
+    public static final int RAMP_DIR_NEG_X = 3;
+
     // build UVs for vertex lists
     public static float[] buildUVs(float[] vertexes, float[] normals, float uvScale) {
         int n, k, nVertex, offset, minIntX, minIntY;
@@ -740,4 +745,107 @@ public class MeshUtility {
     public static Mesh createMeshCylinderSimple(String bitmapName, int sideCount, RagPoint centerPnt, float ty, float by, float radius, boolean addTop, boolean addBot) {
         return (createCylinder(bitmapName, sideCount, centerPnt, ty, by, new float[]{1.0f, 1.0f}, radius, addTop, addBot));
     }
+
+    // ramp
+    public static Mesh createRamp(String bitmapName, float x, float y, float z, int dir, float rampWidth, float rampHeight, float rampLength, boolean back) {
+        int trigIdx;
+        float x2, y2, z2;
+        ArrayList<Float> vertexArray;
+        ArrayList<Integer> indexArray;
+        int[] indexes;
+        float[] vertexes, normals, tangents, uvs;
+        RagPoint centerPnt;
+
+        centerPnt = null;
+
+        // allocate proper buffers
+        vertexArray = new ArrayList<>();
+        indexArray = new ArrayList<>();
+
+        // ramp
+        trigIdx = 0;
+
+        x2 = x;
+        y2 = y;
+        z2 = z;
+
+        switch (dir) {
+            case RAMP_DIR_POS_Z:
+                x2 = x + rampWidth;
+                y2 = y + rampHeight;
+                z2 = z + rampLength;
+                vertexArray.addAll(Arrays.asList(x, y, z, x2, y, z, x2, y2, z2, x, y2, z2));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x, y, z, x, y, z2, x, y2, z2));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x2, y, z, x2, y, z2, x2, y2, z2));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+
+                if (back) {
+                    vertexArray.addAll(Arrays.asList(x, y, z2, x2, y, z2, x2, y2, z2, x, y2, z2));
+                    trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                }
+                break;
+            case RAMP_DIR_NEG_Z:
+                x2 = x + rampWidth;
+                y2 = y + rampHeight;
+                z2 = z + rampLength;
+                vertexArray.addAll(Arrays.asList(x, y2, z, x2, y2, z, x2, y, z2, x, y, z2));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x, y, z2, x, y, z, x, y2, z));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x2, y, z2, x2, y, z, x2, y2, z));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+
+                if (back) {
+                    vertexArray.addAll(Arrays.asList(x, y, z, x2, y, z, x2, y2, z, x, y2, z));
+                    trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                }
+                break;
+            case RAMP_DIR_POS_X:
+                x2 = x + rampLength;
+                y2 = y + rampHeight;
+                z2 = z + rampWidth;
+                vertexArray.addAll(Arrays.asList(x, y, z, x, y, z2, x2, y2, z2, x2, y2, z));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x, y, z, x2, y, z, x2, y2, z));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x, y, z2, x2, y, z2, x2, y2, z2));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+
+                if (back) {
+                    vertexArray.addAll(Arrays.asList(x2, y, z, x2, y, z2, x2, y2, z2, x2, y2, z));
+                    trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                }
+                break;
+            case RAMP_DIR_NEG_X:
+                x2 = x + rampLength;
+                y2 = y + rampHeight;
+                z2 = z + rampWidth;
+                vertexArray.addAll(Arrays.asList(x, y2, z, x, y2, z2, x2, y, z2, x2, y, z));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x2, y, z, x, y, z, x, y2, z));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+                vertexArray.addAll(Arrays.asList(x2, y, z2, x, y, z2, x, y2, z2));
+                trigIdx = MeshUtility.addTrigToIndexes(indexArray, trigIdx);
+
+                if (back) {
+                    vertexArray.addAll(Arrays.asList(x, y, z, x, y, z2, x, y2, z2, x, y2, z));
+                    trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+                }
+                break;
+        }
+
+        centerPnt = new RagPoint(((x + x2) * 0.5f), ((y + y2) * 0.5f), ((z + z2) * 0.5f));
+
+        // create the mesh
+        vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
+        indexes = MeshUtility.intArrayListToInt(indexArray);
+        normals = MeshUtility.buildNormals(vertexes, indexes, centerPnt, false);
+        uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
+        tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
+
+        return (new Mesh("ramp", bitmapName, vertexes, normals, tangents, uvs, indexes));
+    }
+
 }
