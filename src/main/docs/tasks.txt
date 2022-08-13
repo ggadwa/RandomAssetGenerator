@@ -1,5 +1,8 @@
 
 map
+ - blur needs to stay within box
+ - skybox has bad uv (lines)
+ - need ability to set texture size
  - going up ramps is sometimes broken
  - open ceiling
  - windows
@@ -10,7 +13,6 @@ bitmaps
  - more distinct control panels pieces (keyboard)
  - make face textures 1, 2, or 3 eye
  - brick walls with boards on them
- - sky boxes?
 
 model
  - finish junction

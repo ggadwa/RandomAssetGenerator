@@ -12,7 +12,7 @@ public class Mesh
     public float[] vertexes, normals, tangents, uvs;
     public int vboVertexId, vboNormalId, vboTangentId, vboUVId;
     public RagBound xBound, yBound, zBound;
-    public boolean hasAlpha;
+    public boolean hasAlpha, highlight;
 
     public Mesh(String name,String bitmapName,float[] vertexes,float[] normals,float[] tangents,float[] uvs,int[] indexes)
     {

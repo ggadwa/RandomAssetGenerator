@@ -522,16 +522,41 @@ public class MapBuilder
         }
     }
 
+    // sky boxes
+    private void buildSkyBox() {
+        float min, max;
+        RagPoint minPnt, maxPnt;
+
+        // get dimensions of sky box
+        minPnt = new RagPoint(0.0f, 0.0f, 0.0f);
+        maxPnt = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        meshList.getMixMaxVertex(minPnt, maxPnt);
+
+        minPnt.scale(1.1f);
+        maxPnt.scale(1.1f);
+
+        min = Math.min(Math.min(minPnt.x, minPnt.y), minPnt.z);
+        max = Math.max(Math.max(maxPnt.x, maxPnt.y), maxPnt.z);
+
+        // make skybox
+        meshList.add(MeshUtility.createCube("sky_box", min, max, min, max, min, max, true, true, true, true, true, true, true, MeshUtility.UV_SKY_BOX));
+
+        // so view drawer knows not to erase
+        meshList.setSkyBox(true);
+    }
+
     //
     // required bitmaps
     //
-    public void buildRequiredBitmaps(int mapType) {
+    public void buildRequiredBitmaps(int mapType, boolean skyBox) {
         String[] wallBitmaps = {"BrickPattern", "BrickRow", "Geometric", "MetalHexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StoneWoodWall", "StoneWall", "Temple", "Tile", "WoodBoard"};
         String[] insideFloorBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalHexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "WoodBoard"};
         String[] outsideFloorBitmaps = {"Dirt", "Grass"};
         String[] ceilingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "WoodBoard"};
         String[] platformBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "WoodBoard"};
         String[] stairBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "WoodBoard"};
+        String[] skyBoxBitmaps = {"SkyBoxMountain"};
 
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
             BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
@@ -547,13 +572,17 @@ public class MapBuilder
             BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
             BitmapBase.mapBitmapLoader(bitmaps, "floor", outsideFloorBitmaps);
         }
+
+        if (skyBox) {
+            BitmapBase.mapBitmapLoader(bitmaps, "sky_box", skyBoxBitmaps);
+        }
     }
 
         //
         // build a map
         //
 
-    public void build(int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, float tallRoom, float sunkenRoom, boolean complex) {
+    public void build(int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, float tallRoom, float sunkenRoom, boolean complex, boolean skyBox) {
         int mainFloorRoomCount, mainFloorRoomExtensionCount;
         int upperFloorRoomCount, lowerFloorRoomCount;
         MapRoom room;
@@ -570,8 +599,11 @@ public class MapBuilder
         mainFloorRoomExtensionCount = AppWindow.random.nextInt(mainFloorRoomCount / 10);
 
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
+
+            // main floor
             addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, mapCompactFactor, complex);
 
+            // upper and lower floors
             upperFloorRoomCount = (int) (10.0f * upperFloorMapSize);
             if (upperFloorRoomCount != 0) {
                 addUpperOrLowerFloor(rooms, upperFloorRoomCount, true, mapCompactFactor, complex);
@@ -580,21 +612,26 @@ public class MapBuilder
             if (lowerFloorRoomCount != 0) {
                 addUpperOrLowerFloor(rooms, lowerFloorRoomCount, false, mapCompactFactor, complex);
             }
+
+            // tall or sunken rooms
+            setTallOrSunkenRooms(rooms, tallRoom, sunkenRoom);
         } else {
             addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, 1.0f, false);
         }
-
-        // tall or sunken rooms
-        setTallOrSunkenRooms(rooms, tallRoom, sunkenRoom);
 
         // eliminate all combined walls
         removeSharedWalls(rooms);
 
         // required textures for map
-        buildRequiredBitmaps(mapType);
+        buildRequiredBitmaps(mapType, skyBox);
 
         // now create the meshes
         createRoomMeshes(mapType, rooms);
+
+        // any skybox
+        if (skyBox) {
+            buildSkyBox();
+        }
 
         // setup the view center point
         room = rooms.get(0);

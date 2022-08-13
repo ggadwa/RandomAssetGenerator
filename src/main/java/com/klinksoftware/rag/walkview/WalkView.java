@@ -27,7 +27,7 @@ public class WalkView extends AWTGLCanvas {
     public static final int WV_DISPLAY_EMISSIVE = 4;
 
     private static final float RAG_NEAR_Z=1.0f;
-    private static final float RAG_FAR_Z=500.0f;
+    private static final float RAG_FAR_Z = 1000.0f;
     private static final float RAG_FOV=55.0f;
     private static final long RAG_PAINT_TICK = 33;
     private static final float RAG_LIGHT_LOW_INTENSITY = 100.0f;
@@ -37,14 +37,14 @@ public class WalkView extends AWTGLCanvas {
     private int vertexShaderId,fragmentShaderId,programId;
     private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
     private int perspectiveMatrixUniformId, viewMatrixUniformId, normalMatrixUniformId, lightPositionIntensityUniformId;
-    private int displayTypeUniformId, hasEmissiveUniformId, emissiveFactorUniformId;
+    private int displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId;
     private int displayType;
     private long nextPaintTick;
     private float aspectRatio;
     public float cameraRotateDistance;
     private float cameraRotateOffsetY;
     private float currentLightIntensity;
-    private boolean cameraCenterRotate;
+    private boolean cameraCenterRotate, noClear;
     private MeshList meshList, incommingMeshList;
     private Skeleton incommingSkeleton;
     private HashMap<String, BitmapBase> incommingBitmaps;
@@ -126,6 +126,8 @@ public class WalkView extends AWTGLCanvas {
 
         displayType = WV_DISPLAY_RENDER;
 
+        noClear = false;
+
         cameraCenterRotate = false;
         cameraRotateDistance=0.0f;
         cameraRotateOffsetY = 0.0f;
@@ -201,6 +203,8 @@ public class WalkView extends AWTGLCanvas {
         displayTypeUniformId = glGetUniformLocation(programId, "displayType");
 
         lightPositionIntensityUniformId = glGetUniformLocation(programId, "lightPositionIntensity");
+
+        highlightedUniformId = glGetUniformLocation(programId, "highlighted");
 
         hasEmissiveUniformId = glGetUniformLocation(programId, "hasEmissive");
         emissiveFactorUniformId = glGetUniformLocation(programId, "emissiveFactor");
@@ -382,6 +386,48 @@ public class WalkView extends AWTGLCanvas {
         return(textureId);
     }
 
+    private WalkViewTexture bufferTexture(BitmapBase bitmapBase) {
+        WalkViewTexture texture;
+
+        texture = new WalkViewTexture();
+        texture.colorTextureId = loadTexture(bitmapBase.getTextureSize(), bitmapBase.hasAlpha(), bitmapBase.getColorDataAsBytes());
+
+        if (!bitmapBase.hasNormal()) {
+            texture.normalTextureId = -1;
+        } else {
+            texture.normalTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getNormalDataAsBytes());
+        }
+
+        if (!bitmapBase.hasMetallicRoughness()) {
+            texture.metallicRoughnessTextureId = -1;
+        } else {
+            texture.metallicRoughnessTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getMetallicRoughnessDataAsBytes());
+        }
+
+        if (!bitmapBase.hasEmissive()) {
+            texture.emissiveTextureId = -1;
+        } else {
+            texture.emissiveTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getEmissiveDataAsBytes());
+        }
+
+        return (texture);
+    }
+
+    private void deleteTexture(WalkViewTexture texture) {
+        if (texture.colorTextureId != -1) {
+            glDeleteBuffers(texture.colorTextureId);
+        }
+        if (texture.normalTextureId != -1) {
+            glDeleteBuffers(texture.normalTextureId);
+        }
+        if (texture.metallicRoughnessTextureId != -1) {
+            glDeleteBuffers(texture.metallicRoughnessTextureId);
+        }
+        if (texture.emissiveTextureId != -1) {
+            glDeleteBuffers(texture.emissiveTextureId);
+        }
+    }
+
     //
     // stage the mesh list
     // this gets triggered during a draw operation when an incomming mesh
@@ -390,11 +436,8 @@ public class WalkView extends AWTGLCanvas {
 
     private void stageMeshList() {
         int n, nMesh, boneIdx;
-        String bitmapName;
         Mesh mesh;
-        BitmapBase bitmapBase;
         RagPoint tempPnt;
-        WalkViewTexture texture;
 
         if (incommingMeshList==null) return;
 
@@ -409,22 +452,13 @@ public class WalkView extends AWTGLCanvas {
         }
 
         // remove old textures
-
         if (textures != null) {
             for (WalkViewTexture texture2 : textures.values()) {
-                if (texture2.colorTextureId!=-1) glDeleteBuffers(texture2.colorTextureId);
-                if (texture2.normalTextureId!=-1) glDeleteBuffers(texture2.normalTextureId);
-                if (texture2.metallicRoughnessTextureId != -1) {
-                    glDeleteBuffers(texture2.metallicRoughnessTextureId);
-                }
-                if (texture2.emissiveTextureId != -1) {
-                    glDeleteBuffers(texture2.emissiveTextureId);
-                }
+                deleteTexture(texture2);
             }
         }
 
         // setup the new mesh
-
         tempPnt=new RagPoint(0.0f,0.0f,0.0f);
         textures = new HashMap<>();
 
@@ -432,8 +466,7 @@ public class WalkView extends AWTGLCanvas {
 
         for (n=0;n!=nMesh;n++) {
 
-                // the mesh
-
+            // the mesh
             mesh=incommingMeshList.get(n);
             boneIdx=incommingSkeleton.findBoneIndexforMeshIndex(n);
             if (boneIdx==-1) {
@@ -443,33 +476,19 @@ public class WalkView extends AWTGLCanvas {
                 stageMesh(mesh,incommingSkeleton.getBoneAbsolutePoint(boneIdx));
             }
 
-                // the bitmap
-
-            bitmapName=mesh.bitmapName;
-
-            if (!textures.containsKey(bitmapName)) {
-                bitmapBase = incommingBitmaps.get(bitmapName);
-
-                texture = new WalkViewTexture();
-                texture.colorTextureId=loadTexture(bitmapBase.getTextureSize(),bitmapBase.hasAlpha(),bitmapBase.getColorDataAsBytes());
-                texture.normalTextureId=loadTexture(bitmapBase.getTextureSize(),false,bitmapBase.getNormalDataAsBytes());
-                texture.metallicRoughnessTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getMetallicRoughnessDataAsBytes());
-
-                if (!bitmapBase.hasEmissive()) {
-                    texture.emissiveTextureId = -1;
-                } else {
-                    texture.emissiveTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getEmissiveDataAsBytes());
-                }
-
-                textures.put(bitmapName, texture);
+            // the bitmap
+            if (!textures.containsKey(mesh.bitmapName)) {
+                textures.put(mesh.bitmapName, bufferTexture(incommingBitmaps.get(mesh.bitmapName)));
             }
 
-            mesh.hasAlpha = incommingBitmaps.get(bitmapName).hasAlpha();
+            mesh.hasAlpha = incommingBitmaps.get(mesh.bitmapName).hasAlpha();
         }
 
-            // unbind any textures
-
+        // unbind any textures
         glBindTexture(GL_TEXTURE_2D, 0);
+
+        // set noClear
+        noClear = incommingMeshList.hasSkyBox();
 
         // setup the collision data
         physics.setupCollision(incommingMeshList, incommingSkeleton);
@@ -633,8 +652,11 @@ public class WalkView extends AWTGLCanvas {
         glBindTexture(GL_TEXTURE_2D, texture.normalTextureId);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, texture.metallicRoughnessTextureId);
+
+        glUniform1i(highlightedUniformId, (texture.normalTextureId != -1) ? 0 : 1);
+
         if (texture.emissiveTextureId == -1) {
-            glUniform1i(hasEmissiveUniformId, 1);
+            glUniform1i(hasEmissiveUniformId, 0);
             glUniform1f(emissiveFactorUniformId, 0.0f);
         } else {
             glUniform1i(hasEmissiveUniformId, 1);
@@ -702,7 +724,7 @@ public class WalkView extends AWTGLCanvas {
         }
 
         // clear
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glClear(noClear ? GL_DEPTH_BUFFER_BIT : GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // start the program and setup
         // the drawing matrixes

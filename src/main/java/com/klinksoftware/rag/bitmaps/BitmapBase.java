@@ -112,6 +112,14 @@ public class BitmapBase
         return(hasAlpha);
     }
 
+    public boolean hasNormal() {
+        return (hasNormal);
+    }
+
+    public boolean hasMetallicRoughness() {
+        return (hasMetallicRoughness);
+    }
+
     public boolean hasEmissive() {
         return (hasEmissive);
     }
@@ -2137,6 +2145,30 @@ public class BitmapBase
         }
     }
 
+    protected void drawVerticalGradient(int lft, int top, int rgt, int bot, RagColor topColor, RagColor botColor) {
+        int x, y, idx;
+        float f, fInv, fHigh;
+
+        if ((rgt <= lft) || (bot <= top)) {
+            return;
+        }
+
+        fHigh = (float) (bot - top);
+
+        for (y = top; y != bot; y++) {
+
+            f = (float) (y - top) / fHigh;
+            fInv = 1.0f - f;
+
+            for (x = lft; x != rgt; x++) {
+                idx = ((y * textureSize) + x) * 4;
+                colorData[idx] = (topColor.r * fInv) + (botColor.r * f);
+                colorData[idx + 1] = (topColor.g * fInv) + (botColor.g * f);
+                colorData[idx + 2] = (topColor.b * fInv) + (botColor.b * f);
+            }
+        }
+    }
+
         //
         // line drawings
         //
@@ -2862,8 +2894,7 @@ public class BitmapBase
         // clear and write images
         //
 
-    private void clearImageData(float[] imgData,float r,float g,float b,float a)
-    {
+    public void clearImageData(float[] imgData, float r, float g, float b, float a)    {
         int     n;
 
         for (n=0;n!=imgData.length;n+=4) {

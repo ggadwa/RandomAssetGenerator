@@ -5,37 +5,42 @@ import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
 
-public class MeshList
-{
-    private ArrayList<Mesh>         meshes;
+public class MeshList {
 
-    public MeshList()
-    {
+    private boolean skyBox;
+    private ArrayList<Mesh> meshes;
+
+    public MeshList() {
+        skyBox = false;
         meshes=new ArrayList<>();
     }
 
-    public int add(Mesh mesh)
-    {
+    public int add(Mesh mesh) {
         meshes.add(mesh);
         return(meshes.size()-1);
     }
 
-    public Mesh get(int index)
-    {
+    public Mesh get(int index) {
         return(meshes.get(index));
     }
 
-    public int count()
-    {
+    public int count() {
         return(meshes.size());
     }
 
-    public Skeleton rebuildMapMeshesWithSkeleton()
-    {
-        int             n;
-        Mesh            mesh;
-        Skeleton        skeleton;
-        RagPoint        center;
+    public void setSkyBox(boolean skyBox) {
+        this.skyBox = skyBox;
+    }
+
+    public boolean hasSkyBox() {
+        return (skyBox);
+    }
+
+    public Skeleton rebuildMapMeshesWithSkeleton() {
+        int n;
+        Mesh mesh;
+        Skeleton skeleton;
+        RagPoint center;
 
             // this is used to turn boneless maps
             // into a simple skeleton with a single
@@ -56,10 +61,9 @@ public class MeshList
         return(skeleton);
     }
 
-    private void rebuildModelMeshWithSkeletonRecurse(Skeleton skeleton,Bone bone,RagPoint offsetPnt)
-    {
-        int         n;
-        RagPoint    nextOffsetPnt;
+    private void rebuildModelMeshWithSkeletonRecurse(Skeleton skeleton, Bone bone, RagPoint offsetPnt) {
+        int n;
+        RagPoint nextOffsetPnt;
 
             // everything is absolute now so just
             // move the mesh to where the bone will be relative
@@ -81,8 +85,7 @@ public class MeshList
         }
     }
 
-    public void rebuildModelMeshWithSkeleton(Skeleton skeleton)
-    {
+    public void rebuildModelMeshWithSkeleton(Skeleton skeleton) {
             // when constructing the bones are
             // all absolute, this makes everything relative
 

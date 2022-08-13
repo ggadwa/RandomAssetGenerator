@@ -9,7 +9,7 @@ uniform int displayType;
 
 uniform highp vec4 lightPositionIntensity;   // xyz = position, w = intensity
 
-uniform bool hasEmissive;
+uniform bool highlighted, hasEmissive;
 uniform mediump float emissiveFactor;
 
 in highp vec3 eyeVector,eyePosition;
@@ -29,7 +29,7 @@ void main(void)
         // some specific display types outside
         // of normal processing
 
-    if (displayType==1) {   // normals
+    if ((displayType==1) || (highlighted)) {   // color
         outputPixel.rgb=texture(baseTex,fragUV).rgb;
         outputPixel.a=1.0;
         return;

@@ -9,15 +9,16 @@ public class BitmapSkyBoxMountain extends BitmapBase {
     public BitmapSkyBoxMountain() {
         super();
 
-        hasNormal = true;
-        hasMetallicRoughness = true;
+        hasNormal = false;
+        hasMetallicRoughness = false;
         hasEmissive = false;
         hasAlpha = false;
     }
 
-    private void generateClouds(int lft, int top, int rgt, int bot, boolean allSides, RagColor cloudColor) {
-        int n, x, y, x2, y2, xsz, ysz;
-        int wid, high, quarterWid, quarterHigh;
+    private void generateClouds(int lft, int top, int rgt, int bot, RagColor cloudColor) {
+        int n, x, y, xsz, ysz;
+        int wid, high, quarterWid, quarterHigh, edgeSize;
+        float edgeColorFactor;
 
         wid = rgt - lft;
         high = bot - top;
@@ -27,107 +28,129 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         createPerlinNoiseData(32, 32);
         createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
 
-        // random clouds
+        edgeSize = 1 + AppWindow.random.nextInt(4);
+        edgeColorFactor = 0.6f + AppWindow.random.nextFloat(0.3f);
+
+        // cloud parts
         for (n = 0; n != 20; n++) {
-            xsz = quarterWid + AppWindow.random.nextInt(quarterWid);
-            ysz = quarterHigh + quarterWid + AppWindow.random.nextInt(quarterHigh);
+            xsz = (quarterWid + AppWindow.random.nextInt(quarterWid)) - (edgeSize * 2);
+            ysz = (quarterHigh + AppWindow.random.nextInt(quarterHigh)) - (edgeSize * 2);
 
-            x = quarterWid + ((lft + AppWindow.random.nextInt(wid)) - (xsz / 2));
-            y = top - (ysz / 2);
+            x = (lft + edgeSize) + AppWindow.random.nextInt(wid - xsz);
+            y = (top + edgeSize) + AppWindow.random.nextInt(high - ysz);
 
-            // the top
-            drawOval(x, y, (x + xsz), (y + ysz), 0.0f, 1.0f, AppWindow.random.nextFloat(0.1f), AppWindow.random.nextFloat(0.1f), 0, 0.0f, cloudColor, cloudColor, 0.5f, false, true, 0.9f, 1.0f);
+            drawOval(x, y, (x + xsz), (y + ysz), 0.0f, 1.0f, (0.1f + AppWindow.random.nextFloat(0.2f)), (0.1f + AppWindow.random.nextFloat(0.2f)), edgeSize, edgeColorFactor, cloudColor, cloudColor, 0.5f, false, true, 0.9f, 1.0f);
+        }
+    }
 
-            //this.drawOval(x,y,(x+xsz),(y+ysz),cloudColor,null);
-            if (x < lft) {
-                x2 = rgt + x;
-                //this.drawOval(x2,y,(x2+xsz),(y+ysz),cloudColor,null);
-            }
-            if ((x + xsz) > rgt) {
-                x2 = lft - ((x + xsz) - rgt);
-                //this.drawOval(x2,y,(x2+xsz),(y+ysz),cloudColor,null);
-            }
+    private void generateMountainsDraw(int lft, int top, int rgt, int bot, int rangeVerticalMove, RagColor col, float colorAdjust) {
+        int x, y, halfWid, midY, midDir, midCount;
+        int wid, idx;
+        int[] rangeY;
+        float colFactor, colorFactorAdd;
 
-            if (!allSides) {
-                continue;
-            }
+        wid = rgt - lft;
 
-            // the bottom
-            y = bot - (ysz / 2);
+        // we only do half the range, and reverse for the other half so
+        // they match up
+        halfWid = wid / 2;
 
-            //this.drawOval(x,y,(x+xsz),(y+ysz),cloudColor,null);
-            if (x < lft) {
-                x2 = rgt + x;
-                //this.drawOval(x2,y,(x2+xsz),(y+ysz),cloudColor,null);
-            }
-            if ((x + xsz) > rgt) {
-                x2 = lft - ((x + xsz) - rgt);
-                //this.drawOval(x2,y,(x2+xsz),(y+ysz),cloudColor,null);
-            }
+        // remember the mid point and we either favor going
+        // down or up if we pass it
+        midY = (top + bot) / 2;
+        midDir = 0;
+        midCount = 0;
 
-            // the left
-            x = lft - (xsz / 2);
-            y = top + ((top + AppWindow.random.nextInt(high)) - (ysz / 2));
+        // create the range
+        y = midY;
+        rangeY = new int[wid];
 
-            //this.drawOval(x,y,(x+xsz),(y+ysz),cloudColor,null);
-            if (y < bot) {
-                y2 = bot + y;
-                //this.drawOval(x,y2,(x+xsz),(y2+ysz),cloudColor,null);
-            }
-            if ((y + ysz) > bot) {
-                y2 = top - ((y + ysz) - bot);
-                //this.drawOval(x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+        for (x = 0; x != halfWid; x++) {
+            rangeY[x] = y;
+            rangeY[(wid - 1) - x] = y;
+
+            if (midCount <= 0) {
+                midCount = AppWindow.random.nextInt(50);
+                midDir = (y > midY) ? -1 : 1;
             }
 
-            // the right
-            x = rgt - (xsz / 2);
+            y += (AppWindow.random.nextInt(rangeVerticalMove) * midDir);
 
-            //this.drawOval(x,y,(x+xsz),(y+ysz),cloudColor,null);
-            if (y < bot) {
-                y2 = bot + y;
-                //this.drawOval(x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+            if (y < top) {
+                y = top;
+                midDir = 1;
             }
-            if ((y + ysz) > bot) {
-                y2 = top - ((y + ysz) - bot);
-                //this.drawOval(x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+            if (y > bot) {
+                y = bot;
+                midDir = -1;
             }
 
+            midCount--;
+        }
+
+        // perlin noise for mountain
+        createPerlinNoiseData(32, 32);
+        colorFactorAdd = 0.3f + AppWindow.random.nextFloat(0.2f);
+
+        // run through the ranges
+        for (x = lft; x != rgt; x++) {
+            for (y = rangeY[x - lft]; y <= bot; y++) {
+                colFactor = 0.5f + (colorFactorAdd * perlinNoiseColorFactor[(y * textureSize) + x]);
+
+                idx = ((y * wid) + x) * 4;
+
+                colorData[idx] = (col.r * colFactor) * colorAdjust;
+                colorData[idx + 1] = (col.g * colFactor) * colorAdjust;
+                colorData[idx + 2] = (col.b * colFactor) * colorAdjust;
+            }
         }
     }
 
     @Override
     public void generateInternal() {
-        int mx, my, qx, rangeY;
-        RagColor cloudColor, skyColor, mountainColor, groundColor;
+        int n, qtr, cloudCount, mountainCount;
+        float colorAdjustSize, colorAdjustAdd, colorAdjust;
+        RagColor cloudColor, skyColor, mountainColor;
 
-        mx = textureSize / 2;
-        my = textureSize / 2;
-        qx = textureSize / 4;
+        qtr = textureSize / 4;
 
-        cloudColor = new RagColor(1.0f, 1.0f, 1.0f);
-        skyColor = new RagColor(0.1f, 0.95f, 1.0f);
+        cloudColor = adjustColor(new RagColor(1.0f, 1.0f, 1.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
+        skyColor = adjustColor(new RagColor(0.1f, 0.95f, 1.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
         mountainColor = new RagColor(0.65f, 0.35f, 0.0f);
-        groundColor = new RagColor(0.1f, 1.0f, 0.1f);
 
-        // top and bottom
-        drawRect(0, my, qx, textureSize, skyColor);
-        generateClouds(0, my, qx, textureSize, true, cloudColor);
+        // top
+        drawRect(qtr, 0, (qtr * 2), qtr, skyColor);
+        generateClouds(qtr, 0, (qtr * 2), qtr, cloudColor);
+        blur(colorData, 0, 0, textureSize, textureSize, 5, true);
 
-        this.drawRect(qx, my, mx, textureSize, groundColor);
+        // bottom
+        drawRect(qtr, (qtr * 2), (qtr * 2), (qtr * 3), adjustColor(mountainColor, 0.5f));
 
-        /*
-        // side
-        this.drawVerticalGradient(0,0,this.bitmapCanvas.width,my,skyColor,this.darkenColor(skyColor,0.5));
-        generateClouds(0,0,textureSize,my,false,cloudColor);
-        this.blur(0,my,this.bitmapCanvas.width,this.bitmapCanvas.height,3,true);
+        // sides
+        drawVerticalGradient(0, qtr, (qtr * 4), (qtr * 2), skyColor, adjustColor(skyColor, (0.6f + AppWindow.random.nextFloat(0.3f))));
 
-        rangeY=this.generateMountainsBuildRange(0,Math.trunc(my*0.75),this.bitmapCanvas.width,8);
-        this.generateMountainsDraw(0,0,this.bitmapCanvas.width,my,rangeY,this.darkenColor(mountainColor,0.8));
+        // clouds on sides
+        cloudCount = 1 + AppWindow.random.nextInt(5);
 
-        rangeY=this.generateMountainsBuildRange(Math.trunc(my*0.25),my,this.bitmapCanvas.width,5);
-        this.generateMountainsDraw(0,0,this.bitmapCanvas.width,my,rangeY,mountainColor);
+        for (n = 0; n != cloudCount; n++) {
+            generateClouds(0, (qtr + (qtr / 5)), (qtr * 4), ((qtr * 2) - (qtr / 4)), cloudColor);
+        }
 
-        this.drawVerticalGradient(0,Math.trunc(my*0.9),this.bitmapCanvas.width,my,this.darkenColor(groundColor,0.8),groundColor);
-         */
+        blur(colorData, 0, 0, textureSize, textureSize, 5, true);
+
+        // mountain on sides
+        mountainCount = 1 + AppWindow.random.nextInt(3);
+        colorAdjustSize = 0.2f + AppWindow.random.nextFloat(0.3f);
+        colorAdjustAdd = colorAdjustSize / (float) mountainCount;
+        colorAdjust = 1.0f - colorAdjustSize;
+
+        for (n = 0; n != mountainCount; n++) {
+            generateMountainsDraw(0, (qtr + (qtr / 4)), (qtr * 4), (qtr * 2), (2 + AppWindow.random.nextInt(6)), mountainColor, colorAdjust);
+            colorAdjust += colorAdjustAdd;
+        }
+
+        // never lit
+        clearImageData(normalData, 0.5f, 0.5f, 1.0f, 1.0f);
+        clearImageData(metallicRoughnessData, 0.0f, 0.0f, 0.0f, 1.0f);
     }
 }
