@@ -1,11 +1,10 @@
 
 map
- - blur needs to stay within box
- - skybox has bad uv (lines)
  - need ability to set texture size
  - going up ramps is sometimes broken
  - open ceiling
  - windows
+ - skybox has bad uv (lines)
 
 bitmaps
  - hexagon has lines through it
@@ -15,6 +14,7 @@ bitmaps
  - brick walls with boards on them
 
 model
+ - vertex snaps for humanoid, etc
  - finish junction
  - finish pipes
  - table: bars on legs

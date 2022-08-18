@@ -29,7 +29,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
 
         edgeSize = 1 + AppWindow.random.nextInt(4);
-        edgeColorFactor = 0.6f + AppWindow.random.nextFloat(0.3f);
+        edgeColorFactor = 0.3f + AppWindow.random.nextFloat(0.3f);
 
         // cloud parts
         for (n = 0; n != 20; n++) {
@@ -108,20 +108,34 @@ public class BitmapSkyBoxMountain extends BitmapBase {
 
     @Override
     public void generateInternal() {
-        int n, qtr, cloudCount, mountainCount;
+        int n, lft, top, qtr, cloudCount, cloudXSize, cloudYSize;
+        int edgeSize, sunSize, mountainCount;
         float colorAdjustSize, colorAdjustAdd, colorAdjust;
-        RagColor cloudColor, skyColor, mountainColor;
+        RagColor cloudColor, skyColor, sunColor, mountainColor;
 
         qtr = textureSize / 4;
 
         cloudColor = adjustColor(new RagColor(1.0f, 1.0f, 1.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
         skyColor = adjustColor(new RagColor(0.1f, 0.95f, 1.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
+        sunColor = adjustColor(new RagColor(1.0f, 0.75f, 0.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
         mountainColor = new RagColor(0.65f, 0.35f, 0.0f);
 
         // top
         drawRect(qtr, 0, (qtr * 2), qtr, skyColor);
-        generateClouds(qtr, 0, (qtr * 2), qtr, cloudColor);
-        blur(colorData, 0, 0, textureSize, textureSize, 5, true);
+
+        cloudCount = 1 + AppWindow.random.nextInt(5);
+
+        for (n = 0; n != cloudCount; n++) {
+            cloudXSize = (qtr / 5) + AppWindow.random.nextInt(qtr / 3);
+            lft = qtr + AppWindow.random.nextInt(qtr - cloudXSize);
+
+            cloudYSize = (qtr / 5) + AppWindow.random.nextInt(qtr / 3);
+            top = AppWindow.random.nextInt(qtr - cloudYSize);
+
+            generateClouds(lft, top, (lft + cloudXSize), (top + cloudYSize), cloudColor);
+        }
+
+        blur(colorData, qtr, 0, (qtr + qtr), qtr, 5, true);
 
         // bottom
         drawRect(qtr, (qtr * 2), (qtr * 2), (qtr * 3), adjustColor(mountainColor, 0.5f));
@@ -129,14 +143,31 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         // sides
         drawVerticalGradient(0, qtr, (qtr * 4), (qtr * 2), skyColor, adjustColor(skyColor, (0.6f + AppWindow.random.nextFloat(0.3f))));
 
+        //sun
+        sunSize = (qtr / 5) + AppWindow.random.nextInt(qtr / 2);
+        lft = AppWindow.random.nextInt(textureSize - sunSize);
+        top = qtr + AppWindow.random.nextInt(qtr - sunSize);
+        edgeSize = AppWindow.random.nextInt(sunSize);
+
+        drawOval(lft, top, (lft + sunSize), (top + sunSize), 0.0f, 1.0f, 0.0f, 0.0f, edgeSize, (1.0f + AppWindow.random.nextFloat(0.5f)), sunColor, sunColor, 0.5f, false, true, 0.9f, 1.0f);
+
         // clouds on sides
         cloudCount = 1 + AppWindow.random.nextInt(5);
 
         for (n = 0; n != cloudCount; n++) {
-            generateClouds(0, (qtr + (qtr / 5)), (qtr * 4), ((qtr * 2) - (qtr / 4)), cloudColor);
+            cloudXSize = qtr + AppWindow.random.nextInt(qtr);
+            lft = AppWindow.random.nextInt(textureSize - cloudXSize);
+
+            cloudYSize = (int) ((float) cloudXSize * (0.1f + AppWindow.random.nextFloat(0.3f)));
+            if (cloudYSize > qtr) {
+                cloudYSize = qtr;
+            }
+            top = qtr + AppWindow.random.nextInt(qtr - cloudYSize);
+
+            generateClouds(lft, top, (lft + cloudXSize), (top + cloudYSize), cloudColor);
         }
 
-        blur(colorData, 0, 0, textureSize, textureSize, 5, true);
+        blur(colorData, 0, qtr, textureSize, (qtr + qtr), 5, true);
 
         // mountain on sides
         mountainCount = 1 + AppWindow.random.nextInt(3);
