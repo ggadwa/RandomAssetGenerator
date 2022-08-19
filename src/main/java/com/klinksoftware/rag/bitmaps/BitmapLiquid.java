@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapLiquid extends BitmapBase
 {
-    public BitmapLiquid()    {
-        super();
+    public BitmapLiquid(int textureSize) {
+        super(textureSize);
 
         hasNormal=true;
         hasMetallicRoughness=true;

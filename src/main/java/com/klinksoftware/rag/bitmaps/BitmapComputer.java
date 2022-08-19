@@ -12,10 +12,9 @@ public class BitmapComputer extends BitmapBase
         new RagColor(1.0f, 0.0f, 0.0f)
     };
 
-    public BitmapComputer() {
-        super();
+    public BitmapComputer(int textureSize) {
+        super(textureSize);
 
-        textureSize=1024;
         hasNormal=true;
         hasMetallicRoughness=true;
         hasEmissive=true;

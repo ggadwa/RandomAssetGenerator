@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapMonitor extends BitmapComputer {
 
-    public BitmapMonitor() {
-        super();
+    public BitmapMonitor(int textureSize) {
+        super(textureSize);
 
         textureSize = 1024;
         hasNormal = true;

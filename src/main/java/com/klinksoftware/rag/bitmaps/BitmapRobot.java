@@ -5,8 +5,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapRobot extends BitmapBase {
 
-    public BitmapRobot() {
-        super();
+    public BitmapRobot(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;
@@ -34,7 +34,7 @@ public class BitmapRobot extends BitmapBase {
     private void generateSingleChunk(int x, int y) {
         BitmapBase bitmap;
 
-        bitmap = new BitmapMetal();
+        bitmap = new BitmapMetal(textureSize);
         bitmap.generate();
 
         blockQuarterCopy(bitmap.colorData, colorData, x, y);

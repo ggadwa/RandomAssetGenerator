@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapMonster extends BitmapBase
 {
-    public BitmapMonster() {
-        super();
+    public BitmapMonster(int textureSize) {
+        super(textureSize);
 
         hasNormal=true;
         hasMetallicRoughness=true;
@@ -36,13 +36,13 @@ public class BitmapMonster extends BitmapBase
 
         switch (AppWindow.random.nextInt(3)) {
             case 0:
-                bitmap = new BitmapFur();
+                bitmap = new BitmapFur(textureSize);
                 break;
             case 1:
-                bitmap = new BitmapScale();
+                bitmap = new BitmapScale(textureSize);
                 break;
             default:
-                bitmap = new BitmapOrganic();
+                bitmap = new BitmapOrganic(textureSize);
                 break;
         }
 

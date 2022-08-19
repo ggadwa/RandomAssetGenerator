@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.RagColor;
 @BitmapInterface
 public class BitmapWoodBoard extends BitmapBase {
 
-    public BitmapWoodBoard() {
-        super();
+    public BitmapWoodBoard(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

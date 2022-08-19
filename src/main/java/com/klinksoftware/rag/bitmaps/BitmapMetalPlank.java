@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapMetalPlank extends BitmapBase {
 
-    public BitmapMetalPlank() {
-        super();
+    public BitmapMetalPlank(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

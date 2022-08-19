@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapTemple extends BitmapBase {
 
-    public BitmapTemple() {
-        super();
+    public BitmapTemple(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

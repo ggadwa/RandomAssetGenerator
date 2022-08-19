@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapStorage extends BitmapBase {
 
-    public BitmapStorage() {
-        super();
+    public BitmapStorage(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

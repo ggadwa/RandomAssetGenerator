@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapPlaster extends BitmapBase {
 
-    public BitmapPlaster() {
-        super();
+    public BitmapPlaster(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

@@ -6,10 +6,9 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapControlPanel extends BitmapComputer {
 
-    public BitmapControlPanel() {
-        super();
+    public BitmapControlPanel(int textureSize) {
+        super(textureSize);
 
-        textureSize = 1024;
         hasNormal = true;
         hasMetallicRoughness = true;
         hasEmissive = true;

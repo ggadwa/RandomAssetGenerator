@@ -5,8 +5,8 @@ import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
 public class BitmapGrass extends BitmapDirt {
-    public BitmapGrass() {
-        super();
+    public BitmapGrass(int textureSize) {
+        super(textureSize);
 
         hasNormal=true;
         hasMetallicRoughness=true;

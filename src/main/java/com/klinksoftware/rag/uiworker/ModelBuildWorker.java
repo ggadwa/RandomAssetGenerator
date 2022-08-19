@@ -8,15 +8,17 @@ import javax.swing.*;
 public class ModelBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
+    private int textureSize;
     private String modelName;
     private boolean bilateral;
     private float roughness;
 
     public static ModelBase generatedModel = null;
 
-    public ModelBuildWorker(AppWindow appWindow, String modelName, boolean bilateral, float roughness) {
+    public ModelBuildWorker(AppWindow appWindow, String modelName, int textureSize, boolean bilateral, float roughness) {
         this.appWindow = appWindow;
         this.modelName = modelName;
+        this.textureSize = textureSize;
         this.bilateral = bilateral;
         this.roughness = roughness;
     }
@@ -38,7 +40,7 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
         // run the model builder
         try {
             model = (ModelBase) (Class.forName("com.klinksoftware.rag.models.Model" + modelName.replace(" ", ""))).getConstructor().newInstance();
-            model.build(bilateral, roughness);
+            model.build(textureSize, bilateral, roughness);
         } catch (Exception e) {
             e.printStackTrace();
             return (0);

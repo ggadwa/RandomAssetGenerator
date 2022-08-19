@@ -8,8 +8,8 @@ import org.apache.commons.math3.util.Pair;
 @BitmapInterface
 public class BitmapRockCracked extends BitmapBase {
 
-    public BitmapRockCracked() {
-        super();
+    public BitmapRockCracked(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

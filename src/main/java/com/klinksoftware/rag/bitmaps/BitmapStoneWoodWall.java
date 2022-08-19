@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapStoneWoodWall extends BitmapStoneWall {
 
-    public BitmapStoneWoodWall() {
-        super();
+    public BitmapStoneWoodWall(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

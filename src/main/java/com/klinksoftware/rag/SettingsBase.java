@@ -146,4 +146,9 @@ public class SettingsBase extends JPanel {
 
         return (items);
     }
+
+    protected int getIntFromStringCombo(JComboBox combo) {
+        return (Integer.parseInt((String) combo.getModel().getElementAt(combo.getSelectedIndex())));
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.klinksoftware.rag;
 
+import static com.klinksoftware.rag.SettingsBase.ROW_GAP;
+import static com.klinksoftware.rag.SettingsBase.ROW_HEIGHT;
 import com.klinksoftware.rag.uiworker.MapBuildWorker;
 import com.klinksoftware.rag.uiworker.MapExportWorker;
 import javax.swing.JButton;
@@ -19,7 +21,7 @@ public class SettingsMap extends SettingsBase {
     private JButton generateMapButton, exportMapButton;
     private JSlider mainFloorSizeSlider, upperFloorSizeSlider, lowerFloorSizeSlider, compactSlider, tallRoomSlider, sunkenRoomSlider;
     private JCheckBox complexCheckBox, skyBoxCheckBox;
-    private JComboBox mapTypeCombo;
+    private JComboBox mapTypeCombo, textureSizeCombo;
 
     public SettingsMap(AppWindow appWindow) {
         super(appWindow);
@@ -34,6 +36,9 @@ public class SettingsMap extends SettingsBase {
         y += (ROW_HEIGHT + ROW_GAP);
 
         mapTypeCombo = addComboBox(y, "Model Type", MAP_TYPE, 0);
+        y += (ROW_HEIGHT + ROW_GAP);
+
+        textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 0);
         y += (ROW_HEIGHT + ROW_GAP);
 
         mainFloorSizeSlider = addSlider(y, "Main Floor Size", 0.6f);
@@ -70,6 +75,7 @@ public class SettingsMap extends SettingsBase {
                 (new MapBuildWorker(
                         appWindow,
                         mapTypeCombo.getSelectedIndex(),
+                        getIntFromStringCombo(textureSizeCombo),
                         ((float) mainFloorSizeSlider.getValue() / 100.0f),
                         ((float) upperFloorSizeSlider.getValue() / 100.0f),
                         ((float) lowerFloorSizeSlider.getValue() / 100.0f),

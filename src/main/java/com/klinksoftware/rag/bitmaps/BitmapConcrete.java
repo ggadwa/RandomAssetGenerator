@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapConcrete extends BitmapBase
 {
-    public BitmapConcrete() {
-        super();
+    public BitmapConcrete(int textureSize) {
+        super(textureSize);
 
         hasNormal=true;
         hasMetallicRoughness=true;

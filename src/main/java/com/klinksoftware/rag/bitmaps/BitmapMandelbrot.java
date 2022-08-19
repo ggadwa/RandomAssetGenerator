@@ -7,8 +7,8 @@ import org.apache.commons.math3.complex.Complex;
 @BitmapInterface
 public class BitmapMandelbrot extends BitmapBase {
 
-    public BitmapMandelbrot() {
-        super();
+    public BitmapMandelbrot(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

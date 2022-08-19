@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapOrganic extends BitmapBase {
 
-    public BitmapOrganic() {
-        super();
+    public BitmapOrganic(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

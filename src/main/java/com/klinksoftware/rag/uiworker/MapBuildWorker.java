@@ -8,15 +8,16 @@ import javax.swing.*;
 public class MapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
-    private int mapType;
+    private int mapType, textureSize;
     private float mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, tallRoom, sunkenRoom;
     private boolean complex, skyBox;
 
     public static MapBuilder generatedMap = null;
 
-    public MapBuildWorker(AppWindow appWindow, int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompact, float tallRoom, float sunkenRoom, boolean complex, boolean skyBox) {
+    public MapBuildWorker(AppWindow appWindow, int mapType, int textureSize, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompact, float tallRoom, float sunkenRoom, boolean complex, boolean skyBox) {
         this.appWindow = appWindow;
         this.mapType = mapType;
+        this.textureSize = textureSize;
         this.mainFloorMapSize = mainFloorMapSize;
         this.upperFloorMapSize = upperFloorMapSize;
         this.lowerFloorMapSize = lowerFloorMapSize;
@@ -45,7 +46,7 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 
         try {
             mapBuilder = new MapBuilder();
-            mapBuilder.build(mapType, mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, tallRoom, sunkenRoom, complex, skyBox);
+            mapBuilder.build(mapType, textureSize, mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, tallRoom, sunkenRoom, complex, skyBox);
         }
         catch (Exception e)
         {

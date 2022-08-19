@@ -76,11 +76,10 @@ public class BitmapBase
     protected float[]       colorData,normalData,metallicRoughnessData,emissiveData,
                             perlinNoiseColorFactor,noiseNormals;
 
-    public BitmapBase()
-    {
-            // will be reset in children classes
+    public BitmapBase(int textureSize) {
+        this.textureSize = textureSize;
 
-        textureSize=512;
+        // will be reset in child classes
         hasNormal=true;
         hasMetallicRoughness=true;
         hasEmissive=false;
@@ -812,10 +811,9 @@ public class BitmapBase
         }
     }
 
-    public void createNormalNoiseData(float density,float normalZFactor)
-    {
-        int         n,x,y,wid,high,
-                    pixelSize,nCount;
+    public void createNormalNoiseData(float density, float normalZFactor) {
+        int n, x, y, wid, high, pixelSize, nCount;
+        int margin;
 
             // initialize the noise data
 
@@ -830,13 +828,14 @@ public class BitmapBase
 
             // create the random normal chunks
 
-        nCount=(int)(((float)textureSize*0.5f)*density);
+        nCount = (int) (((float) textureSize * 0.5f) * density);
+        margin = textureSize / 25;
 
         for (n=0;n!=nCount;n++) {
             x=AppWindow.random.nextInt(textureSize-1);
             y=AppWindow.random.nextInt(textureSize-1);
-            wid=20+AppWindow.random.nextInt(40);
-            high=20+AppWindow.random.nextInt(40);
+            wid = margin + AppWindow.random.nextInt(margin * 2);
+            high = margin + AppWindow.random.nextInt(margin * 2);
 
             createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,AppWindow.random.nextBoolean());
         }
@@ -3050,7 +3049,7 @@ public class BitmapBase
     //
     // bitmap loading helper
     //
-    public static void mapBitmapLoader(HashMap<String, BitmapBase> bitmaps, String name, String[] classNames) {
+    public static void mapBitmapLoader(HashMap<String, BitmapBase> bitmaps, String name, String[] classNames, int textureSize) {
         BitmapBase bitmap;
 
         if (bitmaps.containsKey(name)) {
@@ -3058,10 +3057,10 @@ public class BitmapBase
         }
 
         try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + classNames[AppWindow.random.nextInt(classNames.length)].replace(" ", ""))).getConstructor().newInstance();
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + classNames[AppWindow.random.nextInt(classNames.length)].replace(" ", ""))).getConstructor(int.class).newInstance(textureSize);
         } catch (Exception e) {
             e.printStackTrace();
-            bitmap = new BitmapTest();
+            bitmap = new BitmapTest(textureSize);
         }
 
         bitmap.generate();

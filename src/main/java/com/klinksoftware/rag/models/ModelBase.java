@@ -17,6 +17,7 @@ public class ModelBase {
     public MeshList meshList;
     public HashMap<String, BitmapBase> bitmaps;
 
+    public int textureSize;
     public boolean bilateral;
     public float roughness;
 
@@ -49,7 +50,7 @@ public class ModelBase {
         bitmapName = bitmapList[AppWindow.random.nextInt(len)];
 
         try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + bitmapName.replace(" ", ""))).getConstructor().newInstance();
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + bitmapName.replace(" ", ""))).getConstructor(int.class).newInstance(textureSize);
             bitmap.generate();
             bitmaps.put(name, bitmap);
         } catch (Exception e) {
@@ -97,7 +98,8 @@ public class ModelBase {
     }
 
     // build a model
-    public void build(boolean bilateral, float roughness) {
+    public void build(int textureSize, boolean bilateral, float roughness) {
+        this.textureSize = textureSize;
         this.bilateral = bilateral;
         this.roughness = roughness;
 

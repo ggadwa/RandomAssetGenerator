@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapBrickPattern extends BitmapBrickRow {
 
-    public BitmapBrickPattern() {
-        super();
+    public BitmapBrickPattern(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

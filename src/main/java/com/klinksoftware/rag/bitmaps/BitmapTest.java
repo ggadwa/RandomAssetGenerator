@@ -5,8 +5,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapTest extends BitmapBase {
 
-    public BitmapTest() {
-        super();
+    public BitmapTest(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;

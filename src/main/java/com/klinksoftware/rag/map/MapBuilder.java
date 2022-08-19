@@ -549,7 +549,7 @@ public class MapBuilder
     //
     // required bitmaps
     //
-    public void buildRequiredBitmaps(int mapType, boolean skyBox) {
+    public void buildRequiredBitmaps(int mapType, int textureSize, boolean skyBox) {
         String[] wallBitmaps = {"BrickPattern", "BrickRow", "Geometric", "MetalHexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StoneWoodWall", "StoneWall", "Temple", "Tile", "WoodBoard"};
         String[] insideFloorBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalHexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "WoodBoard"};
         String[] outsideFloorBitmaps = {"Dirt", "Grass"};
@@ -559,22 +559,22 @@ public class MapBuilder
         String[] skyBoxBitmaps = {"SkyBoxMountain"};
 
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
-            BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
-            BitmapBase.mapBitmapLoader(bitmaps, "wall_upper", wallBitmaps);
-            BitmapBase.mapBitmapLoader(bitmaps, "wall_lower", wallBitmaps);
-            BitmapBase.mapBitmapLoader(bitmaps, "floor", insideFloorBitmaps);
-            BitmapBase.mapBitmapLoader(bitmaps, "floor_lower", insideFloorBitmaps);
-            BitmapBase.mapBitmapLoader(bitmaps, "ceiling", ceilingBitmaps);
-            BitmapBase.mapBitmapLoader(bitmaps, "ceiling_upper", ceilingBitmaps);
-            BitmapBase.mapBitmapLoader(bitmaps, "platform", platformBitmaps);
-            BitmapBase.mapBitmapLoader(bitmaps, "stair", stairBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(bitmaps, "wall_upper", wallBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(bitmaps, "wall_lower", wallBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(bitmaps, "floor", insideFloorBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(bitmaps, "floor_lower", insideFloorBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(bitmaps, "ceiling", ceilingBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(bitmaps, "ceiling_upper", ceilingBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(bitmaps, "platform", platformBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(bitmaps, "stair", stairBitmaps, textureSize);
         } else {
-            BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps);
-            BitmapBase.mapBitmapLoader(bitmaps, "floor", outsideFloorBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(bitmaps, "floor", outsideFloorBitmaps, textureSize);
         }
 
         if (skyBox) {
-            BitmapBase.mapBitmapLoader(bitmaps, "sky_box", skyBoxBitmaps);
+            BitmapBase.mapBitmapLoader(bitmaps, "sky_box", skyBoxBitmaps, textureSize);
         }
     }
 
@@ -582,7 +582,7 @@ public class MapBuilder
         // build a map
         //
 
-    public void build(int mapType, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, float tallRoom, float sunkenRoom, boolean complex, boolean skyBox) {
+    public void build(int mapType, int textureSize, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, float tallRoom, float sunkenRoom, boolean complex, boolean skyBox) {
         int mainFloorRoomCount, mainFloorRoomExtensionCount;
         int upperFloorRoomCount, lowerFloorRoomCount;
         MapRoom room;
@@ -623,7 +623,7 @@ public class MapBuilder
         removeSharedWalls(rooms);
 
         // required textures for map
-        buildRequiredBitmaps(mapType, skyBox);
+        buildRequiredBitmaps(mapType, textureSize, skyBox);
 
         // now create the meshes
         createRoomMeshes(mapType, rooms);

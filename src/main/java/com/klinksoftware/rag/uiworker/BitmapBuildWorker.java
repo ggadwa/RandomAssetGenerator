@@ -10,12 +10,14 @@ import javax.swing.*;
 public class BitmapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
+    private int textureSize;
     private String bitmapName;
 
     public static BitmapBase generatedBitmap = null;
 
-    public BitmapBuildWorker(AppWindow appWindow, String bitmapName) {
+    public BitmapBuildWorker(AppWindow appWindow, int textureSize, String bitmapName) {
         this.appWindow = appWindow;
+        this.textureSize = textureSize;
         this.bitmapName = bitmapName;
     }
 
@@ -32,7 +34,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         AppWindow.random.setSeed(seed);
 
         try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + bitmapName.replace(" ", ""))).getConstructor().newInstance();
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + bitmapName.replace(" ", ""))).getConstructor(int.class).newInstance(textureSize);
             bitmap.generate();
         } catch (Exception e) {
             e.printStackTrace();

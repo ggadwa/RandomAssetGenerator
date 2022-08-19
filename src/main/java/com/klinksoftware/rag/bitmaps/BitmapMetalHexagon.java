@@ -6,8 +6,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapMetalHexagon extends BitmapBase {
 
-    public BitmapMetalHexagon() {
-        super();
+    public BitmapMetalHexagon(int textureSize) {
+        super(textureSize);
 
         hasNormal = true;
         hasMetallicRoughness = true;
