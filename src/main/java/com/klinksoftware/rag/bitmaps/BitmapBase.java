@@ -74,7 +74,7 @@ public class BitmapBase
     protected boolean       hasNormal,hasMetallicRoughness,hasEmissive,hasAlpha;
     protected RagPoint      specularFactor,emissiveFactor;
     protected float[]       colorData,normalData,metallicRoughnessData,emissiveData,
-                            perlinNoiseColorFactor,noiseNormals;
+            perlinNoiseColorFactor, noiseNormals, blurData;
 
     public BitmapBase(int textureSize) {
         this.textureSize = textureSize;
@@ -88,19 +88,18 @@ public class BitmapBase
         specularFactor=new RagPoint(5.0f,5.0f,5.0f);
         emissiveFactor=new RagPoint(1.0f,1.0f,1.0f);
 
-            // the color, normal, metallic-roughness, and emissive
-            // define them later as child classes
-            // can change texture size
-
-        colorData=null;
+        // the color, normal, metallic-roughness, and emissive
+        colorData = null;
         normalData=null;
         metallicRoughnessData=null;
         emissiveData=null;
 
-            // noise
-
+        // noise
         perlinNoiseColorFactor=null;
-        noiseNormals=null;
+        noiseNormals = null;
+
+        // blur
+        blurData = null;
     }
 
         //
@@ -267,30 +266,32 @@ public class BitmapBase
         // blur
         //
 
-    protected void blur(float[] data,int lft,int top,int rgt,int bot,int blurCount,boolean clamp)
-    {
-        int             n,x,y,idx,
-                        cx,cy,cxs,cxe,cys,cye,dx,dy;
-        float           r,g,b;
-        float[]         blurData;
+    protected void blur(float[] data, int lft, int top, int rgt, int bot, int blurCount, boolean clamp) {
+        int n, x, y, idx, idx2;
+        int cx, cy, cxs, cxe, cys, cye, dx, dy;
+        float r, g, b;
 
-        if ((lft>=rgt) || (top>=bot)) return;
+        if ((lft >= rgt) || (top >= bot)) {
+            return;
+        }
 
-        blurData=new float[data.length];
+        if (blurData == null) {
+            blurData = new float[data.length];
+        }
 
-            // blur pixels to count
-
-        for (n=0;n!=blurCount;n++) {
+        // blur pixels to count
+        for (n = 0; n != blurCount; n++) {
 
             for (y=top;y!=bot;y++) {
 
                 cys=y-1;
-                cye=y+2;
+                cye = y + 2;
+
+                idx = ((y * textureSize) + lft) * 4;
 
                 for (x=lft;x!=rgt;x++) {
 
-                        // get blur from 8 surrounding pixels
-
+                    // get blur from 8 surrounding pixels
                     r = g = b = 0.0f;
 
                     cxs=x-1;
@@ -309,9 +310,7 @@ public class BitmapBase
                         }
 
                         for (cx=cxs;cx!=cxe;cx++) {
-                            if ((cy==y) && (cx==x)) continue;       // ignore self
-
-                            dx=cx;
+                            dx = cx;
                             if (!clamp) {
                                 if (dx<lft) dx=rgt+(lft-dx);
                                 if (dx>=rgt) dx=lft+(dx-rgt);
@@ -321,34 +320,32 @@ public class BitmapBase
                                 if (dx>=rgt) dx=rgt-1;
                             }
 
-                                // add up blur from the
-                                // original pixels
+                            // add up blur from the original pixels
+                            idx2 = ((dy * textureSize) + dx) * 4;
 
-                            idx=((dy*textureSize)+dx)*4;
-
-                            r+=data[idx];
-                            g+=data[idx+1];
-                            b+=data[idx+2];
+                            r += data[idx2];
+                            g += data[idx2 + 1];
+                            b += data[idx2 + 2];
                         }
                     }
 
-                    idx=((y*textureSize)+x)*4;
+                    //idx=((y*textureSize)+x)*4;
 
-                    blurData[idx]=r*0.125f;     // divide by 8.0f
-                    blurData[idx+1]=g*0.125f;
-                    blurData[idx+2]=b*0.125f;
+                    blurData[idx] = r * 0.111f; // divide by 9.0f
+                    blurData[idx + 1] = g * 0.111f;
+                    blurData[idx + 2] = b * 0.111f;
+                    idx += 4;
                 }
             }
 
-                // transfer over the changed pixels
-
-            for (y=top;y!=bot;y++) {
-                idx=((y*textureSize)+lft)*4;
+            // transfer over the changed pixels
+            for (y = top; y != bot; y++) {
+                idx = ((y * textureSize) + lft) * 4;
                 for (x=lft;x!=rgt;x++) {
-                    data[idx]=blurData[idx];
-                    data[idx+1]=blurData[idx+1];
-                    data[idx+2]=blurData[idx+2];
-                    idx+=4;
+                    data[idx] = blurData[idx];
+                    data[idx + 1] = blurData[idx + 1];
+                    data[idx + 2] = blurData[idx + 2];
+                    idx += 4;
                 }
             }
         }
@@ -357,13 +354,14 @@ public class BitmapBase
     protected void blurAlpha(float[] data, int lft, int top, int rgt, int bot, int blurCount, boolean clamp) {
         int n, x, y, idx, cx, cy, cxs, cxe, cys, cye, dx, dy;
         float alpha;
-        float[] blurData;
 
         if ((lft >= rgt) || (top >= bot)) {
             return;
         }
 
-        blurData = new float[data.length];
+        if (blurData == null) {
+            blurData = new float[data.length];
+        }
 
         // blur pixels to count
         for (n = 0; n != blurCount; n++) {
@@ -402,7 +400,7 @@ public class BitmapBase
 
                         for (cx = cxs; cx != cxe; cx++) {
                             if ((cy == y) && (cx == x)) {
-                                continue;       // ignore self
+                                continue; // ignore self
                             }
                             dx = cx;
                             if (!clamp) {
@@ -448,9 +446,8 @@ public class BitmapBase
         // noise
         //
 
-    private float getDotGridVector(RagPoint[][] vectors,int gridX,int gridY,int gridWid,int gridHigh,int x,int y)
-    {
-        float       dx,dy;
+    private float getDotGridVector(RagPoint[][] vectors, int gridX, int gridY, int gridWid, int gridHigh, int x, int y) {
+        float dx, dy;
 
         dx=(float)(x-(gridX*gridWid))/gridWid;
         dy=(float)(y-(gridY*gridHigh))/gridHigh;
@@ -458,21 +455,19 @@ public class BitmapBase
         return((dx*vectors[gridY][gridX].x)+(dy*vectors[gridY][gridX].y));
     }
 
-    private float lerp(float a,float b,float w)
-    {
-        double      d;
+    private float lerp(float a, float b, float w) {
+        double d;
 
         d=(Math.pow(w,2)*3)-(Math.pow(w,3)*2);
         return((float)(((1.0-d)*a)+(d*b)));
     }
 
-    protected void createPerlinNoiseData(int gridXSize,int gridYSize)
-    {
-        int             x,y,gridWid,gridHigh,
-                        gridX0,gridX1,gridY0,gridY1;
-        float           sx,sy,ix0,ix1,n0,n1;
-        RagPoint        normal;
-        RagPoint[][]    vectors;
+    protected void createPerlinNoiseData(int gridXSize, int gridYSize) {
+        int x, y, gridWid, gridHigh;
+        int gridX0, gridX1, gridY0, gridY1;
+        float sx, sy, ix0, ix1, n0, n1;
+        RagPoint normal;
+        RagPoint[][] vectors;
 
             // the grid
             // it must be evenly divisible
@@ -542,15 +537,13 @@ public class BitmapBase
         }
     }
 
-    protected float getPerlineColorFactorForPosition(int x,int y)
-    {
+    protected float getPerlineColorFactorForPosition(int x, int y) {
         return(perlinNoiseColorFactor[(y*textureSize)+x]);
     }
 
-    protected void drawPerlinNoiseRect(int lft,int top,int rgt,int bot,float colorFactorMin,float colorFactorMax)
-    {
-        int         x,y,idx;
-        float       colFactor,colorFactorAdd;
+    protected void drawPerlinNoiseRect(int lft, int top, int rgt, int bot, float colorFactorMin, float colorFactorMax) {
+        int x, y, idx;
+        float colFactor, colorFactorAdd;
 
         colorFactorAdd=colorFactorMax-colorFactorMin;
 
@@ -572,10 +565,9 @@ public class BitmapBase
         }
     }
 
-    protected void drawPerlinNoiseColorRect(int lft,int top,int rgt,int bot,RagColor color,float mixColorFactor)
-    {
-        int         x,y,idx;
-        float       colFactor;
+    protected void drawPerlinNoiseColorRect(int lft, int top, int rgt, int bot, RagColor color, float mixColorFactor) {
+        int x, y, idx;
+        float colFactor;
 
         for (y=top;y!=bot;y++) {
             for (x=lft;x!=rgt;x++) {
@@ -591,6 +583,26 @@ public class BitmapBase
                 colorData[idx]=(colorData[idx]*(1.0f-colFactor))+(color.r*colFactor);
                 colorData[idx+1]=(colorData[idx+1]*(1.0f-colFactor))+(color.g*colFactor);
                 colorData[idx+2]=(colorData[idx+2]*(1.0f-colFactor))+(color.b*colFactor);
+            }
+        }
+    }
+
+    protected void drawPerlinNoiseColorSwitchRect(int lft, int top, int rgt, int bot, RagColor col1, RagColor col2) {
+        int x, y, idx;
+
+        for (y = top; y != bot; y++) {
+            for (x = lft; x != rgt; x++) {
+                idx = ((y * textureSize) + x) * 4;
+
+                if (perlinNoiseColorFactor[(y * textureSize) + x] >= 0.5f) {
+                    colorData[idx] = col1.r;
+                    colorData[idx + 1] = col1.g;
+                    colorData[idx + 2] = col1.b;
+                } else {
+                    colorData[idx] = col2.r;
+                    colorData[idx + 1] = col2.g;
+                    colorData[idx + 2] = col2.b;
+                }
             }
         }
     }
@@ -627,26 +639,29 @@ public class BitmapBase
         }
     }
 
-    protected void drawStaticNoiseRect(int lft,int top,int rgt,int bot,float colorFactorMin,float colorFactorMax)
-    {
-        int         x,y,idx;
-        float       colFactor,colorFactorAdd;
+    protected void drawStaticNoiseRect(int lft, int top, int rgt, int bot, float colorFactorMin, float colorFactorMax) {
+        int x, y, x2, y2, idx, sz;
+        float colFactor, colorFactorAdd;
 
+        sz = textureSize / 512;
         colorFactorAdd=colorFactorMax-colorFactorMin;
 
-        for (y=top;y!=bot;y++) {
-            for (x=lft;x!=rgt;x++) {
+        for (y = top; y != bot; y += sz) {
+            for (x = lft; x != rgt; x += sz) {
 
                     // the static random color factor
 
-                colFactor=colorFactorMin+(AppWindow.random.nextFloat()*colorFactorAdd);
+                colFactor = colorFactorMin + (AppWindow.random.nextFloat(colorFactorAdd));
 
-                idx=((y*textureSize)+x)*4;
-
-                colorData[idx]=colorData[idx]*colFactor;
-                colorData[idx+1]=colorData[idx+1]*colFactor;
-                colorData[idx+2]=colorData[idx+2]*colFactor;
-             }
+                for (y2 = y; y2 != (y + sz); y2++) {
+                    for (x2 = x; x2 != (x + sz); x2++) {
+                        idx = ((y2 * textureSize) + x2) * 4;
+                        colorData[idx] = colorData[idx] * colFactor;
+                        colorData[idx + 1] = colorData[idx + 1] * colFactor;
+                        colorData[idx + 2] = colorData[idx + 2] * colFactor;
+                    }
+                }
+            }
         }
     }
 
@@ -815,8 +830,7 @@ public class BitmapBase
         int n, x, y, wid, high, pixelSize, nCount;
         int margin;
 
-            // initialize the noise data
-
+        // initialize the noise data
         pixelSize=(textureSize*textureSize)*4;
         noiseNormals=new float[pixelSize];
 
@@ -826,8 +840,7 @@ public class BitmapBase
             noiseNormals[n+2]=1.0f;
         }
 
-            // create the random normal chunks
-
+        // create the random normal chunks
         nCount = (int) (((float) textureSize * 0.5f) * density);
         margin = textureSize / 25;
 
@@ -840,15 +853,13 @@ public class BitmapBase
             createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,AppWindow.random.nextBoolean());
         }
 
-            // blur to fix any missing pixels and make the
-            // height change not as drastic
-
-        blur(noiseNormals,0,0,textureSize,textureSize,5,false);
+        // blur to fix any missing pixels and make the
+        // height change not as drastic
+        blur(noiseNormals, 0, 0, textureSize, textureSize, (textureSize / 100), false);
     }
 
-    public void drawNormalNoiseRect(int lft,int top,int rgt,int bot)
-    {
-        int         x,y,idx;
+    public void drawNormalNoiseRect(int lft, int top, int rgt, int bot) {
+        int x, y, idx;
 
         for (y=top;y!=bot;y++) {
             for (x=lft;x!=rgt;x++) {
@@ -1723,17 +1734,16 @@ public class BitmapBase
             if (x>=rgt) break;
         }
 
-        blur(colorData,lft,top,rgt,bot,3,true);
+        blur(colorData, lft, top, rgt, bot, (textureSize / 150), true);
     }
 
         //
         // streaks and stains
         //
 
-    private void drawStreakDirtSingle(int lft,int top,int rgt,int bot,float minMix,float addMix,RagColor color,float minXReduce)
-    {
-        int             x,y,lx,rx,wid,high,idx;
-        float           xAdd,flx,frx,factor,factor2;
+    private void drawStreakDirtSingle(int lft, int top, int rgt, int bot, float minMix, float addMix, RagColor color, float minXReduce) {
+        int x, y, lx, rx, wid, high, idx;
+        float xAdd, flx, frx, factor, factor2;
 
         wid=rgt-lft;
         high=bot-top;
@@ -1742,14 +1752,14 @@ public class BitmapBase
 
             // random shrink
 
-        xAdd=AppWindow.random.nextFloat()*minXReduce;
+        xAdd = AppWindow.random.nextFloat(minXReduce);
 
             // draw the dirt
 
         flx=(int)lft;
-        frx=(int)rgt;
+        frx = (int) rgt;
 
-        for (y=top;y!=bot;y++) {
+        for (y = top; y != bot; y++) {
             factor=(float)(bot-y)/(float)high;
 
             lx=(int)flx;
@@ -1757,12 +1767,12 @@ public class BitmapBase
             if (lx>=rx) break;
 
             for (x=lx;x!=rx;x++) {
-                factor2=factor*(minMix+(AppWindow.random.nextFloat()*addMix));
+                factor2 = factor * (minMix + (AppWindow.random.nextFloat(addMix)));
 
                 idx=((y*textureSize)+x)*4;
-                colorData[idx]=((1.0f-factor2)*colorData[idx])+(color.r*factor2);
-                colorData[idx+1]=((1.0f-factor2)*colorData[idx+1])+(color.g*factor2);
-                colorData[idx+2]=((1.0f-factor2)*colorData[idx+2])+(color.b*factor2);
+                colorData[idx] = ((1.0f - factor2) * colorData[idx]) + (color.r * factor2);
+                colorData[idx + 1] = ((1.0f - factor2) * colorData[idx + 1]) + (color.g * factor2);
+                colorData[idx + 2] = ((1.0f - factor2) * colorData[idx + 2]) + (color.b * factor2);
             }
 
             flx+=xAdd;
@@ -1770,19 +1780,16 @@ public class BitmapBase
         }
     }
 
-    protected void drawStreakDirt(int lft,int top,int rgt,int bot,int additionalStreakCount,float minMix,float maxMix,RagColor color)
-    {
-        int         n,sx,ex,minWid;
-        float       addMix;
+    protected void drawStreakDirt(int lft, int top, int rgt, int bot, int additionalStreakCount, float minMix, float maxMix, RagColor color) {
+        int n, sx, ex, minWid;
+        float addMix;
 
         addMix=maxMix-minMix;
 
-            // original streak
+        // original streak
+        drawStreakDirtSingle(lft, top, rgt, bot, minMix, addMix, color, 0.25f);
 
-        drawStreakDirtSingle(lft,top,rgt,bot,minMix,addMix,color,0.25f);
-
-            // additional streaks
-
+        // additional streaks
         minWid=(int)((float)(rgt-lft)*0.1f);
 
         for (n=0;n!=additionalStreakCount;n++) {
@@ -1790,16 +1797,14 @@ public class BitmapBase
             ex=(sx+minWid)+AppWindow.random.nextInt(rgt-(sx+minWid));
             if (sx>=ex) continue;
 
-            drawStreakDirtSingle(sx,top,ex,bot,minMix,addMix,color,0.1f);
+            drawStreakDirtSingle(sx, top, ex, bot, minMix, addMix, color, 0.1f);
         }
     }
 
-    protected void drawOvalStain(int lft,int top,int rgt,int bot,float outerPercentage,float innerPercentage,float darken)
-    {
-        int         n,x,y,mx,my,wid,high,idx;
-        float       halfWid,halfHigh,rad,
-                    percentageAdd,curPercentage;
-        float[]     origColorData;
+    protected void drawOvalStain(int lft, int top, int rgt, int bot, float outerPercentage, float innerPercentage, float darken) {
+        int n, x, y, mx, my, wid, high, idx, stainPixelCount;
+        float halfWid, halfHigh, rad, percentageAdd, curPercentage;
+        float[] origColorData;
 
         if ((lft>=rgt) || (top>=bot)) return;
 
@@ -1826,14 +1831,15 @@ public class BitmapBase
 
         curPercentage=outerPercentage;
 
-            // fill the oval
+        // fill the oval
+        stainPixelCount = textureSize * 2;
 
         while ((wid>0) && (high>0)) {
 
             halfWid=(float)wid*0.5f;
             halfHigh=(float)high*0.5f;
 
-            for (n=0;n!=1000;n++) {
+            for (n = 0; n != stainPixelCount; n++) {
                 if (AppWindow.random.nextFloat()>curPercentage) continue;
 
                 rad=(float)(Math.PI*2.0)*((float)n*0.001f);
@@ -1908,6 +1914,35 @@ public class BitmapBase
             wid--;
             high--;
         }
+    }
+
+    //
+    // grout
+    //
+    protected void drawGrout() {
+        int n, nStain, x, y, wid, high;
+        RagColor groutColor;
+
+        // background
+        groutColor = getRandomGray(0.3f, 0.5f);
+        drawRect(0, 0, textureSize, textureSize, groutColor);
+        drawStaticNoiseRect(0, 0, textureSize, textureSize, 0.4f, 1.0f);
+
+        // some stains
+        nStain = 5 + AppWindow.random.nextInt(textureSize / 100);
+
+        for (n = 0; n != nStain; n++) {
+            wid = 20 + AppWindow.random.nextInt(textureSize / 4);
+            x = AppWindow.random.nextInt(textureSize - wid);
+
+            high = 20 + AppWindow.random.nextInt(textureSize / 4);
+            y = AppWindow.random.nextInt(textureSize - high);
+
+            drawOvalStain(x, y, (x + wid), (y + high), (0.01f + AppWindow.random.nextFloat(0.01f)), (0.15f + AppWindow.random.nextFloat(0.05f)), (0.3f + AppWindow.random.nextFloat(0.4f)));
+        }
+
+        // blur
+        blur(colorData, 0, 0, textureSize, textureSize, (textureSize / 500), false);
     }
 
         //
@@ -2701,8 +2736,8 @@ public class BitmapBase
         }
 
         // blur both the color and the normal
-        blur(colorData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 2, true);
-        blur(normalData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), 5, true);
+        blur(colorData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), (textureSize / 250), true);
+        blur(normalData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), (textureSize / 100), true);
 
         // the board edge
         draw3DDarkenFrameRect(lft, top, rgt, bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), true);

@@ -28,15 +28,7 @@ public class BitmapStoneWoodWall extends BitmapStoneWall {
         groutColor = getRandomGray(0.35f, 0.55f);
 
         // the noise grout
-        drawRect(0, 0, textureSize, textureSize, groutColor);
-        createPerlinNoiseData(32, 32);
-        drawStaticNoiseRect(0, 0, textureSize, textureSize, 0.5f, 1.1f);
-        drawPerlinNoiseRect(0, 0, textureSize, textureSize, 0.3f, 0.9f);
-        blur(colorData, 0, 0, textureSize, textureSize, 1, false);
-
-        createNormalNoiseData(2.5f, 0.5f);
-        drawNormalNoiseRect(0, 0, textureSize, textureSize);
-        blur(normalData, 0, 0, textureSize, textureSize, 1, false);
+        drawGrout();
 
         // we draw the stones all alone on the noise
         // background so we can distort the stones and
@@ -44,6 +36,8 @@ public class BitmapStoneWoodWall extends BitmapStoneWall {
         backgroundData = colorData.clone();
         stoneColorData = colorData.clone();
         stoneNormalData = normalData.clone();
+
+        createNormalNoiseData(2.5f, 0.5f);
 
         // draw the stones
         yCount = 4 + AppWindow.random.nextInt(6);

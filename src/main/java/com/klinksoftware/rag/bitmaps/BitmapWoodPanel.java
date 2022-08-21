@@ -69,8 +69,8 @@ public class BitmapWoodPanel extends BitmapBase
         }
 
         // blur both the color and the normal
-        blur(colorData, 0, 0, textureSize, textureSize, 2, true);
-        blur(normalData, 0, 0, textureSize, textureSize, 5, true);
+        blur(colorData, 0, 0, textureSize, textureSize, (textureSize / 250), true);
+        blur(normalData, 0, 0, textureSize, textureSize, (textureSize / 100), true);
 
         createMetallicRoughnessMap(0.4f,0.2f);
     }

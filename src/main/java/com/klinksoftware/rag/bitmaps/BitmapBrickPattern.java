@@ -23,23 +23,20 @@ public class BitmapBrickPattern extends BitmapBrickRow {
         boolean badSpot;
         int[] sz;
         int[][] brickSizes = {{2, 2}, {3, 3}, {4, 4}, {2, 1}, {1, 2}, {3, 1}, {1, 3}, {2, 3}, {3, 2}};
-        RagColor brickColor, altBrickColor, groutColor;
+        RagColor brickColor, altBrickColor;
 
         brickColor = getRandomColor();
         altBrickColor = getRandomColor();
-        groutColor = getRandomGray(0.3f, 0.5f);
 
-        edgeSize = 3 + AppWindow.random.nextInt(7);
-        paddingSize = 3 + AppWindow.random.nextInt(5);
+        edgeSize = 3 + AppWindow.random.nextInt(textureSize / 70);
+        paddingSize = 3 + AppWindow.random.nextInt(textureSize / 100);
 
         // create noise data
         createPerlinNoiseData(32, 32);
         createNormalNoiseData(1.5f, 0.5f);
 
         // grout is a static noise color
-        drawRect(0, 0, textureSize, textureSize, groutColor);
-        drawStaticNoiseRect(0, 0, textureSize, textureSize, 1.0f, 1.4f);
-        blur(colorData, 0, 0, textureSize, textureSize, 1, false);
+        drawGrout();
 
         gridSize = AppWindow.random.nextBoolean() ? 8 : 4;
         grid = new int[gridSize][gridSize];

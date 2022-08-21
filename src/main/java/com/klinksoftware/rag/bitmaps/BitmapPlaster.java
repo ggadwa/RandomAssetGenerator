@@ -55,7 +55,7 @@ public class BitmapPlaster extends BitmapBase {
         // any stains
         generateStainsOverlay();
 
-        blur(colorData, 0, 0, textureSize, textureSize, 25, false);
+        blur(colorData, 0, 0, textureSize, textureSize, (textureSize / 20), false);
 
         createMetallicRoughnessMap(0.4f, 0.3f);
     }

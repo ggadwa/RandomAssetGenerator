@@ -102,7 +102,7 @@ public class BitmapConcrete extends BitmapBase
             }
         }
 
-        blur(colorData, 0, 0, textureSize, textureSize, 1, false);
+        blur(colorData, 0, 0, textureSize, textureSize, (1 + AppWindow.random.nextInt(textureSize / 125)), false);
 
         // concrete expansion joints
         jointColor = adjustColorRandom(concreteColor, 0.5f, 0.6f);

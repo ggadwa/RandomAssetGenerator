@@ -1,4 +1,10 @@
 
+
+
+--> oval draw is bad
+
+
+
 map
  - going up ramps is sometimes broken
  - open ceiling

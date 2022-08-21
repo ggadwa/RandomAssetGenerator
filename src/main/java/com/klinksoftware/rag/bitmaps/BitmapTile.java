@@ -111,7 +111,7 @@ public class BitmapTile extends BitmapBase
 
                 if (tileDirty) {
                     drawStaticNoiseRect((dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.8f,1.2f);
-                    blur(colorData,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),5,false);
+                    blur(colorData, (dLft + edgeSize), (dTop + edgeSize), (dRgt - edgeSize), (dBot - edgeSize), (textureSize / 100), false);
                 }
 
                     // possible crack

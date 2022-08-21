@@ -30,7 +30,8 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         appWindow.enableSettings(false);
 
         // get a random seed and generate the bitmap
-        seed=Calendar.getInstance().getTimeInMillis();
+        seed = Calendar.getInstance().getTimeInMillis();
+        seed = 1660930028219L;
         AppWindow.random.setSeed(seed);
 
         try {

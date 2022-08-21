@@ -46,7 +46,7 @@ public class BitmapDirt extends BitmapBase {
 
         createNormalNoiseData(2.5f, 0.5f);
         drawNormalNoiseRect(0, 0, textureSize, textureSize);
-        blur(colorData, 0, 0, textureSize, textureSize, (1 + AppWindow.random.nextInt(4)), true);
+        blur(colorData, 0, 0, textureSize, textureSize, (1 + AppWindow.random.nextInt(textureSize / 125)), true);
 
         // stones
         backgroundData = colorData.clone();

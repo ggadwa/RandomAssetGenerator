@@ -135,7 +135,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
             generateClouds(lft, top, (lft + cloudXSize), (top + cloudYSize), cloudColor);
         }
 
-        blur(colorData, qtr, 0, (qtr + qtr), qtr, 5, true);
+        blur(colorData, qtr, 0, (qtr + qtr), qtr, (textureSize / 100), true);
 
         // bottom
         drawRect(qtr, (qtr * 2), (qtr * 2), (qtr * 3), adjustColor(mountainColor, 0.5f));
@@ -167,7 +167,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
             generateClouds(lft, top, (lft + cloudXSize), (top + cloudYSize), cloudColor);
         }
 
-        blur(colorData, 0, qtr, textureSize, (qtr + qtr), 5, true);
+        blur(colorData, 0, qtr, textureSize, (qtr + qtr), (textureSize / 100), true);
 
         // mountain on sides
         mountainCount = 1 + AppWindow.random.nextInt(3);

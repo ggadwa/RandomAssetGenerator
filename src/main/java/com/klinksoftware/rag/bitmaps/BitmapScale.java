@@ -38,7 +38,7 @@ public class BitmapScale extends BitmapBase {
         drawRect(0, 0, textureSize, textureSize, scaleColor);
         drawPerlinNoiseRect(0, 0, textureSize, textureSize, 0.8f, 1.3f);
         drawNormalNoiseRect(0, 0, textureSize, textureSize);
-        blur(colorData, 0, 0, textureSize, textureSize, 5, false);
+        blur(colorData, 0, 0, textureSize, textureSize, (textureSize / 100), false);
 
         // scales (need extra row for overlap)
         dy = textureSize - (sHigh / 2);

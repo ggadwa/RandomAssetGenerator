@@ -44,7 +44,7 @@ public class BitmapTemple extends BitmapBase {
         createNormalNoiseData(3.0f, 0.4f);
         drawNormalNoiseRect(lft, top, rgt, bot);
 
-        blur(colorData, lft, top, rgt, bot, 1, false);
+        blur(colorData, lft, top, rgt, bot, (textureSize / 500), false);
 
         // skip out if we don't have enough margin
         if ((Math.abs(lft - rgt) <= margin) || (Math.abs(top - bot) <= margin)) {

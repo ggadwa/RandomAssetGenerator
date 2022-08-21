@@ -39,38 +39,34 @@ public class BitmapBrickRow extends BitmapBase {
         }
         else {
             drawBrickColor = adjustColor((isSmall ? altBrickColor : brickColor), f);
-            drawRect(lft,top,(rgt-paddingSize),(bot-paddingSize),drawBrickColor);
+            drawRect(lft, top, (rgt - paddingSize), (bot - paddingSize), drawBrickColor);
             drawPerlinNoiseRect(lft, top, (rgt - paddingSize), (bot - paddingSize), 0.8f, 1.3f);
             drawNormalNoiseRect(lft, top, (rgt - paddingSize), (bot - paddingSize));
             draw3DDarkenFrameRect(lft, top, (rgt - paddingSize), (bot - paddingSize), edgeSize, (0.85f + AppWindow.random.nextFloat(0.1f)), true);
         }
 
-            // any streaks/stains/cracks
-            // do not do on odd bricks
-
-        lft+=edgeSize;
-        rgt-=(edgeSize+paddingSize);
-        top+=edgeSize;
-        bot-=(edgeSize+paddingSize);
-
+        // any streaks/stains/cracks
+        // do not do on odd bricks
         if ((!isHalf) && (!isSmall)) {
+            lft += edgeSize;
+            rgt -= (edgeSize + paddingSize);
+            top += edgeSize;
+            bot -= (edgeSize + paddingSize);
 
-                // any cracks
-
+            // any cracks
             if (AppWindow.random.nextFloat()<0.1f) {
                 if ((rgt-lft)>45) {
                     sx=(lft+15)+AppWindow.random.nextInt((rgt-15)-(lft+15));
                     ex=sx+((5+AppWindow.random.nextInt(25))-15);
 
                     lineColor=adjustColorRandom(drawBrickColor,0.65f,0.75f);
-                    drawVerticalCrack(sx,top,bot,lft,rgt,(int)Math.signum(AppWindow.random.nextFloat()-0.5f),10,lineColor,true);
+                    drawVerticalCrack(sx, top, bot, lft, rgt, (int) Math.signum(AppWindow.random.nextFloat() - 0.5f), 10, lineColor, true);
                 }
             }
 
-                // streaks
-
+            // streaks
             if (AppWindow.random.nextFloat()<0.2f) {
-                streakWid=(int)(((float)(rgt-lft)*0.3f)+(AppWindow.random.nextFloat()*((float)(rgt-lft)*0.3f)));
+                streakWid = (int) (((float) (rgt - lft) * 0.3f) + (AppWindow.random.nextFloat((float) (rgt - lft) * 0.3f)));
                 if (streakWid<10) streakWid=10;
                 if (streakWid>(int)((float)textureSize*0.1f)) streakWid=(int)((float)textureSize*0.1f);
 
@@ -78,7 +74,7 @@ public class BitmapBrickRow extends BitmapBase {
                 ex=sx+streakWid;
 
                 streakColor=adjustColorRandom(drawBrickColor,0.65f,0.75f);
-                drawStreakDirt(sx,top,ex,bot,5,0.25f,0.45f,streakColor);
+                drawStreakDirt(sx, top, ex, bot, 5, 0.25f, 0.45f, streakColor);
             }
         }
     }
@@ -87,28 +83,22 @@ public class BitmapBrickRow extends BitmapBase {
     public void generateInternal()    {
         int x, y, xCount, xAdd, yCount, yAdd, halfWid, lft, top, edgeSize, paddingSize;
         boolean halfBrick;
-        RagColor brickColor, altBrickColor, groutColor;
+        RagColor brickColor, altBrickColor;
 
         brickColor=getRandomColor();
-        altBrickColor=getRandomColor();
-        groutColor = getRandomGray(0.3f, 0.5f);
+        altBrickColor = getRandomColor();
 
-        edgeSize = 3 + AppWindow.random.nextInt(7);
-        paddingSize = 3 + AppWindow.random.nextInt(5);
+        edgeSize = 3 + AppWindow.random.nextInt(textureSize / 70);
+        paddingSize = 3 + AppWindow.random.nextInt(textureSize / 100);
 
-            // create noise data
-
+        // create noise data
         createPerlinNoiseData(32,32);
         createNormalNoiseData(1.5f,0.5f);
 
-            // grout is a static noise color
+        // grout is a static noise color
+        drawGrout();
 
-        drawRect(0,0,textureSize,textureSize,groutColor);
-        drawStaticNoiseRect(0,0,textureSize,textureSize,1.0f,1.4f);
-        blur(colorData,0,0,textureSize,textureSize,1,false);
-
-            // draw the bricks
-
+        // draw the bricks
         xCount=4+AppWindow.random.nextInt(4);
         xAdd=textureSize/xCount;
         halfWid=xAdd/2;

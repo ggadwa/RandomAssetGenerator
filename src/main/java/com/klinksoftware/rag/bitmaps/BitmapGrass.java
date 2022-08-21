@@ -29,7 +29,7 @@ public class BitmapGrass extends BitmapDirt {
 
         createNormalNoiseData(2.5f, 0.5f);
         drawNormalNoiseRect(0, 0, textureSize, textureSize);
-        blur(colorData, 0, 0, textureSize, textureSize, 5, true);
+        blur(colorData, 0, 0, textureSize, textureSize, (textureSize / 100), true);
     }
 
     @Override

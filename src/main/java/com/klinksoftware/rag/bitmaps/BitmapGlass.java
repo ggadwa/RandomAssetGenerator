@@ -27,7 +27,7 @@ public class BitmapGlass extends BitmapBase
 
         // back noise and blur
         drawStaticNoiseRect(0, 0, textureSize, textureSize, 0.95f, 0.99f);
-        blur(colorData, 0, 0, textureSize, textureSize, 10, false);
+        blur(colorData, 0, 0, textureSize, textureSize, (textureSize / 50), false);
 
         // reflection lines in alpha
         setImageAlpha(0.75f);
