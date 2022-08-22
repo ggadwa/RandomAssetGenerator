@@ -23,7 +23,7 @@ public class SoundExportWorker extends SwingWorker<Integer, Void> {
             return (0);
         }
 
-        appWindow.enableSettings(false);
+        appWindow.startBuild();
 
         // pick folder to save too
         fileChooser = new JFileChooser();
@@ -38,6 +38,6 @@ public class SoundExportWorker extends SwingWorker<Integer, Void> {
 
     @Override
     protected void done() {
-        appWindow.enableSettings(true);
+        appWindow.stopBuild();
     }
 }

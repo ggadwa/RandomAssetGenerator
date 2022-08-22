@@ -35,6 +35,7 @@ public class AppWindow extends JFrame {
     private JTabbedPane settingsTab;
     private JPanel displayPanel;
     private CardLayout displayPanelCardLayout;
+    private SpinnerPane spinnerPane;
 
     public static Random random;
     public static WalkView walkView;
@@ -118,6 +119,10 @@ public class AppWindow extends JFrame {
         settingsSound = new SettingsSound(this);
         settingsTab.addTab("Sound", settingsSound);
 
+        // the spinner
+        spinnerPane = new SpinnerPane();
+        setGlassPane(spinnerPane);
+
         // quit handler for some OSes
         try {
             Desktop.getDesktop().setQuitHandler((event, response) -> dispose());
@@ -138,12 +143,24 @@ public class AppWindow extends JFrame {
     }
 
     // utility
-    public void enableSettings(boolean enable) {
-        settingsTab.setEnabled(enable);
-        settingsMap.enableAll(enable);
-        settingsModel.enableAll(enable);
-        settingsTexture.enableAll(enable);
-        settingsSound.enableAll(enable);
+    public void startBuild() {
+        settingsTab.setEnabled(false);
+        settingsMap.enableAll(false);
+        settingsModel.enableAll(false);
+        settingsTexture.enableAll(false);
+        settingsSound.enableAll(false);
+
+        spinnerPane.start();
+    }
+
+    public void stopBuild() {
+        settingsTab.setEnabled(true);
+        settingsMap.enableAll(true);
+        settingsModel.enableAll(true);
+        settingsTexture.enableAll(true);
+        settingsSound.enableAll(true);
+
+        spinnerPane.stop();
     }
 
     public void switchView(String name) {

@@ -28,7 +28,7 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
         long seed;
         ModelBase model;
 
-        appWindow.enableSettings(false);
+        appWindow.startBuild();
 
             // set the seed and base path for model
             // and make directories if necessary
@@ -60,6 +60,6 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
 
     @Override
     protected void done() {
-        appWindow.enableSettings(true);
+        appWindow.stopBuild();
     }
 }

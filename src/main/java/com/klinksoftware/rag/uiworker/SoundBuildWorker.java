@@ -22,7 +22,7 @@ public class SoundBuildWorker extends SwingWorker<Integer, Void> {
         long seed;
         SoundBase sound;
 
-        appWindow.enableSettings(false);
+        appWindow.startBuild();
 
         // get a random seed and generate the sound
         seed = Calendar.getInstance().getTimeInMillis();
@@ -48,6 +48,6 @@ public class SoundBuildWorker extends SwingWorker<Integer, Void> {
 
     @Override
     protected void done() {
-        appWindow.enableSettings(true);
+        appWindow.stopBuild();
     }
 }

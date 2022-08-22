@@ -27,11 +27,11 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         BitmapBase bitmap;
         HashMap<String, BitmapBase> bitmaps;
 
-        appWindow.enableSettings(false);
+        appWindow.startBuild();
 
         // get a random seed and generate the bitmap
         seed = Calendar.getInstance().getTimeInMillis();
-        seed = 1660930028219L;
+        //seed = 1660930028219L;
         AppWindow.random.setSeed(seed);
 
         try {
@@ -63,6 +63,6 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
 
     @Override
     protected void done() {
-        appWindow.enableSettings(true);
+        appWindow.stopBuild();
     }
 }

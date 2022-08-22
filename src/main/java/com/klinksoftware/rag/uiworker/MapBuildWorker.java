@@ -33,7 +33,7 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
         long seed;
         MapBuilder mapBuilder;
 
-        appWindow.enableSettings(false);
+        appWindow.startBuild();
 
             // set the seed and base path for map
             // and make directories if necessary
@@ -68,6 +68,6 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 
     @Override
     protected void done() {
-        appWindow.enableSettings(true);
+        appWindow.stopBuild();
     }
 }
