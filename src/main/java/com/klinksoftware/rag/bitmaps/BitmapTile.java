@@ -93,7 +93,7 @@ public class BitmapTile extends BitmapBase
 
                     switch (tileContent) {
                         case 0:
-                            drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0.0f,1.0f,0.0f,0.0f,edgeSize,0.8f,designColor,null,0.5f,false,false,1.0f,0.0f);
+                            drawOval((dLft + padding), (dTop + padding), (dRgt - padding), (dBot - padding), 0.0f, 1.0f, 0.0f, 0.0f, edgeSize, 0.8f, designColor, 0.5f, false, false, 1.0f, 0.0f);
                             break;
                         case 1:
                             drawDiamond((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),designColor);

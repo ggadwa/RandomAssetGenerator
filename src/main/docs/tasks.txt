@@ -1,7 +1,10 @@
 
 
 
---> oval draw is bad
+--> oval updates
+     - add normals back in
+     - need top/bottom draw (in frame too)
+     - add noise back in
 
 
 
@@ -13,7 +16,6 @@ map
 
 bitmaps
  - redo all bitmaps for textureSize for any numbers
- - blur seems bad on bigger maps
  - speed up bitmap drawing
  - hexagon has lines through it
  - gravel (like dirt)

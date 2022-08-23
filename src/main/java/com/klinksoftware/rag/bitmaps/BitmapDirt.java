@@ -107,7 +107,8 @@ public class BitmapDirt extends BitmapBase {
             drawRectAlpha(0, 0, textureSize, textureSize, 1.0f);
 
             outlineColor = adjustColor(stoneColor, 0.5f);
-            drawOval(lft, top, rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, 0.5f, stoneColor, outlineColor, normalZFactor, false, true, 0.4f, 1.2f);
+            drawOval(lft, top, rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, 0.5f, stoneColor, normalZFactor, false, true, 0.4f, 1.2f);
+            drawFrameOval(lft, top, rgt, bot, xRoundFactor, yRoundFactor, outlineColor);
 
             // gravity distortions to make stones unique
             gravityDistortEdges(lft, top, rgt, bot, 10, 35, 5);

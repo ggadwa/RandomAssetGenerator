@@ -39,7 +39,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
             x = (lft + edgeSize) + AppWindow.random.nextInt(wid - xsz);
             y = (top + edgeSize) + AppWindow.random.nextInt(high - ysz);
 
-            drawOval(x, y, (x + xsz), (y + ysz), 0.0f, 1.0f, (0.1f + AppWindow.random.nextFloat(0.2f)), (0.1f + AppWindow.random.nextFloat(0.2f)), edgeSize, edgeColorFactor, cloudColor, cloudColor, 0.5f, false, true, 0.9f, 1.0f);
+            drawOval(x, y, (x + xsz), (y + ysz), 0.0f, 1.0f, (0.1f + AppWindow.random.nextFloat(0.2f)), (0.1f + AppWindow.random.nextFloat(0.2f)), edgeSize, edgeColorFactor, cloudColor, 0.5f, false, true, 0.9f, 1.0f);
         }
     }
 
@@ -149,7 +149,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         top = qtr + AppWindow.random.nextInt(qtr - sunSize);
         edgeSize = AppWindow.random.nextInt(sunSize);
 
-        drawOval(lft, top, (lft + sunSize), (top + sunSize), 0.0f, 1.0f, 0.0f, 0.0f, edgeSize, (1.0f + AppWindow.random.nextFloat(0.5f)), sunColor, sunColor, 0.5f, false, true, 0.9f, 1.0f);
+        drawOval(lft, top, (lft + sunSize), (top + sunSize), 0.0f, 1.0f, 0.0f, 0.0f, edgeSize, (1.0f + AppWindow.random.nextFloat(0.5f)), sunColor, 0.5f, false, true, 0.9f, 1.0f);
 
         // clouds on sides
         cloudCount = 1 + AppWindow.random.nextInt(5);

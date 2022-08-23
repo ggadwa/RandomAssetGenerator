@@ -56,8 +56,9 @@ public class BitmapStoneWall extends BitmapBase
             // draw on the background
             colorData = backgroundData.clone();
 
-            outlineColor = adjustColor(drawStoneColor, (0.4f + AppWindow.random.nextFloat(0.2f)));
-            drawOval((lft + xOff), (top + yOff), rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, edgeColorFactor, drawStoneColor, outlineColor, normalZFactor, false, true, 0.4f, 1.2f);
+            outlineColor = adjustColor(drawStoneColor, (0.1f + AppWindow.random.nextFloat(0.2f)));
+            drawOval((lft + xOff), (top + yOff), rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, edgeColorFactor, drawStoneColor, normalZFactor, false, true, 0.4f, 1.2f);
+            drawFrameOval((lft + xOff), (top + yOff), rgt, bot, xRoundFactor, yRoundFactor, outlineColor);
 
             // gravity distortions to make stones unique
             gravityDistortEdges((lft + xOff), (top + yOff), rgt, bot, (8 + AppWindow.random.nextInt(4)), (textureSize / 14), (textureSize / 100));

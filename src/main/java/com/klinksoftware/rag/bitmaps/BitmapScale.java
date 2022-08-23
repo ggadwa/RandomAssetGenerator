@@ -74,7 +74,8 @@ public class BitmapScale extends BitmapBase {
                 // the scale itself
                 // we draw the scale as a solid, flat oval and
                 // then redraw the border with normals
-                drawOval(sx, sy, sx2, sy2, 0.25f, 0.75f, 0.0f, 0.0f, 3, 0.8f, col, borderColor, 0.5f, false, false, 0.0f, 1.0f);
+                drawOval(sx, sy, sx2, sy2, 0.25f, 0.75f, 0.0f, 0.0f, 3, 0.8f, col, 0.5f, false, false, 0.0f, 1.0f);
+                drawFrameOval(sx, sy, sx2, sy2, 0.0f, 0.0f, borderColor);
 
                 dx += sWid;
             }

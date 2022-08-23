@@ -149,7 +149,7 @@ public class BitmapComputer extends BitmapBase
 
                 color=getRandomColor();
                 if (AppWindow.random.nextBoolean()) color=adjustColor(color,0.8f);
-                drawOval((dx+1),(dy+1),(dx+(sz-1)),(dy+(sz-1)),0.0f,1.0f,0.0f,0.0f,sz,0.8f,color,null,0.5f,false,false,1.0f,0.0f);
+                drawOval((dx + 1), (dy + 1), (dx + (sz - 1)), (dy + (sz - 1)), 0.0f, 1.0f, 0.0f, 0.0f, sz, 0.8f, color, 0.5f, false, false, 1.0f, 0.0f);
 
                     // the possible emissive
 
@@ -251,19 +251,24 @@ public class BitmapComputer extends BitmapBase
                 dx = (lft + xMargin) + (x * (sz + margin));
                 dx2 = dx + sz;
 
-                drawOval(dx, dy, dx2, dy2, 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.8f, outlineColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
-                drawOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.75f, 1.25f, 0.0f, 0.0f, 0, 0.8f, dialColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+                drawOval(dx, dy, dx2, dy2, 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.8f, outlineColor, 0.5f, false, false, 1.0f, 0.0f);
+                drawFrameOval(dx, dy, dx2, dy2, 0.0f, 0.0f, COLOR_BLACK);
+                drawOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.75f, 1.25f, 0.0f, 0.0f, 0, 0.8f, dialColor, 0.5f, false, false, 1.0f, 0.0f);
+                drawFrameOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.0f, 0.0f, COLOR_BLACK);
+
                 if (AppWindow.random.nextBoolean()) {
                     drawRect(dx, ((dy + dy2) / 2), dx2, dy2, outlineColor);
                     draw3DFrameRect(dx, ((dy + dy2) / 2), dx2, dy2, 2, outlineColor, true);
                 } else {
-                    drawOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.25f, 0.75f, 0.0f, 0.0f, 0, 0.8f, outlineColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+                    drawOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.25f, 0.75f, 0.0f, 0.0f, 0, 0.8f, outlineColor, 0.5f, false, false, 1.0f, 0.0f);
+                    drawFrameOval((dx + 2), (dy + 2), (dx2 - 2), (dy2 - 2), 0.0f, 0.0f, COLOR_BLACK);
                 }
 
                 mx = dx + (sz / 2);
                 my = dy + (sz / 2);
 
-                drawOval((mx - margin), (my - margin), (mx + margin), (my + margin), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.8f, outlineColor, COLOR_BLACK, 0.5f, false, false, 1.0f, 0.0f);
+                drawOval((mx - margin), (my - margin), (mx + margin), (my + margin), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.8f, outlineColor, 0.5f, false, false, 1.0f, 0.0f);
+                drawFrameOval((mx - margin), (my - margin), (mx + margin), (my + margin), 0.0f, 0.0f, COLOR_BLACK);
 
                 pnt = new RagPoint(0, 0, (dy - my));
                 pnt.rotateY(AppWindow.random.nextFloat(180.0f) - 90.0f);
@@ -354,10 +359,10 @@ public class BitmapComputer extends BitmapBase
 
         drawRect(lft,top,rgt,bot,COLOR_BLACK);
 
-        drawOval((lft+3),(top+3),(lft+13),(top+13),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
-        drawOval((rgt-13),(top+3),(rgt-3),(top+13),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
-        drawOval((lft+3),(bot-13),(lft+13),(bot-3),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
-        drawOval((rgt-13),(bot-13),(rgt-3),(bot-3),0.0f,1.0f,0.0f,0.0f,0,0.0f,screenColor,null,0.5f,false,false,1.0f,0.0f);
+        drawOval((lft + 3), (top + 3), (lft + 13), (top + 13), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.0f, screenColor, 0.5f, false, false, 1.0f, 0.0f);
+        drawOval((rgt - 13), (top + 3), (rgt - 3), (top + 13), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.0f, screenColor, 0.5f, false, false, 1.0f, 0.0f);
+        drawOval((lft + 3), (bot - 13), (lft + 13), (bot - 3), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.0f, screenColor, 0.5f, false, false, 1.0f, 0.0f);
+        drawOval((rgt - 13), (bot - 13), (rgt - 3), (bot - 3), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.0f, screenColor, 0.5f, false, false, 1.0f, 0.0f);
 
         drawRect((lft+8),(top+8),(rgt-8),(bot-8),screenColor);
         drawRect((lft+8),(top+3),(rgt-8),(top+8),screenColor);

@@ -1194,16 +1194,117 @@ public class BitmapBase
         }
     }
 
-    protected void drawOval(int lft,int top,int rgt,int bot,float startArc,float endArc,float xRoundFactor,float yRoundFactor,int edgeSize,float edgeColorFactor,RagColor color,RagColor outlineColor,float normalZFactor,boolean flipNormals,boolean addNoise,float colorFactorMin,float colorFactorMax)
-    {
-        int         n,x,y,mx,my,wid,high,idx,
-                    edgeCount,drawStartArc,drawEndArc;
-        float       fx,fy,halfWid,halfHigh,rad,
-                    colorFactorAdd,colorFactor,nFactor;
+    protected void drawOval(int lft, int top, int rgt, int bot, float startArc, float endArc, float xRoundFactor, float yRoundFactor, int edgeSize, float edgeColorFactor, RagColor color, float normalZFactor, boolean flipNormals, boolean addNoise, float colorFactorMin, float colorFactorMax)    {
+        int n, x, y, mx, my, cx, cy, wid, high, idx, edgeCount, drawStartArc, drawEndArc;
+        float rad, colorFactorAdd, colorFactor, nFactor;
         RagColor    col;
-        RagPoint    normal;
+        RagPoint normal;
 
-        if ((lft>=rgt) || (top>=bot)) return;
+        int halfWid, halfHigh;
+        float edgeDist, edgeSize2 = 1.5f;
+        double dx, dy, dxRoundFactor, dyRoundFactor, ovalDist;
+        double squareHalfWid, squareHalfHigh, squareHalfWidAndHigh;
+
+        if ((lft >= rgt) || (top >= bot)) {
+            return;
+        }
+
+        col = new RagColor(0.0f, 0.0f, 0.0f);
+
+        // draw oval in box
+        halfWid = (rgt - lft) / 2;
+        squareHalfWid = (double) halfWid * (double) halfWid;
+
+        halfHigh = (bot - top) / 2;
+        squareHalfHigh = (double) halfHigh * (double) halfHigh;
+
+        squareHalfWidAndHigh = squareHalfWid * squareHalfHigh;
+
+        dxRoundFactor = (double) (1.0f - xRoundFactor);
+        dyRoundFactor = (double) (1.0f - yRoundFactor);
+
+        mx = (lft + rgt) / 2;
+        my = (top + bot) / 2;
+
+        for (y = 0; y != halfHigh; y++) {
+            dy = (double) y * (double) y;
+            dy = (dy * squareHalfWid) * dyRoundFactor;
+
+            for (x = 0; x != halfWid; x++) {
+                dx = (double) x * (double) x;
+
+                // in oval?
+                ovalDist = ((dx * squareHalfHigh) * dxRoundFactor) + dy;
+                if (ovalDist > squareHalfWidAndHigh) {
+                    continue;
+                }
+
+                // get the color
+                col.setFromColor(color);
+
+                if ((edgeSize2 != 0.0f) && (ovalDist != 0.0)) {
+                    edgeDist = ((float) Math.sqrt(squareHalfWidAndHigh / ovalDist)) - 1.0f;
+                    if (edgeDist < edgeSize2) {
+                        colorFactor = edgeColorFactor + ((edgeDist / edgeSize2) * (1.0f - edgeColorFactor));
+                        col.factor(colorFactor);
+                    }
+                }
+
+                if (addNoise) {
+                    //colorFactor=colorFactorMin+(colorFactorAdd*perlinNoiseColorFactor[(y*textureSize)+x]);
+                    //col.factor(colorFactor);
+                }
+
+
+                // top
+                cy = my - y;
+                if ((cy >= 0) && (cy < textureSize)) {
+
+                    cx = mx + x;
+                    if ((cx >= 0) && (cx < textureSize)) {
+                        idx = ((cy * textureSize) + cx) * 4;
+                        colorData[idx] = col.r;
+                        colorData[idx + 1] = col.g;
+                        colorData[idx + 2] = col.b;
+                        colorData[idx + 3] = 0.0f;
+                    }
+
+                    cx = mx - x;
+                    if ((cx >= 0) && (cx < textureSize)) {
+                        idx = ((cy * textureSize) + cx) * 4;
+                        colorData[idx] = col.r;
+                        colorData[idx + 1] = col.g;
+                        colorData[idx + 2] = col.b;
+                        colorData[idx + 3] = 0.0f;
+                    }
+                }
+
+                // bottom
+                cy = my + y;
+                if ((cy >= 0) && (cy < textureSize)) {
+
+                    cx = mx + x;
+                    if ((cx >= 0) && (cx < textureSize)) {
+                        idx = ((cy * textureSize) + cx) * 4;
+                        colorData[idx] = col.r;
+                        colorData[idx + 1] = col.g;
+                        colorData[idx + 2] = col.b;
+                        colorData[idx + 3] = 0.0f;
+                    }
+
+                    cx = mx - x;
+                    if ((cx >= 0) && (cx < textureSize)) {
+                        idx = ((cy * textureSize) + cx) * 4;
+                        colorData[idx] = col.r;
+                        colorData[idx + 1] = col.g;
+                        colorData[idx + 2] = col.b;
+                        colorData[idx + 3] = 0.0f;
+                    }
+                }
+            }
+        }
+
+        /*
 
             // start and end arc
 
@@ -1312,46 +1413,76 @@ public class BitmapBase
             wid--;
             high--;
         }
+*/
+    }
 
-            // any outline
+    protected void drawFrameOval(int lft, int top, int rgt, int bot, float xRoundFactor, float yRoundFactor, RagColor color) {
+        int n, x, y, mx, my;
+        int lastX, lastY, firstX, firstY;
+        float halfWid, halfHigh;
+        float fx, fy, rad;
 
-        if (outlineColor!=null) {
-            wid=(rgt-lft)-1;
-            high=(bot-top)-1;         // avoids clipping on bottom from being on wid,high
-
-            halfWid=(float)wid*0.5f;
-            halfHigh=(float)high*0.5f;
-
-            for (n=drawStartArc;n<drawEndArc;n++) {
-                rad=(float)(Math.PI*2.0)*((float)n*0.001f);
-
-                fx=(float)Math.sin(rad);
-                fx+=(fx*xRoundFactor);
-                if (fx>1.0f) fx=1.0f;
-                if (fx<-1.0f) fx=-1.0f;
-
-                x=mx+(int)(halfWid*fx);
-                if ((x<0) || (x>=textureSize)) continue;
-
-                fy=(float)Math.cos(rad);
-                fy+=(fy*yRoundFactor);
-                if (fy>1.0f) fy=1.0f;
-                if (fy<-1.0f) fy=-1.0f;
-
-                y=my-(int)(halfHigh*fy);
-                if ((y<0) || (y>=textureSize)) continue;
-
-                    // the color pixel
-
-                idx=((y*textureSize)+x)*4;
-
-                colorData[idx]=outlineColor.r;
-                colorData[idx+1]=outlineColor.g;
-                colorData[idx + 2] = outlineColor.b;
-                colorData[idx + 3] = 0.0f;
-            }
+        if ((lft >= rgt) || (top >= bot)) {
+            return;
         }
 
+        halfWid = (float) (rgt - lft) * 0.5f;
+        halfHigh = (float) (bot - top) * 0.5f;
+
+        mx = (lft + rgt) / 2;
+        my = (top + bot) / 2;
+
+        lastX = -1;
+        lastY = -1;
+        firstX = -1;
+        firstY = -1;
+
+        for (n = 0; n != 360; n++) {
+            rad = (float) (Math.PI * 2.0) * (((float) n) / 360.0f);
+
+            fx = (float) Math.sin(rad);
+            fx += (fx * xRoundFactor);
+            if (fx > 1.0f) {
+                fx = 1.0f;
+            }
+            if (fx < -1.0f) {
+                fx = -1.0f;
+            }
+
+            x = mx + (int) (halfWid * fx);
+            if ((x < 0) || (x >= textureSize)) {
+                continue;
+            }
+
+            fy = (float) Math.cos(rad);
+            fy += (fy * yRoundFactor);
+            if (fy > 1.0f) {
+                fy = 1.0f;
+            }
+            if (fy < -1.0f) {
+                fy = -1.0f;
+            }
+
+            y = my - (int) (halfHigh * fy);
+            if ((y < 0) || (y >= textureSize)) {
+                continue;
+            }
+
+            // line to line for pixels
+            if (n == 0) {
+                firstX = x;
+                firstY = y;
+            } else {
+                if (n == 359) {
+                    drawLineColor(x, y, firstX, firstY, color);
+                } else {
+                    drawLineColor(lastX, lastY, x, y, color);
+                }
+            }
+
+            lastX = x;
+            lastY = y;
+        }
     }
 
     protected void drawOvalEmissive(int lft,int top,int rgt,int bot,RagColor color)
@@ -2245,14 +2376,16 @@ public class BitmapBase
                     idx=((dy*textureSize)+dx)*4;
                     colorData[idx]=color.r;
                     colorData[idx+1]=color.g;
-                    colorData[idx+2]=color.b;
+                    colorData[idx + 2] = color.b;
+                    colorData[idx + 3] = 0.0f;
 
                     if (prevY!=-1) {
                         if (dy!=prevY) {
                             idx=((prevY*textureSize)+dx)*4;
                             colorData[idx]=(colorData[idx]*0.5f)+(color.r*0.5f);
                             colorData[idx+1]=(colorData[idx+1]*0.5f)+(color.g*0.5f);
-                            colorData[idx+2]=(colorData[idx+2]*0.5f)+(color.b*0.5f);
+                            colorData[idx + 2] = (colorData[idx + 2] * 0.5f) + (color.b * 0.5f);
+                            colorData[idx + 3] = 0.0f;
                         }
                     }
 
@@ -2287,14 +2420,16 @@ public class BitmapBase
                     idx=((dy*textureSize)+dx)*4;
                     colorData[idx]=color.r;
                     colorData[idx+1]=color.g;
-                    colorData[idx+2]=color.b;
+                    colorData[idx + 2] = color.b;
+                    colorData[idx + 3] = 0.0f;
 
                     if (prevX!=-1) {
                         if (dx!=prevX) {
                             idx=((dy*textureSize)+prevX)*4;
                             colorData[idx]=(colorData[idx]*0.5f)+(color.r*0.5f);
                             colorData[idx+1]=(colorData[idx+1]*0.5f)+(color.g*0.5f);
-                            colorData[idx+2]=(colorData[idx+2]*0.5f)+(color.b*0.5f);
+                            colorData[idx + 2] = (colorData[idx + 2] * 0.5f) + (color.b * 0.5f);
+                            colorData[idx + 3] = 0.0f;
                         }
                     }
 
@@ -2834,7 +2969,8 @@ public class BitmapBase
     public void drawScrew(int x, int y, RagColor screwColor, RagColor outlineColor, int screwSize, int edgeSize) {
         int mx, my;
 
-        drawOval(x, y, (x + screwSize), (y + screwSize), 0.0f, 1.0f, 0.0f, 0.0f, edgeSize, 0.8f, screwColor, outlineColor, 0.5f, false, false, 1.0f, 0.0f);
+        drawOval(x, y, (x + screwSize), (y + screwSize), 0.0f, 1.0f, 0.0f, 0.0f, edgeSize, 0.8f, screwColor, 0.5f, false, false, 1.0f, 0.0f);
+        drawFrameOval(x, y, (x + screwSize), (y + screwSize), 0.0f, 0.0f, outlineColor);
 
         if (AppWindow.random.nextBoolean()) {
             my = y + (screwSize / 2);
