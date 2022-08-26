@@ -71,7 +71,7 @@ public class BitmapWoodBoard extends BitmapBase {
         boardCount = 4 + AppWindow.random.nextInt(12);
         boardSize = textureSize / boardCount;
         edgeSize = (int) (((float) textureSize * 0.005f) + (AppWindow.random.nextFloat() * ((float) textureSize * 0.005f)));
-        woodColor = getRandomColor();
+        woodColor = getRandomBrownOrGrayColor();
 
         // the planks
         generateWoodPlanks(boardCount, boardSize, edgeSize, woodColor);

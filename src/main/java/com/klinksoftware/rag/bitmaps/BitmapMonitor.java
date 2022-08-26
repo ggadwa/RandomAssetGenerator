@@ -25,7 +25,7 @@ public class BitmapMonitor extends BitmapComputer {
         panelEdgeSize = 4 + AppWindow.random.nextInt(6);
         panelInsideEdgeSize = 3 + AppWindow.random.nextInt(3);
 
-        panelColor = getRandomGray(0.6f, 0.8f);
+        panelColor = getRandomGrayColor(0.6f, 0.8f);
         panelColor.b *= (1.0f + AppWindow.random.nextFloat(0.2f));
 
         drawRect(0, 0, textureSize, textureSize, panelColor);

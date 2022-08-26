@@ -27,7 +27,10 @@ public class SpinnerPane extends JComponent {
     }
 
     public void stop() {
-        timer.stop();
+        if (timer != null) {
+            timer.stop();
+            timer = null;
+        }
 
         setVisible(false);
     }

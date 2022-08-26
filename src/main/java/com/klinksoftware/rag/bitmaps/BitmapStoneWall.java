@@ -37,8 +37,8 @@ public class BitmapStoneWall extends BitmapBase
             // the stone itself
             drawStoneColor = adjustColorRandom(((AppWindow.random.nextFloat() < 0.7f) ? stoneColor : altStoneColor), 0.7f, 1.2f);
 
-            xOff = (int) (AppWindow.random.nextFloat() * ((float) textureSize * 0.01f));
-            yOff = (int) (AppWindow.random.nextFloat() * ((float) textureSize * 0.01f));
+            xOff = 0; // (int) (AppWindow.random.nextFloat() * ((float) textureSize * 0.01f));
+            yOff = 0; // (int) (AppWindow.random.nextFloat() * ((float) textureSize * 0.01f));
 
             edgeSize = (textureSize / 15) + AppWindow.random.nextInt(textureSize / 6);
             edgeColorFactor = 0.4f + AppWindow.random.nextFloat(0.2f);
@@ -46,18 +46,13 @@ public class BitmapStoneWall extends BitmapBase
             yRoundFactor = 0.02f + (AppWindow.random.nextFloat(0.05f));
             normalZFactor = 0.2f + (AppWindow.random.nextFloat(0.2f));
 
-            if (AppWindow.random.nextBoolean()) {
-                createPerlinNoiseData(16, 16);
-            } else {
-                createPerlinNoiseData(32, 32);
-            }
             createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
 
             // draw on the background
             colorData = backgroundData.clone();
 
             outlineColor = adjustColor(drawStoneColor, (0.1f + AppWindow.random.nextFloat(0.2f)));
-            drawOval((lft + xOff), (top + yOff), rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, edgeColorFactor, drawStoneColor, normalZFactor, false, true, 0.4f, 1.2f);
+            drawOval((lft + xOff), (top + yOff), rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, edgeColorFactor, drawStoneColor, normalZFactor, false, true, (0.2f + AppWindow.random.nextFloat(0.3f)), (1.0f + AppWindow.random.nextFloat(0.2f)));
             drawFrameOval((lft + xOff), (top + yOff), rgt, bot, xRoundFactor, yRoundFactor, outlineColor);
 
             // gravity distortions to make stones unique
@@ -73,6 +68,14 @@ public class BitmapStoneWall extends BitmapBase
         }
     }
 
+    protected void createPerlinNoiseForStoneSize(int yCount) {
+        if (yCount < 6) {
+            createPerlinNoiseData(16, 16);
+        } else {
+            createPerlinNoiseData(32, 32);
+        }
+    }
+
     @Override
     public void generateInternal() {
         int y, yCount, yAdd, top, bot;
@@ -81,7 +84,7 @@ public class BitmapStoneWall extends BitmapBase
 
         stoneColor=getRandomColor();
         altStoneColor=getRandomColorDull(0.9f);
-        groutColor=getRandomGray(0.35f,0.55f);
+        groutColor = getRandomGrayColor(0.35f, 0.55f);
 
         // the noise grout
         drawGrout();
@@ -98,8 +101,12 @@ public class BitmapStoneWall extends BitmapBase
 
         // draw the stones
         yCount = 4 + AppWindow.random.nextInt(6);
-        yAdd=textureSize/yCount;
+        yAdd = textureSize / yCount;
 
+        // create perlin based on # of stones
+        createPerlinNoiseForStoneSize(yCount);
+
+        // draw the stones
         top=0;
 
         for (y=0;y!=yCount;y++) {

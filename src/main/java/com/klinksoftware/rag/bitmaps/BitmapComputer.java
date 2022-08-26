@@ -30,7 +30,7 @@ public class BitmapComputer extends BitmapBase
         boolean horz;
         RagColor recessColor, lineColor;
 
-        recessColor=getRandomGray(0.15f,0.25f);
+        recessColor = getRandomGrayColor(0.15f, 0.25f);
 
             // wires background
 
@@ -154,7 +154,7 @@ public class BitmapComputer extends BitmapBase
                     // the possible emissive
 
                 if (AppWindow.random.nextBoolean()) {
-                    drawOvalEmissive((dx + 1), (dy + 1), (dx + (sz - 1)), (dy + (sz - 1)), adjustColor(color, 0.7f));
+                    drawSimpleOval(emissiveData, (dx + 1), (dy + 1), (dx + (sz - 1)), (dy + (sz - 1)), adjustColor(color, 0.7f));
                 }
             }
         }
@@ -184,7 +184,7 @@ public class BitmapComputer extends BitmapBase
         xMargin=(((rgt-lft)-(xCount*sz))/2);
         yMargin=(((bot-top)-(yCount*sz))/2);
 
-        outlineColor=getRandomGray(0.1f,0.3f);
+        outlineColor = getRandomGrayColor(0.1f, 0.3f);
 
         for (y=0;y!=yCount;y++) {
             dy=(top+yMargin)+(y*sz);
@@ -294,7 +294,7 @@ public class BitmapComputer extends BitmapBase
 
             // the random color (always dark)
 
-        color=getRandomGray(0.1f,0.3f);
+        color = getRandomGrayColor(0.1f, 0.3f);
         outlineColor=adjustColor(color,0.8f);
 
             // the drive sizes

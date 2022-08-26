@@ -17,15 +17,15 @@ public class BitmapStoneWoodWall extends BitmapStoneWall {
 
     @Override
     public void generateInternal() {
-        int y, yCount, yAdd, top, bot, edgeSize;
+        int y, yCount, yAdd, top, bot;
+        int boardCount, boardLft, boardRgt, boardEdgeSize;
         float[] backgroundData, stoneColorData, stoneNormalData;
         boolean wasBoard;
-        RagColor stoneColor, altStoneColor, woodColor, groutColor;
+        RagColor stoneColor, altStoneColor, woodColor;
 
         stoneColor = getRandomColor();
         altStoneColor = getRandomColorDull(0.9f);
-        woodColor = getRandomColor();
-        groutColor = getRandomGray(0.35f, 0.55f);
+        woodColor = getRandomBrownOrGrayColor();
 
         // the noise grout
         drawGrout();
@@ -43,7 +43,21 @@ public class BitmapStoneWoodWall extends BitmapStoneWall {
         yCount = 4 + AppWindow.random.nextInt(6);
         yAdd = textureSize / yCount;
 
+        // create perlin based on # of stones
+        createPerlinNoiseForStoneSize(yCount);
+
+        // board settings
+        boardLft = 0;
+        boardRgt = textureSize;
+        boardEdgeSize = 3 + AppWindow.random.nextInt(textureSize / 70);
+        if (AppWindow.random.nextBoolean()) {
+            //    boardLft -= boardEdgeSize;
+            //    boardRgt += boardEdgeSize;
+        }
+
+        // draw stones
         top = 0;
+        boardCount = 0;
         wasBoard = true;
 
         for (y = 0; y != yCount; y++) {
@@ -52,15 +66,15 @@ public class BitmapStoneWoodWall extends BitmapStoneWall {
                 bot = textureSize - 1;
             }
 
-            if ((AppWindow.random.nextBoolean()) || (wasBoard)) {
+            if ((AppWindow.random.nextBoolean()) || (wasBoard) || (boardCount == 2)) {
                 generateSingleStoneRow(top, bot, yAdd, backgroundData, stoneColorData, stoneNormalData, stoneColor, altStoneColor);
                 wasBoard = false;
             } else {
                 // need to copy this over because how stones are drawn
-                edgeSize = 3 + AppWindow.random.nextInt(10);
-                generateWoodDrawBoard(0, top, textureSize, bot, edgeSize, woodColor);
+                generateWoodDrawBoard(boardLft, top, boardRgt, bot, boardEdgeSize, woodColor);
                 drawRectAlpha(0, top, textureSize, bot, 0.0f);
                 blockCopy(colorData, normalData, 0, top, textureSize, bot, stoneColorData, stoneNormalData);
+                boardCount++;
                 wasBoard = true;
             }
 

@@ -31,7 +31,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
 
         // get a random seed and generate the bitmap
         seed = Calendar.getInstance().getTimeInMillis();
-        //seed = 1660930028219L;
+        //seed = 1661461387975L;
         AppWindow.random.setSeed(seed);
 
         try {

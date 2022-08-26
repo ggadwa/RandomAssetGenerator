@@ -1,14 +1,9 @@
 
 
-
---> oval updates
-     - add normals back in
-     - need top/bottom draw (in frame too)
-     - add noise back in
-
-
+- do: getRandomBlueOrSilver for metals
 
 map
+ - thread bitmap creation
  - going up ramps is sometimes broken
  - open ceiling
  - windows

@@ -25,12 +25,12 @@ public class BitmapLiquid extends BitmapBase
 
         sz = noiseData[AppWindow.random.nextInt(4)];
         createPerlinNoiseData(sz, sz);
-        liquidColor = getRandomGray(0.0f, 0.5f); // getRandomColor();
+        liquidColor = getRandomGrayColor(0.0f, 0.5f); // getRandomColor();
         drawPerlinNoiseColorRect(0, 0, textureSize, textureSize, liquidColor, (0.4f + AppWindow.random.nextFloat(0.3f)));
 
         sz = noiseData[AppWindow.random.nextInt(4)];
         createPerlinNoiseData(sz, sz);
-        liquidColor = getRandomGray(0.0f, 0.5f); // getRandomColor();
+        liquidColor = getRandomGrayColor(0.0f, 0.5f); // getRandomColor();
         drawPerlinNoiseColorRect(0, 0, textureSize, textureSize, liquidColor, (0.4f + AppWindow.random.nextFloat(0.3f)));
 
         tint(0, 0, textureSize, textureSize, getRandomTintColor(), 0.5f);

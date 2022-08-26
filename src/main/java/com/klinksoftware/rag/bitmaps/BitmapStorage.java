@@ -86,15 +86,16 @@ public class BitmapStorage extends BitmapBase {
         }
 
         // outside planks
-        outerColor = getRandomColor();
         edgeSize = 3 + AppWindow.random.nextInt(4);
 
         if (AppWindow.random.nextBoolean()) {
+            outerColor = getRandomBrownOrGrayColor();
             generateWoodDrawBoard(0, 0, boardSize, textureSize, edgeSize, outerColor);
             generateWoodDrawBoard((textureSize - boardSize), 0, textureSize, textureSize, edgeSize, outerColor);
             generateWoodDrawBoard(boardSize, 0, (textureSize - boardSize), boardSize, edgeSize, outerColor);
             generateWoodDrawBoard(boardSize, (textureSize - boardSize), (textureSize - boardSize), textureSize, edgeSize, outerColor);
         } else {
+            outerColor = getRandomBlueOrSilverColor();
             generateMetalTread(0, 0, boardSize, textureSize, edgeSize, outerColor);
             generateMetalTread((textureSize - boardSize), 0, textureSize, textureSize, edgeSize, outerColor);
             generateMetalTread(boardSize, 0, (textureSize - boardSize), boardSize, edgeSize, outerColor);
