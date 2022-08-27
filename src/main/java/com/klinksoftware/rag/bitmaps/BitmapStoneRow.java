@@ -4,9 +4,9 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapStoneWall extends BitmapBase
+public class BitmapStoneRow extends BitmapBase
 {
-    public BitmapStoneWall(int textureSize) {
+    public BitmapStoneRow(int textureSize) {
         super(textureSize);
 
         hasNormal=true;
@@ -42,8 +42,8 @@ public class BitmapStoneWall extends BitmapBase
 
             edgeSize = (textureSize / 15) + AppWindow.random.nextInt(textureSize / 6);
             edgeColorFactor = 0.4f + AppWindow.random.nextFloat(0.2f);
-            xRoundFactor = 0.02f + (AppWindow.random.nextFloat(0.05f));
-            yRoundFactor = 0.02f + (AppWindow.random.nextFloat(0.05f));
+            xRoundFactor = 0.01f + (AppWindow.random.nextFloat(0.03f));
+            yRoundFactor = 0.01f + (AppWindow.random.nextFloat(0.03f));
             normalZFactor = 0.2f + (AppWindow.random.nextFloat(0.2f));
 
             createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));

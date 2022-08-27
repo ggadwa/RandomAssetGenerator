@@ -550,7 +550,7 @@ public class MapBuilder
     // required bitmaps
     //
     public void buildRequiredBitmaps(int mapType, int textureSize, boolean skyBox) {
-        String[] wallBitmaps = {"BrickPattern", "BrickRow", "Geometric", "MetalHexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StoneWoodWall", "StoneWall", "Temple", "Tile", "WoodBoard"};
+        String[] wallBitmaps = {"BrickPattern", "BrickRow", "BrickRowWood", "Geometric", "MetalHexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StonePattern", "StoneRow", "StoneRowWood", "Temple", "Tile", "WoodBoard"};
         String[] insideFloorBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalHexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "WoodBoard"};
         String[] outsideFloorBitmaps = {"Dirt", "Grass"};
         String[] ceilingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "WoodBoard"};

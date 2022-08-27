@@ -4,9 +4,9 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapStoneWoodWall extends BitmapStoneWall {
+public class BitmapStoneRowWood extends BitmapStoneRow {
 
-    public BitmapStoneWoodWall(int textureSize) {
+    public BitmapStoneRowWood(int textureSize) {
         super(textureSize);
 
         hasNormal = true;
@@ -18,9 +18,9 @@ public class BitmapStoneWoodWall extends BitmapStoneWall {
     @Override
     public void generateInternal() {
         int y, yCount, yAdd, top, bot;
-        int boardCount, boardLft, boardRgt, boardEdgeSize;
+        int boardCount, boardLft, boardRgt, boardEdgeSize, boardNailSize;
         float[] backgroundData, stoneColorData, stoneNormalData;
-        boolean wasBoard;
+        boolean wasBoard, boardNail, boardDoubleNail;
         RagColor stoneColor, altStoneColor, woodColor;
 
         stoneColor = getRandomColor();
@@ -50,9 +50,12 @@ public class BitmapStoneWoodWall extends BitmapStoneWall {
         boardLft = 0;
         boardRgt = textureSize;
         boardEdgeSize = 3 + AppWindow.random.nextInt(textureSize / 70);
+        boardNailSize = yAdd / 10;
+        boardNail = AppWindow.random.nextBoolean();
+        boardDoubleNail = AppWindow.random.nextBoolean();
         if (AppWindow.random.nextBoolean()) {
-            //    boardLft -= boardEdgeSize;
-            //    boardRgt += boardEdgeSize;
+            boardLft -= boardEdgeSize;
+            boardRgt += boardEdgeSize;
         }
 
         // draw stones
@@ -72,6 +75,9 @@ public class BitmapStoneWoodWall extends BitmapStoneWall {
             } else {
                 // need to copy this over because how stones are drawn
                 generateWoodDrawBoard(boardLft, top, boardRgt, bot, boardEdgeSize, woodColor);
+                if (boardNail) {
+                    generateWoodDrawBoardNails(0, top, textureSize, bot, boardEdgeSize, boardNailSize, boardDoubleNail);
+                }
                 drawRectAlpha(0, top, textureSize, bot, 0.0f);
                 blockCopy(colorData, normalData, 0, top, textureSize, bot, stoneColorData, stoneNormalData);
                 boardCount++;

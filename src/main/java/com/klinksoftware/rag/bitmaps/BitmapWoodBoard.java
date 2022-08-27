@@ -15,7 +15,12 @@ public class BitmapWoodBoard extends BitmapBase {
         hasAlpha = false;
     }
 
-    public void generateWoodPlanks(int boardCount, int boardSize, int edgeSize, RagColor woodColor) {
+    public void generateSingleWoodPlank(int lft, int top, int rgt, int bot, int edgeSize, int boardNailSize, boolean boardNail, boolean boardDoubleNail, RagColor woodColor) {
+        generateWoodDrawBoard(lft, top, rgt, bot, edgeSize, woodColor);
+        generateWoodDrawBoardNails(lft, top, rgt, bot, edgeSize, boardNailSize, boardDoubleNail);
+    }
+
+    public void generateWoodPlanks(int boardCount, int boardSize, int edgeSize, int boardNailSize, boolean boardNail, boolean boardDoubleNail, RagColor woodColor) {
         int n, y, ty, by, lft, rgt, boardType;
 
         // perlin noise
@@ -38,23 +43,23 @@ public class BitmapWoodBoard extends BitmapBase {
 
             switch (boardType) {
                 case 0:
-                    generateWoodDrawBoard(lft, 0, rgt, textureSize, edgeSize, woodColor);
+                    generateSingleWoodPlank(lft, 0, rgt, textureSize, edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
                     break;
                 case 1:
-                    generateWoodDrawBoard(lft, 0, rgt, y, edgeSize, woodColor);
-                    generateWoodDrawBoard(lft, y, rgt, textureSize, edgeSize, woodColor);
+                    generateSingleWoodPlank(lft, 0, rgt, y, edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
+                    generateSingleWoodPlank(lft, y, rgt, textureSize, edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
                     break;
                 case 2:
-                    generateWoodDrawBoard(lft, -edgeSize, rgt, y, edgeSize, woodColor);
-                    generateWoodDrawBoard(lft, y, rgt, (textureSize + edgeSize), edgeSize, woodColor);
+                    generateSingleWoodPlank(lft, -edgeSize, rgt, y, edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
+                    generateSingleWoodPlank(lft, y, rgt, (textureSize + edgeSize), edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
                     break;
                 case 3:
-                    generateWoodDrawBoard(lft, 0, rgt, ty, edgeSize, woodColor);
-                    generateWoodDrawBoard(lft, ty, rgt, by, edgeSize, woodColor);
-                    generateWoodDrawBoard(lft, by, rgt, textureSize, edgeSize, woodColor);
+                    generateSingleWoodPlank(lft, 0, rgt, ty, edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
+                    generateSingleWoodPlank(lft, ty, rgt, by, edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
+                    generateSingleWoodPlank(lft, by, rgt, textureSize, edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
                     break;
                 case 4:
-                    generateWoodDrawBoard(lft, -edgeSize, rgt, (textureSize + edgeSize), edgeSize, woodColor);
+                    generateSingleWoodPlank(lft, -edgeSize, rgt, (textureSize + edgeSize), edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
                     break;
             }
 
@@ -65,6 +70,8 @@ public class BitmapWoodBoard extends BitmapBase {
     @Override
     public void generateInternal() {
         int boardCount, boardSize, edgeSize;
+        int boardNailSize;
+        boolean boardNail, boardDoubleNail;
         RagColor woodColor;
 
         // some random values
@@ -73,8 +80,13 @@ public class BitmapWoodBoard extends BitmapBase {
         edgeSize = (int) (((float) textureSize * 0.005f) + (AppWindow.random.nextFloat() * ((float) textureSize * 0.005f)));
         woodColor = getRandomBrownOrGrayColor();
 
+        // nails
+        boardNailSize = boardSize / 10;
+        boardNail = AppWindow.random.nextBoolean();
+        boardDoubleNail = AppWindow.random.nextBoolean();
+
         // the planks
-        generateWoodPlanks(boardCount, boardSize, edgeSize, woodColor);
+        generateWoodPlanks(boardCount, boardSize, edgeSize, boardNailSize, boardNail, boardDoubleNail, woodColor);
 
         createMetallicRoughnessMap(0.4f, 0.2f);
     }

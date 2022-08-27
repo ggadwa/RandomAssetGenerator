@@ -3043,6 +3043,7 @@ public class BitmapBase
     //
     protected void generateWoodDrawBoard(int lft, int top, int rgt, int bot, int edgeSize, RagColor woodColor) {
         int n, stainCount, stainMinSize, lx, ty, rx, by, sz;
+        int nailSize;
         float f;
         RagColor col;
 
@@ -3085,6 +3086,76 @@ public class BitmapBase
 
         // the board edge
         draw3DDarkenFrameRect(lft, top, rgt, bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), true);
+    }
+
+    protected void generateWoodDrawBoardNails(int lft, int top, int rgt, int bot, int edgeSize, int nailSize, boolean doubleNail) {
+        int x, y, wid, high;
+        int lft2, top2, rgt2, bot2;
+
+        lft2 = lft + edgeSize;
+        rgt2 = rgt - edgeSize;
+        top2 = top + edgeSize;
+        bot2 = bot - edgeSize;
+
+        wid = rgt - lft;
+        high = bot - top;
+
+        if (nailSize > 10) {
+            nailSize = 10;
+        }
+
+        // square, so four nails
+        if (wid == high) {
+            this.drawSimpleOval(colorData, (lft2 + nailSize), (top2 + nailSize), (lft2 + (nailSize * 2)), (top2 + (nailSize * 2)), COLOR_BLACK);
+            this.drawSimpleOval(colorData, (rgt2 - (nailSize * 2)), (top2 + nailSize), (rgt2 - nailSize), (top2 + (nailSize * 2)), COLOR_BLACK);
+            this.drawSimpleOval(colorData, (lft2 + nailSize), (bot2 - (nailSize * 2)), (lft2 + (nailSize * 2)), (bot2 - nailSize), COLOR_BLACK);
+            this.drawSimpleOval(colorData, (rgt2 - (nailSize * 2)), (bot2 - (nailSize * 2)), (rgt2 - nailSize), (bot2 - nailSize), COLOR_BLACK);
+            return;
+        }
+
+        // vertical
+        if (high > wid) {
+            if (doubleNail) {
+                if (top >= 0) {
+                    this.drawSimpleOval(colorData, (lft2 + nailSize), (top2 + nailSize), (lft2 + (nailSize * 2)), (top2 + (nailSize * 2)), COLOR_BLACK);
+                    this.drawSimpleOval(colorData, (rgt2 - (nailSize * 2)), (top2 + nailSize), (rgt2 - nailSize), (top2 + (nailSize * 2)), COLOR_BLACK);
+                }
+                if (bot <= textureSize) {
+                    this.drawSimpleOval(colorData, (lft2 + nailSize), (bot2 - (nailSize * 2)), (lft2 + (nailSize * 2)), (bot2 - nailSize), COLOR_BLACK);
+                    this.drawSimpleOval(colorData, (rgt2 - (nailSize * 2)), (bot2 - (nailSize * 2)), (rgt2 - nailSize), (bot2 - nailSize), COLOR_BLACK);
+                }
+            } else {
+                x = ((lft + rgt) / 2) - (nailSize / 2);
+                if (top >= 0) {
+                    this.drawSimpleOval(colorData, x, (top2 + nailSize), (x + nailSize), (top2 + (nailSize * 2)), COLOR_BLACK);
+                }
+                if (bot <= textureSize) {
+                    this.drawSimpleOval(colorData, x, (bot2 - (nailSize * 2)), (x + nailSize), (bot2 - nailSize), COLOR_BLACK);
+                }
+            }
+
+            return;
+        }
+
+        // horizontal
+        if (doubleNail) {
+            if (lft >= 0) {
+                this.drawSimpleOval(colorData, (lft2 + nailSize), (top2 + nailSize), (lft2 + (nailSize * 2)), (top2 + (nailSize * 2)), COLOR_BLACK);
+                this.drawSimpleOval(colorData, (lft2 + nailSize), (bot2 - (nailSize * 2)), (lft2 + (nailSize * 2)), (bot2 - nailSize), COLOR_BLACK);
+            }
+            if (rgt <= textureSize) {
+                this.drawSimpleOval(colorData, (rgt2 - (nailSize * 2)), (top2 + nailSize), (rgt2 - nailSize), (top2 + (nailSize * 2)), COLOR_BLACK);
+                this.drawSimpleOval(colorData, (rgt2 - (nailSize * 2)), (bot2 - (nailSize * 2)), (rgt2 - nailSize), (bot2 - nailSize), COLOR_BLACK);
+            }
+        } else {
+            y = ((top + bot) / 2) - (nailSize / 2);
+            if (lft >= 0) {
+                this.drawSimpleOval(colorData, (lft2 + nailSize), y, (lft2 + (nailSize * 2)), (y + nailSize), COLOR_BLACK);
+            }
+            if (rgt <= textureSize) {
+                this.drawSimpleOval(colorData, (rgt2 - (nailSize * 2)), y, (rgt2 - nailSize), (y + nailSize), COLOR_BLACK);
+            }
+        }
     }
 
     //

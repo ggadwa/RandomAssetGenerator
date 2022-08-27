@@ -1,6 +1,10 @@
 
 
-- do: getRandomBlueOrSilver for metals
+- computer next
+- computer, panel, humanoid, etc, multiple textures, not one in many textures, update models
+- implement bitmapstonepattern
+- getRandomBlueOrSilver for metals
+
 
 map
  - thread bitmap creation
@@ -11,7 +15,6 @@ map
 
 bitmaps
  - redo all bitmaps for textureSize for any numbers
- - speed up bitmap drawing
  - hexagon has lines through it
  - gravel (like dirt)
  - more distinct control panels pieces (keyboard)

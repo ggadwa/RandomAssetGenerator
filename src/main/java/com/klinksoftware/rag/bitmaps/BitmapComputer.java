@@ -410,18 +410,17 @@ public class BitmapComputer extends BitmapBase
         }
     }
 
-    protected void generateComputerComponents(int lft, int top, int rgt, int bot, RagColor panelColor, int edgeSize, boolean isControlPanel) {
+    protected void generateComputerComponents(RagColor panelColor, int edgeSize, boolean isControlPanel) {
         int mx, my, sz, lx, ty, rx, by, rndTry;
         int lightCount, buttonCount;
         int minPanelSize, extraPanelSize, skipPanelSize;
         boolean hadWires, hadShutter, hadScreen, hadDials, hadBlank, rndSuccess;
         RagColor altPanelColor;
 
-            // inside components
-            // these are stacks of vertical or horizontal chunks
-
-        mx=lft+edgeSize;
-        my=top+edgeSize;
+        // inside components
+        // these are stacks of vertical or horizontal chunks
+        mx = edgeSize;
+        my = edgeSize;
 
         hadWires=false;
         hadShutter=false;
@@ -441,35 +440,36 @@ public class BitmapComputer extends BitmapBase
             ty=my;
             sz=minPanelSize+AppWindow.random.nextInt(extraPanelSize);
 
-                // vertical stack
-
+            // vertical stack
             if (AppWindow.random.nextBoolean()) {
                 rx=lx+sz;
-                if (rx>=(rgt-(skipPanelSize+edgeSize))) rx=rgt-edgeSize;
-                by=bot-edgeSize;
+                if (rx >= (textureSize - (skipPanelSize + edgeSize))) {
+                    rx = textureSize - edgeSize;
+                }
+                by = textureSize - edgeSize;
 
                 mx=rx+edgeSize;
             }
 
-                // horizontal stack
-
+            // horizontal stack
             else {
                 by=ty+sz;
-                if (by>=(bot-(skipPanelSize+edgeSize))) by=bot-edgeSize;
-                rx=rgt-edgeSize;
+                if (by >= (textureSize - (skipPanelSize + edgeSize))) {
+                    by = textureSize - edgeSize;
+                }
+                rx = textureSize - edgeSize;
 
                 my=by+edgeSize;
             }
 
-                // box around components, can
-                // be randonly in or out
+            // box around components, can
+            // be randonly in or out
             altPanelColor = adjustColorRandom(panelColor, 0.8f, 1.0f);
             drawRect(lx, ty, rx, by, altPanelColor);
             draw3DFrameRect(lx, ty, rx, by, edgeSize, altPanelColor, (AppWindow.random.nextBoolean()));
 
-                // draw the components
-                // we only allow one blank, wires, or shutter
-
+            // draw the components
+            // we only allow one blank, wires, or shutter
             rndTry=0;
 
             while (rndTry<25) {
@@ -549,13 +549,10 @@ public class BitmapComputer extends BitmapBase
 
                 // no more panels
 
-            if ((mx>=(rgt-edgeSize)) || (my>=(bot-edgeSize))) break;
+            if ((mx >= (textureSize - edgeSize)) || (my >= (textureSize - edgeSize))) {
+                break;
+            }
         }
-    }
-
-    protected void drawBlankPanel(int lft, int top, int rgt, int bot, int panelEdgeSize, RagColor panelColor) {
-        drawMetalShine(lft, top, rgt, bot, panelColor);
-        draw3DDarkenFrameRect(lft, top, rgt, bot, panelEdgeSize, (0.8f + AppWindow.random.nextFloat(0.1f)), true);
     }
 
         //
@@ -564,32 +561,20 @@ public class BitmapComputer extends BitmapBase
 
     @Override
     public void generateInternal() {
-        int offset, panelEdgeSize, panelInsideEdgeSize;
-        RagColor panelColor, panelInsideColor;
-
-        offset=textureSize/2;
-        panelEdgeSize = 4 + AppWindow.random.nextInt(6);
-        panelInsideEdgeSize = 3 + AppWindow.random.nextInt(3);
+        int panelEdgeSize;
+        RagColor panelColor;
 
         panelColor = getRandomColor();
-        panelInsideColor = adjustColor(panelColor, 1.1f);
+        panelEdgeSize = (textureSize / 150) + AppWindow.random.nextInt(textureSize / 150);
 
-            // this is a collection of plates that are
-            // used to wrap the object around cubes
-
-        drawRect(0,0,textureSize,textureSize,panelColor);
-
-        generateComputerComponents(0, 0, offset, offset, panelInsideColor, panelInsideEdgeSize, false); // left and right
-        generateComputerComponents(offset, 0, textureSize, offset, panelInsideColor, panelInsideEdgeSize, false); // front and back
-
-        drawBlankPanel(0, offset, offset, textureSize, panelEdgeSize, panelColor);
+        // draw the computer
+        drawRect(0, 0, textureSize, textureSize, panelColor);
+        generateComputerComponents(panelColor, panelEdgeSize, false);
 
         // set the emissive
-
         emissiveFactor=new RagPoint(1.0f,1.0f,1.0f);
 
-            // finish with the metallic-roughness
-
+        // finish with the metallic-roughness
         createMetallicRoughnessMap(0.75f,0.4f);
     }
 }

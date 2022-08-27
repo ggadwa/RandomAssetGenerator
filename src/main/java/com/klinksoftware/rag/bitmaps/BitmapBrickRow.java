@@ -79,6 +79,42 @@ public class BitmapBrickRow extends BitmapBase {
         }
     }
 
+    protected void generateSingleBrickRow(int xCount, int xAdd, int halfWid, int top, int yAdd, int edgeSize, int paddingSize, boolean halfBrick, RagColor brickColor, RagColor altBrickColor) {
+        int x, lft;
+
+        // special lines (full line or double bricks)
+        if (AppWindow.random.nextFloat() < 0.2f) {
+            if (AppWindow.random.nextBoolean()) {
+                generateSingleBrick(0, top, (textureSize - 1), (top + yAdd), edgeSize, paddingSize, brickColor, altBrickColor, false, false, true);
+            } else {
+                lft = 0;
+
+                for (x = 0; x != xCount; x++) {
+                    generateSingleBrick(lft, top, (lft + halfWid), (top + yAdd), edgeSize, paddingSize, brickColor, altBrickColor, false, true, false);
+                    generateSingleBrick((lft + halfWid), top, ((x == (xCount - 1)) ? (textureSize - 1) : (lft + xAdd)), (top + yAdd), edgeSize, paddingSize, brickColor, altBrickColor, false, true, false);
+                    lft += xAdd;
+                }
+            }
+        } // regular lines
+        else {
+            if (halfBrick) {
+                lft = -halfWid;
+
+                for (x = 0; x != (xCount + 1); x++) {
+                    generateSingleBrick(lft, top, (lft + xAdd), (top + yAdd), edgeSize, paddingSize, brickColor, altBrickColor, ((x == 0) || (x == xCount)), false, false);
+                    lft += xAdd;
+                }
+            } else {
+                lft = 0;
+
+                for (x = 0; x != xCount; x++) {
+                    generateSingleBrick(lft, top, ((x == (xCount - 1)) ? (textureSize - 1) : (lft + xAdd)), (top + yAdd), edgeSize, paddingSize, brickColor, altBrickColor, (lft < 0), false, false);
+                    lft += xAdd;
+                }
+            }
+        }
+    }
+
     @Override
     public void generateInternal()    {
         int x, y, xCount, xAdd, yCount, yAdd, halfWid, lft, top, edgeSize, paddingSize;
@@ -110,51 +146,13 @@ public class BitmapBrickRow extends BitmapBase {
         halfBrick=false;
 
         for (y=0;y!=yCount;y++) {
-
-                // special lines (full line or double bricks)
-
-            if (AppWindow.random.nextFloat()<0.2f) {
-                if (AppWindow.random.nextBoolean()) {
-                    generateSingleBrick(0,top,(textureSize-1),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,false,true);
-                }
-                else {
-                    lft=0;
-
-                    for (x=0;x!=xCount;x++) {
-                        generateSingleBrick(lft,top,(lft+halfWid),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
-                        generateSingleBrick((lft+halfWid),top,((x==(xCount-1))?(textureSize-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
-                        lft+=xAdd;
-                    }
-                }
-            }
-
-                // regular lines
-
-            else {
-                if (halfBrick) {
-                    lft=-halfWid;
-
-                    for (x=0;x!=(xCount+1);x++) {
-                        generateSingleBrick(lft,top,(lft+xAdd),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,((x==0)||(x==xCount)),false,false);
-                        lft+=xAdd;
-                    }
-                }
-                else {
-                   lft=0;
-
-                    for (x=0;x!=xCount;x++) {
-                        generateSingleBrick(lft,top,((x==(xCount-1))?(textureSize-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,(lft<0),false,false);
-                        lft+=xAdd;
-                    }
-                }
-            }
+            generateSingleBrickRow(xCount, xAdd, halfWid, top, yAdd, edgeSize, paddingSize, halfBrick, brickColor, altBrickColor);
 
             top+=yAdd;
             halfBrick=!halfBrick;
         }
 
-            // finish with the metallic-roughness
-
+        // finish with the metallic-roughness
         createMetallicRoughnessMap(0.5f,0.4f);
     }
 

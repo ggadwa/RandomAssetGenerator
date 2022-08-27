@@ -17,23 +17,15 @@ public class BitmapControlPanel extends BitmapComputer {
 
     @Override
     public void generateInternal() {
-        int offset, panelEdgeSize, panelInsideEdgeSize;
-        RagColor panelColor, panelInsideColor;
-
-        offset = textureSize / 2;
-        panelEdgeSize = 4 + AppWindow.random.nextInt(6);
-        panelInsideEdgeSize = 3 + AppWindow.random.nextInt(3);
+        int panelEdgeSize;
+        RagColor panelColor;
 
         panelColor = getRandomColor();
-        panelInsideColor = adjustColor(panelColor, 1.1f);
+        panelEdgeSize = (textureSize / 150) + AppWindow.random.nextInt(textureSize / 150);
 
-        // this is a collection of plates that are
-        // used to wrap the object around cubes
+        // draw the panel
         drawRect(0, 0, textureSize, textureSize, panelColor);
-
-        drawBlankPanel(0, 0, offset, offset, panelEdgeSize, panelColor); // left and right
-        generateComputerComponents(offset, 0, textureSize, offset, panelInsideColor, panelInsideEdgeSize, true); // front and back
-        drawBlankPanel(0, offset, offset, textureSize, panelEdgeSize, panelColor); // top and bottom
+        generateComputerComponents(panelColor, panelEdgeSize, true);
 
         // set the emissive
         emissiveFactor = new RagPoint(1.0f, 1.0f, 1.0f);
