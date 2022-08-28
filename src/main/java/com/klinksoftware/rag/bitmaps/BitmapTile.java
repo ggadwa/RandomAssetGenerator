@@ -100,7 +100,7 @@ public class BitmapTile extends BitmapBase
                             break;
                         case 2:
                             mx=(dLft+dRgt)/2;
-                            drawTriangle(mx,(dTop+padding),(dLft+padding),(dBot-padding),(dRgt-padding),(dBot-padding),designColor);
+                            drawTriangle(mx, (dTop + padding), (dLft + padding), (dBot - padding), (dRgt - padding), (dBot - padding), true, designColor);
                             break;
                     }
                 }

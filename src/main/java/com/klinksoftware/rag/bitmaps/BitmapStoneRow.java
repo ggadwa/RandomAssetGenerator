@@ -4,8 +4,7 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapStoneRow extends BitmapBase
-{
+public class BitmapStoneRow extends BitmapBase {
     public BitmapStoneRow(int textureSize) {
         super(textureSize);
 
@@ -15,10 +14,45 @@ public class BitmapStoneRow extends BitmapBase
         hasAlpha=false;
     }
 
-    protected void generateSingleStoneRow(int top, int bot, int yAdd, float[] backgroundData, float[] stoneColorData, float[] stoneNormalData, RagColor stoneColor, RagColor altStoneColor) {
-        int lft, rgt, xOff, yOff, edgeSize;
+    protected void generateSingleStone(int lft, int top, int rgt, int bot, float[] backgroundData, float[] stoneColorData, float[] stoneNormalData, boolean round, RagColor stoneColor, RagColor altStoneColor) {
+        int xOff, yOff, edgeSize;
         float xRoundFactor, yRoundFactor, normalZFactor, edgeColorFactor;
         RagColor drawStoneColor, outlineColor;
+
+        drawStoneColor = adjustColorRandom(((AppWindow.random.nextFloat() < 0.7f) ? stoneColor : altStoneColor), 0.7f, 1.2f);
+
+        xOff = (int) (AppWindow.random.nextFloat((float) textureSize * 0.005f));
+        yOff = (int) (AppWindow.random.nextFloat((float) textureSize * 0.005f));
+
+        edgeSize = (textureSize / 15) + AppWindow.random.nextInt(textureSize / 6);
+        edgeColorFactor = 0.4f + AppWindow.random.nextFloat(0.2f);
+        if (round) {
+            xRoundFactor = 0.01f + (AppWindow.random.nextFloat(0.1f));
+            yRoundFactor = 0.01f + (AppWindow.random.nextFloat(0.1f));
+        } else {
+            xRoundFactor = 0.8f + (AppWindow.random.nextFloat(0.02f));
+            yRoundFactor = 0.8f + (AppWindow.random.nextFloat(0.02f));
+        }
+        normalZFactor = 0.2f + (AppWindow.random.nextFloat(0.2f));
+
+        createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
+
+        // draw on the background
+        colorData = backgroundData.clone();
+
+        outlineColor = adjustColor(drawStoneColor, (0.1f + AppWindow.random.nextFloat(0.2f)));
+        drawOval((lft + xOff), (top + yOff), rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, edgeColorFactor, drawStoneColor, normalZFactor, false, true, (0.2f + AppWindow.random.nextFloat(0.3f)), (1.0f + AppWindow.random.nextFloat(0.2f)));
+        drawFrameOval((lft + xOff), (top + yOff), rgt, bot, xRoundFactor, yRoundFactor, outlineColor);
+
+        // gravity distortions to make stones unique
+        gravityDistortEdges((lft + xOff), (top + yOff), rgt, bot, (8 + AppWindow.random.nextInt(4)), (textureSize / 14), (textureSize / 100));
+
+        // and copy over
+        blockCopy(colorData, normalData, (lft + xOff), (top + yOff), rgt, bot, stoneColorData, stoneNormalData);
+    }
+
+    protected void generateSingleStoneRow(int top, int bot, int yAdd, float[] backgroundData, float[] stoneColorData, float[] stoneNormalData, boolean round, RagColor stoneColor, RagColor altStoneColor) {
+        int lft, rgt;
 
         lft = 0;
 
@@ -34,32 +68,7 @@ public class BitmapStoneRow extends BitmapBase
                 rgt = textureSize - 1;
             }
 
-            // the stone itself
-            drawStoneColor = adjustColorRandom(((AppWindow.random.nextFloat() < 0.7f) ? stoneColor : altStoneColor), 0.7f, 1.2f);
-
-            xOff = 0; // (int) (AppWindow.random.nextFloat() * ((float) textureSize * 0.01f));
-            yOff = 0; // (int) (AppWindow.random.nextFloat() * ((float) textureSize * 0.01f));
-
-            edgeSize = (textureSize / 15) + AppWindow.random.nextInt(textureSize / 6);
-            edgeColorFactor = 0.4f + AppWindow.random.nextFloat(0.2f);
-            xRoundFactor = 0.01f + (AppWindow.random.nextFloat(0.03f));
-            yRoundFactor = 0.01f + (AppWindow.random.nextFloat(0.03f));
-            normalZFactor = 0.2f + (AppWindow.random.nextFloat(0.2f));
-
-            createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
-
-            // draw on the background
-            colorData = backgroundData.clone();
-
-            outlineColor = adjustColor(drawStoneColor, (0.1f + AppWindow.random.nextFloat(0.2f)));
-            drawOval((lft + xOff), (top + yOff), rgt, bot, 0.0f, 1.0f, xRoundFactor, yRoundFactor, edgeSize, edgeColorFactor, drawStoneColor, normalZFactor, false, true, (0.2f + AppWindow.random.nextFloat(0.3f)), (1.0f + AppWindow.random.nextFloat(0.2f)));
-            drawFrameOval((lft + xOff), (top + yOff), rgt, bot, xRoundFactor, yRoundFactor, outlineColor);
-
-            // gravity distortions to make stones unique
-            gravityDistortEdges((lft + xOff), (top + yOff), rgt, bot, (8 + AppWindow.random.nextInt(4)), (textureSize / 14), (textureSize / 100));
-
-            // and copy over
-            blockCopy(colorData, normalData, (lft + xOff), (top + yOff), rgt, bot, stoneColorData, stoneNormalData);
+            generateSingleStone(lft, top, rgt, bot, backgroundData, stoneColorData, stoneNormalData, round, stoneColor, altStoneColor);
 
             lft = rgt;
             if (rgt == (textureSize - 1)) {
@@ -80,11 +89,10 @@ public class BitmapStoneRow extends BitmapBase
     public void generateInternal() {
         int y, yCount, yAdd, top, bot;
         float[] backgroundData, stoneColorData, stoneNormalData;
-        RagColor stoneColor, altStoneColor, groutColor;
+        RagColor stoneColor, altStoneColor;
 
         stoneColor=getRandomColor();
-        altStoneColor=getRandomColorDull(0.9f);
-        groutColor = getRandomGrayColor(0.35f, 0.55f);
+        altStoneColor = getRandomColorDull(0.9f);
 
         // the noise grout
         drawGrout();
@@ -99,8 +107,8 @@ public class BitmapStoneRow extends BitmapBase
 
         createNormalNoiseData(2.5f, 0.5f);
 
-        // draw the stones
-        yCount = 4 + AppWindow.random.nextInt(6);
+        // number of stones
+        yCount = 5 + AppWindow.random.nextInt(5);
         yAdd = textureSize / yCount;
 
         // create perlin based on # of stones
@@ -115,7 +123,7 @@ public class BitmapStoneRow extends BitmapBase
                 bot = textureSize - 1;
             }
 
-            generateSingleStoneRow(top, bot, yAdd, backgroundData, stoneColorData, stoneNormalData, stoneColor, altStoneColor);
+            generateSingleStoneRow(top, bot, yAdd, backgroundData, stoneColorData, stoneNormalData, false, stoneColor, altStoneColor);
 
             top+=yAdd;
         }

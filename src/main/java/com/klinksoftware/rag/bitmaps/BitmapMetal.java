@@ -18,7 +18,7 @@ public class BitmapMetal extends BitmapBase {
     public void generateInternal() {
         RagColor metalColor;
 
-        metalColor=getRandomColor();
+        metalColor = getRandomMetalColor();
 
         createPerlinNoiseData(16, 16);
         drawRect(0, 0, textureSize, textureSize, metalColor);

@@ -86,10 +86,10 @@ public class BitmapMetalPlate extends BitmapBase {
         int edgeSize, screwSize;
         RagColor metalColor, altMetalColor;
 
-        metalColor = getRandomColor();
-        altMetalColor = getRandomColor();
-        edgeSize = 4 + AppWindow.random.nextInt(5);
-        screwSize = 5 + AppWindow.random.nextInt(25);
+        metalColor = getRandomMetalColor();
+        altMetalColor = getRandomMetalColor();
+        edgeSize = (textureSize / 120) + AppWindow.random.nextInt(textureSize / 100);
+        screwSize = (textureSize / 100) + AppWindow.random.nextInt(textureSize / 20);
 
         // either single, dual, or 4 panel
         mx = textureSize / 2;

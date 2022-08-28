@@ -2,9 +2,7 @@
 
 - computer next
 - computer, panel, humanoid, etc, multiple textures, not one in many textures, update models
-- implement bitmapstonepattern
-- getRandomBlueOrSilver for metals
-
+- get rid of UV_BOX__???
 
 map
  - thread bitmap creation
@@ -15,7 +13,6 @@ map
 
 bitmaps
  - redo all bitmaps for textureSize for any numbers
- - hexagon has lines through it
  - gravel (like dirt)
  - more distinct control panels pieces (keyboard)
  - make face textures 1, 2, or 3 eye

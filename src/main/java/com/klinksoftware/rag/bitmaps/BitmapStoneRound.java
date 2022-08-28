@@ -1,13 +1,12 @@
 package com.klinksoftware.rag.bitmaps;
 
-import com.klinksoftware.rag.utility.RagColor;
-import com.klinksoftware.rag.utility.RagRect;
-import java.util.ArrayList;
+import com.klinksoftware.rag.*;
+import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapStonePattern extends BitmapStoneRow {
+public class BitmapStoneRound extends BitmapStoneRow {
 
-    public BitmapStonePattern(int textureSize) {
+    public BitmapStoneRound(int textureSize) {
         super(textureSize);
 
         hasNormal = true;
@@ -18,8 +17,8 @@ public class BitmapStonePattern extends BitmapStoneRow {
 
     @Override
     public void generateInternal() {
+        int y, yCount, yAdd, top, bot;
         float[] backgroundData, stoneColorData, stoneNormalData;
-        ArrayList<RagRect> rects;
         RagColor stoneColor, altStoneColor;
 
         stoneColor = getRandomColor();
@@ -37,15 +36,25 @@ public class BitmapStonePattern extends BitmapStoneRow {
 
         createNormalNoiseData(2.5f, 0.5f);
 
-        // get the pattern
-        rects = createBlockPattern();
+        // number of stones
+        yCount = 5 + AppWindow.random.nextInt(5);
+        yAdd = textureSize / yCount;
 
         // create perlin based on # of stones
-        createPerlinNoiseForStoneSize(rects.size());
+        createPerlinNoiseForStoneSize(yCount);
 
-        // draw pattern
-        for (RagRect rect : rects) {
-            generateSingleStone(rect.getLeft(), rect.getTop(), rect.getRight(), rect.getBottom(), backgroundData, stoneColorData, stoneNormalData, false, stoneColor, altStoneColor);
+        // draw the stones
+        top = 0;
+
+        for (y = 0; y != yCount; y++) {
+            bot = (y == (yCount - 1)) ? (textureSize - 1) : (top + yAdd);
+            if (bot >= textureSize) {
+                bot = textureSize - 1;
+            }
+
+            generateSingleStoneRow(top, bot, yAdd, backgroundData, stoneColorData, stoneNormalData, true, stoneColor, altStoneColor);
+
+            top += yAdd;
         }
 
         // finally push over the stone copy version

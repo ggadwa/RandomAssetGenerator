@@ -33,7 +33,7 @@ public class BitmapMetalTread extends BitmapBase {
         RagColor metalColor, metalCorrColor;
 
         // background
-        metalColor = getRandomColor();
+        metalColor = getRandomMetalColor();
 
         createPerlinNoiseData(16, 16);
         drawRect(0, 0, textureSize, textureSize, metalColor);
@@ -48,8 +48,8 @@ public class BitmapMetalTread extends BitmapBase {
         corrWid = textureSize / corrCount;
         corrHigh = textureSize / corrCount;
 
-        lineWid = (float) (corrWid - 4);
-        lineHigh = (float) (corrHigh - 4);
+        lineWid = (float) (corrWid - (textureSize / 120));
+        lineHigh = (float) (corrHigh - (textureSize / 120));
 
         lineStyle = AppWindow.random.nextInt(TREAD_LINES.length);
 

@@ -14,6 +14,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import javax.imageio.ImageIO;
 
@@ -200,7 +201,7 @@ public class BitmapBase
         return(new RagColor(col,col,col));
     }
 
-    protected RagColor getRandomBrownOrGrayColor() {
+    protected RagColor getRandomWoodColor() {
         float f;
 
         if (AppWindow.random.nextBoolean()) {
@@ -211,8 +212,20 @@ public class BitmapBase
         }
     }
 
-    protected RagColor getRandomBlueOrSilverColor() {
-        return (getRandomColor());
+    protected RagColor getRandomMetalColor() {
+        float f;
+
+        switch (AppWindow.random.nextInt(4)) {
+            case 0: // blue-ish
+                return (new RagColor(AppWindow.random.nextFloat(0.3f), AppWindow.random.nextFloat(0.1f), (0.5f + AppWindow.random.nextFloat(0.5f))));
+            case 1: // copper-ish
+                return (new RagColor((0.65f + AppWindow.random.nextFloat(0.2f)), (0.35f + AppWindow.random.nextFloat(0.1f)), (0.1f + AppWindow.random.nextFloat(0.1f))));
+            case 2: // gold-ish
+                return (new RagColor((0.8f + AppWindow.random.nextFloat(0.2f)), (0.6f + AppWindow.random.nextFloat(0.2f)), AppWindow.random.nextFloat(0.1f)));
+            default: // silver-ish
+                f = (0.5f + AppWindow.random.nextFloat(0.2f));
+                return (new RagColor(f, f, (f + AppWindow.random.nextFloat(0.2f))));
+        }
     }
 
     protected RagColor adjustColor(RagColor color, float factor) {
@@ -1379,12 +1392,15 @@ public class BitmapBase
             return;
         }
 
+        wid = (rgt - lft) - 1;
+        high = (bot - top) - 1; // avoids clipping on bottom from being on wid,high
+
         // yes this is a crazy way to draw an oval but it makes it much easier to
         // deal with sliding color/normals factors in the calcs
 
         // start and end arc
-        drawCount = textureSize * 2.0f;
-        drawMult = 1 / drawCount;
+        drawCount = (float) Math.max(wid, high) * 10.0f;
+        drawMult = 1.0f / drawCount;
 
         drawStartArc = (int) (startArc * drawCount);
         drawEndArc = (int) (endArc * drawCount);
@@ -1392,9 +1408,7 @@ public class BitmapBase
             return;
         }
 
-        // the drawing size
-        wid = (rgt - lft) - 1;
-        high = (bot - top) - 1;         // avoids clipping on bottom from being on wid,high
+        // the drawing setup
         mx = lft + (wid / 2);
         my = top + (high / 2);
 
@@ -1855,7 +1869,7 @@ public class BitmapBase
         drawLineNormal(rgt,my,mx,bot,NORMAL_TOP_RIGHT_45);
     }
 
-    protected void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, RagColor color) {
+    protected void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, boolean doNormals, RagColor color) {
         int x, y, lx, rx, ty, my, by, tyX, myX, byX, idx;
 
         if ((y0<=y1) && (y0<=y2)) {
@@ -1934,16 +1948,17 @@ public class BitmapBase
                 colorData[idx+1]=color.g;
                 colorData[idx+2]=color.b;
 
-                normalData[idx]=(NORMAL_CLEAR.x+1.0f)*0.5f;
-                normalData[idx+1]=(NORMAL_CLEAR.y+1.0f)*0.5f;
-                normalData[idx+2]=(NORMAL_CLEAR.z+1.0f)*0.5f;
+                if (doNormals) {
+                    normalData[idx] = (NORMAL_CLEAR.x + 1.0f) * 0.5f;
+                    normalData[idx + 1] = (NORMAL_CLEAR.y + 1.0f) * 0.5f;
+                    normalData[idx + 2] = (NORMAL_CLEAR.z + 1.0f) * 0.5f;
+                }
 
                 idx+=4;
             }
         }
 
-            // bottom half
-
+        // bottom half
         for (y=my;y<by;y++) {
             if ((y<0) || (y>=textureSize)) continue;
 
@@ -1967,18 +1982,22 @@ public class BitmapBase
                 colorData[idx+1]=color.g;
                 colorData[idx+2]=color.b;
 
-                normalData[idx]=(NORMAL_CLEAR.x+1.0f)*0.5f;
-                normalData[idx+1]=(NORMAL_CLEAR.y+1.0f)*0.5f;
-                normalData[idx+2]=(NORMAL_CLEAR.z+1.0f)*0.5f;
+                if (doNormals) {
+                    normalData[idx] = (NORMAL_CLEAR.x + 1.0f) * 0.5f;
+                    normalData[idx + 1] = (NORMAL_CLEAR.y + 1.0f) * 0.5f;
+                    normalData[idx + 2] = (NORMAL_CLEAR.z + 1.0f) * 0.5f;
+                }
 
                 idx+=4;
             }
         }
 
         // normals
-        drawLineNormal(x0, y0, x1, y1, NORMAL_LEFT_45);
-        drawLineNormal(x0, y0, x2, y2, NORMAL_RIGHT_45);
-        drawLineNormal(x1, y1, x2, y2, NORMAL_BOTTOM_45);
+        if (doNormals) {
+            drawLineNormal(x0, y0, x1, y1, NORMAL_LEFT_45);
+            drawLineNormal(x0, y0, x2, y2, NORMAL_RIGHT_45);
+            drawLineNormal(x1, y1, x2, y2, NORMAL_BOTTOM_45);
+        }
     }
 
     protected void drawHexagon(int lft,int top,int rgt,int bot,int pointSize,int edgeSize,RagColor color)
@@ -1987,8 +2006,7 @@ public class BitmapBase
         float       darkenFactor;
         RagColor    darkColor;
 
-            // build the hexagon
-
+        // hexagon size
         my=(top+bot)/2;
 
         lx=lft;
@@ -1998,16 +2016,14 @@ public class BitmapBase
 
         if (lft>=rgt) return;
 
-            // fill the hexagon
-
+        // fill the hexagon
         if (color!=null) {
             drawRect((lx - 1), top, (rx + 1), bot, color);
-            drawTriangle(lx,top,lft,my,lx,bot,color);
-            drawTriangle(rx,top,rgt,my,rx,bot,color);
+            drawTriangle(lx, top, lft, my, lx, bot, false, color);
+            drawTriangle(rx, top, rgt, my, rx, bot, false, color);
         }
 
-            // draw the edges
-
+        // draw the edges
         for (n=0;n!=edgeSize;n++) {
 
                 // the colors
@@ -3241,6 +3257,74 @@ public class BitmapBase
                 ySize = (int) ((float) ySize * 0.8f);
             }
         }
+    }
+
+    //
+    // patterns
+    //
+    public ArrayList<RagRect> createBlockPattern() {
+        int[][] grid;
+        int n, x, y, gx, gy, gridSize, gridPixelSize, tryCount;
+        boolean badSpot;
+        int[] sz;
+        int[][] blockSizes = {{2, 2}, {3, 3}, {4, 4}, {2, 1}, {1, 2}, {3, 1}, {1, 3}, {2, 3}, {3, 2}};
+        ArrayList<RagRect> rects;
+
+        rects = new ArrayList<>();
+
+        gridSize = AppWindow.random.nextBoolean() ? 8 : 4;
+        grid = new int[gridSize][gridSize];
+        gridPixelSize = textureSize / gridSize;
+
+        for (n = 0; n != gridSize; n++) {
+            // random block size
+            sz = blockSizes[AppWindow.random.nextInt(blockSizes.length)];
+
+            // find a place for block
+            tryCount = 0;
+            while (tryCount < 10) {
+                x = AppWindow.random.nextInt(gridSize - (sz[0] - 1));
+                y = AppWindow.random.nextInt(gridSize - (sz[1] - 1));
+
+                badSpot = false;
+
+                for (gy = y; gy < (y + sz[1]); gy++) {
+                    for (gx = x; gx < (x + sz[0]); gx++) {
+                        if (grid[gx][gy] != 0) {
+                            badSpot = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!badSpot) {
+                    for (gy = y; gy < (y + sz[1]); gy++) {
+                        for (gx = x; gx < (x + sz[0]); gx++) {
+                            grid[gx][gy] = 1;
+                        }
+                    }
+
+                    rects.add(new RagRect((x * gridPixelSize), (y * gridPixelSize), ((x * gridPixelSize) + (gridPixelSize * sz[0])), ((y * gridPixelSize) + (gridPixelSize * sz[1]))));
+                    break;
+                }
+
+                tryCount++;
+            }
+
+        }
+
+        // fill in any missing blocks
+        for (y = 0; y != gridSize; y++) {
+            for (x = 0; x != gridSize; x++) {
+                if (grid[x][y] != 0) {
+                    continue;
+                }
+
+                rects.add(new RagRect((x * gridPixelSize), (y * gridPixelSize), ((x * gridPixelSize) + gridPixelSize), ((y * gridPixelSize) + gridPixelSize)));
+            }
+        }
+
+        return (rects);
     }
 
     //

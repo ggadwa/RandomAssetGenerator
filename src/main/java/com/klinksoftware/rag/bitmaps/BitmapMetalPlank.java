@@ -54,8 +54,8 @@ public class BitmapMetalPlank extends BitmapBase {
         boolean alternateScrews;
         RagColor metalColor, altMetalColor;
 
-        metalColor = getRandomColor();
-        altMetalColor = getRandomColor();
+        metalColor = getRandomMetalColor();
+        altMetalColor = getRandomMetalColor();
         edgeSize = 4 + AppWindow.random.nextInt(5);
         screwSize = 5 + AppWindow.random.nextInt(25);
 

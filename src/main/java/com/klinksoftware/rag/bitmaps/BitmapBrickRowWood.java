@@ -24,7 +24,7 @@ public class BitmapBrickRowWood extends BitmapBrickRow {
 
         brickColor = getRandomColor();
         altBrickColor = getRandomColor();
-        woodColor = getRandomBrownOrGrayColor();
+        woodColor = getRandomWoodColor();
 
         edgeSize = 3 + AppWindow.random.nextInt(textureSize / 70);
         paddingSize = 3 + AppWindow.random.nextInt(textureSize / 100);

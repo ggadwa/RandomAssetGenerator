@@ -550,12 +550,12 @@ public class MapBuilder
     // required bitmaps
     //
     public void buildRequiredBitmaps(int mapType, int textureSize, boolean skyBox) {
-        String[] wallBitmaps = {"BrickPattern", "BrickRow", "BrickRowWood", "Geometric", "MetalHexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StonePattern", "StoneRow", "StoneRowWood", "Temple", "Tile", "WoodBoard"};
-        String[] insideFloorBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalHexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "WoodBoard"};
-        String[] outsideFloorBitmaps = {"Dirt", "Grass"};
-        String[] ceilingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "WoodBoard"};
-        String[] platformBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "WoodBoard"};
-        String[] stairBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "WoodBoard"};
+        String[] wallBitmaps = {"BrickPattern", "BrickRow", "BrickRowWood", "Geometric", "Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StonePattern", "StoneRound", "StoneRow", "StoneRowWood", "Temple", "Tile", "WoodBoard"};
+        String[] insideFloorBitmaps = {"BrickPattern", "BrickRow", "Concrete", "Hexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "StonePattern", "WoodBoard"};
+        String[] outsideFloorBitmaps = {"Dirt", "Grass", "StonePattern"};
+        String[] ceilingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "StonePattern", "WoodBoard"};
+        String[] platformBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "StonePattern", "WoodBoard"};
+        String[] stairBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "StonePattern", "WoodBoard"};
         String[] skyBoxBitmaps = {"SkyBoxMountain"};
 
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {

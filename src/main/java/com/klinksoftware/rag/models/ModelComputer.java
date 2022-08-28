@@ -9,21 +9,48 @@ public class ModelComputer extends ModelBase {
 
     @Override
     public float getCameraDistance() {
-        return (11.0f);
+        return (12.0f);
+    }
+
+    private void buildSingleBank(String computerBitmapName, float xMin, float xMax, float zMin, float zMax, boolean flipFront, float pedestalHeight, float computerWidth) {
+        float ty, by, high;
+        boolean hasTop;
+
+        by = pedestalHeight;
+        ty = by + (computerWidth * 2);
+
+        // possible bottom
+        if (AppWindow.random.nextBoolean()) {
+            high = MapBuilder.SEGMENT_SIZE * (0.05f + AppWindow.random.nextFloat(0.05f));
+            meshList.add(MeshUtility.createCube("spacer", xMin, xMax, by, (by + high), zMin, zMax, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
+            by += high;
+            ty += high;
+        }
+
+        // possible top
+        hasTop = AppWindow.random.nextBoolean();
+        if (hasTop) {
+            high = MapBuilder.SEGMENT_SIZE * (0.05f + AppWindow.random.nextFloat(0.05f));
+            meshList.add(MeshUtility.createCube("spacer", xMin, xMax, ty, (ty + high), zMin, zMax, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+        }
+
+        // the computer
+        meshList.add(MeshUtility.createCube(computerBitmapName, xMin, xMax, ty, by, zMin, zMax, false, false, (!flipFront), flipFront, false, false, false, MeshUtility.UV_WHOLE));
+        meshList.add(MeshUtility.createCube("panel", xMin, xMax, ty, by, zMin, zMax, true, true, flipFront, (!flipFront), false, (!hasTop), false, MeshUtility.UV_WHOLE));
     }
 
     @Override
     public void buildInternal() {
-        float computerWidth, computerHeight, computerHeight2, wid, midX, midZ;
+        float computerWidth, wid, midX, midZ;
         float pedestalWidth, pedestalHeight;
 
         addBitmap("computer", new String[]{"Computer"});
-        addBitmap("pedestal", new String[]{"MetalHexagon", "MetalPlank", "MetalPlate", "Mosaic", "WoodPanel"});
+        addBitmap("panel", new String[]{"MetalPlate"});
+        addBitmap("spacer", new String[]{"Metal", "MetalPlank", "MetalPlate"});
+        addBitmap("pedestal", new String[]{"Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "WoodPanel"});
 
         // computer size
         computerWidth = MapBuilder.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.3f));
-        computerHeight = MapBuilder.SEGMENT_SIZE * (0.7f + AppWindow.random.nextFloat(0.3f));
-        computerHeight2 = computerHeight * 0.9f;
 
         // pedestal a little bigger than equipment
         pedestalWidth = computerWidth + (MapBuilder.SEGMENT_SIZE * 0.05f);
@@ -34,31 +61,37 @@ public class ModelComputer extends ModelBase {
         // computer banks
         switch (AppWindow.random.nextInt(4)) {
             case 0: // one bank
-                meshList.add(MeshUtility.createCube("computer", -computerWidth, computerWidth, pedestalHeight, (pedestalHeight + computerHeight), -computerWidth, computerWidth, true, true, true, true, true, false, false, MeshUtility.UV_BOX));
+                buildSingleBank("computer", -computerWidth, computerWidth, -computerWidth, computerWidth, true, pedestalHeight, computerWidth);
                 break;
             case 1:
+                addBitmap("computer2", new String[]{"Computer"});
                 wid = computerWidth / 2.05f;
                 midX = computerWidth / 2.0f;
                 midZ = computerWidth / 2.0f;
-                meshList.add(MeshUtility.createCube("computer", (midX - wid), (midX + wid), pedestalHeight, (pedestalHeight + (AppWindow.random.nextBoolean() ? computerHeight : computerHeight2)), (midZ - wid), (midZ + wid), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
-                meshList.add(MeshUtility.createCube("computer", ((-midX) - wid), ((-midX) + wid), pedestalHeight, (pedestalHeight + (AppWindow.random.nextBoolean() ? computerHeight : computerHeight2)), ((-midZ) - wid), ((-midZ) + wid), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
+                buildSingleBank("computer", (midX - wid), (midX + wid), (midZ - wid), (midZ + wid), true, pedestalHeight, wid);
+                buildSingleBank("computer2", ((-midX) - wid), ((-midX) + wid), ((-midZ) - wid), ((-midZ) + wid), false, pedestalHeight, wid);
                 break;
             case 2:
+                addBitmap("computer2", new String[]{"Computer"});
+                addBitmap("computer3", new String[]{"Computer"});
                 wid = computerWidth / 2.05f;
                 midX = computerWidth / 2.0f;
                 midZ = computerWidth / 2.0f;
-                meshList.add(MeshUtility.createCube("computer", (midX - wid), (midX + wid), pedestalHeight, (pedestalHeight + (AppWindow.random.nextBoolean() ? computerHeight : computerHeight2)), (midZ - wid), (midZ + wid), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
-                meshList.add(MeshUtility.createCube("computer", ((-midX) - wid), ((-midX) + wid), pedestalHeight, (pedestalHeight + (AppWindow.random.nextBoolean() ? computerHeight : computerHeight2)), ((-midZ) - wid), ((-midZ) + wid), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
-                meshList.add(MeshUtility.createCube("computer", (midX - wid), (midX + wid), pedestalHeight, (pedestalHeight + (AppWindow.random.nextBoolean() ? computerHeight : computerHeight2)), ((-midZ) - wid), ((-midZ) + wid), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
+                buildSingleBank("computer", (midX - wid), (midX + wid), (midZ - wid), (midZ + wid), true, pedestalHeight, wid);
+                buildSingleBank("computer2", ((-midX) - wid), ((-midX) + wid), ((-midZ) - wid), ((-midZ) + wid), false, pedestalHeight, wid);
+                buildSingleBank("computer3", (midX - wid), (midX + wid), ((-midZ) - wid), ((-midZ) + wid), false, pedestalHeight, wid);
                 break;
             case 3:
+                addBitmap("computer2", new String[]{"Computer"});
+                addBitmap("computer3", new String[]{"Computer"});
+                addBitmap("computer4", new String[]{"Computer"});
                 wid = computerWidth / 2.05f;
                 midX = computerWidth / 2.0f;
                 midZ = computerWidth / 2.0f;
-                meshList.add(MeshUtility.createCube("computer", (midX - wid), (midX + wid), pedestalHeight, (pedestalHeight + (AppWindow.random.nextBoolean() ? computerHeight : computerHeight2)), (midZ - wid), (midZ + wid), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
-                meshList.add(MeshUtility.createCube("computer", ((-midX) - wid), ((-midX) + wid), pedestalHeight, (pedestalHeight + (AppWindow.random.nextBoolean() ? computerHeight : computerHeight2)), ((-midZ) - wid), ((-midZ) + wid), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
-                meshList.add(MeshUtility.createCube("computer", (midX - wid), (midX + wid), pedestalHeight, (pedestalHeight + (AppWindow.random.nextBoolean() ? computerHeight : computerHeight2)), ((-midZ) - wid), ((-midZ) + wid), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
-                meshList.add(MeshUtility.createCube("computer", ((-midX) - wid), ((-midX) + wid), pedestalHeight, (pedestalHeight + (AppWindow.random.nextBoolean() ? computerHeight : computerHeight2)), (midZ - wid), (midZ + wid), true, true, true, true, true, false, false, MeshUtility.UV_BOX));
+                buildSingleBank("computer", (midX - wid), (midX + wid), (midZ - wid), (midZ + wid), true, pedestalHeight, wid);
+                buildSingleBank("computer2", ((-midX) - wid), ((-midX) + wid), ((-midZ) - wid), ((-midZ) + wid), false, pedestalHeight, wid);
+                buildSingleBank("computer3", (midX - wid), (midX + wid), ((-midZ) - wid), ((-midZ) + wid), false, pedestalHeight, wid);
+                buildSingleBank("computer4", ((-midX) - wid), ((-midX) + wid), (midZ - wid), (midZ + wid), true, pedestalHeight, wid);
                 break;
         }
 

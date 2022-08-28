@@ -23,7 +23,7 @@ public class BitmapWoodPanel extends BitmapBase
         RagColor woodColor, col;
 
         // some random values
-        woodColor = getRandomBrownOrGrayColor();
+        woodColor = getRandomWoodColor();
 
         col = adjustColorRandom(woodColor, 0.7f, 1.2f);
 

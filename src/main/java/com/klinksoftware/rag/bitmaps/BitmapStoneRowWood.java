@@ -25,7 +25,7 @@ public class BitmapStoneRowWood extends BitmapStoneRow {
 
         stoneColor = getRandomColor();
         altStoneColor = getRandomColorDull(0.9f);
-        woodColor = getRandomBrownOrGrayColor();
+        woodColor = getRandomWoodColor();
 
         // the noise grout
         drawGrout();
@@ -39,8 +39,8 @@ public class BitmapStoneRowWood extends BitmapStoneRow {
 
         createNormalNoiseData(2.5f, 0.5f);
 
-        // draw the stones
-        yCount = 4 + AppWindow.random.nextInt(6);
+        // number of stones
+        yCount = 5 + AppWindow.random.nextInt(5);
         yAdd = textureSize / yCount;
 
         // create perlin based on # of stones
@@ -70,7 +70,7 @@ public class BitmapStoneRowWood extends BitmapStoneRow {
             }
 
             if ((AppWindow.random.nextBoolean()) || (wasBoard) || (boardCount == 2)) {
-                generateSingleStoneRow(top, bot, yAdd, backgroundData, stoneColorData, stoneNormalData, stoneColor, altStoneColor);
+                generateSingleStoneRow(top, bot, yAdd, backgroundData, stoneColorData, stoneNormalData, false, stoneColor, altStoneColor);
                 wasBoard = false;
             } else {
                 // need to copy this over because how stones are drawn

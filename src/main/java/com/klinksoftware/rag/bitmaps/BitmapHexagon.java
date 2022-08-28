@@ -4,9 +4,9 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapMetalHexagon extends BitmapBase {
+public class BitmapHexagon extends BitmapBase {
 
-    public BitmapMetalHexagon(int textureSize) {
+    public BitmapHexagon(int textureSize) {
         super(textureSize);
 
         hasNormal = true;
@@ -20,16 +20,16 @@ public class BitmapMetalHexagon extends BitmapBase {
         int x, y, lft, top, pointSize, xCount, yCount, xSize, ySize;
         int edgeSize;
         boolean hasBorder;
-        RagColor color, metalColor, altMetalColor;
+        RagColor color, hexColor, altHexColor;
 
-        metalColor = getRandomColor();
-        altMetalColor = getRandomColor();
-        edgeSize = 4 + AppWindow.random.nextInt(5);
+        hexColor = getRandomColor();
+        altHexColor = getRandomColor();
+        edgeSize = (textureSize / 120) + AppWindow.random.nextInt(textureSize / 100);
 
         hasBorder = AppWindow.random.nextFloat() > 0.7f;
 
-        xCount = 2 + (2 * AppWindow.random.nextInt(2));
-        yCount = 2 + (2 * AppWindow.random.nextInt(3));
+        xCount = (textureSize / 250) + (2 * AppWindow.random.nextInt((textureSize / 250)));
+        yCount = (textureSize / 250) + (2 * AppWindow.random.nextInt((textureSize / 150)));
 
         xSize = textureSize / xCount;
         ySize = textureSize / yCount;
@@ -44,12 +44,12 @@ public class BitmapMetalHexagon extends BitmapBase {
             for (y = 0; y <= yCount; y++) {
 
                 if (((y == 0) || (y == yCount)) && (hasBorder)) {
-                    color = altMetalColor;
+                    color = altHexColor;
                 } else {
                     if ((x != 0) && (x != xCount) && (y != 0) && (y != yCount)) {
-                        color = adjustColorRandom(metalColor, 0.9f, 1.1f);
+                        color = adjustColorRandom(hexColor, 0.9f, 1.1f);
                     } else {
-                        color = metalColor;
+                        color = hexColor;
                     }
                 }
 

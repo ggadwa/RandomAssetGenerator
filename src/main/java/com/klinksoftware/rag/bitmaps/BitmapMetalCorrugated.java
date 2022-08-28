@@ -20,7 +20,7 @@ public class BitmapMetalCorrugated extends BitmapBase {
         int waveCount;
         RagColor metalColor, frameColor;
 
-        metalColor = getRandomColor();
+        metalColor = getRandomMetalColor();
 
         // background
         createPerlinNoiseData(16, 16);
