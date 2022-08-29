@@ -18,7 +18,7 @@ public class ModelJunction extends ModelBase {
         Mesh mesh, mesh2;
 
         addBitmap("pipe", new String[]{"Pipe"});
-        addBitmap("panel", new String[]{"ControlPanel"});
+        addBitmap("panel", new String[]{"Computer"});
 
         // sizes
         junctionWidth = MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f));

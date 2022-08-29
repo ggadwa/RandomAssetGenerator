@@ -1,8 +1,42 @@
 
 
+- use monitor for computers
+  - have wave version
+- handles on access panels
+- vents need to be wider
+- key in circle switches
+
 - computer next
 - computer, panel, humanoid, etc, multiple textures, not one in many textures, update models
 - get rid of UV_BOX__???
+
+
+
+animations:
+--> redo everything to have matrixes for offsets (even in map)
+
+        // calculate the skin animation
+        // and vertex position, if skinning, calc
+        // the skin matrix otherwise just attach to node
+        // by its matrix
+
+        // note we build the normalMatrix here,
+        // this is costly but has to be done because of the
+        // skin matrix
+
+    highp vec4 pos;
+    highp mat3 normalMatrix;
+
+    if (!noSkin) {
+        highp mat4 skinMatrix=(vertexWeight.x*jointMatrix[int(vertexJoint.x)])+(vertexWeight.y*jointMatrix[int(vertexJoint.y)])+(vertexWeight.z*jointMatrix[int(vertexJoint.z)])+(vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
+        pos=viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
+        normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(skinMatrix)));
+    }
+    else {
+        pos=viewMatrix*modelMatrix*noSkinAttachedNodeMatrix*vec4(vertexPosition,1.0);
+        normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(noSkinAttachedNodeMatrix)));
+    }
+
 
 map
  - thread bitmap creation
@@ -19,6 +53,7 @@ bitmaps
  - brick walls with boards on them
 
 model
+ - animations
  - vertex snaps for humanoid, etc
  - finish junction
  - finish pipes

@@ -4,8 +4,7 @@ import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.utility.*;
 
 @BitmapInterface
-public class BitmapComputer extends BitmapBase
-{
+public class BitmapComputer extends BitmapMonitor {
     public final static RagColor[] LED_COLORS = {
         new RagColor(0.0f, 1.0f, 0.0f),
         new RagColor(1.0f, 1.0f, 0.0f),
@@ -107,7 +106,7 @@ public class BitmapComputer extends BitmapBase
         }
     }
 
-    private void generateComputerComponentLights(int lft, int top, int rgt, int bot, int edgeSize, boolean isControlPanel) {
+    private void generateComputerComponentLights(int lft, int top, int rgt, int bot, int edgeSize) {
         int x, y, xCount, yCount, xMargin, yMargin, dx, dy, sz;
         RagColor color;
 
@@ -116,22 +115,10 @@ public class BitmapComputer extends BitmapBase
         top+=edgeSize;
         bot-=edgeSize;
 
-        if (!isControlPanel) {
-            sz = 10 + AppWindow.random.nextInt(10);
+        sz = (textureSize / 100) + AppWindow.random.nextInt(textureSize / 100);
 
-            xCount = (rgt - lft) / sz;
-            yCount = (bot - top) / sz;
-        } else {
-            sz = 20 + AppWindow.random.nextInt(10);
-
-            xCount = (rgt - lft) / sz;
-            yCount = (bot - top) / sz;
-            if (xCount > yCount) {
-                yCount = 1;
-            } else {
-                xCount = 1;
-            }
-        }
+        xCount = (rgt - lft) / sz;
+        yCount = (bot - top) / sz;
 
         if (xCount<=0) xCount=1;
         if (yCount<=0) yCount=1;
@@ -160,7 +147,7 @@ public class BitmapComputer extends BitmapBase
         }
     }
 
-    private void generateComputerComponentButtons(int lft, int top, int rgt, int bot, int edgeSize, boolean isControlPanel) {
+    private void generateComputerComponentButtons(int lft, int top, int rgt, int bot, int edgeSize) {
         int x, y, xCount, yCount, xMargin, yMargin, dx, dy, sz;
         RagColor color, outlineColor;
 
@@ -169,11 +156,7 @@ public class BitmapComputer extends BitmapBase
         top+=edgeSize;
         bot-=edgeSize;
 
-        if (!isControlPanel) {
-            sz = 10 + AppWindow.random.nextInt(15);
-        } else {
-            sz = 15 + AppWindow.random.nextInt(25);
-        }
+        sz = (textureSize / 100) + AppWindow.random.nextInt(textureSize / 60);
 
         xCount=(rgt-lft)/sz;
         yCount=(bot-top)/sz;
@@ -213,7 +196,7 @@ public class BitmapComputer extends BitmapBase
         RagColor dialColor, outlineColor;
         RagPoint pnt;
 
-        margin = 5 + AppWindow.random.nextInt(5);
+        margin = (textureSize / 200) + AppWindow.random.nextInt(textureSize / 200);
 
         lft += margin;
         rgt -= margin;
@@ -281,37 +264,36 @@ public class BitmapComputer extends BitmapBase
         }
     }
 
-    private void generateComputerComponentDrives(int lft,int top,int rgt,int bot,int edgeSize)
-    {
-        int         x,y,xCount,yCount,dx,dy,bx,by,
-                    wid,high,ledWid,ledHigh,xMargin,yMargin;
-        RagColor    color,outlineColor,ledColor;
+    private void generateComputerComponentDrives(int lft, int top, int rgt, int bot, int edgeSize) {
+        int x, y, xCount, yCount, dx, dy, bx, by;
+        int wid, high, ledWid, ledHigh, xMargin, yMargin;
+        RagColor color, outlineColor, ledColor;
 
         lft+=edgeSize;
         rgt-=edgeSize;
         top+=edgeSize;
         bot-=edgeSize;
 
-            // the random color (always dark)
-
+        // the random color (always dark)
         color = getRandomGrayColor(0.1f, 0.3f);
-        outlineColor=adjustColor(color,0.8f);
+        outlineColor = adjustColor(color, 0.8f);
 
-            // the drive sizes
-            // pick randomly, but make sure they fill entire size
+        // drives are 1 across on the shortest side
+        if ((rgt - lft) > (bot - top)) {
+            yCount = 1;
+            xCount = 4 + AppWindow.random.nextInt(4);
+            ledWid = (int) ((float) (bot - top) * 0.1f);
+        } else {
+            xCount = 1;
+            yCount = 4 + AppWindow.random.nextInt(4);
+            ledWid = (int) ((float) (rgt - lft) * 0.1f);
+        }
 
-        high=15+AppWindow.random.nextInt(15);
-        wid=high*2;
-
-        ledWid=(int)((float)high*0.1f);
-        if (ledWid<4) ledWid=4;
-        ledHigh=(int)((float)ledWid*0.5f);
-
-        xCount=(rgt-lft)/wid;
-        yCount=(bot-top)/high;
-
-        if (xCount<=0) xCount=1;
-        if (yCount<=0) yCount=1;
+        // led sizes
+        if (ledWid < (textureSize / 100)) {
+            ledWid = (textureSize / 100);
+        }
+        ledHigh = ledWid / 2;
 
         wid=(rgt-lft)/xCount;
         high=(bot-top)/yCount;
@@ -325,96 +307,42 @@ public class BitmapComputer extends BitmapBase
             for (x=0;x!=xCount;x++) {
                 dx=(lft+xMargin)+(x*wid);
 
-                    // the drive
-
+                // the drive
                 drawRect(dx,dy,(dx+wid),(dy+high),color);
-                draw3DFrameRect(dx,dy,(dx+wid),(dy+high),2,outlineColor,true);
+                draw3DFrameRect(dx, dy, (dx + wid), (dy + high), edgeSize, outlineColor, true);
 
-                    // the emissive indicator
-
+                // the emissive indicator
                 ledColor=LED_COLORS[AppWindow.random.nextInt(3)];
 
-                bx=(dx+wid)-(ledWid+5);
-                by=(dy+high)-(ledHigh+5);
+                bx = (dx + wid) - ((ledWid + ledHigh) + edgeSize);
+                by = (dy + high) - ((ledHigh + ledHigh) + edgeSize);
                 drawRect(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
                 drawRectEmissive(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
             }
         }
     }
 
-    protected void generateComputerComponentScreen(int lft, int top, int rgt, int bot, int edgeSize) {
-        int x, y, dx, dy, rowCount, colCount, colCount2;
-        RagColor screenColor, charColor, emissiveCharColor;
-
-        lft+=edgeSize;
-        rgt-=edgeSize;
-        top+=edgeSize;
-        bot-=edgeSize;
-
-        screenColor=new RagColor(0.2f,0.25f,0.2f);
-        charColor=new RagColor(0.2f,0.6f,0.2f);
-        emissiveCharColor=adjustColor(charColor,0.8f);
-
-            // screen
-
-        drawRect(lft,top,rgt,bot,COLOR_BLACK);
-
-        drawOval((lft + 3), (top + 3), (lft + 13), (top + 13), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.0f, screenColor, 0.5f, false, false, 1.0f, 0.0f);
-        drawOval((rgt - 13), (top + 3), (rgt - 3), (top + 13), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.0f, screenColor, 0.5f, false, false, 1.0f, 0.0f);
-        drawOval((lft + 3), (bot - 13), (lft + 13), (bot - 3), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.0f, screenColor, 0.5f, false, false, 1.0f, 0.0f);
-        drawOval((rgt - 13), (bot - 13), (rgt - 3), (bot - 3), 0.0f, 1.0f, 0.0f, 0.0f, 0, 0.0f, screenColor, 0.5f, false, false, 1.0f, 0.0f);
-
-        drawRect((lft+8),(top+8),(rgt-8),(bot-8),screenColor);
-        drawRect((lft+8),(top+3),(rgt-8),(top+8),screenColor);
-        drawRect((lft+8),(bot-8),(rgt-8),(bot-3),screenColor);
-        drawRect((lft+3),(top+8),(lft+8),(bot-8),screenColor);
-        drawRect((rgt-8),(top+8),(rgt-3),(bot-8),screenColor);
-
-            // chars
-
-        dy=top+10;
-        rowCount=((bot-top)-20)/10;
-
-        for (y=0;y<rowCount;y++) {
-            colCount=3+((((rgt-lft)-20)/7)-3);
-
-            dx=lft+10;
-
-            colCount2=(colCount/2)+AppWindow.random.nextInt(colCount/2);
-
-            for (x=0;x<colCount2;x++) {
-
-                switch (AppWindow.random.nextInt(5)) {
-                    case 0:
-                        drawRect(dx,dy,(dx+5),(dy+8),charColor);
-                        drawRectEmissive(dx,dy,(dx+5),(dy+8),emissiveCharColor);
-                        break;
-                    case 1:
-                        drawRect((dx+2),dy,(dx+5),(dy+6),charColor);
-                        drawRectEmissive((dx+2),dy,(dx+5),(dy+6),emissiveCharColor);
-                        break;
-                    case 2:
-                        drawRect(dx,(dy+5),(dx+5),(dy+8),charColor);
-                        drawRectEmissive(dx,(dy+5),(dx+5),(dy+8),emissiveCharColor);
-                        break;
-                    case 3:
-                        drawRect(dx,dy,(dx+5),(dy+3),charColor);
-                        drawRectEmissive(dx,dy,(dx+5),(dy+3),emissiveCharColor);
-                        break;
-                }
-
-                dx+=7;
-            }
-
-            dy+=10;
-        }
+    private void generateComputerComponentScreen(int lft, int top, int rgt, int bot) {
+        generateScreen(lft, top, rgt, bot); // from bitmap monitor
     }
 
-    protected void generateComputerComponents(RagColor panelColor, int edgeSize, boolean isControlPanel) {
+    private void generateComputerComponentAccess(int lft, int top, int rgt, int bot, int edgeSize, RagColor altPanelColor) {
+        int charWid, charHigh, charPadding, charMargin;
+
+        // label
+        charWid = textureSize / 100;
+        charHigh = (int) ((float) charWid * 1.6f);
+        charPadding = textureSize / 250;
+        charMargin = ((textureSize / 100) + edgeSize);
+
+        generateScreenCharacterLine((lft + charMargin), (top + charMargin), charWid, charHigh, charPadding, (3 + AppWindow.random.nextInt(3)), adjustColorRandom(altPanelColor, 0.5f, 0.8f), null);
+    }
+
+    protected void generateComputerComponents(RagColor panelColor, int edgeSize) {
         int mx, my, sz, lx, ty, rx, by, rndTry;
-        int lightCount, buttonCount;
+        int lightCount, buttonCount, screenCount;
         int minPanelSize, extraPanelSize, skipPanelSize;
-        boolean hadWires, hadShutter, hadScreen, hadDials, hadBlank, rndSuccess;
+        boolean hadWires, hadShutter, hadDisks, hadDials, hadAccess, hadBlank, rndSuccess;
         RagColor altPanelColor;
 
         // inside components
@@ -423,14 +351,16 @@ public class BitmapComputer extends BitmapBase
         my = edgeSize;
 
         hadWires=false;
-        hadShutter=false;
-        hadScreen = false;
+        hadShutter = false;
+        hadDisks = false;
         hadDials = false;
+        hadAccess = false;
         hadBlank=false;
         lightCount=0;
-        buttonCount=0;
+        buttonCount = 0;
+        screenCount = 0;
 
-        minPanelSize=(int)((float)textureSize*0.1f);
+        minPanelSize = (int) ((float) textureSize * 0.2f);
         extraPanelSize=(int)((float)textureSize*0.04f);
         skipPanelSize=(int)((float)textureSize*0.05f);
 
@@ -478,7 +408,7 @@ public class BitmapComputer extends BitmapBase
                 switch (AppWindow.random.nextInt(8)) {
                     case 0:
                         // no wires on control panels or horizontal plates
-                        if ((isControlPanel) || (hadWires) || ((rx - lx) > (by - ty))) {
+                        if ((hadWires) || ((rx - lx) > (by - ty))) {
                             break;              // no wires on panels
                         }
 
@@ -487,7 +417,7 @@ public class BitmapComputer extends BitmapBase
                         rndSuccess=true;
                         break;
                     case 1:
-                        if ((isControlPanel) || (hadShutter)) {
+                        if (hadShutter) {
                             break;
                         }
                         hadShutter=true;
@@ -495,49 +425,58 @@ public class BitmapComputer extends BitmapBase
                         rndSuccess=true;
                         break;
                     case 2:
-                        if (isControlPanel) {
+                        if (lightCount > 1) {
                             break;
                         }
-                        if (lightCount>1) break;
                         lightCount++;
-                        generateComputerComponentLights(lx, ty, rx, by, edgeSize, isControlPanel);
+                        generateComputerComponentLights(lx, ty, rx, by, edgeSize);
                         rndSuccess=true;
                         break;
                     case 3:
                         if (buttonCount>2) break;
                         buttonCount++;
-                        generateComputerComponentButtons(lx, ty, rx, by, edgeSize, isControlPanel);
+                        generateComputerComponentButtons(lx, ty, rx, by, edgeSize);
                         rndSuccess=true;
                         break;
                     case 4:
-                        if (isControlPanel) {
+                        if (hadDisks) {
                             break;
                         }
+                        hadDisks = true;
                         generateComputerComponentDrives(lx, ty, rx, by, edgeSize);
                         rndSuccess=true;
                         break;
                     case 5:
                         // screens only horizontal
-                        if ((!isControlPanel) || (hadScreen) || ((rx - lx) < (by - ty))) {
+                        if ((screenCount > 2) || ((rx - lx) < (by - ty))) {
                             break;
                         }
-                        hadScreen=true;
-                        generateComputerComponentScreen(lx,ty,rx,by,edgeSize);
+                        screenCount++;
+                        generateComputerComponentScreen(lx, ty, rx, by);
                         rndSuccess=true;
                         break;
                     case 6:
-                        if ((!isControlPanel) || (hadDials)) {
+                        if (hadDials) {
                             break;
                         }
                         hadDials = true;
                         generateComputerComponentDials(lx, ty, rx, by);
                         rndSuccess = true;
                         break;
+                    case 7:
+                        if (hadAccess) {
+                            break;
+                        }
+                        hadAccess = true;
+                        generateComputerComponentAccess(lx, ty, rx, by, edgeSize, altPanelColor);
+                        rndSuccess = true;
+                        break;
+
                     default:
                         if (hadBlank) {
                             break;
                         }
-                        hadBlank=true;
+                        hadBlank = true;
                         rndSuccess=true;
                         break;
                 }
@@ -569,7 +508,7 @@ public class BitmapComputer extends BitmapBase
 
         // draw the computer
         drawRect(0, 0, textureSize, textureSize, panelColor);
-        generateComputerComponents(panelColor, panelEdgeSize, false);
+        generateComputerComponents(panelColor, panelEdgeSize);
 
         // set the emissive
         emissiveFactor=new RagPoint(1.0f,1.0f,1.0f);
