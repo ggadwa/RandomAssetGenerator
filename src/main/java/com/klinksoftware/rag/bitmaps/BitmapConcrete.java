@@ -52,7 +52,7 @@ public class BitmapConcrete extends BitmapBase
                 break;
         }
 
-        drawSimpleCrack(sx, sy, ex, ey, (4 + AppWindow.random.nextInt(4)), AppWindow.random.nextInt(40), AppWindow.random.nextInt(40), crackColor);
+        drawSimpleCrack(sx, sy, ex, ey, (4 + AppWindow.random.nextInt(4)), AppWindow.random.nextInt(textureSize / 15), AppWindow.random.nextInt(textureSize / 15), crackColor);
     }
 
     @Override
@@ -183,8 +183,7 @@ public class BitmapConcrete extends BitmapBase
 
         }
 
-            // finish with the metallic-roughness
-
+        // finish with the metallic-roughness
         createMetallicRoughnessMap(0.35f,0.3f);
     }
 }

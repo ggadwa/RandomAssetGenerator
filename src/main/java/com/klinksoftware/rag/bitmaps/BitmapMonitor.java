@@ -79,7 +79,37 @@ public class BitmapMonitor extends BitmapBase {
     }
 
     private void generateScreenGraph(int lft, int top, int rgt, int bot) {
+        int n, lineCount;
+        int x, y, lastX, lastY, spikeCount, spikeWid;
+        RagColor lineColor;
 
+        if (bot <= top) {
+            return;
+        }
+
+        lineCount = 2 + AppWindow.random.nextInt(3);
+
+        for (n = 0; n != lineCount; n++) {
+            lineColor = getRandomColor();
+
+            spikeCount = 5 + AppWindow.random.nextInt(15);
+            spikeWid = (rgt - lft) / spikeCount;
+
+            x = lft;
+            lastX = -1;
+            lastY = -1;
+
+            for (x = lft; x < rgt; x += spikeWid) {
+                y = top + AppWindow.random.nextInt(bot - top);
+
+                if (x != lft) {
+                    drawLineColor(lastX, lastY, x, y, lineColor);
+                }
+
+                lastX = x;
+                lastY = y;
+            }
+        }
     }
 
     public void generateScreen(int lft, int top, int rgt, int bot) {
@@ -121,11 +151,11 @@ public class BitmapMonitor extends BitmapBase {
         drawOval((lft + panelInsideEdgeSize), (top + panelInsideEdgeSize), (rgt - panelInsideEdgeSize), (bot - panelInsideEdgeSize), 0.0f, 1.0f, 0.35f, 0.35f, 0, 0.0f, screenColor, 0.5f, false, false, 1.0f, 0.0f);
 
         // monitor contents
-        //if (AppWindow.random.nextBoolean()) {
-        generateScreenCharacterBlock((lft + contentEdgeSize), (top + contentEdgeSize), (rgt - contentEdgeSize), (bot - contentEdgeSize));
-        //} else {
-        //    generateScreenGraph((lft + contentEdgeSize), (top + contentEdgeSize), (rgt - contentEdgeSize), (bot - contentEdgeSize));
-        //}
+        if (AppWindow.random.nextBoolean()) {
+            generateScreenCharacterBlock((lft + contentEdgeSize), (top + contentEdgeSize), (rgt - contentEdgeSize), (bot - contentEdgeSize));
+        } else {
+            generateScreenGraph((lft + contentEdgeSize), (top + contentEdgeSize), (rgt - contentEdgeSize), (bot - contentEdgeSize));
+        }
 
         // finally the edge
         draw3DDarkenFrameRect(lft, top, rgt, bot, panelEdgeSize, (0.9f + AppWindow.random.nextFloat(0.1f)), true);

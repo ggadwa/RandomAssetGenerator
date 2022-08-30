@@ -1,19 +1,18 @@
 
 
-- use monitor for computers
-  - have wave version
-- handles on access panels
-- vents need to be wider
-- key in circle switches
+- concrete next, bigger expansion joints, stains aren't showing up
+- humanoid, etc, multiple textures, not one in many textures, update models
 
-- computer next
-- computer, panel, humanoid, etc, multiple textures, not one in many textures, update models
-- get rid of UV_BOX__???
+
 
 
 
 animations:
---> redo everything to have matrixes for offsets (even in map)
+--> on view mesh load, don't remake skeletons by adding in the absolute bone offset
+--> create a matrix (with just transpose) and put shader to start
+--> then do joints
+--> mesh will need per vertex joint and weight array
+--> will need a parallel joint matrix for every skeleton bone
 
         // calculate the skin animation
         // and vertex position, if skinning, calc
@@ -50,7 +49,7 @@ bitmaps
  - gravel (like dirt)
  - more distinct control panels pieces (keyboard)
  - make face textures 1, 2, or 3 eye
- - brick walls with boards on them
+ - computer access panels have handles?
 
 model
  - animations

@@ -6,13 +6,13 @@ import java.util.*;
 
 public class Bone
 {
-    public int                          meshIdx;
+    public int meshIdx;
     public final float radius;
-    public final String                 name;
-    public final RagPoint               pnt;
-    public final ArrayList<Integer>     children;
+    public final String name;
+    public final RagPoint pnt;
+    public final ArrayList<Integer> children;
 
-    public Bone(String name, int meshIdx, float radius, RagPoint pnt)    {
+    public Bone(String name, int meshIdx, float radius, RagPoint pnt) {
         this.name=name;
         this.meshIdx=meshIdx;
         this.radius = radius;
@@ -21,8 +21,7 @@ public class Bone
         children=new ArrayList<>();
     }
 
-    public void addChild(int index)
-    {
+    public void addChild(int index) {
         children.add(index);
     }
 }

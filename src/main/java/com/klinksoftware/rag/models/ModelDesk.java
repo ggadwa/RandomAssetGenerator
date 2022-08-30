@@ -137,7 +137,8 @@ public class ModelDesk extends ModelBase {
 
         // the monitor
         y += standHigh;
-        meshList.add(MeshUtility.createCubeRotated("monitor", -monitorWidth, monitorWidth, y, (y + ((deskDepth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, true, true, true, true, true, true, false, MeshUtility.UV_BOX_ONE_FRONT));
+        meshList.add(MeshUtility.createCubeRotated("monitor", -monitorWidth, monitorWidth, y, (y + ((deskDepth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, false, false, true, false, false, false, false, MeshUtility.UV_WHOLE));
+        meshList.add(MeshUtility.createCubeRotated("stand", -monitorWidth, monitorWidth, y, (y + ((deskDepth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, true, true, false, true, true, true, false, MeshUtility.UV_MAP));
 
         // now build a fake skeleton for the glTF
         skeleton = meshList.rebuildMapMeshesWithSkeleton();

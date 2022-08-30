@@ -9,10 +9,8 @@ import java.util.*;
 public class MeshUtility {
 
     public static final int UV_WHOLE = 0;
-    public static final int UV_BOX = 1;
-    public static final int UV_BOX_ONE_FRONT = 2;
-    public static final int UV_MAP = 3;
-    public static final int UV_SKY_BOX = 4;
+    public static final int UV_MAP = 1;
+    public static final int UV_SKY_BOX = 2;
 
     public static final int RAMP_DIR_POS_Z = 0;
     public static final int RAMP_DIR_NEG_Z = 1;
@@ -385,10 +383,6 @@ public class MeshUtility {
                 case MeshUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
                     break;
-                case MeshUtility.UV_BOX:
-                case MeshUtility.UV_BOX_ONE_FRONT:
-                    uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 0.499f, 0.499f, 0.499f, 0.499f, 0.0f));
-                    break;
                 case MeshUtility.UV_SKY_BOX:
                     uvArray.addAll(Arrays.asList(0.0f, 0.26f, 0.0f, 0.49f, 0.25f, 0.49f, 0.25f, 0.26f));
                     break;
@@ -408,10 +402,6 @@ public class MeshUtility {
             switch (uvMode) {
                 case MeshUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-                    break;
-                case MeshUtility.UV_BOX:
-                case MeshUtility.UV_BOX_ONE_FRONT:
-                    uvArray.addAll(Arrays.asList(0.0f, 0.499f, 0.0f, 0.0f, 0.499f, 0.0f, 0.499f, 0.499f));
                     break;
                 case MeshUtility.UV_SKY_BOX:
                     //uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
@@ -434,10 +424,6 @@ public class MeshUtility {
                 case MeshUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
                     break;
-                case MeshUtility.UV_BOX:
-                case MeshUtility.UV_BOX_ONE_FRONT:
-                    uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 0.499f, 0.5f, 0.499f, 0.5f, 0.0f));
-                    break;
                 case MeshUtility.UV_SKY_BOX:
                     uvArray.addAll(Arrays.asList(1.0f, 0.26f, 1.0f, 0.49f, 0.75f, 0.49f, 0.75f, 0.26f));
                     break;
@@ -457,12 +443,6 @@ public class MeshUtility {
             switch (uvMode) {
                 case MeshUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
-                    break;
-                case MeshUtility.UV_BOX:
-                    uvArray.addAll(Arrays.asList(0.5f, 0.0f, 0.5f, 0.499f, 1.0f, 0.499f, 1.0f, 0.0f));
-                    break;
-                case MeshUtility.UV_BOX_ONE_FRONT:
-                    uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 0.499f, 0.499f, 0.499f, 0.499f, 0.0f));
                     break;
                 case MeshUtility.UV_SKY_BOX:
                     uvArray.addAll(Arrays.asList(0.25f, 0.26f, 0.25f, 0.49f, 0.49f, 0.49f, 0.49f, 0.26f));
@@ -484,10 +464,6 @@ public class MeshUtility {
                 case MeshUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f));
                     break;
-                case MeshUtility.UV_BOX:
-                case MeshUtility.UV_BOX_ONE_FRONT:
-                    uvArray.addAll(Arrays.asList(0.0f, 0.499f, 0.0f, 1.0f, 0.499f, 1.0f, 0.499f, 0.499f));
-                    break;
                 case MeshUtility.UV_SKY_BOX:
                     uvArray.addAll(Arrays.asList(0.25f, 0.24f, 0.25f, 0.0f, 0.49f, 0.0f, 0.49f, 0.24f));
                     break;
@@ -507,10 +483,6 @@ public class MeshUtility {
             switch (uvMode) {
                 case MeshUtility.UV_WHOLE:
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
-                    break;
-                case MeshUtility.UV_BOX:
-                case MeshUtility.UV_BOX_ONE_FRONT:
-                    uvArray.addAll(Arrays.asList(0.0f, 0.499f, 0.0f, 1.0f, 0.499f, 1.0f, 0.499f, 0.499f));
                     break;
                 case MeshUtility.UV_SKY_BOX:
                     uvArray.addAll(Arrays.asList(0.25f, 0.74f, 0.25f, 0.5f, 0.49f, 0.5f, 0.49f, 0.74f));

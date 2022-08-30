@@ -17,8 +17,9 @@ public class ModelJunction extends ModelBase {
         RagPoint rotAngle, centerPnt, pipePnt;
         Mesh mesh, mesh2;
 
+        addBitmap("computer", new String[]{"Computer"});
+        addBitmap("panel", new String[]{"Metal", "MetalPlank", "MetalPlate"});
         addBitmap("pipe", new String[]{"Pipe"});
-        addBitmap("panel", new String[]{"Computer"});
 
         // sizes
         junctionWidth = MapBuilder.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f));
@@ -30,7 +31,8 @@ public class ModelJunction extends ModelBase {
 
         juncHalfWid = junctionWidth * 0.5f;
 
-        meshList.add(MeshUtility.createCube("panel", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, true, true, true, true, true, true, false, MeshUtility.UV_BOX));
+        meshList.add(MeshUtility.createCube("computer", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, false, false, false, true, false, false, false, MeshUtility.UV_WHOLE));
+        meshList.add(MeshUtility.createCube("panel", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, true, true, true, false, true, true, false, MeshUtility.UV_MAP));
         /*
             // the pipes
 

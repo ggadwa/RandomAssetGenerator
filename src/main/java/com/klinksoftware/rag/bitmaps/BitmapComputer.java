@@ -93,7 +93,7 @@ public class BitmapComputer extends BitmapMonitor {
         shutterColor=getRandomColor();
         shutterEdgeColor=adjustColor(shutterColor,0.9f);
 
-        sz=(int)((float)Math.max((rgt-lft),(bot-top))*0.1f);
+        sz = (int) ((float) Math.max((rgt - lft), (bot - top)) * 0.05f);
         shutterCount=sz+AppWindow.random.nextInt(sz);
 
         drawMetalShine(lft,top,rgt,bot,shutterColor);
@@ -115,7 +115,7 @@ public class BitmapComputer extends BitmapMonitor {
         top+=edgeSize;
         bot-=edgeSize;
 
-        sz = (textureSize / 100) + AppWindow.random.nextInt(textureSize / 100);
+        sz = (textureSize / 50) + AppWindow.random.nextInt(textureSize / 50);
 
         xCount = (rgt - lft) / sz;
         yCount = (bot - top) / sz;
@@ -156,7 +156,7 @@ public class BitmapComputer extends BitmapMonitor {
         top+=edgeSize;
         bot-=edgeSize;
 
-        sz = (textureSize / 100) + AppWindow.random.nextInt(textureSize / 60);
+        sz = (textureSize / 50) + AppWindow.random.nextInt(textureSize / 20);
 
         xCount=(rgt-lft)/sz;
         yCount=(bot-top)/sz;
@@ -196,7 +196,7 @@ public class BitmapComputer extends BitmapMonitor {
         RagColor dialColor, outlineColor;
         RagPoint pnt;
 
-        margin = (textureSize / 200) + AppWindow.random.nextInt(textureSize / 200);
+        margin = (textureSize / 100) + AppWindow.random.nextInt(textureSize / 100);
 
         lft += margin;
         rgt -= margin;
@@ -205,12 +205,12 @@ public class BitmapComputer extends BitmapMonitor {
 
         if ((rgt - lft) > (bot - top)) {
             sz = (bot - top) - (margin * 2);
-            xCount = (rgt - lft) / sz;
+            xCount = (rgt - lft) / (sz + margin);
             yCount = 1;
         } else {
             sz = (rgt - lft) - (margin * 2);
             xCount = 1;
-            yCount = (bot - top) / sz;
+            yCount = (bot - top) / (sz + margin);
         }
 
         if (xCount <= 0) {
@@ -223,9 +223,6 @@ public class BitmapComputer extends BitmapMonitor {
         xMargin = ((rgt - lft) - ((xCount * sz) + ((xCount - 1) * margin))) / 2;
         yMargin = ((bot - top) - ((yCount * sz) + ((yCount - 1) * margin))) / 2;
 
-        dialColor = getRandomColor();
-        outlineColor = adjustColor(dialColor, 0.5f);
-
         for (y = 0; y != yCount; y++) {
             dy = (top + yMargin) + (y * (sz + margin));
             dy2 = dy + sz;
@@ -233,6 +230,9 @@ public class BitmapComputer extends BitmapMonitor {
             for (x = 0; x != xCount; x++) {
                 dx = (lft + xMargin) + (x * (sz + margin));
                 dx2 = dx + sz;
+
+                dialColor = getRandomColor();
+                outlineColor = adjustColor(dialColor, 0.5f);
 
                 drawOval(dx, dy, dx2, dy2, 0.0f, 1.0f, 0.0f, 0.0f, 2, 0.8f, outlineColor, 0.5f, false, false, 1.0f, 0.0f);
                 drawFrameOval(dx, dy, dx2, dy2, 0.0f, 0.0f, COLOR_BLACK);
@@ -329,7 +329,6 @@ public class BitmapComputer extends BitmapMonitor {
     private void generateComputerComponentAccess(int lft, int top, int rgt, int bot, int edgeSize, RagColor altPanelColor) {
         int charWid, charHigh, charPadding, charMargin;
 
-        // label
         charWid = textureSize / 100;
         charHigh = (int) ((float) charWid * 1.6f);
         charPadding = textureSize / 250;
@@ -396,7 +395,7 @@ public class BitmapComputer extends BitmapMonitor {
             // be randonly in or out
             altPanelColor = adjustColorRandom(panelColor, 0.8f, 1.0f);
             drawRect(lx, ty, rx, by, altPanelColor);
-            draw3DFrameRect(lx, ty, rx, by, edgeSize, altPanelColor, (AppWindow.random.nextBoolean()));
+            draw3DFrameRect(lx, ty, rx, by, edgeSize, altPanelColor, true);
 
             // draw the components
             // we only allow one blank, wires, or shutter
@@ -409,7 +408,7 @@ public class BitmapComputer extends BitmapMonitor {
                     case 0:
                         // no wires on control panels or horizontal plates
                         if ((hadWires) || ((rx - lx) > (by - ty))) {
-                            break;              // no wires on panels
+                            break; // no wires on panels
                         }
 
                         hadWires = true;
@@ -504,7 +503,7 @@ public class BitmapComputer extends BitmapMonitor {
         RagColor panelColor;
 
         panelColor = getRandomColor();
-        panelEdgeSize = (textureSize / 150) + AppWindow.random.nextInt(textureSize / 150);
+        panelEdgeSize = (textureSize / 200) + AppWindow.random.nextInt(textureSize / 150);
 
         // draw the computer
         drawRect(0, 0, textureSize, textureSize, panelColor);

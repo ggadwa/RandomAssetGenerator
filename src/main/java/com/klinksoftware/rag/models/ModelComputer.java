@@ -22,7 +22,7 @@ public class ModelComputer extends ModelBase {
         // possible bottom
         if (AppWindow.random.nextBoolean()) {
             high = MapBuilder.SEGMENT_SIZE * (0.05f + AppWindow.random.nextFloat(0.05f));
-            meshList.add(MeshUtility.createCube("spacer", xMin, xMax, by, (by + high), zMin, zMax, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
+            meshList.add(MeshUtility.createCube("spacer", xMin, xMax, (by + high), by, zMin, zMax, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
             by += high;
             ty += high;
         }
@@ -31,11 +31,11 @@ public class ModelComputer extends ModelBase {
         hasTop = AppWindow.random.nextBoolean();
         if (hasTop) {
             high = MapBuilder.SEGMENT_SIZE * (0.05f + AppWindow.random.nextFloat(0.05f));
-            meshList.add(MeshUtility.createCube("spacer", xMin, xMax, ty, (ty + high), zMin, zMax, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+            meshList.add(MeshUtility.createCube("spacer", xMin, xMax, (ty + high), ty, zMin, zMax, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
         }
 
         // the computer
-        meshList.add(MeshUtility.createCube(computerBitmapName, xMin, xMax, ty, by, zMin, zMax, false, false, (!flipFront), flipFront, false, false, false, MeshUtility.UV_WHOLE));
+        meshList.add(MeshUtility.createCube(computerBitmapName, xMin, xMax, by, ty, zMin, zMax, false, false, (!flipFront), flipFront, false, false, false, MeshUtility.UV_WHOLE));
         meshList.add(MeshUtility.createCube("panel", xMin, xMax, ty, by, zMin, zMax, true, true, flipFront, (!flipFront), false, (!hasTop), false, MeshUtility.UV_WHOLE));
     }
 
@@ -45,7 +45,7 @@ public class ModelComputer extends ModelBase {
         float pedestalWidth, pedestalHeight;
 
         addBitmap("computer", new String[]{"Computer"});
-        addBitmap("panel", new String[]{"MetalPlate"});
+        addBitmap("panel", new String[]{"Metal", "MetalPlank", "MetalPlate"});
         addBitmap("spacer", new String[]{"Metal", "MetalPlank", "MetalPlate"});
         addBitmap("pedestal", new String[]{"Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "WoodPanel"});
 
