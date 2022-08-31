@@ -36,6 +36,21 @@ animations:
         normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(noSkinAttachedNodeMatrix)));
     }
 
+--> save as:
+
+            "name" : "Node_7",
+            "rotation" : [
+                -0.7071068286895752,
+                0,
+                0,
+                0.7071068286895752
+            ],
+            "translation" : [
+                0.003179544350132346,
+                0.008089185692369938,
+                -0.05187902972102165
+            ]
+
 
 map
  - thread bitmap creation

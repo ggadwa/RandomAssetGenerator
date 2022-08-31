@@ -2000,6 +2000,145 @@ public class BitmapBase
         }
     }
 
+    protected void darkenTriangle(int x0, int y0, int x1, int y1, int x2, int y2, boolean doNormals, float factor) {
+        int x, y, lx, rx, ty, my, by, tyX, myX, byX, idx;
+
+        if ((y0 <= y1) && (y0 <= y2)) {
+            ty = y0;
+            tyX = x0;
+            if (y1 < y2) {
+                my = y1;
+                myX = x1;
+                by = y2;
+                byX = x2;
+            } else {
+                my = y2;
+                myX = x2;
+                by = y1;
+                byX = x1;
+            }
+        } else {
+            if ((y1 <= y0) && (y1 <= y2)) {
+                ty = y1;
+                tyX = x1;
+                if (y0 < y2) {
+                    my = y0;
+                    myX = x0;
+                    by = y2;
+                    byX = x2;
+                } else {
+                    my = y2;
+                    myX = x2;
+                    by = y0;
+                    byX = x0;
+                }
+            } else {
+                ty = y2;
+                tyX = x2;
+                if (y0 < y1) {
+                    my = y0;
+                    myX = x0;
+                    by = y1;
+                    byX = x1;
+                } else {
+                    my = y1;
+                    myX = x1;
+                    by = y0;
+                    byX = x0;
+                }
+            }
+        }
+
+        // top half
+        for (y = ty; y < my; y++) {
+            if ((y < 0) || (y >= textureSize)) {
+                continue;
+            }
+
+            if (myX < tyX) {
+                lx = tyX + (int) ((float) ((myX - tyX) * (y - ty)) / (float) (my - ty));
+                rx = tyX + (int) ((float) ((byX - tyX) * (y - ty)) / (float) (by - ty));
+            } else {
+                lx = tyX + (int) ((float) ((byX - tyX) * (y - ty)) / (float) (by - ty));
+                rx = tyX + (int) ((float) ((myX - tyX) * (y - ty)) / (float) (my - ty));
+            }
+
+            if (lx < 0) {
+                lx = 0;
+            }
+            if (rx >= textureSize) {
+                rx = textureSize - 1;
+            }
+            if (lx > rx) {
+                continue;
+            }
+
+            idx = ((y * textureSize) + lx) * 4;
+
+            for (x = lx; x < rx; x++) {
+                colorData[idx] = colorData[idx] * factor;
+                colorData[idx + 1] = colorData[idx + 1] * factor;
+                colorData[idx + 2] = colorData[idx + 2] * factor;
+
+                if (doNormals) {
+                    normalData[idx] = (NORMAL_CLEAR.x + 1.0f) * 0.5f;
+                    normalData[idx + 1] = (NORMAL_CLEAR.y + 1.0f) * 0.5f;
+                    normalData[idx + 2] = (NORMAL_CLEAR.z + 1.0f) * 0.5f;
+                }
+
+                idx += 4;
+            }
+        }
+
+        // bottom half
+        for (y = my; y < by; y++) {
+            if ((y < 0) || (y >= textureSize)) {
+                continue;
+            }
+
+            if (myX < tyX) {
+                lx = myX + (int) ((float) ((byX - myX) * (y - my)) / (float) (by - my));
+                rx = tyX + (int) ((float) ((byX - tyX) * (y - ty)) / (float) (by - ty));
+            } else {
+                lx = tyX + (int) ((float) ((byX - tyX) * (y - ty)) / (float) (by - ty));
+                rx = myX + (int) ((float) ((byX - myX) * (y - my)) / (float) (by - my));
+            }
+
+            if (lx < 0) {
+                lx = 0;
+            }
+            if (rx >= textureSize) {
+                rx = textureSize - 1;
+            }
+            if (lx > rx) {
+                continue;
+            }
+
+            idx = ((y * textureSize) + lx) * 4;
+
+            for (x = lx; x < rx; x++) {
+                colorData[idx] = colorData[idx] * factor;
+                colorData[idx + 1] = colorData[idx + 1] * factor;
+                colorData[idx + 2] = colorData[idx + 2] * factor;
+
+                if (doNormals) {
+                    normalData[idx] = (NORMAL_CLEAR.x + 1.0f) * 0.5f;
+                    normalData[idx + 1] = (NORMAL_CLEAR.y + 1.0f) * 0.5f;
+                    normalData[idx + 2] = (NORMAL_CLEAR.z + 1.0f) * 0.5f;
+                }
+
+                idx += 4;
+            }
+        }
+
+        // normals
+        if (doNormals) {
+            drawLineNormal(x0, y0, x1, y1, NORMAL_LEFT_45);
+            drawLineNormal(x0, y0, x2, y2, NORMAL_RIGHT_45);
+            drawLineNormal(x1, y1, x2, y2, NORMAL_BOTTOM_45);
+        }
+    }
+
     protected void drawHexagon(int lft,int top,int rgt,int bot,int pointSize,int edgeSize,RagColor color)
     {
         int         n,lx,rx,my;
@@ -2355,11 +2494,10 @@ public class BitmapBase
         }
     }
 
-    protected void drawColorStripeVertical(int lft,int top,int rgt,int bot,float factor,RagColor baseColor)
-    {
-        int                 x,y,count,idx;
-        float               f,r,g,b,nx,ny,nz;
-        RagPoint            normal;
+    protected void drawColorStripeVertical(int lft, int top, int rgt, int bot, float factor, RagColor baseColor) {
+        int x, y, count, idx;
+        float f, r, g, b, nx, ny, nz;
+        RagPoint normal;
 
         if ((rgt<=lft) || (bot<=top)) return;
 
@@ -2406,11 +2544,9 @@ public class BitmapBase
         }
     }
 
-    protected void drawNormalWaveHorizontal(int lft,int top,int rgt,int bot,RagColor color,RagColor lineColor,int waveCount)
-    {
-        int         x,y,idx,
-                    waveIdx,wavePos,waveAdd;
-        float       nx,ny,nz;
+    protected void drawNormalWaveHorizontal(int lft, int top, int rgt, int bot, RagColor color, RagColor lineColor, int waveCount) {
+        int x, y, idx, waveIdx, wavePos, waveAdd;
+        float nx, ny, nz;
 
         if ((rgt<=lft) || (bot<=top)) return;
 
@@ -2469,11 +2605,9 @@ public class BitmapBase
         }
     }
 
-    protected void drawNormalWaveVertical(int lft,int top,int rgt,int bot,RagColor color,RagColor lineColor,int waveCount)
-    {
-        int         x,y,idx,
-                    waveIdx,wavePos,waveAdd;
-        float       nx,ny,nz;
+    protected void drawNormalWaveVertical(int lft, int top, int rgt, int bot, RagColor color, RagColor lineColor, int waveCount) {
+        int x, y, idx, waveIdx, wavePos, waveAdd;
+        float nx, ny, nz;
 
         if ((rgt<=lft) || (bot<=top)) return;
 
@@ -3058,22 +3192,24 @@ public class BitmapBase
     // planks
     //
     protected void generateWoodDrawBoard(int lft, int top, int rgt, int bot, int edgeSize, RagColor woodColor) {
-        int n, stainCount, stainMinSize, lx, ty, rx, by, sz;
-        int nailSize;
+        int n, chipCount, stainCount, stainMinSize, lx, ty, rx, by, sz;
+        int x1, y1, x2, y2, x3, y3, maxChipSize, maxChipLen;
         float f;
-        RagColor col;
+        boolean vert;
+        RagColor color;
 
-        col = adjustColorRandom(woodColor, 0.7f, 1.2f);
+        color = adjustColorRandom(woodColor, 0.7f, 1.2f);
+        vert = ((bot - top) > (rgt - lft));
 
         // board background
-        drawRect(lft, top, rgt, bot, col);
+        drawRect(lft, top, rgt, bot, color);
 
         // stripes and a noise overlay
         f = 0.1f + AppWindow.random.nextFloat(0.3f);
-        if ((bot - top) > (rgt - lft)) {
-            drawColorStripeVertical((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), f, col);
+        if (vert) {
+            drawColorStripeVertical((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), f, color);
         } else {
-            drawColorStripeHorizontal((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), f, col);
+            drawColorStripeHorizontal((lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), f, color);
         }
 
         // stains
@@ -3099,6 +3235,56 @@ public class BitmapBase
         // blur both the color and the normal
         blur(colorData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), (textureSize / 250), true);
         blur(normalData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), (textureSize / 100), true);
+
+        // chipped ends
+        maxChipLen = edgeSize * 5;
+        maxChipSize = edgeSize * 3;
+
+        // lft-top end
+        chipCount = ((lft < 0) || (top < 0)) ? 0 : AppWindow.random.nextInt(10);
+        for (n = 0; n != chipCount; n++) {
+
+            if (vert) {
+                x1 = lft + (AppWindow.random.nextInt((rgt - lft) - maxChipSize));
+                y1 = top;
+                x2 = x1 + (edgeSize + AppWindow.random.nextInt(maxChipSize));
+                y2 = top;
+                x3 = (x1 + x2) / 2;
+                y3 = y2 + (edgeSize + AppWindow.random.nextInt(maxChipLen));
+            } else {
+                x1 = lft;
+                y1 = top + (AppWindow.random.nextInt((bot - top) - maxChipSize));
+                x2 = lft;
+                y2 = y1 + (edgeSize + AppWindow.random.nextInt(maxChipSize));
+                x3 = x2 + (edgeSize + AppWindow.random.nextInt(maxChipLen));
+                y3 = (y1 + y2) / 2;
+            }
+
+            darkenTriangle(x1, y1, x2, y2, x3, y3, true, (0.5f + AppWindow.random.nextFloat(0.2f)));
+        }
+
+        // rgt-bot end
+        chipCount = ((rgt > textureSize) || (bot > textureSize)) ? 0 : AppWindow.random.nextInt(10);
+        for (n = 0; n != chipCount; n++) {
+
+            if (vert) {
+                x1 = lft + (AppWindow.random.nextInt((rgt - lft) - maxChipSize));
+                y1 = bot - edgeSize;
+                x2 = x1 + (edgeSize + AppWindow.random.nextInt(maxChipSize));
+                y2 = bot;
+                x3 = (x1 + x2) / 2;
+                y3 = y2 - (edgeSize + AppWindow.random.nextInt(maxChipLen));
+            } else {
+                x1 = rgt;
+                y1 = top + (AppWindow.random.nextInt((bot - top) - maxChipSize));
+                x2 = rgt;
+                y2 = y1 + (edgeSize + AppWindow.random.nextInt(maxChipSize));
+                x3 = x2 + (edgeSize + AppWindow.random.nextInt(maxChipLen));
+                y3 = (y1 + y2) / 2;
+            }
+
+            darkenTriangle(x1, y1, x2, y2, x3, y3, true, (0.5f + AppWindow.random.nextFloat(0.2f)));
+        }
 
         // the board edge
         draw3DDarkenFrameRect(lft, top, rgt, bot, edgeSize, (0.65f + AppWindow.random.nextFloat(0.1f)), true);
