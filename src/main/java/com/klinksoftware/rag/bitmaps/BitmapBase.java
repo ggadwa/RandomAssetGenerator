@@ -156,6 +156,28 @@ public class BitmapBase
         return (new RagColor(col[0], col[1], col[2]));
     }
 
+    protected RagColor getRandomColorSkipColor(RagColor[] skipColors) {
+        int n;
+        boolean hit;
+        RagColor color;
+
+        while (true) {
+            color = getRandomColor();
+
+            hit = false;
+            for (n = 0; n != skipColors.length; n++) {
+                if (color.equals(skipColors[n])) {
+                    hit = true;
+                    break;
+                }
+            }
+
+            if (!hit) {
+                return (color);
+            }
+        }
+    }
+
     protected RagColor getRandomTintColor() {
         float[] col;
 

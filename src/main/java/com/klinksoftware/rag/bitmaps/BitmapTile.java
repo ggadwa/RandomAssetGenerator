@@ -31,7 +31,7 @@ public class BitmapTile extends BitmapBase
         tileStyle=AppWindow.random.nextInt(3);
         tileContent=AppWindow.random.nextInt(4);
         tileDirty=(AppWindow.random.nextFloat()<0.2f);
-        edgeSize=(int)(((float)textureSize*0.005f)+(AppWindow.random.nextFloat()*((float)textureSize*0.01f)));
+        edgeSize = (textureSize / 250) + AppWindow.random.nextInt(textureSize / 100);
 
             // splits
 
@@ -185,8 +185,8 @@ public class BitmapTile extends BitmapBase
 
         tileColor=new RagColor[2];
         tileColor[0]=getRandomColor();
-        tileColor[1]=getRandomColor();
-        designColor=getRandomColor();
+        tileColor[1] = getRandomColorSkipColor(new RagColor[]{tileColor[0]});
+        designColor = getRandomColorSkipColor(tileColor);
 
         createPerlinNoiseData(16,16);
 
