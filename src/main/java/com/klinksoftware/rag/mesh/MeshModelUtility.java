@@ -13,7 +13,7 @@ public class MeshModelUtility
     private static final int CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT = 4;
 
     // build a cylinder around a limb
-    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, RagPoint topPnt, float topRadius, int aroundCount, int acrossCount, float uOffset, float vOffset, float uSize, float vSize) {
+    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, RagPoint topPnt, float topRadius, int aroundCount, int acrossCount) {
         int n, k, rowIdx, row2Idx, vIdx, vStartIdx;
         float ang, angAdd, acrossPos, acrossAdd;
         float tx, ty, tz;
@@ -63,8 +63,8 @@ public class MeshModelUtility
             centerPnt.z = botPnt.z + (((topPnt.z - botPnt.z) * (float) k) / (float) acrossCount);
 
             ang = 0.0f;
-            u = uOffset;
-            uAdd = uSize / (float) (aroundCount + 1);
+            u = 0.0f;
+            uAdd = 1.0f / (float) (aroundCount + 1);
 
             // we need to dupliacte the seam so the uvs work
             for (n = 0; n != (aroundCount + 1); n++) {
@@ -98,7 +98,7 @@ public class MeshModelUtility
                 normal.setFromValues((tx - centerPnt.x), (ty - centerPnt.y), (tz - centerPnt.z));
                 normal.normalize();
                 normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-                uvArray.addAll(Arrays.asList(u, ((((float) k / (float) acrossCount)) * vSize) + vOffset));
+                uvArray.addAll(Arrays.asList(u, ((float) k / (float) acrossCount)));
 
                 ang += angAdd;
                 u += uAdd;
@@ -137,7 +137,7 @@ public class MeshModelUtility
             normal.setFromValues((topPnt.x - botPnt.x), (topPnt.y - botPnt.y), (topPnt.z - botPnt.z));
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-            uvArray.addAll(Arrays.asList((uOffset + (uSize * 0.5f)), vOffset));
+            uvArray.addAll(Arrays.asList(0.5f, 0.0f));
 
             for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
@@ -157,7 +157,7 @@ public class MeshModelUtility
             normal.setFromValues((botPnt.x - topPnt.x), (botPnt.y - topPnt.y), (botPnt.z - topPnt.z));
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
-            uvArray.addAll(Arrays.asList((uOffset + (uSize * 0.5f)), (vOffset + vSize)));
+            uvArray.addAll(Arrays.asList(0.5f, 1.0f));
 
             for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
@@ -221,9 +221,9 @@ public class MeshModelUtility
 
         // build the cylinder around the bones
         if (organic) {
-            mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT, limb.uOffset, limb.vOffset, limb.uSize, limb.vSize);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
         } else {
-            mesh = buildCylinderAroundLimb(limb.name, "bitmap", limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT, limb.uOffset, limb.vOffset, limb.uSize, limb.vSize);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, bone1.pnt, bone1.radius, bone2.pnt, bone2.radius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
         }
 
         rebuildNormals(mesh, bone1, bone2);

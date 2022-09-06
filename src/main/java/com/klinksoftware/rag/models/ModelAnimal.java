@@ -13,7 +13,12 @@ public class ModelAnimal extends ModelBase {
 
     @Override
     public void buildInternal() {
-        addBitmap("bitmap", new String[]{"Monster"});
+        addBitmap("body", new String[]{"Fur", "Organic", "Scale"});
+        addBitmap("leg", new String[]{"Fur", "Organic", "Scale"});
+        addBitmap("foot", new String[]{"Fur", "Organic", "Scale"});
+        addBitmap("arm", new String[]{"Fur", "Organic", "Scale"});
+        addBitmap("hand", new String[]{"Fur", "Organic", "Scale"});
+        addBitmap("head", new String[]{"Fur", "Organic", "Scale"});
 
         // build the skeleton
         skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_ANIMAL, bilateral);

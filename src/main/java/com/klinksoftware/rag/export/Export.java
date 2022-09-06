@@ -18,10 +18,9 @@ public class Export
         // adding materials, textures, and images
         //
 
-    private int addTextureAndImage(String name,ArrayList<Object> texturesArr,ArrayList<Object> imagesArr)
-    {
-        int                             imageIdx;
-        LinkedHashMap<String,Object>    textureObj,imageObj;
+    private int addTextureAndImage(String name, ArrayList<Object> texturesArr, ArrayList<Object> imagesArr) {
+        int imageIdx;
+        LinkedHashMap<String, Object> textureObj, imageObj;
 
         imageIdx=imagesArr.size();              // the next image
 
@@ -41,12 +40,11 @@ public class Export
         return(texturesArr.size()-1);
     }
 
-    private int addMaterial(String name, HashMap<String, BitmapBase> bitmaps, ArrayList<Object> materialsArr, ArrayList<Object> texturesArr, ArrayList<Object> imagesArr)    {
-        int                             n,materialIdx,textureIdx;
-        String                          checkName;
-        LinkedHashMap<String,Object>    materialObj,normalObj,pbrObj,
-                                        colorObj,metallicRoughnessObj,
-                                        emissiveObj;
+    private int addMaterial(String name, HashMap<String, BitmapBase> bitmaps, ArrayList<Object> materialsArr, ArrayList<Object> texturesArr, ArrayList<Object> imagesArr) {
+        int n, textureIdx;
+        LinkedHashMap<String, Object> materialObj, normalObj, pbrObj;
+        LinkedHashMap<String, Object> colorObj, metallicRoughnessObj;
+        LinkedHashMap<String, Object> emissiveObj;
 
             // did we already use this material?
 
@@ -113,10 +111,9 @@ public class Export
         // bin utilities
         //
 
-    private int addBinData(int componentType,int count,String dataType,byte[] bytes,ArrayList<Object> accessorsArr,ArrayList<Object> bufferViewsArr,RagPoint min,RagPoint max,ByteArrayOutputStream bin) throws Exception
-    {
-        int                                 bufferIdx;
-        LinkedHashMap<String,Object>        accessorObj,bufferViewObj;
+    private int addBinData(int componentType, int count, String dataType, byte[] bytes, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, RagPoint min, RagPoint max, ByteArrayOutputStream bin) throws Exception {
+        int bufferIdx;
+        LinkedHashMap<String, Object> accessorObj, bufferViewObj;
 
         bufferIdx=bufferViewsArr.size();      // next buffer index
 
@@ -148,10 +145,9 @@ public class Export
         return(accessorsArr.size()-1);
     }
 
-    private byte[] floatArrayToFloatBytes(float[] arr)
-    {
-        int             n;
-        ByteBuffer      byteBuf;
+    private byte[] floatArrayToFloatBytes(float[] arr) {
+        int n;
+        ByteBuffer byteBuf;
 
         byteBuf=ByteBuffer.allocate(4*arr.length).order(ByteOrder.LITTLE_ENDIAN);
 
@@ -162,8 +158,7 @@ public class Export
         return(byteBuf.array());
     }
 
-    private byte[] intArrayToShortBytes(int[] arr)
-    {
+    private byte[] intArrayToShortBytes(int[] arr) {
         int             n;
         ByteBuffer      byteBuf;
 
@@ -180,12 +175,11 @@ public class Export
         // adding a mesh
         //
 
-    private void addMesh(Mesh mesh,int materialIdx,ArrayList<Object> meshesArr,ArrayList<Object> accessorsArr,ArrayList<Object> bufferViewsArr,ByteArrayOutputStream bin) throws Exception
-    {
-        int                                 accessorIdx;
-        ArrayList<Object>                   primitiveArr;
-        LinkedHashMap<String,Object>        meshObj,primitiveObj,attributeObj;
-        RagPoint                            min,max;
+    private void addMesh(Mesh mesh, int materialIdx, ArrayList<Object> meshesArr, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
+        int accessorIdx;
+        ArrayList<Object> primitiveArr;
+        LinkedHashMap<String, Object> meshObj, primitiveObj, attributeObj;
+        RagPoint min, max;
 
             // figure out the min and max of vertex data
 
@@ -232,18 +226,18 @@ public class Export
         //
 
     public void export(MeshList meshList, Skeleton skeleton, HashMap<String, BitmapBase> bitmaps, String path, String name) throws Exception {
-        int                             n,meshCount,materialIdx;
-        byte[]                          binBytes;
+        int n, meshCount, materialIdx;
+        byte[] binBytes;
         float[] translation, rotation, scale;
         String path2;
         ByteArrayOutputStream bin;
-        Mesh                            mesh;
-        Bone                            bone;
-        ArrayList<Object>               arrList,nodesArr,meshesArr,
-                                        accessorsArr,bufferViewsArr,bufferArr,
-                                        samplerArr,materialsArr,texturesArr,imagesArr;
-        LinkedHashMap<String,Object>    json,obj2,nodeObj,bufferObj,samplerObj;
-        ObjectMapper                    objMapper;
+        Mesh mesh;
+        Bone bone;
+        ArrayList<Object> arrList, nodesArr, meshesArr;
+        ArrayList<Object> accessorsArr, bufferViewsArr, bufferArr;
+        ArrayList<Object> samplerArr, materialsArr, texturesArr, imagesArr;
+        LinkedHashMap<String, Object> json, obj2, nodeObj, bufferObj, samplerObj;
+        ObjectMapper objMapper;
 
             // the bin data
 
@@ -270,7 +264,7 @@ public class Export
         obj2=new LinkedHashMap<>();
         obj2.put("name","Scene");
 
-        nodesArr=new ArrayList<>();      // one node for every mesh
+        nodesArr = new ArrayList<>(); // one node for every mesh
         nodesArr.add(0);
         obj2.put("nodes",nodesArr);
 
@@ -281,7 +275,7 @@ public class Export
             // the nodes, pointed from scene
             // one for each bone
 
-        rotation=new float[]{0.0f,0.0f,0.0f,1.0f};      // always the same, we can share
+        rotation = new float[]{0.0f, 0.0f, 0.0f, 1.0f}; // always the same, we can share
         scale=new float[]{1.0f,1.0f,1.0f};
 
         nodesArr=new ArrayList<>();
@@ -383,7 +377,6 @@ public class Export
 
         objMapper=new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         try {
-
             objMapper.writeValue(new File(path2), json);
         }
         catch (IOException e)

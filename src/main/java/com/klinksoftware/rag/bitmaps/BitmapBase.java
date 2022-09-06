@@ -1256,6 +1256,10 @@ public class BitmapBase
         double dx, dy, ovalDist;
         double squareHalfWid, squareHalfHigh, squareHalfWidAndHigh;
 
+        if ((lft >= rgt) || (top >= bot)) {
+            return;
+        }
+
         // draw oval in box
         halfWid = (rgt - lft) / 2;
         squareHalfWid = (double) halfWid * (double) halfWid;

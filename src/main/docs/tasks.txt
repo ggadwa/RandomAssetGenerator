@@ -2,7 +2,7 @@
 
 - concrete next, bigger expansion joints, stains aren't showing up
 - humanoid, etc, multiple textures, not one in many textures, update models
-
+- faces by meshes
 
 
 
@@ -67,6 +67,7 @@ bitmaps
  - computer access panels have handles?
 
 model
+ - robot model needs to be chunkier
  - animations
  - vertex snaps for humanoid, etc
  - finish junction

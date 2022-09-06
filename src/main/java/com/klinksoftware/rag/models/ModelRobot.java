@@ -7,7 +7,12 @@ public class ModelRobot extends ModelBase {
 
     @Override
     public void buildInternal() {
-        addBitmap("bitmap", new String[]{"Robot"});
+        addBitmap("body", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        addBitmap("leg", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        addBitmap("foot", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        addBitmap("arm", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        addBitmap("hand", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        addBitmap("head", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
 
         // build the skeleton
         skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_ROBOT, bilateral);
