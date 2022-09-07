@@ -2,7 +2,16 @@ package com.klinksoftware.rag.mesh;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.utility.*;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import org.lwjgl.system.MemoryUtil;
+import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class Mesh
 {
@@ -321,4 +330,67 @@ public class Mesh
             }
         }
     }
+
+    // setup buffers for opengl drawing
+    public void setupGLBuffers(RagPoint bonePoint) {
+        int n;
+        FloatBuffer buf;
+
+        // vertexes
+        buf = MemoryUtil.memAllocFloat(vertexes.length);
+
+        for (n = 0; n < vertexes.length; n += 3) {
+            buf.put(vertexes[n] + bonePoint.x);
+            buf.put(vertexes[n + 1] + bonePoint.y);
+            buf.put(vertexes[n + 2] + bonePoint.z);
+        }
+
+        buf.flip();
+
+        vboVertexId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboVertexId);
+        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+        memFree(buf);
+
+        // uvs
+        buf = MemoryUtil.memAllocFloat(uvs.length);
+        buf.put(uvs).flip();
+
+        vboUVId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboUVId);
+        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+        memFree(buf);
+
+        // normals
+        buf = MemoryUtil.memAllocFloat(normals.length);
+        buf.put(normals).flip();
+
+        vboNormalId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboNormalId);
+        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+        memFree(buf);
+
+        // tangents
+        buf = MemoryUtil.memAllocFloat(tangents.length);
+        buf.put(tangents).flip();
+
+        vboTangentId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboTangentId);
+        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+        memFree(buf);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        // setup the bounds for culling
+        setGlobalBounds(bonePoint);
+    }
+
+    // release buffers for opengl drawing
+    public void releaseGLBuffers() {
+        glDeleteBuffers(vboVertexId);
+        glDeleteBuffers(vboUVId);
+        glDeleteBuffers(vboNormalId);
+        glDeleteBuffers(vboTangentId);
+    }
+
 }

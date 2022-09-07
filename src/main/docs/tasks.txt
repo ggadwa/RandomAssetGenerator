@@ -1,9 +1,14 @@
 
 
 - concrete next, bigger expansion joints, stains aren't showing up
-- humanoid, etc, multiple textures, not one in many textures, update models
-- faces by meshes
 
+
+
+# loadtexture, buffertexture, etc to walkviewtexture
+# do model view first, attach to each mesh
+
+# get rid of bone.meshIdx, vertexes need bone list (size=4 short and 4 float weight per vertex)
+# have joint buffers in skeleton
 
 
 
@@ -11,7 +16,7 @@ animations:
 --> on view mesh load, don't remake skeletons by adding in the absolute bone offset
 --> create a matrix (with just transpose) and put shader to start
 --> then do joints
---> mesh will need per vertex joint and weight array
+--> mesh will need per vertex joint and weight array (probably in wrap)
 --> will need a parallel joint matrix for every skeleton bone
 
         // calculate the skin animation
@@ -22,6 +27,19 @@ animations:
         // note we build the normalMatrix here,
         // this is costly but has to be done because of the
         // skin matrix
+
+NOTE: x/y/z/w are used to point to one weight and one matrix
+
+
+for (n=0;n!==this.core.MAX_SKELETON_JOINT;n++) {
+            name='jointMatrix['+n+']';
+            this.jointMatrixUniformArray.push(gl.getUniformLocation(this.program,name));
+        }
+
+
+
+uniform highp mat4 jointMatrix[64];
+
 
     highp vec4 pos;
     highp mat3 normalMatrix;
@@ -58,16 +76,20 @@ map
  - open ceiling
  - windows
  - skybox has bad uv (lines)
+ - put back in decorations
 
 bitmaps
  - redo all bitmaps for textureSize for any numbers
  - gravel (like dirt)
  - more distinct control panels pieces (keyboard)
- - make face textures 1, 2, or 3 eye
  - computer access panels have handles?
 
 model
+ - get rid of monitor on desk
+ - add: chair, dresser, storage tank, pc (can put on desk), bookcase (books?), electrical box
+ - some models need to have flags for "on wall" or "on desk, table, etc"
  - robot model needs to be chunkier
+ - faces by meshes
  - animations
  - vertex snaps for humanoid, etc
  - finish junction

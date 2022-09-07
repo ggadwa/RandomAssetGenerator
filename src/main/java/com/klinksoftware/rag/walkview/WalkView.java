@@ -36,7 +36,7 @@ public class WalkView extends AWTGLCanvas {
     public int wid, high;
     private int vertexShaderId,fragmentShaderId,programId;
     private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
-    private int perspectiveMatrixUniformId, viewMatrixUniformId, normalMatrixUniformId, lightPositionIntensityUniformId;
+    private int perspectiveMatrixUniformId, viewMatrixUniformId, lightPositionIntensityUniformId;
     private int displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId;
     private int displayType;
     private long nextPaintTick;
@@ -50,8 +50,7 @@ public class WalkView extends AWTGLCanvas {
     private HashMap<String, BitmapBase> incommingBitmaps;
     public RagPoint cameraAngle;
     public RagPoint eyePoint, cameraPoint, lightEyePoint, lookAtUpVector, fixedLightPoint;
-    private RagMatrix4f perspectiveMatrix,viewMatrix,rotMatrix,rotMatrix2;
-    private RagMatrix3f normalMatrix;
+    private RagMatrix4f perspectiveMatrix, viewMatrix, rotMatrix, rotMatrix2;
     private float[] clipPlane;
     private RagPlane frustumLeftPlane, frustumRightPlane, frustumTopPlane, frustumBottomPlane, frustumNearPlane, frustumFarPlane;
     private HashMap<String, WalkViewTexture> textures;
@@ -102,8 +101,7 @@ public class WalkView extends AWTGLCanvas {
         lookAtUpVector=new RagPoint(0.0f,-1.0f,0.0f);
 
         perspectiveMatrix=new RagMatrix4f();
-        viewMatrix=new RagMatrix4f();
-        normalMatrix=new RagMatrix3f();
+        viewMatrix = new RagMatrix4f();
         rotMatrix=new RagMatrix4f();
         rotMatrix2 = new RagMatrix4f();
 
@@ -197,8 +195,7 @@ public class WalkView extends AWTGLCanvas {
 
         // get locations of uniforms and attributes
         perspectiveMatrixUniformId=glGetUniformLocation(programId,"perspectiveMatrix");
-        viewMatrixUniformId=glGetUniformLocation(programId,"viewMatrix");
-        normalMatrixUniformId = glGetUniformLocation(programId, "normalMatrix");
+        viewMatrixUniformId = glGetUniformLocation(programId, "viewMatrix");
 
         displayTypeUniformId = glGetUniformLocation(programId, "displayType");
 
@@ -261,70 +258,6 @@ public class WalkView extends AWTGLCanvas {
 
     public void setDisplayType(int displayType) {
         this.displayType = displayType;
-    }
-
-    //
-    // add and remove meshes from view
-    //
-
-    private void stageMesh(Mesh mesh,RagPoint bonePoint) {
-        int n;
-        FloatBuffer buf;
-
-        // vertexes
-        buf = MemoryUtil.memAllocFloat(mesh.vertexes.length);
-
-        for (n=0;n<mesh.vertexes.length;n+=3) {
-            buf.put(mesh.vertexes[n]+bonePoint.x);
-            buf.put(mesh.vertexes[n+1]+bonePoint.y);
-            buf.put(mesh.vertexes[n+2]+bonePoint.z);
-        }
-
-        buf.flip();
-
-        mesh.vboVertexId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
-        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
-        memFree(buf);
-
-        // uvs
-        buf = MemoryUtil.memAllocFloat(mesh.uvs.length);
-        buf.put(mesh.uvs).flip();
-
-        mesh.vboUVId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboUVId);
-        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
-        memFree(buf);
-
-        // normals
-        buf = MemoryUtil.memAllocFloat(mesh.normals.length);
-        buf.put(mesh.normals).flip();
-
-        mesh.vboNormalId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboNormalId);
-        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
-        memFree(buf);
-
-        // tangents
-        buf = MemoryUtil.memAllocFloat(mesh.tangents.length);
-        buf.put(mesh.tangents).flip();
-
-        mesh.vboTangentId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.vboTangentId);
-        glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
-        memFree(buf);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        // setup the bounds for culling
-        mesh.setGlobalBounds(bonePoint);
-    }
-
-    private void releaseMesh(Mesh mesh) {
-        glDeleteBuffers(mesh.vboVertexId);
-        glDeleteBuffers(mesh.vboUVId);
-        glDeleteBuffers(mesh.vboNormalId);
-        glDeleteBuffers(mesh.vboTangentId);
     }
 
     //
@@ -446,8 +379,8 @@ public class WalkView extends AWTGLCanvas {
         if (meshList!=null) {
             nMesh=meshList.count();
 
-            for (n=0;n!=nMesh;n++) {
-                releaseMesh(meshList.get(n));
+            for (n = 0; n != nMesh; n++) {
+                meshList.get(n).releaseGLBuffers();
             }
         }
 
@@ -469,11 +402,11 @@ public class WalkView extends AWTGLCanvas {
             // the mesh
             mesh=incommingMeshList.get(n);
             boneIdx=incommingSkeleton.findBoneIndexforMeshIndex(n);
-            if (boneIdx==-1) {
-                stageMesh(mesh,tempPnt);
+            if (boneIdx == -1) {
+                mesh.setupGLBuffers(tempPnt);
             }
             else {
-                stageMesh(mesh,incommingSkeleton.getBoneAbsolutePoint(boneIdx));
+                mesh.setupGLBuffers(incommingSkeleton.getBoneAbsolutePoint(boneIdx));
             }
 
             // the bitmap
@@ -732,8 +665,7 @@ public class WalkView extends AWTGLCanvas {
 
         try (MemoryStack stack = stackPush()) {
             perspectiveMatrix.setPerspectiveMatrix(RAG_FOV,aspectRatio,RAG_NEAR_Z,RAG_FAR_Z);
-            viewMatrix.setLookAtMatrix(eyePoint,cameraPoint,lookAtUpVector);
-            normalMatrix.setInvertTransposeFromMat4(viewMatrix);
+            viewMatrix.setLookAtMatrix(eyePoint, cameraPoint, lookAtUpVector);
 
             buf=stack.mallocFloat(16);
             buf.put(perspectiveMatrix.data).flip();
@@ -742,10 +674,6 @@ public class WalkView extends AWTGLCanvas {
             buf=stack.mallocFloat(16);
             buf.put(viewMatrix.data).flip();
             glUniformMatrix4fv(viewMatrixUniformId,false,buf);
-
-            buf=stack.mallocFloat(12);
-            buf.put(normalMatrix.data).flip();
-            glUniformMatrix3fv(normalMatrixUniformId,false,buf);
 
             if (fixedLightPoint != null) {   // lights need to be in eye coordinates
                 convertToEyeCoordinates(fixedLightPoint, lightEyePoint);
