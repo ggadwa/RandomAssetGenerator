@@ -2,8 +2,7 @@ package com.klinksoftware.rag.uiworker;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.bitmaps.*;
-import com.klinksoftware.rag.mesh.MeshList;
-import com.klinksoftware.rag.skeleton.Skeleton;
+import com.klinksoftware.rag.scene.Scene;
 import java.util.*;
 import javax.swing.*;
 
@@ -25,7 +24,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
     protected Integer doInBackground() throws Exception {
         long seed;
         BitmapBase bitmap;
-        HashMap<String, BitmapBase> bitmaps;
+        Scene scene;
 
         appWindow.startBuild();
 
@@ -42,18 +41,13 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
             return (0);
         }
 
-        bitmaps = new HashMap<>();
-        bitmaps.put("bitmap", bitmap);
-
         generatedBitmap = bitmap;
 
-        MeshList meshList = new MeshList();
-        meshList.makeListSimpleCube("bitmap");
-
-        Skeleton skeleton = meshList.rebuildMapMeshesWithSkeleton();
+        scene = new Scene();
+        scene.makeSceneSimpleCube(bitmap);
 
         AppWindow.walkView.setCameraCenterRotate(4.0f, -25.0f, 225.0f, 0.0f, -2.0f);
-        AppWindow.walkView.setIncommingMeshList(meshList, skeleton, bitmaps);
+        AppWindow.walkView.setIncommingScene(scene);
 
         appWindow.walkLabel.setGeneratedTitle("Bitmap", seed);
         appWindow.switchView("walkView");

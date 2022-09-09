@@ -1,15 +1,14 @@
 package com.klinksoftware.rag.walkview;
 
+import com.klinksoftware.rag.scene.Scene;
+import com.klinksoftware.rag.scene.Node;
+import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.*;
-import com.klinksoftware.rag.bitmaps.*;
-import com.klinksoftware.rag.mesh.*;
-import com.klinksoftware.rag.skeleton.Skeleton;
 import java.awt.Cursor;
 import java.nio.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
-import static org.lwjgl.opengl.ARBFramebufferObject.*;
 import static org.lwjgl.opengl.GL.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -36,8 +35,8 @@ public class WalkView extends AWTGLCanvas {
     public int wid, high;
     private int vertexShaderId,fragmentShaderId,programId;
     private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
-    private int perspectiveMatrixUniformId, viewMatrixUniformId, lightPositionIntensityUniformId;
-    private int displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId;
+    private int perspectiveMatrixUniformId, viewMatrixUniformId, modelMatrixUniformId, lightPositionIntensityUniformId;
+    private int skinnedUniformId, displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId;
     private int displayType;
     private long nextPaintTick;
     private float aspectRatio;
@@ -45,9 +44,8 @@ public class WalkView extends AWTGLCanvas {
     private float cameraRotateOffsetY;
     private float currentLightIntensity;
     private boolean cameraCenterRotate, noClear;
-    private MeshList meshList, incommingMeshList;
-    private Skeleton incommingSkeleton;
-    private HashMap<String, BitmapBase> incommingBitmaps;
+    private Scene scene, incommingScene;
+    private WalkViewTexture lastUsedTexture;
     public RagPoint cameraAngle;
     public RagPoint eyePoint, cameraPoint, lightEyePoint, lookAtUpVector, fixedLightPoint;
     private RagMatrix4f perspectiveMatrix, viewMatrix, rotMatrix, rotMatrix2;
@@ -115,12 +113,10 @@ public class WalkView extends AWTGLCanvas {
 
             // no mesh loaded
 
-        meshList = null;
+        scene = null;
         textures = null;
 
-        incommingMeshList=null;
-        incommingSkeleton=null;
-        incommingBitmaps = null;
+        incommingScene = null;
 
         displayType = WV_DISPLAY_RENDER;
 
@@ -196,7 +192,9 @@ public class WalkView extends AWTGLCanvas {
         // get locations of uniforms and attributes
         perspectiveMatrixUniformId=glGetUniformLocation(programId,"perspectiveMatrix");
         viewMatrixUniformId = glGetUniformLocation(programId, "viewMatrix");
+        modelMatrixUniformId = glGetUniformLocation(programId, "modelMatrix");
 
+        skinnedUniformId = glGetUniformLocation(programId, "skinned");
         displayTypeUniformId = glGetUniformLocation(programId, "displayType");
 
         lightPositionIntensityUniformId = glGetUniformLocation(programId, "lightPositionIntensity");
@@ -261,15 +259,13 @@ public class WalkView extends AWTGLCanvas {
     }
 
     //
-    // setup meshes in view
+    // setup scene in view
     // we do this as an incomming list so we can actually
     // have the correct context as this gets triggered during a draw
     //
 
-    public void setIncommingMeshList(MeshList incommingMeshList, Skeleton incommingSkeleton, HashMap<String, BitmapBase> incommingBitmaps) {
-        this.incommingMeshList=incommingMeshList;
-        this.incommingSkeleton=incommingSkeleton;
-        this.incommingBitmaps = incommingBitmaps;
+    public void setIncommingScene(Scene incommingScene) {
+        this.incommingScene = incommingScene;
     }
 
     //
@@ -294,143 +290,49 @@ public class WalkView extends AWTGLCanvas {
     }
 
     //
-    // textures
+    // stage the scene
+    // this gets triggered during a draw operation when an incomming scene
+    // has been set
     //
 
-    private int loadTexture(int textureSize, boolean hasAlpha, byte[] textureData) {
-        int textureId;
-        ByteBuffer bitmapBuf;
-
-        if (textureData==null) return(-1);
-
-        bitmapBuf = MemoryUtil.memAlloc((textureSize * (hasAlpha ? 4 : 3)) * textureSize);
-        bitmapBuf.put(textureData).flip();
-
-        textureId=glGenTextures();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,textureId);
-        glTexImage2D(GL_TEXTURE_2D,0,(hasAlpha?GL_RGBA:GL_RGB),textureSize,textureSize,0,(hasAlpha?GL_RGBA:GL_RGB),GL_UNSIGNED_BYTE,bitmapBuf);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        MemoryUtil.memFree(bitmapBuf);
-
-        return(textureId);
-    }
-
-    private WalkViewTexture bufferTexture(BitmapBase bitmapBase) {
-        WalkViewTexture texture;
-
-        texture = new WalkViewTexture();
-        texture.colorTextureId = loadTexture(bitmapBase.getTextureSize(), bitmapBase.hasAlpha(), bitmapBase.getColorDataAsBytes());
-
-        if (!bitmapBase.hasNormal()) {
-            texture.normalTextureId = -1;
-        } else {
-            texture.normalTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getNormalDataAsBytes());
+    private void stageScene() {
+        if (incommingScene == null) {
+            return;
         }
 
-        if (!bitmapBase.hasMetallicRoughness()) {
-            texture.metallicRoughnessTextureId = -1;
-        } else {
-            texture.metallicRoughnessTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getMetallicRoughnessDataAsBytes());
-        }
-
-        if (!bitmapBase.hasEmissive()) {
-            texture.emissiveTextureId = -1;
-        } else {
-            texture.emissiveTextureId = loadTexture(bitmapBase.getTextureSize(), false, bitmapBase.getEmissiveDataAsBytes());
-        }
-
-        return (texture);
-    }
-
-    private void deleteTexture(WalkViewTexture texture) {
-        if (texture.colorTextureId != -1) {
-            glDeleteBuffers(texture.colorTextureId);
-        }
-        if (texture.normalTextureId != -1) {
-            glDeleteBuffers(texture.normalTextureId);
-        }
-        if (texture.metallicRoughnessTextureId != -1) {
-            glDeleteBuffers(texture.metallicRoughnessTextureId);
-        }
-        if (texture.emissiveTextureId != -1) {
-            glDeleteBuffers(texture.emissiveTextureId);
-        }
-    }
-
-    //
-    // stage the mesh list
-    // this gets triggered during a draw operation when an incomming mesh
-    // list has been set
-    //
-
-    private void stageMeshList() {
-        int n, nMesh, boneIdx;
-        Mesh mesh;
-        RagPoint tempPnt;
-
-        if (incommingMeshList==null) return;
-
-            // remove old mesh list
-
-        if (meshList!=null) {
-            nMesh=meshList.count();
-
-            for (n = 0; n != nMesh; n++) {
-                meshList.get(n).releaseGLBuffers();
-            }
+        // remove old scene meshes
+        if (scene != null) {
+            scene.releaseGLBuffersForAllMeshes();
         }
 
         // remove old textures
         if (textures != null) {
             for (WalkViewTexture texture2 : textures.values()) {
-                deleteTexture(texture2);
+                texture2.deleteTexture();
             }
         }
 
         // setup the new mesh
-        tempPnt=new RagPoint(0.0f,0.0f,0.0f);
+        incommingScene.setupGLBuffersForAllMeshes();
+
         textures = new HashMap<>();
-
-        nMesh=incommingMeshList.count();
-
-        for (n=0;n!=nMesh;n++) {
-
-            // the mesh
-            mesh=incommingMeshList.get(n);
-            boneIdx=incommingSkeleton.findBoneIndexforMeshIndex(n);
-            if (boneIdx == -1) {
-                mesh.setupGLBuffers(tempPnt);
-            }
-            else {
-                mesh.setupGLBuffers(incommingSkeleton.getBoneAbsolutePoint(boneIdx));
-            }
-
-            // the bitmap
-            if (!textures.containsKey(mesh.bitmapName)) {
-                textures.put(mesh.bitmapName, bufferTexture(incommingBitmaps.get(mesh.bitmapName)));
-            }
-
-            mesh.hasAlpha = incommingBitmaps.get(mesh.bitmapName).hasAlpha();
+        for (String bitmapName : incommingScene.bitmaps.keySet()) {
+            textures.put(bitmapName, WalkViewTexture.createTexture(incommingScene.bitmaps.get(bitmapName)));
         }
 
         // unbind any textures
         glBindTexture(GL_TEXTURE_2D, 0);
 
         // set noClear
-        noClear = incommingMeshList.hasSkyBox();
+        noClear = incommingScene.skyBox;
 
         // setup the collision data
-        physics.setupCollision(incommingMeshList, incommingSkeleton);
+        physics.setupCollision(incommingScene);
 
         // switch to new mesh list and clear incomming
-        meshList = incommingMeshList;
-        incommingMeshList=null;
-        incommingSkeleton=null;
-        incommingBitmaps = null;
+        scene = incommingScene;
+
+        incommingScene = null;
     }
 
     //
@@ -600,6 +502,14 @@ public class WalkView extends AWTGLCanvas {
     }
 
     private void setupMeshBuffers(Mesh mesh) {
+        FloatBuffer buf;
+
+        try ( MemoryStack stack = stackPush()) {
+            buf = stack.mallocFloat(16);
+            buf.put(mesh.modelMatrix.data).flip();
+            glUniformMatrix4fv(modelMatrixUniformId, false, buf);
+        }
+
         glBindBuffer(GL_ARRAY_BUFFER, mesh.vboVertexId);
         glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
 
@@ -614,20 +524,128 @@ public class WalkView extends AWTGLCanvas {
     }
 
     //
+    // opaque mesh drawing
+    //
+    private void drawOpaqueNodeRecursive(Node node, long tick) {
+        WalkViewTexture texture;
+        IntBuffer intBuf;
+
+        for (Mesh mesh : node.meshes) {
+            texture = textures.get(mesh.bitmapName);
+            if (texture.hasAlpha) {
+                continue;
+            }
+
+            // culled?
+            if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
+                continue;
+            }
+
+            // new texture?
+            texture = textures.get(mesh.bitmapName);
+            if (texture != lastUsedTexture) {
+                lastUsedTexture = texture;
+                switchTexture(texture, tick);
+            }
+
+            // draw the mesh
+            setupMeshBuffers(mesh);
+
+            intBuf = MemoryUtil.memAllocInt(mesh.indexes.length);
+            intBuf.put(mesh.indexes).flip();
+
+            glDrawElements(GL_TRIANGLES, intBuf);
+
+            memFree(intBuf);
+        }
+
+        // next nodes
+        for (Node childNode : node.childNodes) {
+            drawOpaqueNodeRecursive(childNode, tick);
+        }
+    }
+
+    //
+    // transparent mesh triangle sorting and drawing
+    //
+    private void buildTransparentNodeRecursive(Node node) {
+        WalkViewTexture texture;
+
+        for (Mesh mesh : node.meshes) {
+            texture = textures.get(mesh.bitmapName);
+            if (!texture.hasAlpha) {
+                continue;
+            }
+
+            // culled?
+            if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
+                continue;
+            }
+
+            // add to trig sort array
+            trigSort.addTrigsFromMesh(mesh, cameraPoint);
+        }
+
+        // next nodes
+        for (Node childNode : node.childNodes) {
+            buildTransparentNodeRecursive(childNode);
+        }
+    }
+
+    private void drawSortedTransparentTrigs(long tick) {
+        int n, trigIndexIdx;
+        Mesh mesh, lastUsedMesh;
+        WalkViewTexture texture;
+        IntBuffer intBuf;
+
+        lastUsedMesh = null;
+
+        glEnable(GL_BLEND);
+        glDepthMask(false);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        for (n = 0; n != trigSort.trigCount; n++) {
+            mesh = trigSort.trigArray[n].mesh;
+
+            // new mesh?
+            if (lastUsedMesh != mesh) {
+                lastUsedMesh = mesh;
+                setupMeshBuffers(mesh);
+
+                // new texture?
+                texture = textures.get(mesh.bitmapName);
+                if (texture != lastUsedTexture) {
+                    lastUsedTexture = texture;
+                    switchTexture(texture, tick);
+                }
+            }
+
+            // draw the trig
+            trigIndexIdx = trigSort.trigArray[n].trigIdx * 3;
+
+            intBuf = MemoryUtil.memAllocInt(3);
+            intBuf.put(mesh.indexes[trigIndexIdx++]).put(mesh.indexes[trigIndexIdx++]).put(mesh.indexes[trigIndexIdx++]).flip();
+
+            glDrawElements(GL_TRIANGLES, intBuf);
+
+            memFree(intBuf);
+        }
+
+        glDepthMask(true);
+        glDisable(GL_BLEND);
+    }
+
+    //
     // draw the scene
     //
-
     @Override
     public void paintGL() {
-        int n, nMesh, trigIndexIdx;
         long tick;
         FloatBuffer buf;
-        IntBuffer intBuf;
-        Mesh mesh, curMesh;
-        WalkViewTexture texture,curTexture;
 
-        // do we have an incomming meshlist?
-        stageMeshList();
+        // do we have an incomming scene?
+        stageScene();
 
         // redraw timing
         tick=System.currentTimeMillis();
@@ -637,8 +655,8 @@ public class WalkView extends AWTGLCanvas {
             nextPaintTick+=RAG_PAINT_TICK;
         }
 
-        // no meshes, just black
-        if (meshList == null) {
+        // no scene, just black
+        if (scene == null) {
             glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
             swapBuffers();
@@ -673,7 +691,9 @@ public class WalkView extends AWTGLCanvas {
 
             buf=stack.mallocFloat(16);
             buf.put(viewMatrix.data).flip();
-            glUniformMatrix4fv(viewMatrixUniformId,false,buf);
+            glUniformMatrix4fv(viewMatrixUniformId, false, buf);
+
+            glUniform1i(skinnedUniformId, scene.skinned ? 1 : 0);
 
             if (fixedLightPoint != null) {   // lights need to be in eye coordinates
                 convertToEyeCoordinates(fixedLightPoint, lightEyePoint);
@@ -691,95 +711,13 @@ public class WalkView extends AWTGLCanvas {
         setupCullingFrustum();
 
         // draw the opaque meshes
-        curTexture=null;
-
-        nMesh = meshList.count();
-
-        for (n = 0; n != nMesh; n++) {
-            mesh = meshList.get(n);
-            if (mesh.hasAlpha) {
-                continue;
-            }
-
-            // culled?
-            if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
-                continue;
-            }
-
-            // new texture?
-            texture = textures.get(mesh.bitmapName);
-            if (texture!=curTexture) {
-                curTexture = texture;
-                switchTexture(texture, tick);
-            }
-
-            // draw the mesh
-            setupMeshBuffers(mesh);
-
-            intBuf = MemoryUtil.memAllocInt(mesh.indexes.length);
-            intBuf.put(mesh.indexes).flip();
-
-            glDrawElements(GL_TRIANGLES, intBuf);
-
-            memFree(intBuf);
-        }
+        lastUsedTexture = null;
+        drawOpaqueNodeRecursive(scene.rootNode, tick);
 
         // add transparent trigs to sortable array
         trigSort.clearTrigs();
-
-        for (n = 0; n != nMesh; n++) {
-            mesh = meshList.get(n);
-            if (!mesh.hasAlpha) {
-                continue;
-            }
-
-            // culled?
-            if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
-                continue;
-            }
-
-            // add to sort array
-            trigSort.addTrigsFromMesh(meshList, cameraPoint, n);
-        }
-
-        // draw the transparent meshes
-        curTexture = null;
-        curMesh = null;
-
-        glEnable(GL_BLEND);
-        glDepthMask(false);
-
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        for (n = 0; n != trigSort.trigCount; n++) {
-            mesh = meshList.get(trigSort.trigArray[n].meshIdx);
-
-            // new mesh?
-            if (curMesh != mesh) {
-                curMesh = mesh;
-                setupMeshBuffers(mesh);
-
-                // new texture?
-                texture = textures.get(mesh.bitmapName);
-                if (texture != curTexture) {
-                    curTexture = texture;
-                    switchTexture(texture, tick);
-                }
-            }
-
-            // draw the trig
-            trigIndexIdx = trigSort.trigArray[n].trigIdx * 3;
-
-            intBuf = MemoryUtil.memAllocInt(3);
-            intBuf.put(mesh.indexes[trigIndexIdx++]).put(mesh.indexes[trigIndexIdx++]).put(mesh.indexes[trigIndexIdx++]).flip();
-
-            glDrawElements(GL_TRIANGLES, intBuf);
-
-            memFree(intBuf);
-        }
-
-        glDepthMask(true);
-        glDisable(GL_BLEND);
+        buildTransparentNodeRecursive(scene.rootNode);
+        drawSortedTransparentTrigs(tick);
 
         // shutdown drawing
         glBindBuffer(GL_ARRAY_BUFFER,0);

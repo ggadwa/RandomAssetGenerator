@@ -2,8 +2,8 @@ package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
-import com.klinksoftware.rag.mesh.Mesh;
-import com.klinksoftware.rag.mesh.MeshUtility;
+import com.klinksoftware.rag.scene.Mesh;
+import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
 @ModelInterface
@@ -71,7 +71,7 @@ public class ModelDesk extends ModelBase {
     }
 
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         float deskLength, deskDepth, deskTopMargin, deskTopHeight;
         float deskLegWidth, deskLegHeight, deskStandOffset, monitorWidth;
         float deskHalfLength, deskHalfDepth;
@@ -115,12 +115,12 @@ public class ModelDesk extends ModelBase {
             deskMesh.combine(MeshUtility.createCube("desk", -(deskHalfLength - deskTopMargin), (deskHalfLength - deskTopMargin), 0.0f, deskLegHeight, -deskHalfDepth, -(deskHalfDepth - deskTopMargin), true, true, true, true, false, true, false, MeshUtility.UV_MAP));
         }
 
-        meshList.add(deskMesh);
+        scene.rootNode.meshes.add(deskMesh);
         if (standMesh != null) {
-            meshList.add(standMesh);
+            scene.rootNode.meshes.add(standMesh);
         }
         if (drawerMesh != null) {
-            meshList.add(drawerMesh);
+            scene.rootNode.meshes.add(drawerMesh);
         }
 
         // monitor
@@ -133,14 +133,11 @@ public class ModelDesk extends ModelBase {
         y = (deskLegHeight + deskTopHeight);
 
         rotAngle = new RagPoint(0.0f, (160.0f + AppWindow.random.nextFloat(40.0f)), 0.0f);
-        meshList.add(MeshUtility.createCubeRotated("desk", -standHalfWid, standHalfWid, y, (y + standHigh), -standHalfWid, standHalfWid, rotAngle, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
+        scene.rootNode.meshes.add(MeshUtility.createCubeRotated("desk", -standHalfWid, standHalfWid, y, (y + standHigh), -standHalfWid, standHalfWid, rotAngle, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
 
         // the monitor
         y += standHigh;
-        meshList.add(MeshUtility.createCubeRotated("monitor", -monitorWidth, monitorWidth, y, (y + ((deskDepth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, false, false, true, false, false, false, false, MeshUtility.UV_WHOLE));
-        meshList.add(MeshUtility.createCubeRotated("stand", -monitorWidth, monitorWidth, y, (y + ((deskDepth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, true, true, false, true, true, true, false, MeshUtility.UV_MAP));
-
-        // now build a fake skeleton for the glTF
-        skeleton = meshList.rebuildMapMeshesWithSkeleton();
+        scene.rootNode.meshes.add(MeshUtility.createCubeRotated("monitor", -monitorWidth, monitorWidth, y, (y + ((deskDepth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, false, false, true, false, false, false, false, MeshUtility.UV_WHOLE));
+        scene.rootNode.meshes.add(MeshUtility.createCubeRotated("stand", -monitorWidth, monitorWidth, y, (y + ((deskDepth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, true, true, false, true, true, true, false, MeshUtility.UV_MAP));
     }
 }

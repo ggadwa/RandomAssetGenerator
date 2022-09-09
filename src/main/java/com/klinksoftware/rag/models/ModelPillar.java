@@ -2,8 +2,8 @@ package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
-import com.klinksoftware.rag.mesh.Mesh;
-import com.klinksoftware.rag.mesh.MeshUtility;
+import com.klinksoftware.rag.scene.Mesh;
+import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
 @ModelInterface
@@ -22,7 +22,7 @@ public class ModelPillar extends ModelBase {
     }
 
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         int n, columnSideCount, baseTopSideCount, baseBotSideCount, topBaseCount, botBaseCount;
         float radius, baseRadius, topRadius, botRadius, baseTopHeight, baseBotHeight, topBaseGrow, botBaseGrow;
         float pillarTy, pillarBy;
@@ -80,15 +80,12 @@ public class ModelPillar extends ModelBase {
             botRadius *= botBaseGrow;
         }
 
-        meshList.add(mesh);
+        scene.rootNode.meshes.add(mesh);
 
         // middle
         radius = Math.min(topRadius, botRadius) * (0.7f + AppWindow.random.nextFloat(0.1f));
 
         mesh = MeshUtility.createCylinder("pillar", columnSideCount, centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);
-        meshList.add(mesh);
-
-        // now build a fake skeleton for the glTF
-        skeleton = meshList.rebuildMapMeshesWithSkeleton();
+        scene.rootNode.meshes.add(mesh);
     }
 }

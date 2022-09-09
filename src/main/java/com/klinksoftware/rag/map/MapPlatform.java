@@ -1,7 +1,9 @@
 package com.klinksoftware.rag.map;
 
+import com.klinksoftware.rag.utility.MeshMapUtility;
+import com.klinksoftware.rag.utility.MeshUtility;
+import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.mesh.*;
 
 import java.util.*;
 
@@ -16,11 +18,9 @@ public class MapPlatform {
     public static final int FLAG_PLATFORM=2;
     public static final int FLAG_WALL=3;
 
-    private MeshList meshList;
     private ArrayList<MapRoom> rooms;
 
-    public MapPlatform(MeshList meshList, ArrayList<MapRoom> rooms) {
-        this.meshList = meshList;
+    public MapPlatform(ArrayList<MapRoom> rooms) {
         this.rooms = rooms;
     }
 
@@ -190,7 +190,7 @@ public class MapPlatform {
         uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
-        meshList.add(new Mesh(("platform_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
+        room.node.meshes.add(new Mesh(("platform_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
     }
 
         //

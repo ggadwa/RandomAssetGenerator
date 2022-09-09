@@ -4,42 +4,41 @@
 
 
 
-# loadtexture, buffertexture, etc to walkviewtexture
-# do model view first, attach to each mesh
+///////// DO NODE REDO
 
-# get rid of bone.meshIdx, vertexes need bone list (size=4 short and 4 float weight per vertex)
-# have joint buffers in skeleton
+- bad map: 1662698717154
+
+- redo all the skeleton/limb stuff, and models that run with it
+- createJointsAndWeights from nodes, not bones
+- finally delete meshlist.java
+- finally delete skeleton and bone
+
+- test model with and without skeleton exports
+
+rendering:
+- rethink this part of fragment shader, maybe get more expressive textures
+    lightCol*=bump;
+    lightCol=clamp(lightCol,0.2,1.0); // maybe at end after all calculations or not at all
+
+        // finally create the pixel
+
+    pixel.rgb=(tex.rgb*lightCol);
+    pixel.rgb+=(min(metallic,1.0)*lightCol); // maybe clamp at end, or no clamp?
+    if (hasEmissive) pixel.rgb+=(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
+    pixel.a=tex.a;
 
 
 
 animations:
---> on view mesh load, don't remake skeletons by adding in the absolute bone offset
---> create a matrix (with just transpose) and put shader to start
---> then do joints
---> mesh will need per vertex joint and weight array (probably in wrap)
---> will need a parallel joint matrix for every skeleton bone
-
-        // calculate the skin animation
-        // and vertex position, if skinning, calc
-        // the skin matrix otherwise just attach to node
-        // by its matrix
-
-        // note we build the normalMatrix here,
-        // this is costly but has to be done because of the
-        // skin matrix
-
-NOTE: x/y/z/w are used to point to one weight and one matrix
-
+- need to redo all the skin/joint/weight/jointmatrix stuff
+- eventually needs to be exported
 
 for (n=0;n!==this.core.MAX_SKELETON_JOINT;n++) {
             name='jointMatrix['+n+']';
             this.jointMatrixUniformArray.push(gl.getUniformLocation(this.program,name));
         }
 
-
-
 uniform highp mat4 jointMatrix[64];
-
 
     highp vec4 pos;
     highp mat3 normalMatrix;
@@ -54,20 +53,7 @@ uniform highp mat4 jointMatrix[64];
         normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(noSkinAttachedNodeMatrix)));
     }
 
---> save as:
 
-            "name" : "Node_7",
-            "rotation" : [
-                -0.7071068286895752,
-                0,
-                0,
-                0.7071068286895752
-            ],
-            "translation" : [
-                0.003179544350132346,
-                0.008089185692369938,
-                -0.05187902972102165
-            ]
 
 
 map
@@ -80,6 +66,7 @@ map
 
 bitmaps
  - redo all bitmaps for textureSize for any numbers
+ - real font (in monitor and computer panels)
  - gravel (like dirt)
  - more distinct control panels pieces (keyboard)
  - computer access panels have handles?
@@ -87,6 +74,7 @@ bitmaps
 model
  - get rid of monitor on desk
  - add: chair, dresser, storage tank, pc (can put on desk), bookcase (books?), electrical box
+ - computer top can be random block on top, bottom can be randomly bigger than bank, rename "computerbank" maybe
  - some models need to have flags for "on wall" or "on desk, table, etc"
  - robot model needs to be chunkier
  - faces by meshes

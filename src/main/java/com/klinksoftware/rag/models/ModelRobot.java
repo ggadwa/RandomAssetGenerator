@@ -1,12 +1,15 @@
 package com.klinksoftware.rag.models;
 
+import com.klinksoftware.rag.skeleton.Skeleton;
 import com.klinksoftware.rag.skeleton.SkeletonBuilder;
 
 @ModelInterface
 public class ModelRobot extends ModelBase {
 
+    public Skeleton skeleton;
+
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         addBitmap("body", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
         addBitmap("leg", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
         addBitmap("foot", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
@@ -18,11 +21,15 @@ public class ModelRobot extends ModelBase {
         skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_ROBOT, bilateral);
 
         // build the meshes around the limbs
-        wrapLimbs(false);
+        wrapLimbs(skeleton.limbs, false);
 
-        // skeletons and meshes are created with absolute
-        // points, we need to change this to relative before
-        // saving the model
-        meshList.rebuildModelMeshWithSkeleton(skeleton);
+        // has animations
+        scene.skinned = true;
     }
+
+    @Override
+    public void buildAnimations() {
+
+    }
+
 }

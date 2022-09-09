@@ -14,7 +14,7 @@ public class Bone
 
     public Bone(String name, int meshIdx, float radius, RagPoint pnt) {
         this.name=name;
-        this.meshIdx=meshIdx;
+        this.meshIdx = meshIdx;
         this.radius = radius;
         this.pnt=new RagPoint(pnt.x,pnt.y,pnt.z);
 

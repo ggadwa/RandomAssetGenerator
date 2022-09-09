@@ -2,15 +2,15 @@ package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
-import com.klinksoftware.rag.mesh.Mesh;
-import com.klinksoftware.rag.mesh.MeshUtility;
+import com.klinksoftware.rag.scene.Mesh;
+import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
 @ModelInterface
 public class ModelJunction extends ModelBase {
 
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         float junctionWidth, pipeHeight, pipeRadius, junctionHalfDepth;
         float dx, dz, juncHalfWid;
         String name;
@@ -31,8 +31,8 @@ public class ModelJunction extends ModelBase {
 
         juncHalfWid = junctionWidth * 0.5f;
 
-        meshList.add(MeshUtility.createCube("computer", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, false, false, false, true, false, false, false, MeshUtility.UV_WHOLE));
-        meshList.add(MeshUtility.createCube("panel", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, true, true, true, false, true, true, false, MeshUtility.UV_MAP));
+        scene.rootNode.meshes.add(MeshUtility.createCube("computer", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, false, false, false, true, false, false, false, MeshUtility.UV_WHOLE));
+        scene.rootNode.meshes.add(MeshUtility.createCube("panel", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, true, true, true, false, true, true, false, MeshUtility.UV_MAP));
         /*
             // the pipes
 
@@ -108,11 +108,9 @@ public class ModelJunction extends ModelBase {
         }
 
         if (mesh != null) {
-            meshList.add(mesh);
+            scene.rootNode.meshes.add(mesh);
         }
 
          */
-        // now build a fake skeleton for the glTF
-        skeleton = meshList.rebuildMapMeshesWithSkeleton();
     }
 }

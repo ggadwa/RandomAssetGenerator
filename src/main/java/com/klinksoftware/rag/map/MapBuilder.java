@@ -1,10 +1,12 @@
 package com.klinksoftware.rag.map;
 
+import com.klinksoftware.rag.utility.MeshMapUtility;
+import com.klinksoftware.rag.scene.Scene;
+import com.klinksoftware.rag.scene.Node;
+import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.export.Export;
-import com.klinksoftware.rag.mesh.*;
-import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
@@ -24,9 +26,7 @@ public class MapBuilder
 
     public static final int FAIL_COUNT = 50;
 
-    public MeshList meshList;
-    public Skeleton skeleton;
-    public HashMap<String, BitmapBase> bitmaps;
+    public Scene scene;
     public RagPoint viewCenterPoint;
     private MapPieceList mapPieceList;
 
@@ -107,12 +107,15 @@ public class MapBuilder
         int failCount, placeCount, moveCount;
         int touchIdx;
         float xAdd, zAdd, origX, origZ;
+        String name;
         MapRoom room;
 
         // other rooms start outside around the first room
         // room and gravity brings them in until they connect
         room = new MapRoom(mapPieceList.getRandomPiece(mapCompactFactor, complex));
         room.story = story;
+
+        name = "room_" + Integer.toString(rooms.size());
 
         failCount = FAIL_COUNT;
 
@@ -155,6 +158,8 @@ public class MapBuilder
                     touchIdx = room.touches(rooms);
                     if (touchIdx != -1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
+                            room.node = new Node(name, room.getNodePoint());
+                            scene.rootNode.childNodes.add(room.node);
                             rooms.add(room);
                             return (room);
                         }
@@ -168,6 +173,8 @@ public class MapBuilder
                     touchIdx = room.touches(rooms);
                     if (touchIdx != -1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
+                            room.node = new Node(name, room.getNodePoint());
+                            scene.rootNode.childNodes.add(room.node);
                             rooms.add(room);
                             return (room);
                         }
@@ -199,6 +206,7 @@ public class MapBuilder
 
     private void addMainFloor(ArrayList<MapRoom> rooms, int roomCount, int roomExtensionCount, float mapCompactFactor, boolean complex) {
         int n, failCount, firstRoomIdx, endRoomIdx;
+        String name;
         MapRoom room, lastRoom, connectRoom;
 
         // first room is alone so it
@@ -207,6 +215,10 @@ public class MapBuilder
         room.x = 0;
         room.z = 0;
 
+        name = "room_" + Integer.toString(rooms.size());
+
+        room.node = new Node(name, room.getNodePoint());
+        scene.rootNode.childNodes.add(room.node);
         rooms.add(room);
 
         lastRoom=room;
@@ -228,6 +240,8 @@ public class MapBuilder
             room = new MapRoom(mapPieceList.getRandomPiece(1.0f, complex));
             room.story = MapRoom.ROOM_STORY_MAIN;
 
+            name = "room_" + Integer.toString(rooms.size());
+
             failCount = FAIL_COUNT;
 
             while (failCount>0) {
@@ -237,6 +251,8 @@ public class MapBuilder
                 room.z=connectRoom.z;     // on left
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
+                        room.node = new Node(name, room.getNodePoint());
+                        scene.rootNode.childNodes.add(room.node);
                         rooms.add(room);
                         break;
                     }
@@ -246,6 +262,8 @@ public class MapBuilder
                 room.z=connectRoom.z;     // on right
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
+                        room.node = new Node(name, room.getNodePoint());
+                        scene.rootNode.childNodes.add(room.node);
                         rooms.add(room);
                         break;
                     }
@@ -255,6 +273,8 @@ public class MapBuilder
                 room.z=connectRoom.z-room.piece.sizeZ;     // on top
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
+                        room.node = new Node(name, room.getNodePoint());
+                        scene.rootNode.childNodes.add(room.node);
                         rooms.add(room);
                         break;
                     }
@@ -264,6 +284,8 @@ public class MapBuilder
                 room.z=connectRoom.z+connectRoom.piece.sizeZ;     // on bottom
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
+                        room.node = new Node(name, room.getNodePoint());
+                        scene.rootNode.childNodes.add(room.node);
                         rooms.add(room);
                         break;
                     }
@@ -334,6 +356,7 @@ public class MapBuilder
         }
 
         // add the new rooms
+        // don't add a node here, use the same node as the duplicated room
         endFloorRoom = null;
 
         if (upper) {
@@ -402,6 +425,7 @@ public class MapBuilder
             }
 
             // tall rooms
+            // don't add a node here, use same room node
             if (room.roomAbove(rooms) == -1) {
                 if (AppWindow.random.nextFloat() < tallRoom) {
                     room.hasUpperExtension = true;
@@ -440,6 +464,7 @@ public class MapBuilder
                 }
 
                 // sink the room
+                // don't add a node here, use same room node
                 if (AppWindow.random.nextFloat() < sunkenRoom) {
                     room.hasLowerExtension = true;
                     addRoom = room.duplicate(MapRoom.ROOM_STORY_SUNKEN_EXTENSION);
@@ -465,12 +490,12 @@ public class MapBuilder
             centerPnt = new RagPoint((((room.x * SEGMENT_SIZE) + (room.piece.sizeX * SEGMENT_SIZE)) * 0.5f), ((SEGMENT_SIZE + FLOOR_HEIGHT) + (SEGMENT_SIZE * 0.5f)), (((room.z * SEGMENT_SIZE) + (room.piece.sizeZ * SEGMENT_SIZE)) * 0.5f));
 
             if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
-                MeshMapUtility.buildRoomIndoorWalls(meshList, room, centerPnt, n);
-                MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, true);
-                MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, false);
+                MeshMapUtility.buildRoomIndoorWalls(room, centerPnt, n);
+                MeshMapUtility.buildRoomFloorCeiling(room, centerPnt, n, true);
+                MeshMapUtility.buildRoomFloorCeiling(room, centerPnt, n, false);
             } else {
-                MeshMapUtility.buildRoomOutdoorWalls(meshList, room, centerPnt, n);
-                MeshMapUtility.buildRoomFloorCeiling(meshList, room, centerPnt, n, true);
+                MeshMapUtility.buildRoomOutdoorWalls(room, centerPnt, n);
+                MeshMapUtility.buildRoomFloorCeiling(room, centerPnt, n, true);
             }
         }
     }
@@ -481,7 +506,7 @@ public class MapBuilder
         MapRoom room;
 
         roomCount = rooms.size();
-        mapStair = new MapStair(meshList, rooms);
+        mapStair = new MapStair(rooms);
 
         // stairs when changing to upper or lower
         for (n = 0; n != roomCount; n++) {
@@ -509,7 +534,7 @@ public class MapBuilder
         MapPlatform mapPlatform;
 
         roomCount = rooms.size();
-        mapPlatform = new MapPlatform(meshList, rooms);
+        mapPlatform = new MapPlatform(rooms);
 
         for (n = 0; n != roomCount; n++) {
             room = rooms.get(n);
@@ -531,7 +556,7 @@ public class MapBuilder
         minPnt = new RagPoint(0.0f, 0.0f, 0.0f);
         maxPnt = new RagPoint(0.0f, 0.0f, 0.0f);
 
-        meshList.getMixMaxVertex(minPnt, maxPnt);
+        scene.getMixMaxVertex(minPnt, maxPnt);
 
         minPnt.scale(1.1f);
         maxPnt.scale(1.1f);
@@ -540,10 +565,10 @@ public class MapBuilder
         max = Math.max(Math.max(maxPnt.x, maxPnt.y), maxPnt.z);
 
         // make skybox
-        meshList.add(MeshUtility.createCube("sky_box", min, max, min, max, min, max, true, true, true, true, true, true, true, MeshUtility.UV_SKY_BOX));
+        scene.rootNode.meshes.add(MeshUtility.createCube("sky_box", min, max, min, max, min, max, true, true, true, true, true, true, true, MeshUtility.UV_SKY_BOX));
 
         // so view drawer knows not to erase
-        meshList.setSkyBox(true);
+        scene.skyBox = true;
     }
 
     //
@@ -559,22 +584,22 @@ public class MapBuilder
         String[] skyBoxBitmaps = {"SkyBoxMountain"};
 
         if (mapType == SettingsMap.MAP_TYPE_INDOOR) {
-            BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps, textureSize);
-            BitmapBase.mapBitmapLoader(bitmaps, "wall_upper", wallBitmaps, textureSize);
-            BitmapBase.mapBitmapLoader(bitmaps, "wall_lower", wallBitmaps, textureSize);
-            BitmapBase.mapBitmapLoader(bitmaps, "floor", insideFloorBitmaps, textureSize);
-            BitmapBase.mapBitmapLoader(bitmaps, "floor_lower", insideFloorBitmaps, textureSize);
-            BitmapBase.mapBitmapLoader(bitmaps, "ceiling", ceilingBitmaps, textureSize);
-            BitmapBase.mapBitmapLoader(bitmaps, "ceiling_upper", ceilingBitmaps, textureSize);
-            BitmapBase.mapBitmapLoader(bitmaps, "platform", platformBitmaps, textureSize);
-            BitmapBase.mapBitmapLoader(bitmaps, "stair", stairBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "wall_main", wallBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "wall_upper", wallBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "wall_lower", wallBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "floor", insideFloorBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "floor_lower", insideFloorBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "ceiling", ceilingBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "ceiling_upper", ceilingBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "platform", platformBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "stair", stairBitmaps, textureSize);
         } else {
-            BitmapBase.mapBitmapLoader(bitmaps, "wall_main", wallBitmaps, textureSize);
-            BitmapBase.mapBitmapLoader(bitmaps, "floor", outsideFloorBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "wall_main", wallBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "floor", outsideFloorBitmaps, textureSize);
         }
 
         if (skyBox) {
-            BitmapBase.mapBitmapLoader(bitmaps, "sky_box", skyBoxBitmaps, textureSize);
+            BitmapBase.mapBitmapLoader(scene.bitmaps, "sky_box", skyBoxBitmaps, textureSize);
         }
     }
 
@@ -588,11 +613,10 @@ public class MapBuilder
         MapRoom room;
         ArrayList<MapRoom> rooms;
 
-        bitmaps = new HashMap<>();
+        scene = new Scene();
         mapPieceList=new MapPieceList();
 
-        rooms=new ArrayList<>();
-        meshList = new MeshList();
+        rooms = new ArrayList<>();
 
         // the main rooms, stories, extensions
         mainFloorRoomCount = 1 + (int) (50.0f * mainFloorMapSize);
@@ -639,8 +663,8 @@ public class MapBuilder
 
         // outdoor maps randomization
         if (mapType == SettingsMap.MAP_TYPE_OUTDOOR) {
-            meshList.randomizeWallVertexesFromCenter(0.5f, (SEGMENT_SIZE / 3.0f), viewCenterPoint);
-            meshList.randomizeFloorVertexes(0.5f, FLOOR_HEIGHT);
+            scene.randomizeWallVertexesFromCenter(0.5f, (SEGMENT_SIZE / 3.0f), viewCenterPoint);
+            scene.randomizeFloorVertexes(0.5f, FLOOR_HEIGHT);
         }
 
         // steps and platforms
@@ -649,13 +673,19 @@ public class MapBuilder
             buildPlatforms(mapType, rooms);
         }
 
-        // now build a fake skeleton for the glTF
-        skeleton=meshList.rebuildMapMeshesWithSkeleton();
+        // maps are build with absolute vertexes, we
+        // need to adjust these to be relative to nodes
+        scene.shiftAbsoluteMeshesToNodeRelativeMeshes();
+
+        // need to build unique indexes for all nodes
+        // and meshes, which is how they refer to each other in
+        // the gltf
+        scene.createNodeAndMeshIndexes();
     }
 
     public void writeToFile(String path) {
         try {
-            (new Export()).export(meshList, skeleton, bitmaps, path, "map");
+            (new Export()).export(scene, path, "map");
         } catch (Exception e) {
             e.printStackTrace();
         }

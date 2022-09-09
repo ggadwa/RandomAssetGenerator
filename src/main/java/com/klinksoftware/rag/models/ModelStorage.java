@@ -2,15 +2,15 @@ package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
-import com.klinksoftware.rag.mesh.Mesh;
-import com.klinksoftware.rag.mesh.MeshUtility;
+import com.klinksoftware.rag.scene.Mesh;
+import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
 @ModelInterface
 public class ModelStorage extends ModelBase {
 
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         int n, x, z, groupCount, stackCount;
         float dx, y, dz, boxSize, drawBoxSize, boxSizeReduction, boxHalfSize, bigHeight;
         RagPoint rotAngle;
@@ -76,9 +76,6 @@ public class ModelStorage extends ModelBase {
             }
         }
 
-        meshList.add(mesh);
-
-        // now build a fake skeleton for the glTF
-        skeleton = meshList.rebuildMapMeshesWithSkeleton();
+        scene.rootNode.meshes.add(mesh);
     }
 }

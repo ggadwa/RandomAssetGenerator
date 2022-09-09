@@ -58,7 +58,7 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 
         // and set the walk view
         AppWindow.walkView.setCameraWalkView(mapBuilder.viewCenterPoint.x, mapBuilder.viewCenterPoint.y, mapBuilder.viewCenterPoint.z, (MapBuilder.SEGMENT_SIZE * 0.5f));
-        AppWindow.walkView.setIncommingMeshList(mapBuilder.meshList, mapBuilder.skeleton, mapBuilder.bitmaps);
+        AppWindow.walkView.setIncommingScene(mapBuilder.scene);
 
         appWindow.walkLabel.setGeneratedTitle("Map", seed);
         appWindow.switchView("walkView");

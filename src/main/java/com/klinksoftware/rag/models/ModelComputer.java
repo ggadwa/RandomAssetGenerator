@@ -2,7 +2,7 @@ package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
-import com.klinksoftware.rag.mesh.MeshUtility;
+import com.klinksoftware.rag.utility.MeshUtility;
 
 @ModelInterface
 public class ModelComputer extends ModelBase {
@@ -22,7 +22,7 @@ public class ModelComputer extends ModelBase {
         // possible bottom
         if (AppWindow.random.nextBoolean()) {
             high = MapBuilder.SEGMENT_SIZE * (0.05f + AppWindow.random.nextFloat(0.05f));
-            meshList.add(MeshUtility.createCube("spacer", xMin, xMax, (by + high), by, zMin, zMax, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
+            scene.rootNode.meshes.add(MeshUtility.createCube("spacer", xMin, xMax, (by + high), by, zMin, zMax, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
             by += high;
             ty += high;
         }
@@ -31,16 +31,16 @@ public class ModelComputer extends ModelBase {
         hasTop = AppWindow.random.nextBoolean();
         if (hasTop) {
             high = MapBuilder.SEGMENT_SIZE * (0.05f + AppWindow.random.nextFloat(0.05f));
-            meshList.add(MeshUtility.createCube("spacer", xMin, xMax, (ty + high), ty, zMin, zMax, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+            scene.rootNode.meshes.add(MeshUtility.createCube("spacer", xMin, xMax, (ty + high), ty, zMin, zMax, true, true, true, true, false, true, false, MeshUtility.UV_MAP));
         }
 
         // the computer
-        meshList.add(MeshUtility.createCube(computerBitmapName, xMin, xMax, by, ty, zMin, zMax, false, false, (!flipFront), flipFront, false, false, false, MeshUtility.UV_WHOLE));
-        meshList.add(MeshUtility.createCube("panel", xMin, xMax, ty, by, zMin, zMax, true, true, flipFront, (!flipFront), false, (!hasTop), false, MeshUtility.UV_WHOLE));
+        scene.rootNode.meshes.add(MeshUtility.createCube(computerBitmapName, xMin, xMax, by, ty, zMin, zMax, false, false, (!flipFront), flipFront, false, false, false, MeshUtility.UV_WHOLE));
+        scene.rootNode.meshes.add(MeshUtility.createCube("panel", xMin, xMax, ty, by, zMin, zMax, true, true, flipFront, (!flipFront), false, (!hasTop), false, MeshUtility.UV_WHOLE));
     }
 
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         float computerWidth, wid, midX, midZ;
         float pedestalWidth, pedestalHeight;
 
@@ -56,7 +56,7 @@ public class ModelComputer extends ModelBase {
         pedestalWidth = computerWidth + (MapBuilder.SEGMENT_SIZE * 0.05f);
         pedestalHeight = (MapBuilder.FLOOR_HEIGHT * 0.25f) + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT * 0.75f);
 
-        meshList.add(MeshUtility.createCube("pedestal", -pedestalWidth, pedestalWidth, 0, pedestalHeight, -pedestalWidth, pedestalWidth, true, true, true, true, true, true, false, MeshUtility.UV_MAP));
+        scene.rootNode.meshes.add(MeshUtility.createCube("pedestal", -pedestalWidth, pedestalWidth, 0, pedestalHeight, -pedestalWidth, pedestalWidth, true, true, true, true, true, true, false, MeshUtility.UV_MAP));
 
         // computer banks
         switch (AppWindow.random.nextInt(4)) {
@@ -94,8 +94,5 @@ public class ModelComputer extends ModelBase {
                 buildSingleBank("computer4", ((-midX) - wid), ((-midX) + wid), (midZ - wid), (midZ + wid), true, pedestalHeight, wid);
                 break;
         }
-
-        // now build a fake skeleton for the glTF
-        skeleton = meshList.rebuildMapMeshesWithSkeleton();
     }
 }

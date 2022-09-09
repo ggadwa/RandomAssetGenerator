@@ -127,7 +127,7 @@ public class ModelPipe extends ModelBase {
         mesh=new MeshClass(this.view,this.pipeBitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
 
-        this.map.meshList.add(mesh);
+        scene.rootNode.meshes.add(mesh);
     }
 
     addPipeCornerChunk(pnt,radius,xStart,zStart,xTurn,zTurn,yFlip)
@@ -272,7 +272,7 @@ public class ModelPipe extends ModelBase {
         mesh=new MeshClass(this.view,this.pipeBitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
 
-        this.map.meshList.add(mesh);
+        scene.rootNode.meshes.add(mesh);
     }
 
         //
@@ -448,7 +448,7 @@ public class ModelPipe extends ModelBase {
         platformBoundZ=new BoundClass(z,(z+MapIndoorBuilder.SEGMENT_SIZE));
 
         platformBoundY=new BoundClass((yBound.max-floorDepth),room.yBound.max);
-        this.map.meshList.add(MeshUtility.createCube(room,"","platform",platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,MeshUtility.UV_MAP,MapIndoorBuilder.SEGMENT_SIZE));
+        scene.rootNode.meshes.add(MeshUtility.createCube(room,"","platform",platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,MeshUtility.UV_MAP,MapIndoorBuilder.SEGMENT_SIZE));
 
             // determine direction
 
@@ -486,11 +486,9 @@ public class ModelPipe extends ModelBase {
     }
      */
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
 
         addBitmap("pipe", new String[]{"Pipe"});
 
-        // now build a fake skeleton for the glTF
-        skeleton = meshList.rebuildMapMeshesWithSkeleton();
     }
 }

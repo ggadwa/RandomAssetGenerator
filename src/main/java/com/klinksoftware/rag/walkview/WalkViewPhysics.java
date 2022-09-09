@@ -1,8 +1,7 @@
 package com.klinksoftware.rag.walkview;
 
 import com.klinksoftware.rag.collision.Collision;
-import com.klinksoftware.rag.mesh.MeshList;
-import com.klinksoftware.rag.skeleton.Skeleton;
+import com.klinksoftware.rag.scene.Scene;
 import com.klinksoftware.rag.utility.RagMatrix4f;
 import com.klinksoftware.rag.utility.RagPoint;
 
@@ -41,9 +40,9 @@ public class WalkViewPhysics {
         collision = null;
     }
 
-    public void setupCollision(MeshList meshList, Skeleton skeleton) {
+    public void setupCollision(Scene scene) {
         collision = new Collision();
-        collision.buildFromMeshList(meshList, skeleton);
+        collision.buildFromScene(scene);
     }
 
     public void run(boolean cameraCenterRotate) {

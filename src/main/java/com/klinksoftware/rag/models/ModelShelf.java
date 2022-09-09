@@ -2,8 +2,8 @@ package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
-import com.klinksoftware.rag.mesh.Mesh;
-import com.klinksoftware.rag.mesh.MeshUtility;
+import com.klinksoftware.rag.scene.Mesh;
+import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
 @ModelInterface
@@ -44,7 +44,7 @@ public class ModelShelf extends ModelBase {
     }
 
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         int n, stackCount;
         float shelfLegWidth, shelfHeight, xShelfWidth, zShelfWidth;
         float y, bx, bz, shelfXMin, shelfXMax, shelfZMin, shelfZMax, boxSize;
@@ -147,13 +147,10 @@ public class ModelShelf extends ModelBase {
         }
 
         if (shelfMesh != null) {
-            meshList.add(shelfMesh);
+            scene.rootNode.meshes.add(shelfMesh);
         }
         if (boxMesh != null) {
-            meshList.add(boxMesh);
+            scene.rootNode.meshes.add(boxMesh);
         }
-
-        // now build a fake skeleton for the glTF
-        skeleton = meshList.rebuildMapMeshesWithSkeleton();
     }
 }

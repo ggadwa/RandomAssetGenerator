@@ -1,17 +1,15 @@
-package com.klinksoftware.rag.mesh;
+package com.klinksoftware.rag.scene;
 
+import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.skeleton.*;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
 
 public class MeshList {
-
-    private boolean skyBox;
     private ArrayList<Mesh> meshes;
 
     public MeshList() {
-        skyBox = false;
         meshes=new ArrayList<>();
     }
 
@@ -28,25 +26,15 @@ public class MeshList {
         return(meshes.size());
     }
 
-    public void setSkyBox(boolean skyBox) {
-        this.skyBox = skyBox;
-    }
-
-    public boolean hasSkyBox() {
-        return (skyBox);
-    }
-
-    public Skeleton rebuildMapMeshesWithSkeleton() {
+    // this is used to create a skeleton for models without
+    // bones, creating one root and a child root for every mesh
+    public Skeleton createSkeletonFromAbsoluteMeshList() {
         int n;
         Mesh mesh;
         Skeleton skeleton;
         RagPoint center;
 
-            // this is used to turn boneless maps
-            // into a simple skeleton with a single
-            // root node
-
-        skeleton=new Skeleton();        // node 0 will be root
+        skeleton = new Skeleton();
 
         center=new RagPoint(0.0f,0.0f,0.0f);
 
@@ -61,6 +49,7 @@ public class MeshList {
         return(skeleton);
     }
 
+    // this is used to change meshes to be relative to bones
     private void rebuildModelMeshWithSkeletonRecurse(Skeleton skeleton, Bone bone, RagPoint offsetPnt) {
         int n;
         RagPoint nextOffsetPnt;
@@ -90,6 +79,12 @@ public class MeshList {
             // all absolute, this makes everything relative
 
         rebuildModelMeshWithSkeletonRecurse(skeleton,skeleton.bones.get(0),null);
+    }
+
+    public void createJointsAndWeights(Skeleton skeleton) {
+        for (Mesh mesh : meshes) {
+            mesh.createJointsAndWeights(skeleton);
+        }
     }
 
     public void makeListSimpleCube(String bitmapName) {

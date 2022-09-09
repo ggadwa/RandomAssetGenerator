@@ -2,8 +2,8 @@ package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
-import com.klinksoftware.rag.mesh.Mesh;
-import com.klinksoftware.rag.mesh.MeshUtility;
+import com.klinksoftware.rag.scene.Mesh;
+import com.klinksoftware.rag.utility.MeshUtility;
 
 @ModelInterface
 public class ModelTable extends ModelBase {
@@ -24,7 +24,7 @@ public class ModelTable extends ModelBase {
     }
 
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         float tableHeight, tableLegWidth, xTableWidth, zTableWidth;
         float tableXMin, tableXMax, tableZMin, tableZMax;
         Mesh mesh;
@@ -51,9 +51,6 @@ public class ModelTable extends ModelBase {
         // the table
         mesh.combine(MeshUtility.createCube("table", tableXMin, tableXMax, tableHeight, (tableHeight + tableLegWidth), tableZMin, tableZMax, true, true, true, true, true, true, false, MeshUtility.UV_MAP));
 
-        meshList.add(mesh);
-
-        // now build a fake skeleton for the glTF
-        skeleton = meshList.rebuildMapMeshesWithSkeleton();
+        scene.rootNode.meshes.add(mesh);
     }
 }

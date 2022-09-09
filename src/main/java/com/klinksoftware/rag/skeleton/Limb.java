@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.skeleton;
 
+import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.utility.*;
 
 public class Limb
@@ -14,17 +15,17 @@ public class Limb
     public static final int LIMB_AXIS_Z=2;
 
     public int uvMapType, meshType, axis;
-    public int bone1Idx, bone2Idx;
     public String name, bitmapName;
     public RagPoint scale;
+    public Node node1, node2;
 
-    public Limb(String name, String bitmapName, int meshType, int axis, RagPoint scale, int bone1Idx, int bone2Idx) {
+    public Limb(String name, String bitmapName, int meshType, int axis, RagPoint scale, Node node1, Node node2) {
         this.name = name;
         this.bitmapName = bitmapName;
         this.meshType = meshType;
         this.axis=axis;
         this.scale = scale;
-        this.bone1Idx = bone1Idx;
-        this.bone2Idx = bone2Idx;
+        this.node1 = node1;
+        this.node2 = node2;
     }
 }

@@ -2,8 +2,8 @@ package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
-import com.klinksoftware.rag.mesh.Mesh;
-import com.klinksoftware.rag.mesh.MeshUtility;
+import com.klinksoftware.rag.scene.Mesh;
+import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
 @ModelInterface
@@ -15,7 +15,7 @@ public class ModelBarrel extends ModelBase {
     }
 
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         float barrelSectionRadius, barrelRingRadius, barrelRingHeight, barrelSectionHeight;
         float by;
         RagPoint centerPnt;
@@ -49,9 +49,6 @@ public class ModelBarrel extends ModelBase {
         centerPnt = new RagPoint(0, (by + (barrelRingHeight * 0.5f)), 0);
         mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
 
-        meshList.add(mesh);
-
-        // now build a fake skeleton for the glTF
-        skeleton = meshList.rebuildMapMeshesWithSkeleton();
+        scene.rootNode.meshes.add(mesh);
     }
 }

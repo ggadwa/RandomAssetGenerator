@@ -1,10 +1,13 @@
 package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
+import com.klinksoftware.rag.skeleton.Skeleton;
 import com.klinksoftware.rag.skeleton.SkeletonBuilder;
 
 @ModelInterface
 public class ModelAnimal extends ModelBase {
+
+    public Skeleton skeleton;
 
     @Override
     public float getCameraRotateY() {
@@ -12,7 +15,7 @@ public class ModelAnimal extends ModelBase {
     }
 
     @Override
-    public void buildInternal() {
+    public void buildMeshes() {
         addBitmap("body", new String[]{"Fur", "Organic", "Scale"});
         addBitmap("leg", new String[]{"Fur", "Organic", "Scale"});
         addBitmap("foot", new String[]{"Fur", "Organic", "Scale"});
@@ -24,17 +27,20 @@ public class ModelAnimal extends ModelBase {
         skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_ANIMAL, bilateral);
 
         // build the meshes around the limbs
-        wrapLimbs(true);
+        wrapLimbs(skeleton.limbs, true);
 
         // any randomization
         if (roughness != 0.0f) {
-            meshList.randomizeVertexes(roughness, (0.025f + AppWindow.random.nextFloat(0.05f)));
+            scene.randomizeVertexes(roughness, (0.025f + AppWindow.random.nextFloat(0.05f)));
         }
 
-        // skeletons and meshes are created with absolute
-        // points, we need to change this to relative before
-        // saving the model
-        meshList.rebuildModelMeshWithSkeleton(skeleton);
+        // has animations
+        scene.skinned = true;
+    }
+
+    @Override
+    public void buildAnimations() {
+
     }
 
 }

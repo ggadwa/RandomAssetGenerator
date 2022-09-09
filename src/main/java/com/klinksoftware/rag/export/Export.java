@@ -1,14 +1,16 @@
 package com.klinksoftware.rag.export;
 
-import com.klinksoftware.rag.mesh.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.bitmaps.*;
-import com.klinksoftware.rag.skeleton.*;
+import com.klinksoftware.rag.scene.Node;
 
 import java.util.*;
 import java.io.*;
 import java.nio.*;
-import com.fasterxml.jackson.databind.*;
+import com.klinksoftware.rag.scene.Scene;
 
 public class Export
 {
@@ -175,46 +177,52 @@ public class Export
         // adding a mesh
         //
 
-    private void addMesh(Mesh mesh, int materialIdx, ArrayList<Object> meshesArr, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
-        int accessorIdx;
+    private void addMeshes(Scene scene, Node node, ArrayList<Object> meshesArr, ArrayList<Object> materialsArr, ArrayList<Object> texturesArr, ArrayList<Object> imagesArr, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
+        int accessorIdx, materialIdx;
         ArrayList<Object> primitiveArr;
         LinkedHashMap<String, Object> meshObj, primitiveObj, attributeObj;
         RagPoint min, max;
 
-            // figure out the min and max of vertex data
-
-        min=new RagPoint(0.0f,0.0f,0.0f);
-        max=new RagPoint(0.0f,0.0f,0.0f);
-        mesh.getMinMaxVertex(min,max);
-
-            // do the mesh object
-
+        // the mesh object
         meshObj=new LinkedHashMap<>();
-        meshObj.put("name",mesh.name);
+        meshObj.put("name", node.name);
 
-            // and it's primitive
+        // the primitive list
+        primitiveArr = new ArrayList<>();
 
-        primitiveObj=new LinkedHashMap<>();
+        // all the meshes attached to this node
+        for (Mesh mesh : node.meshes) {
+            primitiveObj = new LinkedHashMap<>();
 
-        attributeObj=new LinkedHashMap<>();
+            // the material
+            materialIdx = addMaterial(mesh.bitmapName, scene.bitmaps, materialsArr, texturesArr, imagesArr);
 
-        accessorIdx=addBinData(5126,(mesh.vertexes.length/3),"VEC3",floatArrayToFloatBytes(mesh.vertexes),accessorsArr,bufferViewsArr,min,max,bin);
-        attributeObj.put("POSITION",accessorIdx);
+            // figure out the min and max of vertex data
+            min = new RagPoint(0.0f, 0.0f, 0.0f);
+            max = new RagPoint(0.0f, 0.0f, 0.0f);
+            mesh.getMinMaxVertex(min, max);
 
-        accessorIdx=addBinData(5126,(mesh.normals.length/3),"VEC3",floatArrayToFloatBytes(mesh.normals),accessorsArr,bufferViewsArr,null,null,bin);
-        attributeObj.put("NORMAL",accessorIdx);
+            // the primitive attributes
+            attributeObj = new LinkedHashMap<>();
 
-        accessorIdx=addBinData(5126,(mesh.uvs.length/2),"VEC2",floatArrayToFloatBytes(mesh.uvs),accessorsArr,bufferViewsArr,null,null,bin);
-        attributeObj.put("TEXCOORD_0",accessorIdx);
+            accessorIdx = addBinData(5126, (mesh.vertexes.length / 3), "VEC3", floatArrayToFloatBytes(mesh.vertexes), accessorsArr, bufferViewsArr, min, max, bin);
+            attributeObj.put("POSITION", accessorIdx);
 
-        primitiveObj.put("attributes",attributeObj);
+            accessorIdx = addBinData(5126, (mesh.normals.length / 3), "VEC3", floatArrayToFloatBytes(mesh.normals), accessorsArr, bufferViewsArr, null, null, bin);
+            attributeObj.put("NORMAL", accessorIdx);
 
-        accessorIdx=addBinData(5123,mesh.indexes.length,"SCALAR",intArrayToShortBytes(mesh.indexes),accessorsArr,bufferViewsArr,null,null,bin);
-        primitiveObj.put("indices",accessorIdx);
+            accessorIdx = addBinData(5126, (mesh.uvs.length / 2), "VEC2", floatArrayToFloatBytes(mesh.uvs), accessorsArr, bufferViewsArr, null, null, bin);
+            attributeObj.put("TEXCOORD_0", accessorIdx);
 
-        primitiveObj.put("material",materialIdx);
-        primitiveArr=new ArrayList<>();
-        primitiveArr.add(primitiveObj);
+            primitiveObj.put("attributes", attributeObj);
+
+            accessorIdx = addBinData(5123, mesh.indexes.length, "SCALAR", intArrayToShortBytes(mesh.indexes), accessorsArr, bufferViewsArr, null, null, bin);
+            primitiveObj.put("indices", accessorIdx);
+
+            primitiveObj.put("material", materialIdx);
+
+            primitiveArr.add(primitiveObj);
+        }
 
         meshObj.put("primitives",primitiveArr);
 
@@ -225,46 +233,40 @@ public class Export
         // main export
         //
 
-    public void export(MeshList meshList, Skeleton skeleton, HashMap<String, BitmapBase> bitmaps, String path, String name) throws Exception {
-        int n, meshCount, materialIdx;
+    public void export(Scene scene, String path, String name) throws Exception {
+        int n, nodeCount;
         byte[] binBytes;
         float[] translation, rotation, scale;
         String path2;
         ByteArrayOutputStream bin;
-        Mesh mesh;
-        Bone bone;
+        Node node;
+        ArrayList<Integer> children;
         ArrayList<Object> arrList, nodesArr, meshesArr;
         ArrayList<Object> accessorsArr, bufferViewsArr, bufferArr;
         ArrayList<Object> samplerArr, materialsArr, texturesArr, imagesArr;
         LinkedHashMap<String, Object> json, obj2, nodeObj, bufferObj, samplerObj;
         ObjectMapper objMapper;
 
-            // the bin data
-
+        // the bin data
         bin=new ByteArrayOutputStream(32*1024);
 
-            // the json
+        // the json
+        json = new LinkedHashMap<>();
 
-        meshCount=meshList.count();
-
-        json=new LinkedHashMap<>();
-
-            // asset header
-
+        // asset header
         obj2=new LinkedHashMap<>();
         obj2.put("generator","WSJS Random Asset Generator");
         obj2.put("version","2.0");
         json.put("asset",obj2);
 
-            // the single scene
-            // points to the root node
-
+        // the single scene
+        // points to the root node
         json.put("scene",0);
 
         obj2=new LinkedHashMap<>();
         obj2.put("name","Scene");
 
-        nodesArr = new ArrayList<>(); // one node for every mesh
+        nodesArr = new ArrayList<>();
         nodesArr.add(0);
         obj2.put("nodes",nodesArr);
 
@@ -272,43 +274,55 @@ public class Export
         arrList.add(obj2);
         json.put("scenes",arrList);
 
-            // the nodes, pointed from scene
-            // one for each bone
-
+        // the nodes, pointed from scene
+        // these are a flat list indexed by order in the gltf, so we need to
+        // look up each from it's internal index so the list is
+        // correctly ordered
+        // we give a single mesh to each node, and then the multiple meshes
+        // per node as primitives in that mesh
         rotation = new float[]{0.0f, 0.0f, 0.0f, 1.0f}; // always the same, we can share
         scale=new float[]{1.0f,1.0f,1.0f};
 
+        nodeCount = scene.getNodeCount();
         nodesArr=new ArrayList<>();
 
-        for (n=0;n!=skeleton.bones.size();n++) {
-            bone=skeleton.bones.get(n);
+        for (n = 0; n != nodeCount; n++) {
+            node = scene.getNodeForIndex(n);
 
             nodeObj=new LinkedHashMap<>();
 
-            nodeObj.put("name",bone.name);
+            nodeObj.put("name", node.name);
             translation=new float[3];
-            translation[0]=bone.pnt.x;
-            translation[1]=bone.pnt.y;
-            translation[2]=bone.pnt.z;
+            translation[0] = node.pnt.x;
+            translation[1] = node.pnt.y;
+            translation[2] = node.pnt.z;
             nodeObj.put("translation",translation);
             nodeObj.put("rotation",rotation);
             nodeObj.put("scale",scale);
-            if (bone.meshIdx!=-1) nodeObj.put("mesh",bone.meshIdx);
+            nodeObj.put("mesh", n); // same index as this node
 
-            if (!bone.children.isEmpty()) nodeObj.put("children",bone.children);
+            children = new ArrayList<>();
+            for (Node childNode : node.childNodes) {
+                children.add(childNode.index);
+            }
+
+            if (!children.isEmpty()) {
+                nodeObj.put("children", children);
+            }
 
             nodesArr.add(nodeObj);
         }
 
         json.put("nodes",nodesArr);
 
-            // the meshes, pointed from nodes
-            // one for each mesh, parallel with the nodes
+        // the meshes, pointed from nodes
+        // one for each mesh, parallel with the nodes
+        // the multiple meshes per node are primitives in
+        // this single mesh
 
-            // we build the accessor and bufferViews at the
-            // same time, along with the materials, textures,
-            // and images
-
+        // we build the accessor and bufferViews at the
+        // same time, along with the materials, textures,
+        // and images
         meshesArr=new ArrayList<>();
         accessorsArr=new ArrayList<>();
         bufferViewsArr=new ArrayList<>();
@@ -316,33 +330,27 @@ public class Export
         texturesArr=new ArrayList<>();
         imagesArr=new ArrayList<>();
 
-        for (n=0;n!=meshCount;n++) {
-            mesh=meshList.get(n);
-
-            materialIdx = addMaterial(mesh.bitmapName, bitmaps, materialsArr, texturesArr, imagesArr);
-            addMesh(mesh,materialIdx,meshesArr,accessorsArr,bufferViewsArr,bin);
+        for (n = 0; n != nodeCount; n++) {
+            node = scene.getNodeForIndex(n);
+            addMeshes(scene, node, meshesArr, materialsArr, texturesArr, imagesArr, accessorsArr, bufferViewsArr, bin);
         }
 
         json.put("meshes",meshesArr);
 
-            // the materials, pointed to from mesh primitives
-            // this is generated while building the meshes
-
+        // the materials, pointed to from mesh primitives
+        // this is generated while building the meshes
         json.put("materials",materialsArr);
 
-            // textures, pointed to from materials
-            // this is generated while building the meshes
-
+        // textures, pointed to from materials
+        // this is generated while building the meshes
         json.put("textures",texturesArr);
 
-            // images, pointed to from textures
-            // this is generated while building the meshes
-
+        // images, pointed to from textures
+        // this is generated while building the meshes
         json.put("images",imagesArr);
 
-            // samplers, pointed to from textures
-            // just one, with mag/min filter
-
+        // samplers, pointed to from textures
+        // just one, with mag/min filter
         samplerArr=new ArrayList<>();
         samplerObj=new LinkedHashMap<>();
         samplerObj.put("magFilter",9729);
@@ -350,18 +358,15 @@ public class Export
         samplerArr.add(samplerObj);
         json.put("samplers",samplerArr);
 
-            // accessors, pointed to from mesh primitives
-            // these are built when we build the meshes
-
+        // accessors, pointed to from mesh primitives
+        // these are built when we build the meshes
         json.put("accessors",accessorsArr);
 
-            // buffer view, pointed to from accessors
-            // these are built when we build the meshes
-
+        // buffer view, pointed to from accessors
+        // these are built when we build the meshes
         json.put("bufferViews",bufferViewsArr);
 
-            // the buffer, just one for all information
-
+        // the buffer, just one for all information
         binBytes=bin.toByteArray();
 
         bufferObj=new LinkedHashMap<>();
@@ -372,7 +377,6 @@ public class Export
         json.put("buffers", bufferArr);
 
         // save the json
-
         path2 = path + File.separator + name + ".gltf";
 
         objMapper=new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
@@ -384,8 +388,7 @@ public class Export
             e.printStackTrace();
         }
 
-            // and write the bin
-
+        // and write the bin
         path2 = path + File.separator + name + ".bin";
 
         try ( FileOutputStream binFile = new FileOutputStream(path2)) {
@@ -400,8 +403,8 @@ public class Export
         path2 = path + File.separator + "textures";
         (new File(path2)).mkdir();
 
-        for (String bitmapName : bitmaps.keySet()) {
-            bitmaps.get(bitmapName).writeToFile(path2, bitmapName);
+        for (String bitmapName : scene.bitmaps.keySet()) {
+            scene.bitmaps.get(bitmapName).writeToFile(path2, bitmapName);
         }
     }
 }

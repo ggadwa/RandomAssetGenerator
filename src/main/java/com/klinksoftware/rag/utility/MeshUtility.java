@@ -1,7 +1,8 @@
-package com.klinksoftware.rag.mesh;
+package com.klinksoftware.rag.utility;
 
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.map.MapBuilder;
+import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;

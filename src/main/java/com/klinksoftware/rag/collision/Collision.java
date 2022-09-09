@@ -1,9 +1,9 @@
 package com.klinksoftware.rag.collision;
 
 import com.klinksoftware.rag.map.MapBuilder;
-import com.klinksoftware.rag.mesh.Mesh;
-import com.klinksoftware.rag.mesh.MeshList;
-import com.klinksoftware.rag.skeleton.Skeleton;
+import com.klinksoftware.rag.scene.Mesh;
+import com.klinksoftware.rag.scene.Node;
+import com.klinksoftware.rag.scene.Scene;
 import com.klinksoftware.rag.utility.RagPoint;
 import java.util.ArrayList;
 
@@ -41,20 +41,9 @@ public class Collision {
         hitPnt = new RagPoint(0.0f, 0.0f, 0.0f);
     }
 
-    private void addMeshTrigsToCollision(MeshList meshList, Skeleton skeleton, int meshIdx) {
-        int n, nTrig, trigIdx, boneIdx, offset;
-        RagPoint v0, v1, v2, normal, bonePoint;
-        Mesh mesh;
-
-        mesh = meshList.get(meshIdx);
-
-        // get offset bone
-        boneIdx = skeleton.findBoneIndexforMeshIndex(meshIdx);
-        if (boneIdx == -1) {
-            bonePoint = new RagPoint(0.0f, 0.0f, 0.0f);
-        } else {
-            bonePoint = skeleton.getBoneAbsolutePoint(boneIdx);
-        }
+    private void addMeshTrigsToCollision(Mesh mesh, RagPoint nodePnt) {
+        int n, nTrig, trigIdx, offset;
+        RagPoint v0, v1, v2, normal;
 
         // create the trigs
         nTrig = mesh.indexes.length / 3;
@@ -65,14 +54,14 @@ public class Collision {
             trigIdx = n * 3;
 
             offset = mesh.indexes[trigIdx] * 3;
-            v0 = new RagPoint((mesh.vertexes[offset] + bonePoint.x), (mesh.vertexes[offset + 1] + bonePoint.y), (mesh.vertexes[offset + 2] + bonePoint.z));
+            v0 = new RagPoint((mesh.vertexes[offset] + nodePnt.x), (mesh.vertexes[offset + 1] + nodePnt.y), (mesh.vertexes[offset + 2] + nodePnt.z));
             normal = new RagPoint(mesh.normals[offset], mesh.normals[offset + 1], mesh.normals[offset + 2]);
 
             offset = mesh.indexes[trigIdx + 1] * 3;
-            v1 = new RagPoint((mesh.vertexes[offset] + bonePoint.x), (mesh.vertexes[offset + 1] + bonePoint.y), (mesh.vertexes[offset + 2] + bonePoint.z));
+            v1 = new RagPoint((mesh.vertexes[offset] + nodePnt.x), (mesh.vertexes[offset + 1] + nodePnt.y), (mesh.vertexes[offset + 2] + nodePnt.z));
 
             offset = mesh.indexes[trigIdx + 2] * 3;
-            v2 = new RagPoint((mesh.vertexes[offset] + bonePoint.x), (mesh.vertexes[offset + 1] + bonePoint.y), (mesh.vertexes[offset + 2] + bonePoint.z));
+            v2 = new RagPoint((mesh.vertexes[offset] + nodePnt.x), (mesh.vertexes[offset + 1] + nodePnt.y), (mesh.vertexes[offset + 2] + nodePnt.z));
 
             // is this a floor?
             if (normal.y > 0.75f) {
@@ -83,15 +72,26 @@ public class Collision {
         }
     }
 
-    public void buildFromMeshList(MeshList meshList, Skeleton skeleton) {
-        int n, nMesh;
+    public void buildFromSceneRecursive(Node node, RagPoint pnt) {
+        RagPoint nextPnt;
 
-        floorTrigs.clear();
+        nextPnt = pnt.copy();
+        nextPnt.addPoint(node.pnt);
 
-        nMesh = meshList.count();
-        for (n = 0; n != nMesh; n++) {
-            addMeshTrigsToCollision(meshList, skeleton, n);
+        for (Mesh mesh : node.meshes) {
+            addMeshTrigsToCollision(mesh, nextPnt);
         }
+
+        for (Node childNode : node.childNodes) {
+            buildFromSceneRecursive(childNode, nextPnt);
+        }
+    }
+
+    public void buildFromScene(Scene scene) {
+        floorTrigs.clear();
+        wallTrigs.clear();
+
+        buildFromSceneRecursive(scene.rootNode, new RagPoint(0.0f, 0.0f, 0.0f));
     }
 
     public boolean collideWithWall(RagPoint rayPnt) {

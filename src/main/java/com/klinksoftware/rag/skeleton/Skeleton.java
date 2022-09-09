@@ -1,29 +1,28 @@
 package com.klinksoftware.rag.skeleton;
 
+import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
 
 public class Skeleton
 {
-
-    public boolean standing;
+    public boolean skinned, standing;
     public ArrayList<Bone> bones;
     public ArrayList<Limb> limbs;
 
-    public Skeleton()
-    {
+    public Skeleton() {
         bones=new ArrayList<>();
-        bones.add(new Bone("root",-1,1.0f,new RagPoint(0.0f,0.0f,0.0f)));     // first bone is always root
+        bones.add(new Bone("root", -1, 1.0f, new RagPoint(0.0f, 0.0f, 0.0f))); // first bone is always root
 
         limbs = new ArrayList<>();
 
+        skinned = false;
         standing = false;
     }
 
-    public int addChildBone(int toBoneIndex,String name,int meshIdx,float gravityLockDistance,RagPoint pnt)
-    {
-        int         idx;
+    public int addChildBone(int toBoneIndex, String name, int meshIdx, float gravityLockDistance, RagPoint pnt) {
+        int idx;
 
         idx=bones.size();
         bones.add(new Bone(name,meshIdx,gravityLockDistance,pnt));
@@ -33,9 +32,8 @@ public class Skeleton
         return(idx);
     }
 
-    public int findBoneIndex(String name)
-    {
-        int         n;
+    public int findBoneIndex(String name) {
+        int n;
 
         for (n=0;n!=bones.size();n++) {
             if (bones.get(n).name.equals(name)) return(n);
@@ -44,9 +42,8 @@ public class Skeleton
         return(-1);
     }
 
-    public int findBoneIndexforMeshIndex(int meshIdx)
-    {
-        int         n;
+    public int findBoneIndexforMeshIndex(int meshIdx) {
+        int n;
 
         for (n=0;n!=bones.size();n++) {
             if (bones.get(n).meshIdx==meshIdx) return(n);
@@ -55,9 +52,8 @@ public class Skeleton
         return(-1);
     }
 
-    private void addBoneAbsolutePointRecurse(int boneIdx,RagPoint pnt)
-    {
-        int         n;
+    private void addBoneAbsolutePointRecurse(int boneIdx, RagPoint pnt) {
+        int n;
 
         pnt.addPoint(bones.get(boneIdx).pnt);
 
@@ -71,8 +67,7 @@ public class Skeleton
         }
     }
 
-    public RagPoint getBoneAbsolutePoint(int boneIdx)
-    {
+    public RagPoint getBoneAbsolutePoint(int boneIdx) {
         RagPoint pnt;
 
         pnt=new RagPoint(0.0f,0.0f,0.0f);
@@ -81,16 +76,38 @@ public class Skeleton
         return(pnt);
     }
 
-    public void setBoneMeshIndex(int boneIdx,int meshIdx)
-    {
+    public int findNearestBone(RagPoint pnt) {
+        int n, boneIdx;
+        float dist, currentDist;
+
+        boneIdx = -1;
+        currentDist = 0.0f;
+
+        for (n = 0; n != bones.size(); n++) {
+            dist = bones.get(n).pnt.distance(pnt);
+            if (boneIdx == -1) {
+                currentDist = dist;
+                boneIdx = n;
+            } else {
+                if (dist < currentDist) {
+                    currentDist = dist;
+                    boneIdx = n;
+                }
+            }
+        }
+
+        return ((boneIdx == -1) ? 0 : boneIdx);
+    }
+
+    public void setBoneMeshIndex(int boneIdx, int meshIdx) {
         bones.get(boneIdx).meshIdx=meshIdx;
     }
 
-    public int addLimb(String name, String bitmapName, int meshType, int axis, RagPoint scale, int bone1Idx, int bone2Idx) {
-        int         idx;
+    public int addLimb(String name, String bitmapName, int meshType, int axis, RagPoint scale, Node node1, Node node2) {
+        int idx;
 
         idx = limbs.size();
-        limbs.add(new Limb(name, bitmapName, meshType, axis, scale, bone1Idx, bone2Idx));
+        limbs.add(new Limb(name, bitmapName, meshType, axis, scale, node1, node2));
 
         return(idx);
     }

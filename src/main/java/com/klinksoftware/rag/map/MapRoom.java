@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.map;
 
+import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.utility.*;
 import java.util.ArrayList;
 
@@ -20,6 +21,7 @@ public class MapRoom
     public byte[] wallHideArray;
     public boolean[] platformGrid;
     public MapRoom extendedFromRoom;
+    public Node node;
     public MapPiece piece;
 
     public MapRoom(MapPiece piece) {
@@ -42,6 +44,10 @@ public class MapRoom
 
         // grids for blocking off platforms and decorations
         platformGrid = new boolean[piece.sizeX * piece.sizeZ];
+
+        // rooms remember a node to attach meshes to
+        // this gets set later after creation
+        node = null;
     }
 
     public MapRoom duplicate(int story) {
@@ -50,6 +56,8 @@ public class MapRoom
         room = new MapRoom(piece.clone());
         room.x = x;
         room.z = z;
+
+        room.node = node;
 
         room.story = story;
         room.stairDir = 0;
@@ -375,6 +383,16 @@ public class MapRoom
         dx = Math.abs((room.x + (room.piece.sizeX / 2)) - (x + (piece.sizeX / 2)));
         dz = Math.abs((room.z + (room.piece.sizeZ / 2)) - (z + (piece.sizeZ / 2)));
         return ((int) Math.sqrt((dx * dx) + (dz * dz)));
+    }
+
+    public RagPoint getNodePoint() {
+        float cx, cy, cz;
+
+        cx = ((x * MapBuilder.SEGMENT_SIZE) + ((x + piece.sizeX) * MapBuilder.SEGMENT_SIZE)) * 0.5f;
+        cy = 0.0f; // always at neutral 0 of map
+        cz = ((z * MapBuilder.SEGMENT_SIZE) + ((z + piece.sizeZ) * MapBuilder.SEGMENT_SIZE)) * 0.5f;
+
+        return (new RagPoint(cx, cy, cz));
     }
 
         //

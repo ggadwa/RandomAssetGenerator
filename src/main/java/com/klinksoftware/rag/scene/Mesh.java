@@ -1,6 +1,7 @@
-package com.klinksoftware.rag.mesh;
+package com.klinksoftware.rag.scene;
 
 import com.klinksoftware.rag.AppWindow;
+import com.klinksoftware.rag.skeleton.Skeleton;
 import com.klinksoftware.rag.utility.*;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -15,13 +16,16 @@ import static org.lwjgl.system.MemoryUtil.memFree;
 
 public class Mesh
 {
+
+    public int index;
     public boolean hasEmissive;
     public String name,bitmapName;
     public int[] indexes;
-    public float[] vertexes, normals, tangents, uvs;
+    public float[] vertexes, normals, tangents, uvs, joints, weights;
     public int vboVertexId, vboNormalId, vboTangentId, vboUVId;
     public RagBound xBound, yBound, zBound;
-    public boolean hasAlpha, highlight;
+    public boolean highlight;
+    public RagMatrix4f modelMatrix;
 
     public Mesh(String name,String bitmapName,float[] vertexes,float[] normals,float[] tangents,float[] uvs,int[] indexes)
     {
@@ -31,7 +35,12 @@ public class Mesh
         this.normals=normals;
         this.tangents=tangents;
         this.uvs=uvs;
-        this.indexes=indexes;
+        this.indexes = indexes;
+
+        joints = null;
+        weights = null;
+
+        modelMatrix = new RagMatrix4f();
     }
 
     public void getMinMaxVertex(RagPoint min,RagPoint max)
@@ -331,21 +340,44 @@ public class Mesh
         }
     }
 
+    // finds the closest bone and makes that the only connected
+    // bone, weight at 100%.  Note that this will need to be updated
+    // in the future to find more bones to make better skinning animations
+    public void createJointsAndWeights(Skeleton skeleton) {
+        int n, idx, boneIdx, vertexCount;
+        RagPoint pnt = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        vertexCount = vertexes.length / 3;
+
+        idx = 0;
+        joints = new float[vertexCount * 4]; // 4 point vector, 4 possible bone connections
+        weights = new float[vertexCount * 4]; // same as above, 1 weight for every 1 bone connection
+
+        for (n = 0; n < vertexCount; n += 3) {
+            pnt.setFromValues(vertexes[n], vertexes[n + 1], vertexes[n + 2]);
+            boneIdx = skeleton.findNearestBone(pnt);
+
+            joints[idx] = (float) boneIdx;
+            joints[idx + 1] = 0.0f;
+            joints[idx + 2] = 0.0f;
+            joints[idx + 3] = 0.0f;
+
+            weights[idx] = 1.0f;
+            weights[idx + 1] = 0.0f;
+            weights[idx + 2] = 0.0f;
+            weights[idx + 3] = 0.0f;
+
+            idx += 4;
+        }
+    }
+
     // setup buffers for opengl drawing
-    public void setupGLBuffers(RagPoint bonePoint) {
-        int n;
+    public void setupGLBuffers(Node node) {
         FloatBuffer buf;
 
         // vertexes
         buf = MemoryUtil.memAllocFloat(vertexes.length);
-
-        for (n = 0; n < vertexes.length; n += 3) {
-            buf.put(vertexes[n] + bonePoint.x);
-            buf.put(vertexes[n + 1] + bonePoint.y);
-            buf.put(vertexes[n + 2] + bonePoint.z);
-        }
-
-        buf.flip();
+        buf.put(vertexes).flip();
 
         vboVertexId = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboVertexId);
@@ -381,8 +413,11 @@ public class Mesh
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+        // create the model matrix
+        modelMatrix.setTranslationFromPoint(node.pnt);
+
         // setup the bounds for culling
-        setGlobalBounds(bonePoint);
+        setGlobalBounds(node.pnt);
     }
 
     // release buffers for opengl drawing
