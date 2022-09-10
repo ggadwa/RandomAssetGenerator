@@ -3,9 +3,18 @@ package com.klinksoftware.rag.scene;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import org.lwjgl.system.MemoryUtil;
+import static org.lwjgl.system.MemoryUtil.memFree;
 
 // this is our internal representation of a gltf file
 // root node is created automatically
@@ -13,6 +22,7 @@ public class Scene {
 
     private int nodeIndex, meshIndex;
 
+    public int vboVertexId, vboUVId;
     public boolean skyBox, skinned;
     public Node rootNode;
     public HashMap<String, BitmapBase> bitmaps;
@@ -36,11 +46,20 @@ public class Scene {
         }
     }
 
-    private ArrayList<Node> getAllNodes() {
+    public ArrayList<Node> getAllNodes() {
         ArrayList<Node> nodes = new ArrayList<>();
 
         getAllNodesRecursive(rootNode, nodes);
         return (nodes);
+    }
+
+    public Node findNodeByName(String name) {
+        for (Node node : getAllNodes()) {
+            if (node.name.equalsIgnoreCase(name)) {
+                return (node);
+            }
+        }
+        return (rootNode);
     }
 
     // convience routine to get all meshes from the tree
@@ -226,13 +245,38 @@ public class Scene {
         rootNode.meshes.add(new Mesh("cube", "bitmap", vertexes, normals, tangents, uvs, indexes));
     }
 
+    // find nearest node
+    public Node findNearestNode(RagPoint pnt) {
+        float dist, currentDist;
+        Node currentNode;
+
+        currentNode = null;
+        currentDist = 0.0f;
+
+        for (Node node : getAllNodes()) {
+            dist = node.pnt.distance(pnt);
+            if (currentNode == null) {
+                currentDist = dist;
+                currentNode = node;
+            } else {
+                if (dist < currentDist) {
+                    currentDist = dist;
+                    currentNode = node;
+                }
+            }
+        }
+
+        return ((currentNode == null) ? rootNode : currentNode);
+    }
+
+
     // create joints and weights for each vertexes
     // we need to create a flat list of nodes here so we can reach them
     // by index, which is what is in the joints x/y/z/w floats
     public void createJointsAndWeights() {
-        //    for (Mesh mesh : meshes) {
-        //        mesh.createJointsAndWeights(skeleton);
-        //    }
+        for (Mesh mesh : getAllMeshes()) {
+            mesh.createJointsAndWeights(this);
+        }
     }
 
     // traverse the nodes to build an absolute position for
@@ -257,7 +301,6 @@ public class Scene {
 
         createNodesAbsolutePositionRecursive(rootNode, pnt);
     }
-
 
     // traverse the tree to give every node and every mesh a index
     // gltf's refer to nodes and meshes this way
@@ -308,4 +351,42 @@ public class Scene {
         throw new RuntimeException("Something is wrong with mesh list");
     }
 
+    // gl buffers for drawing skeletons
+    public void setupGLBuffersForSkeletonDrawing() {
+        int nodeCount, vboVertexId, vboUVId;
+        FloatBuffer vertexBuf, uvBuf;
+        ArrayList<Node> nodes;
+
+        nodes = getAllNodes();
+        nodeCount = nodes.size();
+
+        // build the vertex and fake uv (so we can re-use the shader)
+        // for all the bones and lines
+        vertexBuf = MemoryUtil.memAllocFloat(nodeCount * 3);
+        uvBuf = MemoryUtil.memAllocFloat(nodeCount * 2); // fake, just so shader works
+
+        for (Node node : nodes) {
+            vertexBuf.put(node.absolutePnt.x).put(node.absolutePnt.y).put(node.absolutePnt.z);
+            uvBuf.put(0.0f).put(0.0f);
+        }
+
+        vertexBuf.flip();
+        uvBuf.flip();
+
+        vboVertexId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboVertexId);
+        glBufferData(GL_ARRAY_BUFFER, vertexBuf, GL_STATIC_DRAW);
+        memFree(vertexBuf);
+
+        vboUVId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboUVId);
+        glBufferData(GL_ARRAY_BUFFER, uvBuf, GL_STATIC_DRAW);
+        memFree(uvBuf);
+    }
+
+    // release buffers for opengl drawing
+    public void releaseGLBuffersForSkeletonDrawing() {
+        glDeleteBuffers(vboVertexId);
+        glDeleteBuffers(vboUVId);
+    }
 }

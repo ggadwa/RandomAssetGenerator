@@ -1,7 +1,6 @@
 package com.klinksoftware.rag.scene;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.skeleton.Skeleton;
 import com.klinksoftware.rag.utility.*;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -340,24 +339,26 @@ public class Mesh
         }
     }
 
-    // finds the closest bone and makes that the only connected
-    // bone, weight at 100%.  Note that this will need to be updated
-    // in the future to find more bones to make better skinning animations
-    public void createJointsAndWeights(Skeleton skeleton) {
-        int n, idx, boneIdx, vertexCount;
+    // finds the closest node and makes that the only connected
+    // node, weight at 100%.  Note that this will need to be updated
+    // in the future to find more node to make better skinning animations
+    // this can only be run after the indexes are created on the nodes
+    public void createJointsAndWeights(Scene scene) {
+        int n, idx, vertexCount;
+        Node node;
         RagPoint pnt = new RagPoint(0.0f, 0.0f, 0.0f);
 
         vertexCount = vertexes.length / 3;
 
         idx = 0;
-        joints = new float[vertexCount * 4]; // 4 point vector, 4 possible bone connections
-        weights = new float[vertexCount * 4]; // same as above, 1 weight for every 1 bone connection
+        joints = new float[vertexCount * 4]; // 4 point vector, 4 possible node connections
+        weights = new float[vertexCount * 4]; // same as above, 1 weight for every 1 node connection
 
         for (n = 0; n < vertexCount; n += 3) {
             pnt.setFromValues(vertexes[n], vertexes[n + 1], vertexes[n + 2]);
-            boneIdx = skeleton.findNearestBone(pnt);
+            node = scene.findNearestNode(pnt);
 
-            joints[idx] = (float) boneIdx;
+            joints[idx] = (float) node.index;
             joints[idx + 1] = 0.0f;
             joints[idx + 2] = 0.0f;
             joints[idx + 3] = 0.0f;
@@ -414,7 +415,7 @@ public class Mesh
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         // create the model matrix
-        modelMatrix.setTranslationFromPoint(node.pnt);
+        modelMatrix.setTranslationFromPoint(node.absolutePnt);
 
         // setup the bounds for culling
         setGlobalBounds(node.pnt);

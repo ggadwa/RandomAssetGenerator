@@ -4,9 +4,10 @@ import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.MapBuilder;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.MeshUtility;
+import com.klinksoftware.rag.utility.RagPoint;
 
 @ModelInterface
-public class ModelDesk extends ModelBase {
+public class ModelPC extends ModelBase {
 
     private Mesh deskMesh, standMesh, drawerMesh;
 
@@ -71,52 +72,27 @@ public class ModelDesk extends ModelBase {
 
     @Override
     public void buildMeshes() {
-        float deskLength, deskDepth, deskTopMargin, deskTopHeight;
-        float deskLegWidth, deskLegHeight, deskStandOffset;
-        float deskHalfLength, deskHalfDepth;
+        float y, monitorWidth;
+        float standWid, standHalfWid, standHigh;
+        RagPoint rotAngle;
 
-        addBitmap("desk", new String[]{"Metal", "MetalPlank", "WoodPanel"});
-        addBitmap("stand", new String[]{"Metal", "MetalPlank", "WoodPanel"});
-        addBitmap("drawer", new String[]{"Metal", "WoodPanel"});
+        addBitmap("monitor", new String[]{"Monitor"});
+        addBitmap("case", new String[]{"Metal", "MetalPlank"});
 
-        // sizes
-        deskLength = MapBuilder.SEGMENT_SIZE * (0.6f + AppWindow.random.nextFloat(0.4f));
-        deskHalfLength = deskLength * 0.5f;
-        deskStandOffset = 0.3f + AppWindow.random.nextFloat(0.2f);
-        deskDepth = deskLength * (0.3f + AppWindow.random.nextFloat(0.3f));
-        deskHalfDepth = deskDepth * 0.5f;
-        deskTopMargin = deskDepth * (0.05f + AppWindow.random.nextFloat(0.05f));
-        deskTopHeight = MapBuilder.FLOOR_HEIGHT * (0.1f + AppWindow.random.nextFloat(0.2f));
-        deskLegHeight = MapBuilder.SEGMENT_SIZE * (0.2f + AppWindow.random.nextFloat(0.2f));
-        deskLegWidth = deskDepth * (0.05f + AppWindow.random.nextFloat(0.05f));
+        // monitor
+        standWid = MapBuilder.SEGMENT_SIZE * (0.051f + AppWindow.random.nextFloat(0.05f));
+        standHalfWid = standWid * 0.5f;
+        standHigh = MapBuilder.SEGMENT_SIZE * (0.1f + AppWindow.random.nextFloat(0.1f));
+        monitorWidth = MapBuilder.SEGMENT_SIZE * (0.6f + AppWindow.random.nextFloat(0.4f));
 
-        // the desk
-        deskMesh = MeshUtility.createCube("desk", -deskHalfLength, deskHalfLength, deskLegHeight, (deskLegHeight + deskTopHeight), -deskHalfDepth, deskHalfDepth, true, true, true, true, true, true, false, MeshUtility.UV_MAP);
+        y = 0.0f;
 
-        drawerMesh = null;
-        standMesh = null;
+        rotAngle = new RagPoint(0.0f, (160.0f + AppWindow.random.nextFloat(40.0f)), 0.0f);
+        scene.rootNode.meshes.add(MeshUtility.createCubeRotated("case", -standHalfWid, standHalfWid, y, (y + standHigh), -standHalfWid, standHalfWid, rotAngle, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
 
-        if (AppWindow.random.nextBoolean()) {
-            addSideStand(-(deskHalfLength - deskTopMargin), -(deskHalfLength * deskStandOffset), deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
-        } else {
-            addSideLegs(-(deskHalfLength - deskTopMargin), deskLegWidth, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
-        }
-        if (AppWindow.random.nextBoolean()) {
-            addSideStand((deskHalfLength * deskStandOffset), (deskHalfLength - deskTopMargin), deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
-        } else {
-            addSideLegs((deskHalfLength - (deskTopMargin + deskLegWidth)), deskLegWidth, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
-        }
-
-        if (AppWindow.random.nextBoolean()) {
-            deskMesh.combine(MeshUtility.createCube("desk", -(deskHalfLength - deskTopMargin), (deskHalfLength - deskTopMargin), 0.0f, deskLegHeight, -deskHalfDepth, -(deskHalfDepth - deskTopMargin), true, true, true, true, false, true, false, MeshUtility.UV_MAP));
-        }
-
-        scene.rootNode.meshes.add(deskMesh);
-        if (standMesh != null) {
-            scene.rootNode.meshes.add(standMesh);
-        }
-        if (drawerMesh != null) {
-            scene.rootNode.meshes.add(drawerMesh);
-        }
+        // the monitor
+        y += standHigh;
+        scene.rootNode.meshes.add(MeshUtility.createCubeRotated("monitor", -monitorWidth, monitorWidth, y, (y + ((monitorWidth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, false, false, true, false, false, false, false, MeshUtility.UV_WHOLE));
+        scene.rootNode.meshes.add(MeshUtility.createCubeRotated("case", -monitorWidth, monitorWidth, y, (y + ((monitorWidth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, true, true, false, true, true, true, false, MeshUtility.UV_MAP));
     }
 }

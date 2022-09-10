@@ -1,8 +1,9 @@
 package com.klinksoftware.rag.utility;
 
+import com.klinksoftware.rag.models.Limb;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.scene.Mesh;
-import com.klinksoftware.rag.skeleton.*;
+import com.klinksoftware.rag.scene.Scene;
 import com.klinksoftware.rag.utility.*;
 
 import java.util.*;
@@ -198,12 +199,11 @@ public class MeshModelUtility
             pnt.y=mesh.vertexes[vIdx+1];
             pnt.z=mesh.vertexes[vIdx+2];
 
-                // find closest bone
+            // find closest point
             d = pnt1.distance(pnt);
             d2 = pnt2.distance(pnt);
 
-                // get normal
-
+            // get normal
             pnt.subPoint((d < d2) ? pnt1 : pnt2);
             pnt.normalize();
 
@@ -214,17 +214,20 @@ public class MeshModelUtility
     }
 
     // build mesh around limb
-    public static Mesh buildMeshAroundBoneLimb(Limb limb, boolean organic) {
+    public static Mesh buildMeshAroundNodeLimb(Scene scene, Limb limb, boolean organic) {
         Mesh mesh;
 
-        // build the cylinder around the bones
+        // need absolute position for nodes
+        scene.createNodesAbsolutePosition();
+
+        // build the cylinder around the nodes
         if (organic) {
-            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, limb.node1.pnt, limb.node1.limbRadius, limb.node2.pnt, limb.node2.limbRadius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, limb.node1.absolutePnt, limb.node1.limbRadius, limb.node2.absolutePnt, limb.node2.limbRadius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
         } else {
-            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, limb.node1.pnt, limb.node1.limbRadius, limb.node2.pnt, limb.node2.limbRadius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, limb.node1.absolutePnt, limb.node1.limbRadius, limb.node2.absolutePnt, limb.node2.limbRadius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
         }
 
-        rebuildNormals(mesh, limb.node1.pnt, limb.node2.pnt);
+        rebuildNormals(mesh, limb.node1.absolutePnt, limb.node2.absolutePnt);
         mesh.clipFloorVertexes();
 
         return(mesh);

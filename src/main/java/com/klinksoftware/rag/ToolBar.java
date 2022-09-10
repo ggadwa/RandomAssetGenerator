@@ -14,7 +14,7 @@ import javax.swing.JToolBar;
 public class ToolBar extends JToolBar {
 
     private JToggleButton lightButton, flyButton;
-    private JToggleButton renderButton, colorButton, normalButton, MetallicRoughnessButton, emissiveButton;
+    private JToggleButton renderButton, colorButton, normalButton, MetallicRoughnessButton, emissiveButton, skeletonButton;
 
     public ToolBar() {
         ButtonGroup bg;
@@ -51,6 +51,9 @@ public class ToolBar extends JToolBar {
         });
         emissiveButton = addButton("tool_emissive", "Show Emissive Only", false, bg, (e) -> {
             AppWindow.walkView.setDisplayType(WalkView.WV_DISPLAY_EMISSIVE);
+        });
+        skeletonButton = addButton("tool_skeleton", "Show Skeleton Only", false, bg, (e) -> {
+            AppWindow.walkView.setDisplayType(WalkView.WV_DISPLAY_SKELETON);
         });
     }
 

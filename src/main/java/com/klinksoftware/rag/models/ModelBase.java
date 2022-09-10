@@ -3,9 +3,8 @@ package com.klinksoftware.rag.models;
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.bitmaps.BitmapBase;
 import com.klinksoftware.rag.export.Export;
-import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.scene.Scene;
-import com.klinksoftware.rag.skeleton.Limb;
+import com.klinksoftware.rag.utility.MeshModelUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 import java.util.ArrayList;
 
@@ -16,25 +15,6 @@ public class ModelBase {
     public int textureSize;
     public boolean bilateral;
     public float roughness;
-
-    // limb wrapping (for humanoid, etc models)
-    public void wrapLimbs(ArrayList<Limb> limbs, boolean organic) {
-        int n, meshIdx;
-        Limb limb;
-        Mesh mesh;
-
-        // wrap all the limbs with meshes
-        for (n = 0; n != limbs.size(); n++) {
-            limb = limbs.get(n);
-
-            // wrap the mesh
-            //mesh = MeshModelUtility.buildMeshAroundBoneLimb(skeleton, limb, organic);
-
-            // add mesh and attach to bone
-            //meshIdx = meshList.add(mesh);
-            //skeleton.setBoneMeshIndex(limb.bone1Idx, meshIdx);
-        }
-    }
 
     // bitmaps
     public void addBitmap(String name, String[] bitmapList) {
@@ -51,6 +31,14 @@ public class ModelBase {
             scene.bitmaps.put(name, bitmap);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    // limb wrapping (for humanoid, etc models)
+    // builds a mesh around two nodes and adds the mesh to first node of limb
+    public void wrapLimbs(ArrayList<Limb> limbs, boolean organic) {
+        for (Limb limb : limbs) {
+            limb.node1.meshes.add(MeshModelUtility.buildMeshAroundNodeLimb(scene, limb, organic));
         }
     }
 
@@ -122,7 +110,8 @@ public class ModelBase {
             scene.createJointsAndWeights();
 
             // default no animation joints
-            //skeleton.animation.createJointMatrixesFromBones();
+            scene.animation.createJointMatrixComponentsFromNodes();
+
             // run the internal animation build
             buildAnimations();
         }

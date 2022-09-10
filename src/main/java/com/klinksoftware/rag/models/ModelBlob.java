@@ -1,16 +1,14 @@
 package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.skeleton.Skeleton;
-import com.klinksoftware.rag.skeleton.SkeletonBuilder;
 
 @ModelInterface
 public class ModelBlob extends ModelBase {
 
-    public Skeleton skeleton;
-
     @Override
     public void buildMeshes() {
+        SkeletonBuilder skeletonBuilder;
+
         addBitmap("body", new String[]{"Fur", "Organic", "Scale"});
         addBitmap("leg", new String[]{"Fur", "Organic", "Scale"});
         addBitmap("arm", new String[]{"Fur", "Organic", "Scale"});
@@ -18,10 +16,14 @@ public class ModelBlob extends ModelBase {
         addBitmap("head", new String[]{"Fur", "Organic", "Scale"});
 
         // build the skeleton
-        skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_BLOB, bilateral);
+        skeletonBuilder = new SkeletonBuilder(scene);
+        skeletonBuilder.build(SkeletonBuilder.MODEL_TYPE_BLOB, bilateral);
 
         // build the meshes around the limbs
-        wrapLimbs(skeleton.limbs, true);
+        wrapLimbs(skeletonBuilder.limbs, true);
+
+        // snap vertexes
+        //scene.snapVertexes();
 
         // any randomization
         if (roughness != 0.0f) {

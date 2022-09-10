@@ -1,16 +1,14 @@
 package com.klinksoftware.rag.models;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.skeleton.Skeleton;
-import com.klinksoftware.rag.skeleton.SkeletonBuilder;
 
 @ModelInterface
 public class ModelHumanoid extends ModelBase {
 
-    public Skeleton skeleton;
-
     @Override
     public void buildMeshes() {
+        SkeletonBuilder skeletonBuilder;
+
         addBitmap("body", new String[]{"Fur", "Organic", "Scale"});
         addBitmap("leg", new String[]{"Fur", "Organic", "Scale"});
         addBitmap("foot", new String[]{"Fur", "Organic", "Scale"});
@@ -19,11 +17,14 @@ public class ModelHumanoid extends ModelBase {
         addBitmap("head", new String[]{"Fur", "Organic", "Scale"});
 
         // build the skeleton
-        skeleton = (new SkeletonBuilder()).build(SkeletonBuilder.MODEL_TYPE_HUMANOID, bilateral);
+        skeletonBuilder = new SkeletonBuilder(scene);
+        skeletonBuilder.build(SkeletonBuilder.MODEL_TYPE_HUMANOID, bilateral);
 
         // build the meshes around the limbs
-        wrapLimbs(skeleton.limbs, true);
+        wrapLimbs(skeletonBuilder.limbs, true);
 
+        // snap vertexes
+        //scene.snapVertexes();
         // any randomization
         if (roughness != 0.0f) {
             scene.randomizeVertexes(roughness, (0.025f + AppWindow.random.nextFloat(0.05f)));
@@ -35,7 +36,6 @@ public class ModelHumanoid extends ModelBase {
 
     @Override
     public void buildAnimations() {
-
     }
 
 }

@@ -8,10 +8,10 @@
 
 - bad map: 1662698717154
 
-- redo all the skeleton/limb stuff, and models that run with it
-- createJointsAndWeights from nodes, not bones
-- finally delete meshlist.java
-- finally delete skeleton and bone
+- get rid of createNodesAbsolutePosition, make a recursive routine to get that for each node (will need scene passed in)
+
+- need skeleton drawing
+- figure out what's wrong with skeleton builder
 
 - test model with and without skeleton exports
 
@@ -72,20 +72,18 @@ bitmaps
  - computer access panels have handles?
 
 model
- - get rid of monitor on desk
- - add: chair, dresser, storage tank, pc (can put on desk), bookcase (books?), electrical box
- - computer top can be random block on top, bottom can be randomly bigger than bank, rename "computerbank" maybe
+ - add: chair, bed, couch, dresser, storage tank, pc (can put on desk), bookcase (books?), electrical box
  - some models need to have flags for "on wall" or "on desk, table, etc"
  - robot model needs to be chunkier
+ - skeletons can build two heads
  - faces by meshes
  - animations
- - vertex snaps for humanoid, etc
+ - vertex snaps for humanoid, etc (find and implement: scene.snapVertexes)
  - finish junction
  - finish pipes
  - table: bars on legs
  - lab tube: extra pipes, maybe base, maybe control unit
  - humanoid / etc - more items (spikes, etc.)
- - oil tank
 
 all
  - need to export tangents

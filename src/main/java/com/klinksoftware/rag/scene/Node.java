@@ -29,4 +29,17 @@ public class Node {
         limbRadius = 0.0f; // for limb building in models
     }
 
+    // this version is for the skeleton builder, which attaches
+    // a radius for limb building
+    public Node(String name, float limbRadius, RagPoint pnt) {
+        this.name = name;
+        this.pnt = pnt.copy();
+
+        childNodes = new ArrayList<>();
+        meshes = new ArrayList<>();
+
+        absolutePnt = null;
+        limbRadius = limbRadius;
+    }
+
 }

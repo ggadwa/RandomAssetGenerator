@@ -24,6 +24,7 @@ public class WalkView extends AWTGLCanvas {
     public static final int WV_DISPLAY_NORMAL = 2;
     public static final int WV_DISPLAY_METALLIC_ROUGHNESS = 3;
     public static final int WV_DISPLAY_EMISSIVE = 4;
+    public static final int WV_DISPLAY_SKELETON = 5;
 
     private static final float RAG_NEAR_Z=1.0f;
     private static final float RAG_FAR_Z = 1000.0f;
@@ -36,7 +37,7 @@ public class WalkView extends AWTGLCanvas {
     private int vertexShaderId,fragmentShaderId,programId;
     private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
     private int perspectiveMatrixUniformId, viewMatrixUniformId, modelMatrixUniformId, lightPositionIntensityUniformId;
-    private int skinnedUniformId, displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId;
+    private int skinnedUniformId, displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId, baseColorUniformId;
     private int displayType;
     private long nextPaintTick;
     private float aspectRatio;
@@ -204,6 +205,8 @@ public class WalkView extends AWTGLCanvas {
         hasEmissiveUniformId = glGetUniformLocation(programId, "hasEmissive");
         emissiveFactorUniformId = glGetUniformLocation(programId, "emissiveFactor");
 
+        baseColorUniformId = glGetUniformLocation(programId, "baseColor");
+
         vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
         vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
         vertexNormalAttribute=glGetAttribLocation(programId,"vertexNormal");
@@ -303,6 +306,7 @@ public class WalkView extends AWTGLCanvas {
         // remove old scene meshes
         if (scene != null) {
             scene.releaseGLBuffersForAllMeshes();
+            scene.releaseGLBuffersForSkeletonDrawing();
         }
 
         // remove old textures
@@ -312,8 +316,14 @@ public class WalkView extends AWTGLCanvas {
             }
         }
 
-        // setup the new mesh
+        // setup the scene.  We need absolute points for
+        // either creating the skinning joint matrixes or
+        // the regular model matrixes for stuff without joints
+        // we also setup all the gl buffers for the meshes
+        // and the special one for skeleton drawing
+        incommingScene.createNodesAbsolutePosition();
         incommingScene.setupGLBuffersForAllMeshes();
+        incommingScene.setupGLBuffersForSkeletonDrawing();
 
         textures = new HashMap<>();
         for (String bitmapName : incommingScene.bitmaps.keySet()) {
@@ -637,6 +647,47 @@ public class WalkView extends AWTGLCanvas {
     }
 
     //
+    // draw regular scene
+    //
+    private void drawRegularScene(long tick) {
+        // draw the opaque meshes
+        lastUsedTexture = null;
+        drawOpaqueNodeRecursive(scene.rootNode, tick);
+
+        // add transparent trigs to sortable array
+        trigSort.clearTrigs();
+        buildTransparentNodeRecursive(scene.rootNode);
+        drawSortedTransparentTrigs(tick);
+    }
+
+    //
+    // draw skeleton scene
+    //
+    private void drawSkeletonScene() {
+        int nodeCount;
+        FloatBuffer buf;
+
+        nodeCount = scene.getNodeCount();
+
+        // bind the scene based skeleton node data
+        glBindBuffer(GL_ARRAY_BUFFER, scene.vboVertexId);
+        glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, scene.vboUVId);
+        glVertexAttribPointer(vertexPositionAttribute, 2, GL_FLOAT, false, 0, 0);
+
+        // the bone points, these draw in yellow points
+        try ( MemoryStack stack = stackPush()) {
+            buf = stack.mallocFloat(3);
+            buf.put(1.0f).put(0.8f).put(0.0f).flip();
+            glUniform4fv(baseColorUniformId, buf);
+        }
+
+        glPointSize(5.0f);
+        glDrawArrays(GL_POINTS, 0, nodeCount);
+    }
+
+    //
     // draw the scene
     //
     @Override
@@ -681,15 +732,15 @@ public class WalkView extends AWTGLCanvas {
         // the drawing matrixes
         glUseProgram(programId);
 
-        try (MemoryStack stack = stackPush()) {
-            perspectiveMatrix.setPerspectiveMatrix(RAG_FOV,aspectRatio,RAG_NEAR_Z,RAG_FAR_Z);
+        try ( MemoryStack stack = stackPush()) {
+            perspectiveMatrix.setPerspectiveMatrix(RAG_FOV, aspectRatio, RAG_NEAR_Z, RAG_FAR_Z);
             viewMatrix.setLookAtMatrix(eyePoint, cameraPoint, lookAtUpVector);
 
-            buf=stack.mallocFloat(16);
+            buf = stack.mallocFloat(16);
             buf.put(perspectiveMatrix.data).flip();
-            glUniformMatrix4fv(perspectiveMatrixUniformId,false,buf);
+            glUniformMatrix4fv(perspectiveMatrixUniformId, false, buf);
 
-            buf=stack.mallocFloat(16);
+            buf = stack.mallocFloat(16);
             buf.put(viewMatrix.data).flip();
             glUniformMatrix4fv(viewMatrixUniformId, false, buf);
 
@@ -700,7 +751,7 @@ public class WalkView extends AWTGLCanvas {
             } else {
                 convertToEyeCoordinates(cameraPoint, lightEyePoint);
             }
-            buf=stack.mallocFloat(4);
+            buf = stack.mallocFloat(4);
             buf.put(lightEyePoint.x).put(lightEyePoint.y).put(lightEyePoint.z).put(currentLightIntensity).flip();
             glUniform4fv(lightPositionIntensityUniformId, buf);
 
@@ -710,18 +761,17 @@ public class WalkView extends AWTGLCanvas {
         // setup culling frustum
         setupCullingFrustum();
 
-        // draw the opaque meshes
-        lastUsedTexture = null;
-        drawOpaqueNodeRecursive(scene.rootNode, tick);
+        // draw
+        if (displayType != WV_DISPLAY_SKELETON) {
+            drawRegularScene(tick);
+        } else {
+            drawSkeletonScene();
+        }
 
-        // add transparent trigs to sortable array
-        trigSort.clearTrigs();
-        buildTransparentNodeRecursive(scene.rootNode);
-        drawSortedTransparentTrigs(tick);
+        // clean up any binds and stop program
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
-        // shutdown drawing
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-        glBindTexture(GL_TEXTURE_2D,0);
         glUseProgram(0);
 
         // swap the buffers
