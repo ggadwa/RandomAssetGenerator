@@ -8,10 +8,7 @@
 
 - bad map: 1662698717154
 
-- get rid of createNodesAbsolutePosition, make a recursive routine to get that for each node (will need scene passed in)
 
-- need skeleton drawing
-- figure out what's wrong with skeleton builder
 
 - test model with and without skeleton exports
 

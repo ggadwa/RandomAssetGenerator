@@ -111,12 +111,12 @@ public class ModelDesk extends ModelBase {
             deskMesh.combine(MeshUtility.createCube("desk", -(deskHalfLength - deskTopMargin), (deskHalfLength - deskTopMargin), 0.0f, deskLegHeight, -deskHalfDepth, -(deskHalfDepth - deskTopMargin), true, true, true, true, false, true, false, MeshUtility.UV_MAP));
         }
 
-        scene.rootNode.meshes.add(deskMesh);
+        scene.rootNode.addMesh(deskMesh);
         if (standMesh != null) {
-            scene.rootNode.meshes.add(standMesh);
+            scene.rootNode.addMesh(standMesh);
         }
         if (drawerMesh != null) {
-            scene.rootNode.meshes.add(drawerMesh);
+            scene.rootNode.addMesh(drawerMesh);
         }
     }
 }

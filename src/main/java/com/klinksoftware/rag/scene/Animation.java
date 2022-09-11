@@ -20,9 +20,6 @@ public class Animation {
         Node node;
         RagMatrix4f inverseBindMatrix;
 
-        // get the absolute position for all the nodes
-        scene.createNodesAbsolutePosition();
-
         // create the needed matrixes to do the animation
         nodeCount = scene.getNodeCount();
 
@@ -34,7 +31,7 @@ public class Animation {
             // the inverse bind matrix puts a vertex back into
             // the local space of the joint
             inverseBindMatrix = new RagMatrix4f();
-            inverseBindMatrix.setNegativeTranslationFromPoint(node.absolutePnt);
+            inverseBindMatrix.setNegativeTranslationFromPoint(node.getAbsolutePoint());
             inverseBindMatrixes.add(inverseBindMatrix);
 
         }

@@ -38,7 +38,7 @@ public class ModelBase {
     // builds a mesh around two nodes and adds the mesh to first node of limb
     public void wrapLimbs(ArrayList<Limb> limbs, boolean organic) {
         for (Limb limb : limbs) {
-            limb.node1.meshes.add(MeshModelUtility.buildMeshAroundNodeLimb(scene, limb, organic));
+            limb.node1.addMesh(MeshModelUtility.buildMeshAroundNodeLimb(scene, limb, organic));
         }
     }
 

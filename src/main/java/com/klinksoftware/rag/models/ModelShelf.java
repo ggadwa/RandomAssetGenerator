@@ -147,10 +147,10 @@ public class ModelShelf extends ModelBase {
         }
 
         if (shelfMesh != null) {
-            scene.rootNode.meshes.add(shelfMesh);
+            scene.rootNode.addMesh(shelfMesh);
         }
         if (boxMesh != null) {
-            scene.rootNode.meshes.add(boxMesh);
+            scene.rootNode.addMesh(boxMesh);
         }
     }
 }

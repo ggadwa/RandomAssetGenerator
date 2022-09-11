@@ -38,18 +38,18 @@ public class WalkView extends AWTGLCanvas {
     private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
     private int perspectiveMatrixUniformId, viewMatrixUniformId, modelMatrixUniformId, lightPositionIntensityUniformId;
     private int skinnedUniformId, displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId, baseColorUniformId;
-    private int displayType;
+    private int displayType, skeletonLineCount;
     private long nextPaintTick;
     private float aspectRatio;
     public float cameraRotateDistance;
     private float cameraRotateOffsetY;
     private float currentLightIntensity;
-    private boolean cameraCenterRotate, noClear;
+    private boolean cameraCenterRotate;
     private Scene scene, incommingScene;
     private WalkViewTexture lastUsedTexture;
     public RagPoint cameraAngle;
     public RagPoint eyePoint, cameraPoint, lightEyePoint, lookAtUpVector, fixedLightPoint;
-    private RagMatrix4f perspectiveMatrix, viewMatrix, rotMatrix, rotMatrix2;
+    private RagMatrix4f perspectiveMatrix, viewMatrix, rotMatrix, rotMatrix2, skeletonModelMatrix;
     private float[] clipPlane;
     private RagPlane frustumLeftPlane, frustumRightPlane, frustumTopPlane, frustumBottomPlane, frustumNearPlane, frustumFarPlane;
     private HashMap<String, WalkViewTexture> textures;
@@ -103,6 +103,7 @@ public class WalkView extends AWTGLCanvas {
         viewMatrix = new RagMatrix4f();
         rotMatrix=new RagMatrix4f();
         rotMatrix2 = new RagMatrix4f();
+        skeletonModelMatrix = new RagMatrix4f();
 
         clipPlane = new float[16];
         frustumLeftPlane = new RagPlane(0.0f, 0.0f, 0.0f, 0.0f);
@@ -121,14 +122,14 @@ public class WalkView extends AWTGLCanvas {
 
         displayType = WV_DISPLAY_RENDER;
 
-        noClear = false;
-
         cameraCenterRotate = false;
         cameraRotateDistance=0.0f;
         cameraRotateOffsetY = 0.0f;
         fixedLightPoint = null;
 
         currentLightIntensity = RAG_LIGHT_LOW_INTENSITY;
+
+        skeletonLineCount = 0;
 
         // start opengl
         createCapabilities();
@@ -316,14 +317,10 @@ public class WalkView extends AWTGLCanvas {
             }
         }
 
-        // setup the scene.  We need absolute points for
-        // either creating the skinning joint matrixes or
-        // the regular model matrixes for stuff without joints
-        // we also setup all the gl buffers for the meshes
+        // setup the scene, we setup all the gl buffers for the meshes
         // and the special one for skeleton drawing
-        incommingScene.createNodesAbsolutePosition();
         incommingScene.setupGLBuffersForAllMeshes();
-        incommingScene.setupGLBuffersForSkeletonDrawing();
+        skeletonLineCount = incommingScene.setupGLBuffersForSkeletonDrawing();
 
         textures = new HashMap<>();
         for (String bitmapName : incommingScene.bitmaps.keySet()) {
@@ -332,9 +329,6 @@ public class WalkView extends AWTGLCanvas {
 
         // unbind any textures
         glBindTexture(GL_TEXTURE_2D, 0);
-
-        // set noClear
-        noClear = incommingScene.skyBox;
 
         // setup the collision data
         physics.setupCollision(incommingScene);
@@ -669,22 +663,36 @@ public class WalkView extends AWTGLCanvas {
 
         nodeCount = scene.getNodeCount();
 
+        try ( MemoryStack stack = stackPush()) {
+            buf = stack.mallocFloat(16);
+            buf.put(skeletonModelMatrix.data).flip(); // the identity
+            glUniformMatrix4fv(modelMatrixUniformId, false, buf);
+        }
+
         // bind the scene based skeleton node data
         glBindBuffer(GL_ARRAY_BUFFER, scene.vboVertexId);
         glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, scene.vboUVId);
-        glVertexAttribPointer(vertexPositionAttribute, 2, GL_FLOAT, false, 0, 0);
+        // the line points, these draw in green
+        try ( MemoryStack stack = stackPush()) {
+            buf = stack.mallocFloat(3);
+            buf.put(0.0f).put(1.0f).put(0.0f).flip();
+            glUniform3fv(baseColorUniformId, buf);
+        }
 
-        // the bone points, these draw in yellow points
+        glLineWidth(2.0f);
+        glDrawArrays(GL_LINES, 0, (skeletonLineCount * 2));
+
+        // the bone points, these draw in yellow
         try ( MemoryStack stack = stackPush()) {
             buf = stack.mallocFloat(3);
             buf.put(1.0f).put(0.8f).put(0.0f).flip();
-            glUniform4fv(baseColorUniformId, buf);
+            glUniform3fv(baseColorUniformId, buf);
         }
 
-        glPointSize(5.0f);
-        glDrawArrays(GL_POINTS, 0, nodeCount);
+        glPointSize(10.0f);
+        glDrawArrays(GL_POINTS, (skeletonLineCount * 2), nodeCount);
+        glPointSize(1.0f);
     }
 
     //
@@ -726,7 +734,7 @@ public class WalkView extends AWTGLCanvas {
         }
 
         // clear
-        glClear(noClear ? GL_DEPTH_BUFFER_BIT : GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(((scene.skyBox) && (displayType != this.WV_DISPLAY_SKELETON)) ? GL_DEPTH_BUFFER_BIT : GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // start the program and setup
         // the drawing matrixes

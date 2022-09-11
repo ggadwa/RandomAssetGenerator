@@ -88,11 +88,11 @@ public class ModelPC extends ModelBase {
         y = 0.0f;
 
         rotAngle = new RagPoint(0.0f, (160.0f + AppWindow.random.nextFloat(40.0f)), 0.0f);
-        scene.rootNode.meshes.add(MeshUtility.createCubeRotated("case", -standHalfWid, standHalfWid, y, (y + standHigh), -standHalfWid, standHalfWid, rotAngle, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
+        scene.rootNode.addMesh(MeshUtility.createCubeRotated("case", -standHalfWid, standHalfWid, y, (y + standHigh), -standHalfWid, standHalfWid, rotAngle, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
 
         // the monitor
         y += standHigh;
-        scene.rootNode.meshes.add(MeshUtility.createCubeRotated("monitor", -monitorWidth, monitorWidth, y, (y + ((monitorWidth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, false, false, true, false, false, false, false, MeshUtility.UV_WHOLE));
-        scene.rootNode.meshes.add(MeshUtility.createCubeRotated("case", -monitorWidth, monitorWidth, y, (y + ((monitorWidth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, true, true, false, true, true, true, false, MeshUtility.UV_MAP));
+        scene.rootNode.addMesh(MeshUtility.createCubeRotated("monitor", -monitorWidth, monitorWidth, y, (y + ((monitorWidth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, false, false, true, false, false, false, false, MeshUtility.UV_WHOLE));
+        scene.rootNode.addMesh(MeshUtility.createCubeRotated("case", -monitorWidth, monitorWidth, y, (y + ((monitorWidth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, true, true, false, true, true, true, false, MeshUtility.UV_MAP));
     }
 }

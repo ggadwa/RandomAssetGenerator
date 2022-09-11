@@ -22,7 +22,7 @@ public class Scene {
 
     private int nodeIndex, meshIndex;
 
-    public int vboVertexId, vboUVId;
+    public int vboVertexId;
     public boolean skyBox, skinned;
     public Node rootNode;
     public HashMap<String, BitmapBase> bitmaps;
@@ -78,7 +78,7 @@ public class Scene {
         return (meshes);
     }
 
-    // gets the min max of all vertexes in the scene
+    // gets the min max of all absolute nodes in the scene
     public void getMixMaxVertex(RagPoint minPnt, RagPoint maxPnt) {
         RagPoint meshMin, meshMax;
 
@@ -241,8 +241,8 @@ public class Scene {
         uvs = MeshUtility.floatArrayListToFloat(uvArray);
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
-        rootNode.meshes.clear();
-        rootNode.meshes.add(new Mesh("cube", "bitmap", vertexes, normals, tangents, uvs, indexes));
+        rootNode.clearMeshes();
+        rootNode.addMesh(new Mesh("cube", "bitmap", vertexes, normals, tangents, uvs, indexes));
     }
 
     // find nearest node
@@ -277,29 +277,6 @@ public class Scene {
         for (Mesh mesh : getAllMeshes()) {
             mesh.createJointsAndWeights(this);
         }
-    }
-
-    // traverse the nodes to build an absolute position for
-    // each node, normally used to make default animation joint matrixes
-    private void createNodesAbsolutePositionRecursive(Node node, RagPoint pnt) {
-        RagPoint nextPnt;
-
-        nextPnt = pnt.copy();
-        nextPnt.addPoint(node.pnt);
-
-        node.absolutePnt = nextPnt.copy();
-
-        for (Node childNode : node.childNodes) {
-            createNodesAbsolutePositionRecursive(childNode, nextPnt);
-        }
-    }
-
-    public void createNodesAbsolutePosition() {
-        RagPoint pnt;
-
-        pnt = new RagPoint(0.0f, 0.0f, 0.0f);
-
-        createNodesAbsolutePositionRecursive(rootNode, pnt);
     }
 
     // traverse the tree to give every node and every mesh a index
@@ -352,41 +329,56 @@ public class Scene {
     }
 
     // gl buffers for drawing skeletons
-    public void setupGLBuffersForSkeletonDrawing() {
-        int nodeCount, vboVertexId, vboUVId;
-        FloatBuffer vertexBuf, uvBuf;
+    public int setupGLBuffersForSkeletonDrawing() {
+        int nodeCount, lineCount;
+        RagPoint absPnt, absPnt2;
+        FloatBuffer vertexBuf;
         ArrayList<Node> nodes;
 
         nodes = getAllNodes();
         nodeCount = nodes.size();
 
-        // build the vertex and fake uv (so we can re-use the shader)
-        // for all the bones and lines
-        vertexBuf = MemoryUtil.memAllocFloat(nodeCount * 3);
-        uvBuf = MemoryUtil.memAllocFloat(nodeCount * 2); // fake, just so shader works
+        // count the # of lines we will need
+        lineCount = 0;
 
         for (Node node : nodes) {
-            vertexBuf.put(node.absolutePnt.x).put(node.absolutePnt.y).put(node.absolutePnt.z);
-            uvBuf.put(0.0f).put(0.0f);
+            lineCount += node.childNodes.size();
         }
 
+        // memory for vertexes
+        vertexBuf = MemoryUtil.memAllocFloat(((lineCount * 2) + nodeCount) * 3);
+
+        // vertexes for lines
+        for (Node node : nodes) {
+            absPnt = node.getAbsolutePoint();
+
+            for (Node node2 : node.childNodes) {
+                vertexBuf.put(absPnt.x).put(absPnt.y).put(absPnt.z);
+
+                absPnt2 = node2.getAbsolutePoint();
+                vertexBuf.put(absPnt2.x).put(absPnt2.y).put(absPnt2.z);
+            }
+        }
+
+        // vertexes for bones
+        for (Node node : nodes) {
+            absPnt = node.getAbsolutePoint();
+            vertexBuf.put(absPnt.x).put(absPnt.y).put(absPnt.z);
+        }
+
+        // put it in gl buffer
         vertexBuf.flip();
-        uvBuf.flip();
 
         vboVertexId = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboVertexId);
         glBufferData(GL_ARRAY_BUFFER, vertexBuf, GL_STATIC_DRAW);
         memFree(vertexBuf);
 
-        vboUVId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboUVId);
-        glBufferData(GL_ARRAY_BUFFER, uvBuf, GL_STATIC_DRAW);
-        memFree(uvBuf);
+        return (lineCount);
     }
 
     // release buffers for opengl drawing
     public void releaseGLBuffersForSkeletonDrawing() {
         glDeleteBuffers(vboVertexId);
-        glDeleteBuffers(vboUVId);
     }
 }

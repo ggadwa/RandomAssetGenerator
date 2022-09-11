@@ -80,12 +80,12 @@ public class ModelPillar extends ModelBase {
             botRadius *= botBaseGrow;
         }
 
-        scene.rootNode.meshes.add(mesh);
+        scene.rootNode.addMesh(mesh);
 
         // middle
         radius = Math.min(topRadius, botRadius) * (0.7f + AppWindow.random.nextFloat(0.1f));
 
         mesh = MeshUtility.createCylinder("pillar", columnSideCount, centerPnt, pillarTy, pillarBy, cylinderSegments, radius, false, false);
-        scene.rootNode.meshes.add(mesh);
+        scene.rootNode.addMesh(mesh);
     }
 }

@@ -190,7 +190,7 @@ public class MapPlatform {
         uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
-        room.node.meshes.add(new Mesh(("platform_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
+        room.node.addMesh(new Mesh(("platform_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
     }
 
         //

@@ -76,6 +76,6 @@ public class ModelStorage extends ModelBase {
             }
         }
 
-        scene.rootNode.meshes.add(mesh);
+        scene.rootNode.addMesh(mesh);
     }
 }

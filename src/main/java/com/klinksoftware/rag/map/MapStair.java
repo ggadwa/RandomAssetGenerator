@@ -27,20 +27,20 @@ public class MapStair {
 
         switch (dir) {
             case MeshMapUtility.STAIR_DIR_POS_Z:
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_Z:
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 break;
             case MeshMapUtility.STAIR_DIR_POS_X:
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_X:
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 break;
         }
     }
@@ -55,28 +55,28 @@ public class MapStair {
 
         switch (dir) {
             case MeshMapUtility.STAIR_DIR_POS_Z:
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty2, sz, (sz + MapBuilder.SEGMENT_SIZE), true, true, true, false, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty2, sz, (sz + MapBuilder.SEGMENT_SIZE), true, true, true, false, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty2, sz, (sz + MapBuilder.SEGMENT_SIZE), true, true, true, false, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty2, sz, (sz + MapBuilder.SEGMENT_SIZE), true, true, true, false, true, false, false, MeshUtility.UV_MAP));
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_Z:
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, sz, (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty2, sz, (sz + MapBuilder.SEGMENT_SIZE), true, true, false, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, sz, (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty2, sz, (sz + MapBuilder.SEGMENT_SIZE), true, true, false, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, sz, (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty2, sz, (sz + MapBuilder.SEGMENT_SIZE), true, true, false, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, sz, (sz - MapBuilder.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty2, sz, (sz + MapBuilder.SEGMENT_SIZE), true, true, false, true, true, false, false, MeshUtility.UV_MAP));
                 break;
             case MeshMapUtility.STAIR_DIR_POS_X:
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), sx, sy, ty2, (sz - MapBuilder.FLOOR_HEIGHT), sz, false, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, sx, (sx + MapBuilder.SEGMENT_SIZE), sy, ty2, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, false, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), sx, sy, ty2, (sz - MapBuilder.FLOOR_HEIGHT), sz, false, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, sx, (sx + MapBuilder.SEGMENT_SIZE), sy, ty2, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, false, true, true, true, false, false, MeshUtility.UV_MAP));
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_X:
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, sx, (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), sx, sy, ty2, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, false, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, sx, (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, sx, (sx + MapBuilder.SEGMENT_SIZE), sy, ty2, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), false, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, sx, (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), sx, sy, ty2, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, false, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, sx, (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, sx, (sx + MapBuilder.SEGMENT_SIZE), sy, ty2, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), false, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 break;
         }
     }
@@ -92,28 +92,28 @@ public class MapStair {
 
         switch (dir) {
             case MeshMapUtility.STAIR_DIR_POS_Z:
-                room.node.meshes.add(MeshUtility.createRamp(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), ty, sz, MeshUtility.RAMP_DIR_POS_Z, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, false, true, true, false, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createRamp(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ty, sz, MeshUtility.RAMP_DIR_POS_Z, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), false, true, true, true, false, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createRamp(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), ty, sz, MeshUtility.RAMP_DIR_POS_Z, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), true, false, true, true, false, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createRamp(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ty, sz, MeshUtility.RAMP_DIR_POS_Z, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, sz, (sz + (MapBuilder.SEGMENT_SIZE * 2)), false, true, true, true, false, false, false, MeshUtility.UV_MAP));
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_Z:
-                room.node.meshes.add(MeshUtility.createRamp(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), ty, (sz - MapBuilder.SEGMENT_SIZE), MeshUtility.RAMP_DIR_NEG_Z, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, false, true, true, false, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createRamp(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ty, (sz - MapBuilder.SEGMENT_SIZE), MeshUtility.RAMP_DIR_NEG_Z, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), false, true, true, true, false, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createRamp(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), ty, (sz - MapBuilder.SEGMENT_SIZE), MeshUtility.RAMP_DIR_NEG_Z, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx - MapBuilder.FLOOR_HEIGHT), sx, sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), true, false, true, true, false, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createRamp(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ty, (sz - MapBuilder.SEGMENT_SIZE), MeshUtility.RAMP_DIR_NEG_Z, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), ((sx + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), (sz - MapBuilder.SEGMENT_SIZE), false, true, true, true, false, false, false, MeshUtility.UV_MAP));
                 break;
             case MeshMapUtility.STAIR_DIR_POS_X:
-                room.node.meshes.add(MeshUtility.createRamp(bitmapName, sx, ty, (sz - MapBuilder.FLOOR_HEIGHT), MeshUtility.RAMP_DIR_POS_X, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, false, false, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createRamp(bitmapName, sx, ty, (sz + MapBuilder.SEGMENT_SIZE), MeshUtility.RAMP_DIR_POS_X, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, false, true, false, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createRamp(bitmapName, sx, ty, (sz - MapBuilder.FLOOR_HEIGHT), MeshUtility.RAMP_DIR_POS_X, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, false, false, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createRamp(bitmapName, sx, ty, (sz + MapBuilder.SEGMENT_SIZE), MeshUtility.RAMP_DIR_POS_X, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, sx, (sx + (MapBuilder.SEGMENT_SIZE * 2)), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, false, true, false, false, false, MeshUtility.UV_MAP));
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_X:
-                room.node.meshes.add(MeshUtility.createRamp(bitmapName, (sx - MapBuilder.SEGMENT_SIZE), ty, (sz - MapBuilder.FLOOR_HEIGHT), MeshUtility.RAMP_DIR_NEG_X, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                room.node.meshes.add(MeshUtility.createRamp(bitmapName, (sx - MapBuilder.SEGMENT_SIZE), ty, (sz + MapBuilder.SEGMENT_SIZE), MeshUtility.RAMP_DIR_NEG_X, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
-                room.node.meshes.add(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createRamp(bitmapName, (sx - MapBuilder.SEGMENT_SIZE), ty, (sz - MapBuilder.FLOOR_HEIGHT), MeshUtility.RAMP_DIR_NEG_X, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz - MapBuilder.FLOOR_HEIGHT), sz, true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                room.node.addMesh(MeshUtility.createRamp(bitmapName, (sx - MapBuilder.SEGMENT_SIZE), ty, (sz + MapBuilder.SEGMENT_SIZE), MeshUtility.RAMP_DIR_NEG_X, MapBuilder.FLOOR_HEIGHT, (MapBuilder.SEGMENT_SIZE + MapBuilder.FLOOR_HEIGHT), (MapBuilder.SEGMENT_SIZE * 2), true));
+                room.node.addMesh(MeshUtility.createCube(bitmapName, (sx + MapBuilder.SEGMENT_SIZE), (sx - MapBuilder.SEGMENT_SIZE), sy, ty, (sz + MapBuilder.SEGMENT_SIZE), ((sz + MapBuilder.SEGMENT_SIZE) + MapBuilder.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
                 break;
         }
     }

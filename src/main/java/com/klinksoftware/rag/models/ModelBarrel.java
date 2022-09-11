@@ -49,6 +49,6 @@ public class ModelBarrel extends ModelBase {
         centerPnt = new RagPoint(0, (by + (barrelRingHeight * 0.5f)), 0);
         mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
 
-        scene.rootNode.meshes.add(mesh);
+        scene.rootNode.addMesh(mesh);
     }
 }

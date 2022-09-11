@@ -127,7 +127,7 @@ public class ModelPipe extends ModelBase {
         mesh=new MeshClass(this.view,this.pipeBitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
 
-        scene.rootNode.meshes.add(mesh);
+        scene.rootNode.addMesh(mesh);
     }
 
     addPipeCornerChunk(pnt,radius,xStart,zStart,xTurn,zTurn,yFlip)
@@ -272,7 +272,7 @@ public class ModelPipe extends ModelBase {
         mesh=new MeshClass(this.view,this.pipeBitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
 
-        scene.rootNode.meshes.add(mesh);
+        scene.rootNode.addMesh(mesh);
     }
 
         //
@@ -448,7 +448,7 @@ public class ModelPipe extends ModelBase {
         platformBoundZ=new BoundClass(z,(z+MapIndoorBuilder.SEGMENT_SIZE));
 
         platformBoundY=new BoundClass((yBound.max-floorDepth),room.yBound.max);
-        scene.rootNode.meshes.add(MeshUtility.createCube(room,"","platform",platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,MeshUtility.UV_MAP,MapIndoorBuilder.SEGMENT_SIZE));
+        scene.rootNode.addMesh(MeshUtility.createCube(room,"","platform",platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,MeshUtility.UV_MAP,MapIndoorBuilder.SEGMENT_SIZE));
 
             // determine direction
 

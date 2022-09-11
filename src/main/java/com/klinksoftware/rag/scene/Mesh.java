@@ -415,7 +415,7 @@ public class Mesh
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         // create the model matrix
-        modelMatrix.setTranslationFromPoint(node.absolutePnt);
+        modelMatrix.setTranslationFromPoint(node.getAbsolutePoint());
 
         // setup the bounds for culling
         setGlobalBounds(node.pnt);

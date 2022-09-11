@@ -8,6 +8,7 @@ in highp vec2 vertexUV;
 uniform highp mat4 perspectiveMatrix;
 uniform highp mat4 viewMatrix,modelMatrix;
 
+uniform int displayType;
 uniform bool skinned;
 
 out highp vec3 eyeVector,eyePosition;
@@ -25,6 +26,9 @@ void main(void)
     
     // the frag position
     gl_Position=perspectiveMatrix*pos;
+
+    // if skeleton draw, we can skip the rest
+    if (displayType==5) return;
 
     // get the tangent space
     // this gets passed to the fragment so we can calculate lights

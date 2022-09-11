@@ -1,8 +1,5 @@
 package com.klinksoftware.rag.utility;
 
-import com.klinksoftware.rag.map.MapPiece;
-import com.klinksoftware.rag.map.MapRoom;
-import com.klinksoftware.rag.map.MapBuilder;
 import com.klinksoftware.rag.map.MapBuilder;
 import com.klinksoftware.rag.map.MapPiece;
 import com.klinksoftware.rag.map.MapRoom;
@@ -107,9 +104,9 @@ public class MeshMapUtility
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
         if (floor) {
-            room.node.meshes.add(new Mesh(("floor_" + Integer.toString(roomNumber)), (room.story == MapRoom.ROOM_STORY_MAIN ? "floor" : "floor_lower"), vertexes, normals, tangents, uvs, indexes));
+            room.node.addMesh(new Mesh(("floor_" + Integer.toString(roomNumber)), (room.story == MapRoom.ROOM_STORY_MAIN ? "floor" : "floor_lower"), vertexes, normals, tangents, uvs, indexes));
         } else {
-            room.node.meshes.add(new Mesh(("ceiling_" + Integer.toString(roomNumber)), (room.story == MapRoom.ROOM_STORY_MAIN ? "ceiling" : "ceiling_upper"), vertexes, normals, tangents, uvs, indexes));
+            room.node.addMesh(new Mesh(("ceiling_" + Integer.toString(roomNumber)), (room.story == MapRoom.ROOM_STORY_MAIN ? "ceiling" : "ceiling_upper"), vertexes, normals, tangents, uvs, indexes));
         }
     }
 
@@ -189,21 +186,21 @@ public class MeshMapUtility
 
             switch (room.story) {
                 case MapRoom.ROOM_STORY_MAIN:
-                    room.node.meshes.add(new Mesh(("wall_main_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
+                    room.node.addMesh(new Mesh(("wall_main_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
                     break;
                 case MapRoom.ROOM_STORY_UPPER:
                 case MapRoom.ROOM_STORY_UPPER_EXTENSION:
-                    room.node.meshes.add(new Mesh(("wall_upper_" + Integer.toString(roomNumber)), "wall_upper", vertexes, normals, tangents, uvs, indexes));
+                    room.node.addMesh(new Mesh(("wall_upper_" + Integer.toString(roomNumber)), "wall_upper", vertexes, normals, tangents, uvs, indexes));
                     break;
                 case MapRoom.ROOM_STORY_TALL_EXTENSION:
-                    room.node.meshes.add(new Mesh(("wall_tall_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
+                    room.node.addMesh(new Mesh(("wall_tall_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
                     break;
                 case MapRoom.ROOM_STORY_LOWER:
                 case MapRoom.ROOM_STORY_LOWER_EXTENSION:
-                    room.node.meshes.add(new Mesh(("wall_lower_" + Integer.toString(roomNumber)), "wall_lower", vertexes, normals, tangents, uvs, indexes));
+                    room.node.addMesh(new Mesh(("wall_lower_" + Integer.toString(roomNumber)), "wall_lower", vertexes, normals, tangents, uvs, indexes));
                     break;
                 case MapRoom.ROOM_STORY_SUNKEN_EXTENSION:
-                    room.node.meshes.add(new Mesh(("wall_sunken_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
+                    room.node.addMesh(new Mesh(("wall_sunken_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
                     break;
             }
         }
@@ -253,16 +250,16 @@ public class MeshMapUtility
 
             switch (room.story) {
                 case MapRoom.ROOM_STORY_UPPER_EXTENSION:
-                    room.node.meshes.add(new Mesh(("platform_upper_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
+                    room.node.addMesh(new Mesh(("platform_upper_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
                     break;
                 case MapRoom.ROOM_STORY_TALL_EXTENSION:
-                    room.node.meshes.add(new Mesh(("platform_upper_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
+                    room.node.addMesh(new Mesh(("platform_upper_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
                     break;
                 case MapRoom.ROOM_STORY_LOWER_EXTENSION:
-                    room.node.meshes.add(new Mesh(("platform_lower_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
+                    room.node.addMesh(new Mesh(("platform_lower_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
                     break;
                 case MapRoom.ROOM_STORY_SUNKEN_EXTENSION:
-                    room.node.meshes.add(new Mesh(("platform_lower_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
+                    room.node.addMesh(new Mesh(("platform_lower_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
                     break;
             }
         }
@@ -312,7 +309,7 @@ public class MeshMapUtility
             uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
             tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
-            room.node.meshes.add(new Mesh(("wall_main_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
+            room.node.addMesh(new Mesh(("wall_main_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
         }
     }
 
@@ -461,7 +458,7 @@ public class MeshMapUtility
         uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBuilder.SEGMENT_SIZE));
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
-        room.node.meshes.add(new Mesh(name, "stair", vertexes, normals, tangents, uvs, indexes));
+        room.node.addMesh(new Mesh(name, "stair", vertexes, normals, tangents, uvs, indexes));
     }
 
     // ramp
@@ -472,16 +469,16 @@ public class MeshMapUtility
 
         switch (dir) {
             case STAIR_DIR_POS_Z:
-                room.node.meshes.add(MeshUtility.createRamp("stair", x, y, z, MeshUtility.RAMP_DIR_POS_Z, (MapBuilder.SEGMENT_SIZE * rampWidth), rampHeight, (MapBuilder.SEGMENT_SIZE * rampLength), false));
+                room.node.addMesh(MeshUtility.createRamp("stair", x, y, z, MeshUtility.RAMP_DIR_POS_Z, (MapBuilder.SEGMENT_SIZE * rampWidth), rampHeight, (MapBuilder.SEGMENT_SIZE * rampLength), false));
                 break;
             case STAIR_DIR_NEG_Z:
-                room.node.meshes.add(MeshUtility.createRamp("stair", x, y, z, MeshUtility.RAMP_DIR_NEG_Z, (MapBuilder.SEGMENT_SIZE * rampWidth), rampHeight, (MapBuilder.SEGMENT_SIZE * rampLength), false));
+                room.node.addMesh(MeshUtility.createRamp("stair", x, y, z, MeshUtility.RAMP_DIR_NEG_Z, (MapBuilder.SEGMENT_SIZE * rampWidth), rampHeight, (MapBuilder.SEGMENT_SIZE * rampLength), false));
                 break;
             case STAIR_DIR_POS_X:
-                room.node.meshes.add(MeshUtility.createRamp("stair", x, y, z, MeshUtility.RAMP_DIR_POS_X, (MapBuilder.SEGMENT_SIZE * rampWidth), rampHeight, (MapBuilder.SEGMENT_SIZE * rampLength), false));
+                room.node.addMesh(MeshUtility.createRamp("stair", x, y, z, MeshUtility.RAMP_DIR_POS_X, (MapBuilder.SEGMENT_SIZE * rampWidth), rampHeight, (MapBuilder.SEGMENT_SIZE * rampLength), false));
                 break;
             case STAIR_DIR_NEG_X:
-                room.node.meshes.add(MeshUtility.createRamp("stair", x, y, z, MeshUtility.RAMP_DIR_NEG_X, (MapBuilder.SEGMENT_SIZE * rampWidth), rampHeight, (MapBuilder.SEGMENT_SIZE * rampLength), false));
+                room.node.addMesh(MeshUtility.createRamp("stair", x, y, z, MeshUtility.RAMP_DIR_NEG_X, (MapBuilder.SEGMENT_SIZE * rampWidth), rampHeight, (MapBuilder.SEGMENT_SIZE * rampLength), false));
                 break;
         }
     }

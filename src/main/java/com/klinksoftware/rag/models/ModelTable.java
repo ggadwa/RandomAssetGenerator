@@ -51,6 +51,6 @@ public class ModelTable extends ModelBase {
         // the table
         mesh.combine(MeshUtility.createCube("table", tableXMin, tableXMax, tableHeight, (tableHeight + tableLegWidth), tableZMin, tableZMax, true, true, true, true, true, true, false, MeshUtility.UV_MAP));
 
-        scene.rootNode.meshes.add(mesh);
+        scene.rootNode.addMesh(mesh);
     }
 }

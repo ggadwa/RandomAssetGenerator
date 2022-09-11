@@ -215,22 +215,23 @@ public class MeshModelUtility
 
     // build mesh around limb
     public static Mesh buildMeshAroundNodeLimb(Scene scene, Limb limb, boolean organic) {
+        RagPoint absPnt1, absPnt2;
         Mesh mesh;
 
-        // need absolute position for nodes
-        scene.createNodesAbsolutePosition();
+        absPnt1 = limb.node1.getAbsolutePoint();
+        absPnt2 = limb.node2.getAbsolutePoint();
 
         // build the cylinder around the nodes
         if (organic) {
-            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, limb.node1.absolutePnt, limb.node1.limbRadius, limb.node2.absolutePnt, limb.node2.limbRadius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.node1.limbRadius, absPnt2, limb.node2.limbRadius, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
         } else {
-            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, limb.node1.absolutePnt, limb.node1.limbRadius, limb.node2.absolutePnt, limb.node2.limbRadius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.node1.limbRadius, absPnt2, limb.node2.limbRadius, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
         }
 
-        rebuildNormals(mesh, limb.node1.absolutePnt, limb.node2.absolutePnt);
+        rebuildNormals(mesh, absPnt1, absPnt2);
         mesh.clipFloorVertexes();
 
-        return(mesh);
+        return (mesh);
     }
 
 }

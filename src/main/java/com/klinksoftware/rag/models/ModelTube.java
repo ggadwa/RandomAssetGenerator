@@ -44,13 +44,13 @@ public class ModelTube extends ModelBase {
         mesh = MeshUtility.createMeshCylinderSimple("accessory", 16, centerPnt, yBotCapTy, yBotCapBy, tubeCapRadius, true, true);
         mesh2 = MeshUtility.createMeshCylinderSimple("accessory", 16, centerPnt, yTopCapTy, yTopCapBy, tubeCapRadius, true, true);
         mesh.combine(mesh2);
-        scene.rootNode.meshes.add(mesh);
+        scene.rootNode.addMesh(mesh);
 
         // the tube
-        scene.rootNode.meshes.add(MeshUtility.createMeshCylinderSimple("glass", 16, centerPnt, yTopCapBy, yBotCapTy, tubeRadius, false, false));
+        scene.rootNode.addMesh(MeshUtility.createMeshCylinderSimple("glass", 16, centerPnt, yTopCapBy, yBotCapTy, tubeRadius, false, false));
 
         // the liquid in the tube
         y = yBotCapTy + (AppWindow.random.nextFloat() * (yTopCapBy - yBotCapTy));
-        scene.rootNode.meshes.add(MeshUtility.createMeshCylinderSimple("liquid", 16, centerPnt, y, yBotCapTy, (tubeRadius * 0.98f), true, false));
+        scene.rootNode.addMesh(MeshUtility.createMeshCylinderSimple("liquid", 16, centerPnt, y, yBotCapTy, (tubeRadius * 0.98f), true, false));
     }
 }

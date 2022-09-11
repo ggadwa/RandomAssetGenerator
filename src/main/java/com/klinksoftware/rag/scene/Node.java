@@ -14,7 +14,8 @@ public class Node {
     public int index;
     public float limbRadius;
     public String name;
-    public RagPoint pnt, absolutePnt;
+    public Node parentNode;
+    public RagPoint pnt;
     public ArrayList<Node> childNodes;
     public ArrayList<Mesh> meshes;
 
@@ -22,10 +23,10 @@ public class Node {
         this.name = name;
         this.pnt = pnt.copy();
 
+        parentNode = null;
         childNodes = new ArrayList<>();
         meshes = new ArrayList<>();
 
-        absolutePnt = null; // for animation calcs
         limbRadius = 0.0f; // for limb building in models
     }
 
@@ -38,8 +39,36 @@ public class Node {
         childNodes = new ArrayList<>();
         meshes = new ArrayList<>();
 
-        absolutePnt = null;
-        limbRadius = limbRadius;
+        this.limbRadius = limbRadius;
+    }
+
+    public void addChild(Node node) {
+        node.parentNode = this;
+        childNodes.add(node);
+    }
+
+    public void clearMeshes() {
+        meshes.clear();
+    }
+
+    public void addMesh(Mesh mesh) {
+        meshes.add(mesh);
+    }
+
+    public RagPoint getAbsolutePoint() {
+        RagPoint absPnt;
+        Node node;
+
+        absPnt = new RagPoint(0.0f, 0.0f, 0.0f);
+        node = this;
+
+        while (true) {
+            absPnt.addPoint(node.pnt);
+            node = node.parentNode;
+            if (node == null) {
+                return (absPnt);
+            }
+        }
     }
 
 }

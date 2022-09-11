@@ -31,8 +31,8 @@ public class ModelJunction extends ModelBase {
 
         juncHalfWid = junctionWidth * 0.5f;
 
-        scene.rootNode.meshes.add(MeshUtility.createCube("computer", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, false, false, false, true, false, false, false, MeshUtility.UV_WHOLE));
-        scene.rootNode.meshes.add(MeshUtility.createCube("panel", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, true, true, true, false, true, true, false, MeshUtility.UV_MAP));
+        scene.rootNode.addMesh(MeshUtility.createCube("computer", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, false, false, false, true, false, false, false, MeshUtility.UV_WHOLE));
+        scene.rootNode.addMesh(MeshUtility.createCube("panel", -juncHalfWid, juncHalfWid, pipeHeight, (pipeHeight + junctionWidth), -junctionHalfDepth, junctionHalfDepth, true, true, true, false, true, true, false, MeshUtility.UV_MAP));
         /*
             // the pipes
 
@@ -108,7 +108,7 @@ public class ModelJunction extends ModelBase {
         }
 
         if (mesh != null) {
-            scene.rootNode.meshes.add(mesh);
+            scene.rootNode.addMesh(mesh);
         }
 
          */

@@ -23,7 +23,7 @@ public class ModelComputerBank extends ModelBase {
         if (AppWindow.random.nextBoolean()) {
             margin = MapBuilder.SEGMENT_SIZE * (0.01f + AppWindow.random.nextFloat(0.01f));
             high = MapBuilder.SEGMENT_SIZE * (0.025f + AppWindow.random.nextFloat(0.1f));
-            scene.rootNode.meshes.add(MeshUtility.createCube("spacer", (xMin - margin), (xMax + margin), (by + high), by, (zMin - margin), (zMax + margin), true, true, true, true, false, true, false, MeshUtility.UV_MAP));
+            scene.rootNode.addMesh(MeshUtility.createCube("spacer", (xMin - margin), (xMax + margin), (by + high), by, (zMin - margin), (zMax + margin), true, true, true, true, false, true, false, MeshUtility.UV_MAP));
             by += high;
             ty += high;
         }
@@ -40,12 +40,12 @@ public class ModelComputerBank extends ModelBase {
             z = zMin + AppWindow.random.nextFloat(zSz - zWid);
 
             high = MapBuilder.SEGMENT_SIZE * (0.025f + AppWindow.random.nextFloat(0.075f));
-            scene.rootNode.meshes.add(MeshUtility.createCube("spacer", x, (x + xWid), (ty + high), ty, z, (z + zWid), true, true, true, true, false, true, false, MeshUtility.UV_MAP));
+            scene.rootNode.addMesh(MeshUtility.createCube("spacer", x, (x + xWid), (ty + high), ty, z, (z + zWid), true, true, true, true, false, true, false, MeshUtility.UV_MAP));
         }
 
         // the computer
-        scene.rootNode.meshes.add(MeshUtility.createCube(computerBitmapName, xMin, xMax, by, ty, zMin, zMax, false, false, (!flipFront), flipFront, false, false, false, MeshUtility.UV_WHOLE));
-        scene.rootNode.meshes.add(MeshUtility.createCube("panel", xMin, xMax, ty, by, zMin, zMax, true, true, flipFront, (!flipFront), false, true, false, MeshUtility.UV_WHOLE));
+        scene.rootNode.addMesh(MeshUtility.createCube(computerBitmapName, xMin, xMax, by, ty, zMin, zMax, false, false, (!flipFront), flipFront, false, false, false, MeshUtility.UV_WHOLE));
+        scene.rootNode.addMesh(MeshUtility.createCube("panel", xMin, xMax, ty, by, zMin, zMax, true, true, flipFront, (!flipFront), false, true, false, MeshUtility.UV_WHOLE));
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ModelComputerBank extends ModelBase {
         pedestalWidth = computerWidth + (MapBuilder.SEGMENT_SIZE * 0.05f);
         pedestalHeight = (MapBuilder.FLOOR_HEIGHT * 0.1f) + AppWindow.random.nextFloat(MapBuilder.FLOOR_HEIGHT * 0.5f);
 
-        scene.rootNode.meshes.add(MeshUtility.createCube("pedestal", -pedestalWidth, pedestalWidth, 0, pedestalHeight, -pedestalWidth, pedestalWidth, true, true, true, true, true, true, false, MeshUtility.UV_MAP));
+        scene.rootNode.addMesh(MeshUtility.createCube("pedestal", -pedestalWidth, pedestalWidth, 0, pedestalHeight, -pedestalWidth, pedestalWidth, true, true, true, true, true, true, false, MeshUtility.UV_MAP));
 
         margin = computerWidth * 0.05f;
         wid = computerWidth - (margin * 2.0f);
