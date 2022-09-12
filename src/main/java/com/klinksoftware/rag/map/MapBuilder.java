@@ -556,7 +556,7 @@ public class MapBuilder
         minPnt = new RagPoint(0.0f, 0.0f, 0.0f);
         maxPnt = new RagPoint(0.0f, 0.0f, 0.0f);
 
-        scene.getMixMaxVertex(minPnt, maxPnt);
+        scene.getAbsoluteMixMaxVertexForAbsoluteVertexes(minPnt, maxPnt);
 
         minPnt.scale(1.1f);
         maxPnt.scale(1.1f);

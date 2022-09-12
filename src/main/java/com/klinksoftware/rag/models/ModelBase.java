@@ -73,7 +73,7 @@ public class ModelBase {
 
         min = new RagPoint(0.0f, 0.0f, 0.0f);
         max = new RagPoint(0.0f, 0.0f, 0.0f);
-        scene.getMixMaxVertex(min, max);
+        scene.getAbsoluteMixMaxVertexForRelativeVertexes(min, max);
 
         return ((max.y - min.y) / 2.0f);
     }

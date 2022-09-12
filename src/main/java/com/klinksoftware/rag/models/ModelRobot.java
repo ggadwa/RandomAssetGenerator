@@ -15,8 +15,8 @@ public class ModelRobot extends ModelBase {
         addBitmap("head", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
 
         // build the skeleton
-        skeletonBuilder = new SkeletonBuilder(scene);
-        skeletonBuilder.build(SkeletonBuilder.MODEL_TYPE_ROBOT, bilateral);
+        skeletonBuilder = new SkeletonBuilder(scene, SkeletonBuilder.MODEL_TYPE_ROBOT, bilateral);
+        skeletonBuilder.build();
 
         // build the meshes around the limbs
         wrapLimbs(skeletonBuilder.limbs, false);

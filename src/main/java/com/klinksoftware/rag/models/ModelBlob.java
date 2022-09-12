@@ -16,8 +16,8 @@ public class ModelBlob extends ModelBase {
         addBitmap("head", new String[]{"Fur", "Organic", "Scale"});
 
         // build the skeleton
-        skeletonBuilder = new SkeletonBuilder(scene);
-        skeletonBuilder.build(SkeletonBuilder.MODEL_TYPE_BLOB, bilateral);
+        skeletonBuilder = new SkeletonBuilder(scene, SkeletonBuilder.MODEL_TYPE_BLOB, bilateral);
+        skeletonBuilder.build();
 
         // build the meshes around the limbs
         wrapLimbs(skeletonBuilder.limbs, true);

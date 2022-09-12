@@ -78,8 +78,9 @@ public class Scene {
         return (meshes);
     }
 
-    // gets the min max of all absolute nodes in the scene
-    public void getMixMaxVertex(RagPoint minPnt, RagPoint maxPnt) {
+    // gets the min max of all absolute absolute meshes in the scene
+    // this should only be called when the meshes are absolute
+    public void getAbsoluteMixMaxVertexForAbsoluteVertexes(RagPoint minPnt, RagPoint maxPnt) {
         RagPoint meshMin, meshMax;
 
         meshMin = new RagPoint(0.0f, 0.0f, 0.0f);
@@ -89,6 +90,28 @@ public class Scene {
             mesh.getMinMaxVertex(meshMin, meshMax);
             minPnt.setIfMin(meshMin);
             maxPnt.setIfMax(meshMax);
+        }
+    }
+
+    // gets the min max of all relative meshes in the scene
+    // this should only be called when meshes have been made relative
+    public void getAbsoluteMixMaxVertexForRelativeVertexes(RagPoint minPnt, RagPoint maxPnt) {
+        RagPoint meshMin, meshMax, absPnt;
+
+        meshMin = new RagPoint(0.0f, 0.0f, 0.0f);
+        meshMax = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        for (Node node : getAllNodes()) {
+            absPnt = node.getAbsolutePoint();
+
+            for (Mesh mesh : node.meshes) {
+                mesh.getMinMaxVertex(meshMin, meshMax);
+                meshMin.addPoint(absPnt);
+                meshMax.addPoint(absPnt);
+
+                minPnt.setIfMin(meshMin);
+                maxPnt.setIfMax(meshMax);
+            }
         }
     }
 

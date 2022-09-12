@@ -10,7 +10,6 @@
 
 
 
-- test model with and without skeleton exports
 
 rendering:
 - rethink this part of fragment shader, maybe get more expressive textures
@@ -69,12 +68,14 @@ bitmaps
  - computer access panels have handles?
 
 model
+ - anything with bars (like table, etc) can switch between simple cylinder + cube
  - add: chair, bed, couch, dresser, storage tank, pc (can put on desk), bookcase (books?), electrical box
  - some models need to have flags for "on wall" or "on desk, table, etc"
  - robot model needs to be chunkier
  - skeletons can build two heads
  - faces by meshes
  - animations
+ - limb wrapping: don't do radius changes linearly, do it by sin
  - vertex snaps for humanoid, etc (find and implement: scene.snapVertexes)
  - finish junction
  - finish pipes
