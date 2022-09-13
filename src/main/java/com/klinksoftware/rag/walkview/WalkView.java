@@ -541,8 +541,10 @@ public class WalkView extends AWTGLCanvas {
             }
 
             // culled?
-            if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
-                continue;
+            if (!cameraCenterRotate) {
+                if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
+                    continue;
+                }
             }
 
             // new texture?
@@ -582,8 +584,10 @@ public class WalkView extends AWTGLCanvas {
             }
 
             // culled?
-            if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
-                continue;
+            if (!cameraCenterRotate) {
+                if (!boundBoxInFrustum(mesh.xBound, mesh.yBound, mesh.zBound)) {
+                    continue;
+                }
             }
 
             // add to trig sort array

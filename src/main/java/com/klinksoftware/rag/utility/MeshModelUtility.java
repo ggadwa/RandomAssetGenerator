@@ -218,6 +218,20 @@ public class MeshModelUtility
         RagPoint absPnt1, absPnt2;
         Mesh mesh;
 
+        // globe limbs
+        if (limb.meshType == Limb.MESH_TYPE_GLOBE) {
+            if (organic) {
+                mesh = MeshUtility.createGlobe(limb.name, limb.bitmapName, limb.node1.getAbsolutePoint(), limb.globeRadius, limb.globeRotAngle);
+            } else {
+                mesh = MeshUtility.createCubeSimple(limb.name, limb.bitmapName, limb.node1.getAbsolutePoint(), limb.globeRadius);
+            }
+
+            mesh.clipFloorVertexes();
+
+            return (mesh);
+        }
+
+        // cylinder limbs
         absPnt1 = limb.node1.getAbsolutePoint();
         absPnt2 = limb.node2.getAbsolutePoint();
 

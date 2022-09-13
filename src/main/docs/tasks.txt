@@ -75,6 +75,7 @@ model
  - skeletons can build two heads
  - faces by meshes
  - animations
+ - need meshscale for each end
  - limb wrapping: don't do radius changes linearly, do it by sin
  - vertex snaps for humanoid, etc (find and implement: scene.snapVertexes)
  - finish junction
