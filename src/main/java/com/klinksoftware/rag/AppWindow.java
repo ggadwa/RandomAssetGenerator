@@ -1,6 +1,6 @@
 package com.klinksoftware.rag;
 
-import com.klinksoftware.rag.sounddisplay.SoundView;
+import com.klinksoftware.rag.soundview.SoundView;
 import com.klinksoftware.rag.walkview.WalkThread;
 import com.klinksoftware.rag.walkview.WalkView;
 import java.awt.CardLayout;

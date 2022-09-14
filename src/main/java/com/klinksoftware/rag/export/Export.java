@@ -1,10 +1,10 @@
 package com.klinksoftware.rag.export;
 
+import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.*;
-import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.scene.Node;
 
 import java.util.*;

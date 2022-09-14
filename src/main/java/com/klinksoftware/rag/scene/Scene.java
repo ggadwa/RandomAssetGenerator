@@ -1,6 +1,6 @@
 package com.klinksoftware.rag.scene;
 
-import com.klinksoftware.rag.bitmaps.BitmapBase;
+import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 import java.nio.FloatBuffer;

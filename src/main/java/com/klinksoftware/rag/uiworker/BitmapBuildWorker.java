@@ -1,7 +1,7 @@
 package com.klinksoftware.rag.uiworker;
 
+import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.bitmaps.*;
 import com.klinksoftware.rag.scene.Scene;
 import java.util.*;
 import javax.swing.*;
@@ -34,7 +34,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         AppWindow.random.setSeed(seed);
 
         try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmaps.Bitmap" + bitmapName.replace(" ", ""))).getConstructor(int.class).newInstance(textureSize);
+            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmap.Bitmap" + bitmapName.replace(" ", ""))).getConstructor(int.class).newInstance(textureSize);
             bitmap.generate();
         } catch (Exception e) {
             e.printStackTrace();

@@ -5,7 +5,7 @@ import com.klinksoftware.rag.uiworker.BitmapBuildWorker;
 import com.klinksoftware.rag.uiworker.BitmapExportWorker;
 import javax.swing.JButton;
 import javax.swing.JList;
-import com.klinksoftware.rag.bitmaps.BitmapInterface;
+import com.klinksoftware.rag.bitmap.utility.BitmapInterface;
 import javax.swing.JComboBox;
 
 public class SettingsTexture extends SettingsBase {
@@ -31,7 +31,7 @@ public class SettingsTexture extends SettingsBase {
         generateTextureButton = addButton(y, "Generate Texture", BUTTON_GENERATE_TEXTURE);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        textureTypeList = addList(y, "Texture Type", getAnnotationClasses("com.klinksoftware.rag.bitmaps", "bitmap", BitmapInterface.class), 0);
+        textureTypeList = addList(y, "Texture Type", getAnnotationClasses("com.klinksoftware.rag.bitmap", "bitmap", BitmapInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         textureSizeCombo = addComboBox(y, "Texture Size", TEXTURE_SIZE, 0);

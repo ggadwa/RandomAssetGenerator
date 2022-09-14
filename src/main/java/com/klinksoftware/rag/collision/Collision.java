@@ -1,6 +1,6 @@
 package com.klinksoftware.rag.collision;
 
-import com.klinksoftware.rag.map.MapBuilder;
+import com.klinksoftware.rag.map.utility.MapBase;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.scene.Scene;
@@ -154,8 +154,8 @@ public class Collision {
 
     public void collideWithFloor(RagPoint pnt) {
         // we go two floor height above, and check one below
-        fallPnt.setFromValues(pnt.x, (pnt.y + (MapBuilder.FLOOR_HEIGHT * 2.0f)), pnt.z);
-        fallVct.setFromValues(0.0f, -(MapBuilder.FLOOR_HEIGHT * 3.0f), 0.0f);
+        fallPnt.setFromValues(pnt.x, (pnt.y + (MapBase.FLOOR_HEIGHT * 2.0f)), pnt.z);
+        fallVct.setFromValues(0.0f, -(MapBase.FLOOR_HEIGHT * 3.0f), 0.0f);
 
         for (CollisionTrig trig : floorTrigs) {
             if (trig.rayOverlapBounds(fallPnt, fallVct)) {

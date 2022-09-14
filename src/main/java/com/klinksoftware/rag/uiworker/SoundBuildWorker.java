@@ -1,7 +1,7 @@
 package com.klinksoftware.rag.uiworker;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.sound.SoundBase;
+import com.klinksoftware.rag.sound.utility.SoundBase;
 import java.util.*;
 import javax.swing.*;
 

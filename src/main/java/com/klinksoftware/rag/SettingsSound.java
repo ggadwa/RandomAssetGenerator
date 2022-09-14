@@ -1,6 +1,6 @@
 package com.klinksoftware.rag;
 
-import com.klinksoftware.rag.sound.SoundInterface;
+import com.klinksoftware.rag.sound.utility.SoundInterface;
 import com.klinksoftware.rag.uiworker.SoundBuildWorker;
 import com.klinksoftware.rag.uiworker.SoundExportWorker;
 import javax.swing.JButton;

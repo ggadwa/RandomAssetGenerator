@@ -35,6 +35,7 @@ public class SpinnerPane extends JComponent {
         setVisible(false);
     }
 
+    @Override
     protected void paintComponent(Graphics g) {
         int width, height;
         Component parentWindow;

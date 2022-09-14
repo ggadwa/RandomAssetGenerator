@@ -1,5 +1,7 @@
 package com.klinksoftware.rag.sound;
 
+import com.klinksoftware.rag.sound.utility.SoundInterface;
+import com.klinksoftware.rag.sound.utility.SoundBase;
 import com.klinksoftware.rag.AppWindow;
 
 @SoundInterface

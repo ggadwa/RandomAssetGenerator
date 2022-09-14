@@ -1,7 +1,7 @@
 package com.klinksoftware.rag.uiworker;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.models.ModelBase;
+import com.klinksoftware.rag.model.utility.ModelBase;
 import java.util.*;
 import javax.swing.*;
 
@@ -30,16 +30,14 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
 
         appWindow.startBuild();
 
-            // set the seed and base path for model
-            // and make directories if necessary
-
-        seed=Calendar.getInstance().getTimeInMillis();
+        // set the seed for model
+        seed = Calendar.getInstance().getTimeInMillis();
         AppWindow.random.setSeed(seed);
         //AppWindow.random.setSeed(1662954358313L);
 
         // run the model builder
         try {
-            model = (ModelBase) (Class.forName("com.klinksoftware.rag.models.Model" + modelName.replace(" ", ""))).getConstructor().newInstance();
+            model = (ModelBase) (Class.forName("com.klinksoftware.rag.model.Model" + modelName.replace(" ", ""))).getConstructor().newInstance();
             model.build(textureSize, bilateral, roughness);
         } catch (Exception e) {
             e.printStackTrace();

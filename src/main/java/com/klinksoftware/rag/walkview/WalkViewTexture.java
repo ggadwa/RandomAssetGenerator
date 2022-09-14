@@ -1,6 +1,6 @@
 package com.klinksoftware.rag.walkview;
 
-import com.klinksoftware.rag.bitmaps.BitmapBase;
+import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.ARBFramebufferObject.glGenerateMipmap;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;

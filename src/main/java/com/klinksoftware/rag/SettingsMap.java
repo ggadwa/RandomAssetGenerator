@@ -2,11 +2,13 @@ package com.klinksoftware.rag;
 
 import static com.klinksoftware.rag.SettingsBase.ROW_GAP;
 import static com.klinksoftware.rag.SettingsBase.ROW_HEIGHT;
+import com.klinksoftware.rag.map.utility.MapInterface;
 import com.klinksoftware.rag.uiworker.MapBuildWorker;
 import com.klinksoftware.rag.uiworker.MapExportWorker;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JList;
 import javax.swing.JSlider;
 
 public class SettingsMap extends SettingsBase {
@@ -19,9 +21,10 @@ public class SettingsMap extends SettingsBase {
     private static final String[] MAP_TYPE = {"Indoor", "Outdoor"};
 
     private JButton generateMapButton, exportMapButton;
+    private JList mapTypeList;
+    private JComboBox textureSizeCombo;
     private JSlider mainFloorSizeSlider, upperFloorSizeSlider, lowerFloorSizeSlider, compactSlider, tallRoomSlider, sunkenRoomSlider;
     private JCheckBox complexCheckBox, skyBoxCheckBox;
-    private JComboBox mapTypeCombo, textureSizeCombo;
 
     public SettingsMap(AppWindow appWindow) {
         super(appWindow);
@@ -35,8 +38,8 @@ public class SettingsMap extends SettingsBase {
         generateMapButton = addButton(y, "Generate Map", BUTTON_GENERATE_MAP);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        mapTypeCombo = addComboBox(y, "Model Type", MAP_TYPE, 0);
-        y += (ROW_HEIGHT + ROW_GAP);
+        mapTypeList = addList(y, "Map Type", getAnnotationClasses("com.klinksoftware.rag.map", "map", MapInterface.class), 0);
+        y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 0);
         y += (ROW_HEIGHT + ROW_GAP);
@@ -74,7 +77,7 @@ public class SettingsMap extends SettingsBase {
             case BUTTON_GENERATE_MAP:
                 (new MapBuildWorker(
                         appWindow,
-                        mapTypeCombo.getSelectedIndex(),
+                        (String) mapTypeList.getModel().getElementAt(mapTypeList.getSelectedIndex()),
                         getIntFromStringCombo(textureSizeCombo),
                         ((float) mainFloorSizeSlider.getValue() / 100.0f),
                         ((float) upperFloorSizeSlider.getValue() / 100.0f),

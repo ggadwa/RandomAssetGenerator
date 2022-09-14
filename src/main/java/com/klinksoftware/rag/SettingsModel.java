@@ -1,6 +1,6 @@
 package com.klinksoftware.rag;
 
-import com.klinksoftware.rag.models.ModelInterface;
+import com.klinksoftware.rag.model.utility.ModelInterface;
 import com.klinksoftware.rag.uiworker.ModelBuildWorker;
 import com.klinksoftware.rag.uiworker.ModelExportWorker;
 import javax.swing.JButton;
@@ -32,7 +32,7 @@ public class SettingsModel extends SettingsBase {
         generateModelButton = addButton(y, "Generate Model", BUTTON_GENERATE_MODEL);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        modelTypeList = addList(y, "Model Type", getAnnotationClasses("com.klinksoftware.rag.models", "model", ModelInterface.class), 0);
+        modelTypeList = addList(y, "Model Type", getAnnotationClasses("com.klinksoftware.rag.model", "model", ModelInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 0);
