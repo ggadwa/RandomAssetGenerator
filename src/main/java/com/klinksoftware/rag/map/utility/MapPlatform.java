@@ -3,6 +3,7 @@ package com.klinksoftware.rag.map.utility;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.AppWindow;
+import com.klinksoftware.rag.utility.RagPoint;
 
 import java.util.*;
 
@@ -31,28 +32,65 @@ public class MapPlatform {
         if (x == 0) {
             return (true);
         }
-        return (room.getPlatformGrid((x - 1), z));
+        return (!room.getPlatformGrid((x - 1), z));
     }
 
     private boolean hasPosXWall(MapRoom room, int x, int z) {
         if (x >= (room.piece.sizeX - 1)) {
             return (true);
         }
-        return (room.getPlatformGrid((x + 1), z));
+        return (!room.getPlatformGrid((x + 1), z));
     }
 
     private boolean hasNegZWall(MapRoom room, int x, int z) {
         if (z == 0) {
             return (true);
         }
-        return (room.getPlatformGrid(x, (z - 1)));
+        return (!room.getPlatformGrid(x, (z - 1)));
     }
 
     private boolean hasPosZWall(MapRoom room, int x, int z) {
         if (z >= (room.piece.sizeZ - 1)) {
             return (false);
         }
-        return (room.getPlatformGrid(x, (z + 1)));
+        return (!room.getPlatformGrid(x, (z + 1)));
+    }
+
+    private void addPlatformWalls(MapRoom room, float y) {
+        int x, z;
+        float sx, ty, by, sz;
+
+        by = y + MapBase.FLOOR_HEIGHT;
+        ty = by + (MapBase.SEGMENT_SIZE * 0.5f);
+
+        for (z = 0; z != room.piece.sizeZ; z++) {
+            sz = (float) (z + room.z) * MapBase.SEGMENT_SIZE;
+
+            for (x = 0; x != room.piece.sizeX; x++) {
+                if (!room.getPlatformGrid(x, z)) {
+                    continue;
+                }
+
+                sx = (float) (x + room.x) * MapBase.SEGMENT_SIZE;
+
+                if ((x > 0) && (!room.getPlatformGrid((x - 1), z)) && (!(((x - 2) == room.stairX) && (z == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_POS_X)))) {
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint(sx, ty, sz), new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), MapBase.FLOOR_HEIGHT, 8));
+                    //room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.FLOOR_HEIGHT), by, ty, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                }
+                if ((x < (room.piece.sizeX - 1)) && (!room.getPlatformGrid((x + 1), z)) && (!(((x + 2) == room.stairX) && (z == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_NEG_X)))) {
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), MapBase.FLOOR_HEIGHT, 8));
+                    //room.node.addMesh(MeshUtility.createCube("railing", ((sx + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sx + MapBase.SEGMENT_SIZE), by, ty, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                }
+                if ((z > 0) && (!room.getPlatformGrid(x, (z - 1)) && (!((x == room.stairX) && ((z - 2) == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_POS_Z))))) {
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), MapBase.FLOOR_HEIGHT, 8));
+                    //    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, ty, sz, (sz + MapBase.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                }
+                if ((z < (room.piece.sizeZ - 1)) && (!room.getPlatformGrid(x, (z + 1))) && (!((x == room.stairX) && ((z + 2) == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_NEG_Z)))) {
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), MapBase.FLOOR_HEIGHT, 8));
+                    //room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, ty, ((sz + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                }
+            }
+        }
     }
 
     private void knockOutPlatformSides(MapRoom room, MapRoom platformRoom) {
@@ -64,51 +102,49 @@ public class MapPlatform {
             case MeshMapUtility.STAIR_DIR_POS_Z:
                 k = platformRoom.touchesNegativeZ(rooms) ? 1 : 0;
                 for (z = k; z <= (room.stairZ + 1); z++) {
-                    room.setPlatformGridAcrossZ(z, true);
+                    room.setPlatformGridAcrossZ(z, false);
                 }
                 if ((platformRoom.touchesNegativeX(rooms)) || (AppWindow.random.nextBoolean())) {
-                    room.setPlatformGridAcrossX(0, false);
+                    room.setPlatformGridAcrossX(0, true);
                 }
                 if ((platformRoom.touchesPositiveX(rooms)) || (AppWindow.random.nextBoolean())) {
-                    room.setPlatformGridAcrossX((room.piece.sizeX - 1), false);
+                    room.setPlatformGridAcrossX((room.piece.sizeX - 1), true);
                 }
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_Z:
                 k = platformRoom.touchesPositiveZ(rooms) ? (room.piece.sizeZ - 2) : (room.piece.sizeZ - 1);
                 for (z = k; z >= (room.stairZ - 1); z--) {
-                    room.setPlatformGridAcrossZ(z, true);
+                    room.setPlatformGridAcrossZ(z, false);
                 }
                 if ((platformRoom.touchesNegativeX(rooms)) || (AppWindow.random.nextBoolean())) {
-                    room.setPlatformGridAcrossX(0, false);
+                    room.setPlatformGridAcrossX(0, true);
                 }
                 if ((platformRoom.touchesPositiveX(rooms)) || (AppWindow.random.nextBoolean())) {
-                    room.setPlatformGridAcrossX((room.piece.sizeX - 1), false);
+                    room.setPlatformGridAcrossX((room.piece.sizeX - 1), true);
                 }
                 break;
             case MeshMapUtility.STAIR_DIR_POS_X:
                 k = platformRoom.touchesNegativeX(rooms) ? 1 : 0;
                 for (x = k; x <= (room.stairX + 1); x++) {
-                    room.setPlatformGridAcrossX(x, true);
+                    room.setPlatformGridAcrossX(x, false);
                 }
                 if ((platformRoom.touchesNegativeZ(rooms)) || (AppWindow.random.nextBoolean())) {
-                    room.setPlatformGridAcrossZ(0, false);
+                    room.setPlatformGridAcrossZ(0, true);
                 }
                 if ((platformRoom.touchesPositiveZ(rooms)) || (AppWindow.random.nextBoolean())) {
-                    room.setPlatformGridAcrossZ((room.piece.sizeZ - 1), false);
+                    room.setPlatformGridAcrossZ((room.piece.sizeZ - 1), true);
                 }
                 break;
             case MeshMapUtility.STAIR_DIR_NEG_X:
                 k = platformRoom.touchesPositiveX(rooms) ? (room.piece.sizeX - 2) : (room.piece.sizeX - 1);
                 for (x = k; x >= (room.stairX - 1); x--) {
-                    room.setPlatformGridAcrossX(x, true);
+                    room.setPlatformGridAcrossX(x, false);
                 }
-                room.setPlatformGridAcrossZ(0, false);
-                room.setPlatformGridAcrossZ((room.piece.sizeZ - 1), false);
                 if ((platformRoom.touchesNegativeZ(rooms)) || (AppWindow.random.nextBoolean())) {
-                    room.setPlatformGridAcrossZ(0, false);
+                    room.setPlatformGridAcrossZ(0, true);
                 }
                 if ((platformRoom.touchesPositiveZ(rooms)) || (AppWindow.random.nextBoolean())) {
-                    room.setPlatformGridAcrossZ((room.piece.sizeZ - 1), false);
+                    room.setPlatformGridAcrossZ((room.piece.sizeZ - 1), true);
                 }
                 break;
         }
@@ -122,19 +158,17 @@ public class MapPlatform {
         float[] vertexes, normals, uvs, tangents;
         int[] indexes;
 
-            // setup the buffers
-
+        // setup the buffers
         vertexArray=new ArrayList<>();
         normalArray=new ArrayList<>();
         indexArray=new ArrayList<>();
 
-            // make the segments
-
+        // make the segments
         trigIdx = 0;
 
         for (z = 0; z != room.piece.sizeZ; z++) {
             for (x = 0; x != room.piece.sizeX; x++) {
-                if (room.getPlatformGrid(x, z)) {
+                if (!room.getPlatformGrid(x, z)) {
                     continue;
                 }
 
@@ -159,8 +193,7 @@ public class MapPlatform {
                     trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
                 }
 
-                    // always draw the top
-
+                // always draw the top
                 vertexArray.addAll(Arrays.asList(negX,ty,negZ,negX,ty,posZ,posX,ty,posZ,posX,ty,negZ));
                 normalArray.addAll(Arrays.asList(0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f));
                 trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
@@ -208,6 +241,8 @@ public class MapPlatform {
         if (AppWindow.random.nextBoolean()) {
             knockOutPlatformSides(room, (upper ? room : room.extendedFromRoom));
         }
+
         addPlatforms(room, roomNumber, y);
+        addPlatformWalls(room, y);
     }
 }

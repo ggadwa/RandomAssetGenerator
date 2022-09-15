@@ -46,6 +46,7 @@ public class MapIndoor extends MapBase {
             room = rooms.get(n);
             if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
                 mapStair.buildPlatformStair(room, n, true);
+                continue;
             }
             if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
                 mapStair.buildPlatformStair(room, n, false);
@@ -73,6 +74,7 @@ public class MapIndoor extends MapBase {
             room = rooms.get(n);
             if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
                 mapPlatform.build(room, n, true);
+                continue;
             }
             if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
                 mapPlatform.build(room, n, false);
@@ -86,6 +88,7 @@ public class MapIndoor extends MapBase {
         String[] outsideFloorBitmaps = {"Dirt", "Grass", "StonePattern"};
         String[] ceilingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "StonePattern", "WoodBoard"};
         String[] platformBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "StonePattern", "WoodBoard"};
+        String[] railingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "StonePattern", "WoodBoard"};
         String[] stairBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "StonePattern", "WoodBoard"};
         String[] skyBoxBitmaps = {"SkyBoxMountain"};
 
@@ -97,6 +100,7 @@ public class MapIndoor extends MapBase {
         BitmapBase.mapBitmapLoader(scene.bitmaps, "ceiling", ceilingBitmaps, textureSize);
         BitmapBase.mapBitmapLoader(scene.bitmaps, "ceiling_upper", ceilingBitmaps, textureSize);
         BitmapBase.mapBitmapLoader(scene.bitmaps, "platform", platformBitmaps, textureSize);
+        BitmapBase.mapBitmapLoader(scene.bitmaps, "railing", railingBitmaps, textureSize);
         BitmapBase.mapBitmapLoader(scene.bitmaps, "stair", stairBitmaps, textureSize);
 
         if (skyBox) {

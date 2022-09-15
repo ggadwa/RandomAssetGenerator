@@ -4,7 +4,8 @@
 
 
 
-- work on the animation joint stuff, just with indentity etc joints
+
+- work on the animation joint stuff, just with identity etc joints
 
 rendering:
 - rethink this part of fragment shader, maybe get more expressive textures
@@ -49,6 +50,7 @@ uniform highp mat4 jointMatrix[64];
 
 map
  - thread bitmap creation
+ - need to create railing platform walls
  - going up ramps is sometimes broken
  - open ceiling
  - windows
@@ -56,6 +58,7 @@ map
  - put back in decorations
 
 bitmaps
+ - wood splits is ugly
  - redo all bitmaps for textureSize for any numbers
  - gravel (like dirt)
  - more distinct control panels pieces (keyboard)

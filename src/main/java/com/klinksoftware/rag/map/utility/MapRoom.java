@@ -3,6 +3,7 @@ package com.klinksoftware.rag.map.utility;
 import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.utility.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MapRoom
 {
@@ -42,8 +43,10 @@ public class MapRoom
         // wall hiding
         wallHideArray = new byte[piece.wallLines.length];
 
-        // grids for blocking off platforms and decorations
+        // grids for platforms, start with a platform
+        // on every segment
         platformGrid = new boolean[piece.sizeX * piece.sizeZ];
+        Arrays.fill(platformGrid, true);
 
         // rooms remember a node to attach meshes to
         // this gets set later after creation
@@ -70,6 +73,7 @@ public class MapRoom
 
         room.wallHideArray = new byte[piece.wallLines.length];
         room.platformGrid = new boolean[piece.sizeX * piece.sizeZ];
+        Arrays.fill(room.platformGrid, true);
 
         return (room);
     }
@@ -502,13 +506,6 @@ public class MapRoom
 
             vIdx++;
         }
-        /*
-        if (xRun) {
-            return (new RagBound(piece.sizeX / 2, piece.sizeX / 2));
-        } else {
-            return (new RagBound(piece.sizeZ / 2, piece.sizeZ / 2));
-        }
-        */
 
         // now convert into x or z runs
         if (touchPoints.isEmpty()) return(null);
@@ -544,11 +541,13 @@ public class MapRoom
         // platform and blocking grid
         //
 
-    public void setPlatformGrid(int x, int z)    {
-        platformGrid[(z * piece.sizeX) + x] = true;
+    public void setPlatformGrid(int x, int z, boolean value) {
+        if ((x >= 0) && (x < piece.sizeX) && (z >= 0) && (z < piece.sizeZ)) {
+            platformGrid[(z * piece.sizeX) + x] = value;
+        }
     }
 
-    public boolean getPlatformGrid(int x, int z)    {
+    public boolean getPlatformGrid(int x, int z) {
         return (platformGrid[(z * piece.sizeX) + x]);
     }
 

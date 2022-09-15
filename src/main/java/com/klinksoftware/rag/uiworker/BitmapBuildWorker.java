@@ -32,6 +32,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         seed = Calendar.getInstance().getTimeInMillis();
         //seed = 1661461387975L;
         AppWindow.random.setSeed(seed);
+        System.out.println("seed=" + seed);
 
         try {
             bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmap.Bitmap" + bitmapName.replace(" ", ""))).getConstructor(int.class).newInstance(textureSize);

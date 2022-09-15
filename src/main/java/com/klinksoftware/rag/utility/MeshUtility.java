@@ -18,6 +18,10 @@ public class MeshUtility {
     public static final int RAMP_DIR_POS_X = 2;
     public static final int RAMP_DIR_NEG_X = 3;
 
+    public static final int AXIS_X = 0;
+    public static final int AXIS_Y = 1;
+    public static final int AXIS_Z = 2;
+
     // build UVs for vertex lists
     public static float[] buildUVs(float[] vertexes, float[] normals, float uvScale) {
         int n, k, nVertex, offset, minIntX, minIntY;
@@ -1125,6 +1129,93 @@ public class MeshUtility {
 
         // create the mesh
         normals = MeshUtility.buildNormals(vertexes, indexes, centerPnt, false);
+        tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
+
+        return (new Mesh(name, bitmapName, vertexes, normals, tangents, uvs, indexes));
+    }
+
+    // build a cylinder around axis
+    public static Mesh createCylinderAroundAxis(String name, String bitmapName, int axis, RagPoint pnt1, RagPoint pnt2, float radius, int aroundCount) {
+        int n;
+        float ang, angAdd, rd;
+        float tx, ty, tz, bx, by, bz;
+        ArrayList<Float> vertexArray, normalArray;
+        ArrayList<Integer> indexArray;
+        int[] indexes;
+        float[] vertexes, normals, tangents, uvs;
+        RagPoint normal;
+
+        // allocate arrays
+        vertexArray = new ArrayList<>();
+        normalArray = new ArrayList<>();
+        indexArray = new ArrayList<>();
+
+        normal = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        // the cylinder vertexes
+        ang = 0.0f;
+        angAdd = 360.0f / (float) aroundCount;
+
+        // we need to dupliacte the seam so the uvs work
+        for (n = 0; n != (aroundCount + 1); n++) {
+
+            if (n == aroundCount) {
+                ang = 0.0f;
+            }
+
+            // this is here to make square cylinders face forward
+            rd = (ang - 45.0f) * ((float) Math.PI / 180.0f);
+
+            // get the points around the cylinder
+            switch (axis) {
+                case AXIS_X:
+                    tx = pnt1.x;
+                    bx = pnt2.x;
+                    ty = by = pnt1.y + (radius * (float) Math.cos(rd));
+                    tz = bz = pnt1.z + (radius * (float) Math.sin(rd));
+                    break;
+                case AXIS_Y:
+                    tx = bx = pnt1.x + (radius * (float) Math.cos(rd));
+                    ty = pnt1.y;
+                    by = pnt2.y;
+                    tz = bz = pnt1.z + (radius * (float) Math.sin(rd));
+                    break;
+                default: // Z
+                    tx = bx = pnt1.x + (radius * (float) Math.cos(rd));
+                    ty = by = pnt1.y + (radius * (float) Math.sin(rd));
+                    tz = pnt1.z;
+                    bz = pnt2.z;
+                    break;
+            }
+
+            vertexArray.addAll(Arrays.asList(tx, ty, tz));
+            normal.setFromValues((tx - pnt1.x), (ty - pnt1.y), (tz - pnt1.z));
+            normal.normalize();
+            normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+
+            vertexArray.addAll(Arrays.asList(bx, by, bz));
+            normal.setFromValues((bx - pnt2.x), (by - pnt2.y), (bz - pnt2.z));
+            normal.normalize();
+            normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+
+            ang += angAdd;
+        }
+
+        // the cylinder triangles
+        for (n = 0; n != aroundCount; n++) {
+            indexArray.add(n * 2);
+            indexArray.add((n * 2) + 1);
+            indexArray.add((n + 1) * 2);
+            indexArray.add((n + 1) * 2);
+            indexArray.add(((n + 1) * 2) + 1);
+            indexArray.add((n * 2) + 1);
+        }
+
+        // create the mesh
+        vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
+        normals = MeshUtility.floatArrayListToFloat(normalArray);
+        uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBase.SEGMENT_SIZE));
+        indexes = MeshUtility.intArrayListToInt(indexArray);
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
         return (new Mesh(name, bitmapName, vertexes, normals, tangents, uvs, indexes));
