@@ -8,15 +8,14 @@ import com.klinksoftware.rag.utility.RagPoint;
 import java.util.*;
 
 public class MapPlatform {
-    public static final int PLATFORM_DIR_POS_Z=0;
-    public static final int PLATFORM_DIR_NEG_Z=1;
-    public static final int PLATFORM_DIR_POS_X=2;
-    public static final int PLATFORM_DIR_NEG_X=3;
+    public static final int RAIL_HALF_WALL = 0;
+    public static final int RAIL_QUARTER_WALL = 1;
+    public static final int RAIL_RAIL_SQUARE = 2;
+    public static final int RAIL_RAIL_ROUND = 3;
+    public static final int RAIL_RAIL_SQUARE_WALL = 4;
+    public static final int RAIL_RAIL_ROUND_WALL = 5;
 
-    public static final int FLAG_NONE=0;
-    public static final int FLAG_STEPS=1;
-    public static final int FLAG_PLATFORM=2;
-    public static final int FLAG_WALL=3;
+    public static final int RAIL_AROUND_COUNT = 8;
 
     private ArrayList<MapRoom> rooms;
 
@@ -56,43 +55,184 @@ public class MapPlatform {
         return (!room.getPlatformGrid(x, (z + 1)));
     }
 
-    private void addPlatformWalls(MapRoom room, float y) {
-        int x, z;
-        float sx, ty, by, sz;
+    // platform railings
+    private void addPlatformRailingSegment(MapRoom room, int railType, float railRadius, float railOffset, int x, int z, float y) {
+        float sx, ty, ty2, my, by, sz;
 
         by = y + MapBase.FLOOR_HEIGHT;
         ty = by + (MapBase.SEGMENT_SIZE * 0.5f);
+        ty2 = (railType == RAIL_RAIL_ROUND) ? ty : (ty - (railRadius * 0.5f));
+        my = by + (MapBase.SEGMENT_SIZE * 0.25f);
+
+        sx = (float) (x + room.x) * MapBase.SEGMENT_SIZE;
+        sz = (float) (z + room.z) * MapBase.SEGMENT_SIZE;
+
+        if ((x > 0) && (!room.getPlatformGrid((x - 1), z)) && (!(((x - 2) == room.stairX) && (z == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_POS_X)))) {
+            switch (railType) {
+                case RAIL_HALF_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.FLOOR_HEIGHT), by, ty, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    break;
+                case RAIL_QUARTER_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.FLOOR_HEIGHT), by, my, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    break;
+                case RAIL_RAIL_SQUARE:
+                    sx += railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint(sx, ty, sz), new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(sx, ty2, (sz + railOffset)), new RagPoint(sx, by, (sz + railOffset)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(sx, ty2, ((sz + MapBase.SEGMENT_SIZE) - railOffset)), new RagPoint(sx, by, ((sz + MapBase.SEGMENT_SIZE) + railOffset)), railRadius, 4));
+                    break;
+                case RAIL_RAIL_ROUND:
+                    sx += railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint(sx, ty, sz), new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(sx, ty2, (sz + railOffset)), new RagPoint(sx, by, (sz + railOffset)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(sx, ty2, ((sz + MapBase.SEGMENT_SIZE) - railOffset)), new RagPoint(sx, by, ((sz + MapBase.SEGMENT_SIZE) + railOffset)), railRadius, RAIL_AROUND_COUNT));
+                    break;
+                case RAIL_RAIL_SQUARE_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.FLOOR_HEIGHT), by, my, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    sx += railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint(sx, ty, sz), new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(sx, ty2, (sz + railOffset)), new RagPoint(sx, by, (sz + railOffset)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(sx, ty2, ((sz + MapBase.SEGMENT_SIZE) - railOffset)), new RagPoint(sx, by, ((sz + MapBase.SEGMENT_SIZE) + railOffset)), railRadius, 4));
+                    break;
+                case RAIL_RAIL_ROUND_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.FLOOR_HEIGHT), by, my, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    sx += railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint(sx, ty, sz), new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(sx, ty2, (sz + railOffset)), new RagPoint(sx, by, (sz + railOffset)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(sx, ty2, ((sz + MapBase.SEGMENT_SIZE) - railOffset)), new RagPoint(sx, by, ((sz + MapBase.SEGMENT_SIZE) + railOffset)), railRadius, RAIL_AROUND_COUNT));
+                    break;
+            }
+        }
+        if ((x < (room.piece.sizeX - 1)) && (!room.getPlatformGrid((x + 1), z)) && (!(((x + 2) == room.stairX) && (z == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_NEG_X)))) {
+            switch (railType) {
+                case RAIL_HALF_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", ((sx + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sx + MapBase.SEGMENT_SIZE), by, ty, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    break;
+                case RAIL_QUARTER_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", ((sx + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sx + MapBase.SEGMENT_SIZE), by, my, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    break;
+                case RAIL_RAIL_SQUARE:
+                    sx -= railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty2, (sz + railOffset)), new RagPoint((sx + MapBase.SEGMENT_SIZE), by, (sz + railOffset)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty2, ((sz + MapBase.SEGMENT_SIZE) - railOffset)), new RagPoint((sx + MapBase.SEGMENT_SIZE), by, ((sz + MapBase.SEGMENT_SIZE) + railOffset)), railRadius, 4));
+                    break;
+                case RAIL_RAIL_ROUND:
+                    sx -= railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty2, (sz + railOffset)), new RagPoint((sx + MapBase.SEGMENT_SIZE), by, (sz + railOffset)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty2, ((sz + MapBase.SEGMENT_SIZE) - railOffset)), new RagPoint((sx + MapBase.SEGMENT_SIZE), by, ((sz + MapBase.SEGMENT_SIZE) + railOffset)), railRadius, RAIL_AROUND_COUNT));
+                    break;
+                case RAIL_RAIL_SQUARE_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", ((sx + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sx + MapBase.SEGMENT_SIZE), by, my, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    sx -= railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty2, (sz + railOffset)), new RagPoint((sx + MapBase.SEGMENT_SIZE), by, (sz + railOffset)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty2, ((sz + MapBase.SEGMENT_SIZE) - railOffset)), new RagPoint((sx + MapBase.SEGMENT_SIZE), by, ((sz + MapBase.SEGMENT_SIZE) + railOffset)), railRadius, 4));
+                    break;
+                case RAIL_RAIL_ROUND_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", ((sx + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sx + MapBase.SEGMENT_SIZE), by, my, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    sx -= railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty2, (sz + railOffset)), new RagPoint((sx + MapBase.SEGMENT_SIZE), by, (sz + railOffset)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty2, ((sz + MapBase.SEGMENT_SIZE) - railOffset)), new RagPoint((sx + MapBase.SEGMENT_SIZE), by, ((sz + MapBase.SEGMENT_SIZE) + railOffset)), railRadius, RAIL_AROUND_COUNT));
+                    break;
+            }
+        }
+        if ((z > 0) && (!room.getPlatformGrid(x, (z - 1)) && (!((x == room.stairX) && ((z - 2) == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_POS_Z))))) {
+            switch (railType) {
+                case RAIL_HALF_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, ty, sz, (sz + MapBase.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    break;
+                case RAIL_QUARTER_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, my, sz, (sz + MapBase.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    break;
+                case RAIL_RAIL_SQUARE:
+                    sz += railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + railOffset), ty2, sz), new RagPoint((sx + railOffset), by, sz), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(((sx + MapBase.SEGMENT_SIZE) - railOffset), ty2, sz), new RagPoint(((sz + MapBase.SEGMENT_SIZE) + railOffset), by, sz), railRadius, 4));
+                    break;
+                case RAIL_RAIL_ROUND:
+                    sz += railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + railOffset), ty2, sz), new RagPoint((sx + railOffset), by, sz), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(((sx + MapBase.SEGMENT_SIZE) - railOffset), ty2, sz), new RagPoint(((sz + MapBase.SEGMENT_SIZE) + railOffset), by, sz), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, my, sz, (sz + MapBase.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    break;
+                case RAIL_RAIL_SQUARE_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, my, sz, (sz + MapBase.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    sz += railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + railOffset), ty2, sz), new RagPoint((sx + railOffset), by, sz), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(((sx + MapBase.SEGMENT_SIZE) - railOffset), ty2, sz), new RagPoint(((sz + MapBase.SEGMENT_SIZE) + railOffset), by, sz), railRadius, 4));
+                    break;
+                case RAIL_RAIL_ROUND_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, my, sz, (sz + MapBase.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    sz += railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + railOffset), ty2, sz), new RagPoint((sx + railOffset), by, sz), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(((sx + MapBase.SEGMENT_SIZE) - railOffset), ty2, sz), new RagPoint(((sz + MapBase.SEGMENT_SIZE) + railOffset), by, sz), railRadius, RAIL_AROUND_COUNT));
+                    break;
+            }
+        }
+        if ((z < (room.piece.sizeZ - 1)) && (!room.getPlatformGrid(x, (z + 1))) && (!((x == room.stairX) && ((z + 2) == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_NEG_Z)))) {
+            switch (railType) {
+                case RAIL_HALF_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, ty, ((sz + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    break;
+                case RAIL_QUARTER_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, my, ((sz + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    break;
+                case RAIL_RAIL_SQUARE:
+                    sz -= railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + railOffset), ty2, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + railOffset), by, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(((sx + MapBase.SEGMENT_SIZE) - railOffset), ty2, (sz + MapBase.SEGMENT_SIZE)), new RagPoint(((sz + MapBase.SEGMENT_SIZE) + railOffset), by, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    break;
+                case RAIL_RAIL_ROUND:
+                    sz -= railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + railOffset), ty2, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + railOffset), by, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(((sx + MapBase.SEGMENT_SIZE) - railOffset), ty2, (sz + MapBase.SEGMENT_SIZE)), new RagPoint(((sz + MapBase.SEGMENT_SIZE) + railOffset), by, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    break;
+                case RAIL_RAIL_SQUARE_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, my, ((sz + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    sz -= railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + railOffset), ty2, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + railOffset), by, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(((sx + MapBase.SEGMENT_SIZE) - railOffset), ty2, (sz + MapBase.SEGMENT_SIZE)), new RagPoint(((sz + MapBase.SEGMENT_SIZE) + railOffset), by, (sz + MapBase.SEGMENT_SIZE)), railRadius, 4));
+                    break;
+                case RAIL_RAIL_ROUND_WALL:
+                    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, my, ((sz + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                    sz -= railRadius;
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint((sx + railOffset), ty2, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + railOffset), by, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Y, new RagPoint(((sx + MapBase.SEGMENT_SIZE) - railOffset), ty2, (sz + MapBase.SEGMENT_SIZE)), new RagPoint(((sz + MapBase.SEGMENT_SIZE) + railOffset), by, (sz + MapBase.SEGMENT_SIZE)), railRadius, RAIL_AROUND_COUNT));
+                    break;
+            }
+        }
+    }
+
+    private void addPlatformRailing(MapRoom room, float y) {
+        int x, z;
+        int railType;
+        float railRadius, railOffset;
+
+        railType = AppWindow.random.nextInt(6);
+        railRadius = 0.15f + AppWindow.random.nextFloat(0.3f);
+        railOffset = 0.25f + AppWindow.random.nextFloat(0.4f);
 
         for (z = 0; z != room.piece.sizeZ; z++) {
-            sz = (float) (z + room.z) * MapBase.SEGMENT_SIZE;
-
             for (x = 0; x != room.piece.sizeX; x++) {
-                if (!room.getPlatformGrid(x, z)) {
-                    continue;
-                }
-
-                sx = (float) (x + room.x) * MapBase.SEGMENT_SIZE;
-
-                if ((x > 0) && (!room.getPlatformGrid((x - 1), z)) && (!(((x - 2) == room.stairX) && (z == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_POS_X)))) {
-                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint(sx, ty, sz), new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), MapBase.FLOOR_HEIGHT, 8));
-                    //room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.FLOOR_HEIGHT), by, ty, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                }
-                if ((x < (room.piece.sizeX - 1)) && (!room.getPlatformGrid((x + 1), z)) && (!(((x + 2) == room.stairX) && (z == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_NEG_X)))) {
-                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_Z, new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), MapBase.FLOOR_HEIGHT, 8));
-                    //room.node.addMesh(MeshUtility.createCube("railing", ((sx + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sx + MapBase.SEGMENT_SIZE), by, ty, sz, (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                }
-                if ((z > 0) && (!room.getPlatformGrid(x, (z - 1)) && (!((x == room.stairX) && ((z - 2) == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_POS_Z))))) {
-                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, sz), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, sz), MapBase.FLOOR_HEIGHT, 8));
-                    //    room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, ty, sz, (sz + MapBase.FLOOR_HEIGHT), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
-                }
-                if ((z < (room.piece.sizeZ - 1)) && (!room.getPlatformGrid(x, (z + 1))) && (!((x == room.stairX) && ((z + 2) == room.stairZ) && (room.stairDir == MeshMapUtility.STAIR_DIR_NEG_Z)))) {
-                    room.node.addMesh(MeshUtility.createCylinderAroundAxis("rail", "railing", MeshUtility.AXIS_X, new RagPoint(sx, ty, (sz + MapBase.SEGMENT_SIZE)), new RagPoint((sx + MapBase.SEGMENT_SIZE), ty, (sz + MapBase.SEGMENT_SIZE)), MapBase.FLOOR_HEIGHT, 8));
-                    //room.node.addMesh(MeshUtility.createCube("railing", sx, (sx + MapBase.SEGMENT_SIZE), by, ty, ((sz + MapBase.SEGMENT_SIZE) - MapBase.FLOOR_HEIGHT), (sz + MapBase.SEGMENT_SIZE), true, true, true, true, true, false, false, MeshUtility.UV_MAP));
+                if (room.getPlatformGrid(x, z)) {
+                    addPlatformRailingSegment(room, railType, railRadius, railOffset, x, z, y);
                 }
             }
         }
     }
 
+    // platform segments
     private void knockOutPlatformSides(MapRoom room, MapRoom platformRoom) {
         int x, z, k;
 
@@ -225,10 +365,7 @@ public class MapPlatform {
         room.node.addMesh(new Mesh(("platform_" + Integer.toString(roomNumber)), "platform", vertexes, normals, tangents, uvs, indexes));
     }
 
-        //
-        // second story mainline
-        //
-
+    // build platforms
     public void build(MapRoom room, int roomNumber, boolean upper) {
         float y;
 
@@ -243,6 +380,6 @@ public class MapPlatform {
         }
 
         addPlatforms(room, roomNumber, y);
-        addPlatformWalls(room, y);
+        addPlatformRailing(room, y);
     }
 }

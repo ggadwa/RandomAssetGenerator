@@ -57,132 +57,96 @@ public class BitmapConcrete extends BitmapBase
         drawSimpleCrack(sx, sy, ex, ey, (4 + AppWindow.random.nextInt(4)), AppWindow.random.nextInt(textureSize / 15), AppWindow.random.nextInt(textureSize / 15), crackColor);
     }
 
-    @Override
-    public void generateInternal() {
-        int n, k, stainSize, xSize, ySize;
-        int lft, rgt, top, bot, stainCount, markCount;
-        RagColor concreteColor, jointColor, altJointColor, crackColor;
+    private void drawStains(int lft, int top, int rgt, int bot) {
+        int n, k, stainCount, stainSize;
+        int xSize, ySize, markCount;
 
-        concreteColor=getRandomColor();
+        stainCount = AppWindow.random.nextInt(5);
+        stainSize = textureSize / 10;
 
-            // the concrete background
+        for (n = 0; n != stainCount; n++) {
+            lft = AppWindow.random.nextInt(textureSize);
+            xSize = stainSize + AppWindow.random.nextInt(stainSize);
 
-        drawRect(0,0,textureSize,textureSize,concreteColor);
+            top = AppWindow.random.nextInt(textureSize);
+            ySize = stainSize + AppWindow.random.nextInt(stainSize);
 
-        createPerlinNoiseData(16,16);
-        drawPerlinNoiseRect(0,0,textureSize,textureSize,0.6f,1.0f);
+            markCount = 2 + AppWindow.random.nextInt(4);
 
-        createNormalNoiseData(3.0f,0.4f);
-        drawNormalNoiseRect(0,0,textureSize,textureSize);
-
-            // stains
-
-        stainCount=AppWindow.random.nextInt(5);
-        stainSize=(int)((float)textureSize*0.1f);
-
-        for (n=0;n!=stainCount;n++) {
-            lft=AppWindow.random.nextInt(textureSize);
-            xSize=stainSize+AppWindow.random.nextInt(stainSize);
-
-            top=AppWindow.random.nextInt(textureSize);
-            ySize=stainSize+AppWindow.random.nextInt(stainSize);
-
-            markCount=2+AppWindow.random.nextInt(4);
-
-            for (k=0;k!=markCount;k++) {
-                rgt=lft+xSize;
-                if (rgt>=textureSize) rgt=textureSize-1;
-                bot=top+ySize;
-                if (bot>=textureSize) bot=textureSize-1;
+            for (k = 0; k != markCount; k++) {
+                rgt = lft + xSize;
+                if (rgt >= textureSize) {
+                    rgt = textureSize - 1;
+                }
+                bot = top + ySize;
+                if (bot >= textureSize) {
+                    bot = textureSize - 1;
+                }
 
                 drawOvalStain(lft, top, rgt, bot, (0.01f + AppWindow.random.nextFloat(0.01f)), (0.15f + AppWindow.random.nextFloat(0.05f)), (0.7f + AppWindow.random.nextFloat(0.2f)));
 
-                lft+=(AppWindow.random.nextBoolean())?(-(xSize/3)):(xSize/3);
-                top+=(AppWindow.random.nextBoolean())?(-(ySize/3)):(ySize/3);
-                xSize=(int)((float)xSize*0.8f);
-                ySize=(int)((float)ySize*0.8f);
+                lft += (AppWindow.random.nextBoolean()) ? (-(xSize / 3)) : (xSize / 3);
+                top += (AppWindow.random.nextBoolean()) ? (-(ySize / 3)) : (ySize / 3);
+                xSize = (int) ((float) xSize * 0.8f);
+                ySize = (int) ((float) ySize * 0.8f);
             }
         }
+    }
 
-        blur(colorData, 0, 0, textureSize, textureSize, (1 + AppWindow.random.nextInt(textureSize / 125)), false);
+    private void drawSingleChunk(int lft, int top, int rgt, int bot, int jointSize, RagColor concreteColor) {
+        int n, crackCount;
+        RagColor crackColor;
+
+        // the concrete background
+        drawRect(lft, top, rgt, bot, concreteColor);
+
+        createPerlinNoiseData(16, 16);
+        drawPerlinNoiseRect(lft, top, rgt, bot, 0.6f, 1.0f);
+
+        createNormalNoiseData(1.0f, 0.2f);
+        drawNormalNoiseRect(lft, top, rgt, bot);
+
+        // stains
+        drawStains(lft, top, rgt, bot);
+        blur(colorData, lft, top, rgt, bot, (1 + AppWindow.random.nextInt(textureSize / 125)), false);
+        blur(normalData, lft, top, rgt, bot, (3 + AppWindow.random.nextInt(textureSize / 125)), false);
 
         // concrete expansion joints
-        jointColor = adjustColorRandom(concreteColor, 0.5f, 0.6f);
-        altJointColor = adjustColor(jointColor, 0.9f);
+        draw3DDarkenFrameRect(lft, top, rgt, bot, jointSize, (0.85f + AppWindow.random.nextFloat(0.1f)), true);
 
-        crackColor = adjustColorRandom(concreteColor, 0.4f, 0.5f);
+        // cracks
+        crackCount = AppWindow.random.nextInt(3);
+
+        for (n = 0; n != crackCount; n++) {
+            crackColor = adjustColorRandom(concreteColor, 0.4f, 0.5f);
+            drawCracks((lft + jointSize), (top + jointSize), (rgt - 2), (bot - 2), crackColor);
+        }
+    }
+
+    @Override
+    public void generateInternal() {
+        int mid, jointSize;
+        RagColor concreteColor;
+
+        concreteColor = getRandomColor();
+        jointSize = (textureSize / 150) + AppWindow.random.nextInt(textureSize / 250);
+
+        mid = textureSize / 2;
 
         switch (AppWindow.random.nextInt(3)) {
-
-            // long cuts
-            case 0:
-                drawLineColor(1, 0, 1, textureSize, jointColor);
-                drawLineColor(0, 0, 0, textureSize, altJointColor);
-                drawLineColor(2, 0, 2, textureSize, altJointColor);
-                drawLineNormal(1, 0, 1, textureSize, NORMAL_CLEAR);
-                drawLineNormal(0, 0, 0, textureSize, NORMAL_RIGHT_45);
-                drawLineNormal(2, 0, 2, textureSize, NORMAL_LEFT_45);
-
-                drawCracks(2, 2, (textureSize - 4), (textureSize - 4), crackColor);
+            case 0: // 2 long cuts
+                drawSingleChunk(0, 0, mid, textureSize, jointSize, concreteColor);
+                drawSingleChunk(mid, 0, textureSize, textureSize, jointSize, concreteColor);
                 break;
-
-            // big square
-            case 1:
-                drawLineColor(1, 0, 1, textureSize, jointColor);
-                drawLineColor(0, 0, 0, textureSize, altJointColor);
-                drawLineColor(2, 0, 2, textureSize, altJointColor);
-                drawLineNormal(1, 0, 1, textureSize, NORMAL_CLEAR);
-                drawLineNormal(0, 0, 0, textureSize, NORMAL_RIGHT_45);
-                drawLineNormal(2, 0, 2, textureSize, NORMAL_LEFT_45);
-
-                drawLineColor(0, 1, textureSize, 1, jointColor);
-                drawLineColor(0, 0, textureSize, 0, altJointColor);
-                drawLineColor(0, 2, textureSize, 2, altJointColor);
-                drawLineNormal(0, 1, textureSize, 1, NORMAL_CLEAR);
-                drawLineNormal(0, 0, textureSize, 0, NORMAL_RIGHT_45);
-                drawLineNormal(0, 2, textureSize, 2, NORMAL_LEFT_45);
-
-                drawCracks(2, 2, (textureSize - 4), (textureSize - 4), crackColor);
+            case 1: // big square
+                drawSingleChunk(0, 0, textureSize, textureSize, jointSize, concreteColor);
                 break;
-
-            // small square
-            case 2:
-                k = textureSize / 2;
-
-                drawLineColor(1, 0, 1, textureSize, jointColor);
-                drawLineColor(0, 0, 0, textureSize, altJointColor);
-                drawLineColor(2, 0, 2, textureSize, altJointColor);
-                drawLineNormal(1, 0, 1, textureSize, NORMAL_CLEAR);
-                drawLineNormal(0, 0, 0, textureSize, NORMAL_RIGHT_45);
-                drawLineNormal(2, 0, 2, textureSize, NORMAL_LEFT_45);
-
-                drawLineColor((k + 1), 0, (k + 1), textureSize, jointColor);
-                drawLineColor(k, 0, k, textureSize, altJointColor);
-                drawLineColor((k + 2), 0, (k + 2), textureSize, altJointColor);
-                drawLineNormal((k + 1), 0, (k + 1), textureSize, NORMAL_CLEAR);
-                drawLineNormal(k, 0, k, textureSize, NORMAL_RIGHT_45);
-                drawLineNormal((k + 2), 0, (k + 2), textureSize, NORMAL_LEFT_45);
-
-                drawLineColor(0, 1, textureSize, 1, jointColor);
-                drawLineColor(0, 0, textureSize, 0, altJointColor);
-                drawLineColor(0, 2, textureSize, 2, altJointColor);
-                drawLineNormal(0, 1, textureSize, 1, NORMAL_CLEAR);
-                drawLineNormal(0, 0, textureSize, 0, NORMAL_RIGHT_45);
-                drawLineNormal(0, 2, textureSize, 2, NORMAL_LEFT_45);
-
-                drawLineColor(0, (k + 1), textureSize, (k + 1), jointColor);
-                drawLineColor(0, (k + 0), textureSize, (k + 0), altJointColor);
-                drawLineColor(0, (k + 2), textureSize, (k + 2), altJointColor);
-                drawLineNormal(0, (k + 1), textureSize, (k + 1), NORMAL_CLEAR);
-                drawLineNormal(0, (k + 0), textureSize, (k + 0), NORMAL_RIGHT_45);
-                drawLineNormal(0, (k + 2), textureSize, (k + 2), NORMAL_LEFT_45);
-
-                drawCracks(2, 2, (k - 2), (k - 2), crackColor);
-                drawCracks((k + 2), 2, (textureSize - 4), (k - 2), crackColor);
-                drawCracks(2, (k + 2), (k - 2), (textureSize - 4), crackColor);
-                drawCracks((k + 2), (k + 2), (textureSize - 4), (textureSize - 4), crackColor);
+            case 2: // small squares
+                drawSingleChunk(0, 0, mid, mid, jointSize, concreteColor);
+                drawSingleChunk(mid, 0, textureSize, mid, jointSize, concreteColor);
+                drawSingleChunk(0, mid, mid, textureSize, jointSize, concreteColor);
+                drawSingleChunk(mid, mid, textureSize, textureSize, jointSize, concreteColor);
                 break;
-
         }
 
         // finish with the metallic-roughness

@@ -56,12 +56,12 @@ public class BitmapDirt extends BitmapBase {
         stoneNormalData = normalData.clone();
 
         stoneCount = 3 + AppWindow.random.nextInt(8);
-        maxStoneSize = textureSize / 4;
+        maxStoneSize = textureSize / 10;
 
         rects = new ArrayList<>();
 
         for (n = 0; n != stoneCount; n++) {
-            stoneColor = getRandomColorDull(0.8f);
+            stoneColor = this.getRandomGrayColor(0.3f, 0.7f);
 
             failCount = 0;
             lft = rgt = top = bot = 0;
@@ -92,7 +92,7 @@ public class BitmapDirt extends BitmapBase {
 
             rects.add(testRect);
 
-            edgeSize = 50 + AppWindow.random.nextInt(60);
+            edgeSize = (textureSize / 10) + AppWindow.random.nextInt(textureSize / 10);
             xRoundFactor = 0.02f + (AppWindow.random.nextFloat(0.1f));
             yRoundFactor = 0.02f + (AppWindow.random.nextFloat(0.1f));
             normalZFactor = 0.2f + AppWindow.random.nextFloat(0.2f);

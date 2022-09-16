@@ -1,6 +1,6 @@
 
 
-- concrete next, bigger expansion joints, stains aren't showing up
+
 
 
 
@@ -50,7 +50,7 @@ uniform highp mat4 jointMatrix[64];
 
 map
  - thread bitmap creation
- - need to create railing platform walls
+ - stop getting caught on walls
  - going up ramps is sometimes broken
  - open ceiling
  - windows
@@ -58,10 +58,7 @@ map
  - put back in decorations
 
 bitmaps
- - wood splits is ugly
- - redo all bitmaps for textureSize for any numbers
  - gravel (like dirt)
- - more distinct control panels pieces (keyboard)
  - computer access panels have handles?
 
 model

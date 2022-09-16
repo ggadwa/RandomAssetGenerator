@@ -2823,6 +2823,105 @@ public class BitmapBase
         }
     }
 
+    protected void drawLineDarken(int x, int y, int x2, int y2, float darken) {
+        int xLen, yLen, sp, ep, dx, dy, idx, prevX, prevY;
+        float f, slope;
+
+        // the line
+        xLen = Math.abs(x2 - x);
+        yLen = Math.abs(y2 - y);
+
+        if ((xLen == 0) && (yLen == 0)) {
+            return;
+        }
+
+        if (xLen > yLen) {
+            slope = (float) yLen / (float) xLen;
+
+            if (x < x2) {
+                sp = x;
+                ep = x2;
+                f = y;
+                slope *= (float) Math.signum(y2 - y);
+            } else {
+                sp = x2;
+                ep = x;
+                f = y2;
+                slope *= (float) Math.signum(y - y2);
+            }
+
+            prevY = -1;
+
+            for (dx = sp; dx < ep; dx++) {
+                dy = (int) f;
+                if ((dx >= 0) && (dx < textureSize) && (dy >= 0) && (dy < textureSize)) {
+
+                    idx = ((dy * textureSize) + dx) * 4;
+                    colorData[idx] = colorData[idx] * darken;
+                    colorData[idx + 1] = colorData[idx + 1] * darken;
+                    colorData[idx + 2] = colorData[idx + 2] * darken;
+                    colorData[idx + 3] = 0.0f;
+
+                    if (prevY != -1) {
+                        if (dy != prevY) {
+                            idx = ((prevY * textureSize) + dx) * 4;
+                            colorData[idx] = colorData[idx] * (darken * 0.5f);
+                            colorData[idx + 1] = colorData[idx + 1] * (darken * 0.5f);
+                            colorData[idx + 2] = colorData[idx + 2] * (darken * 0.5f);
+                            colorData[idx + 3] = 0.0f;
+                        }
+                    }
+
+                    prevY = dy;
+                }
+
+                f += slope;
+            }
+        } else {
+            slope = (float) xLen / (float) yLen;
+
+            if (y < y2) {
+                sp = y;
+                ep = y2;
+                f = x;
+                slope *= (float) Math.signum(x2 - x);
+            } else {
+                sp = y2;
+                ep = y;
+                f = x2;
+                slope *= (float) Math.signum(x - x2);
+            }
+
+            prevX = -1;
+
+            for (dy = sp; dy < ep; dy++) {
+                dx = (int) f;
+                if ((dx >= 0) && (dx < textureSize) && (dy >= 0) && (dy < textureSize)) {
+
+                    idx = ((dy * textureSize) + dx) * 4;
+                    colorData[idx] = colorData[idx] * darken;
+                    colorData[idx + 1] = colorData[idx + 1] * darken;
+                    colorData[idx + 2] = colorData[idx + 2] * darken;
+                    colorData[idx + 3] = 0.0f;
+
+                    if (prevX != -1) {
+                        if (dx != prevX) {
+                            idx = ((dy * textureSize) + prevX) * 4;
+                            colorData[idx] = colorData[idx] * (darken * 0.5f);
+                            colorData[idx + 1] = colorData[idx + 1] * (darken * 0.5f);
+                            colorData[idx + 2] = colorData[idx + 2] * (darken * 0.5f);
+                            colorData[idx + 3] = 0.0f;
+                        }
+                    }
+
+                    prevX = dx;
+                }
+
+                f += slope;
+            }
+        }
+    }
+
     protected void drawLineColorEmissive(int x, int y, int x2, int y2, RagColor color, RagColor emissiveColor) {
         int xLen, yLen, sp, ep, dx, dy, idx, prevX, prevY;
         float f, slope;
@@ -3038,20 +3137,16 @@ public class BitmapBase
         }
     }
 
-    protected void drawLineNormal(int x,int y,int x2,int y2,RagPoint normal)
-    {
-        int         xLen,yLen,sp,ep,dx,dy,idx,
-                    prevX,prevY;
-        float       f,slope,r,g,b;
+    protected void drawLineNormal(int x, int y, int x2, int y2, RagPoint normal) {
+        int xLen, yLen, sp, ep, dx, dy, idx, prevX, prevY;
+        float f, slope, r, g, b;
 
-            // get normals in correct format
-
+        // get normals in correct format
         r=(normal.x+1.0f)*0.5f;
         g=(normal.y+1.0f)*0.5f;
         b=(normal.z+1.0f)*0.5f;
 
-            // the line
-
+        // the line
         xLen=Math.abs(x2-x);
         yLen=Math.abs(y2-y);
 
@@ -3342,6 +3437,38 @@ public class BitmapBase
         }
     }
 
+    protected void drawHorizontalRidge(int y, int x, int x2, int wid, float darken) {
+        int dy;
+
+        wid = wid / 2;
+
+        for (dy = (y - wid); dy < y; dy++) {
+            drawLineDarken(x, dy, x2, dy, darken);
+            drawLineNormal(x, dy, x2, dy, NORMAL_TOP_45);
+        }
+
+        for (dy = y; dy < (y + wid); dy++) {
+            drawLineDarken(x, dy, x2, dy, darken);
+            drawLineNormal(x, dy, x2, dy, NORMAL_BOTTOM_45);
+        }
+    }
+
+    protected void drawVerticalRidge(int x, int y, int y2, int wid, float darken) {
+        int dx;
+
+        wid = wid / 2;
+
+        for (dx = (x - wid); dx < x; dx++) {
+            drawLineDarken(dx, y, dx, y2, darken);
+            drawLineNormal(dx, y, dx, y2, NORMAL_TOP_45);
+        }
+
+        for (dx = x; dx < (x + wid); dx++) {
+            drawLineDarken(dx, y, dx, y2, darken);
+            drawLineNormal(dx, y, dx, y2, NORMAL_BOTTOM_45);
+        }
+    }
+
     //
     // random characters
     //
@@ -3437,53 +3564,53 @@ public class BitmapBase
         blur(normalData, (lft + edgeSize), (top + edgeSize), (rgt - edgeSize), (bot - edgeSize), (textureSize / 100), true);
 
         // chipped ends
-        maxChipLen = edgeSize * 5;
-        maxChipSize = edgeSize * 3;
+        maxChipLen = edgeSize * 3;
+        maxChipSize = edgeSize * 2;
 
         // lft-top end
-        chipCount = ((lft < 0) || (top < 0)) ? 0 : AppWindow.random.nextInt(10);
+        chipCount = ((lft < 0) || (top < 0)) ? 0 : AppWindow.random.nextInt(5);
         for (n = 0; n != chipCount; n++) {
 
             if (vert) {
-                x1 = lft + (AppWindow.random.nextInt((rgt - lft) - maxChipSize));
-                y1 = top;
+                x1 = (lft + edgeSize) + (AppWindow.random.nextInt((rgt - lft) - maxChipSize));
+                y1 = top + edgeSize;
                 x2 = x1 + (edgeSize + AppWindow.random.nextInt(maxChipSize));
-                y2 = top;
+                y2 = top + edgeSize;
                 x3 = (x1 + x2) / 2;
                 y3 = y2 + (edgeSize + AppWindow.random.nextInt(maxChipLen));
             } else {
-                x1 = lft;
-                y1 = top + (AppWindow.random.nextInt((bot - top) - maxChipSize));
-                x2 = lft;
+                x1 = lft + edgeSize;
+                y1 = (top + edgeSize) + (AppWindow.random.nextInt((bot - top) - maxChipSize));
+                x2 = lft + edgeSize;
                 y2 = y1 + (edgeSize + AppWindow.random.nextInt(maxChipSize));
                 x3 = x2 + (edgeSize + AppWindow.random.nextInt(maxChipLen));
                 y3 = (y1 + y2) / 2;
             }
 
-            darkenTriangle(x1, y1, x2, y2, x3, y3, true, (0.5f + AppWindow.random.nextFloat(0.2f)));
+            darkenTriangle(x1, y1, x2, y2, x3, y3, true, (0.4f + AppWindow.random.nextFloat(0.2f)));
         }
 
         // rgt-bot end
-        chipCount = ((rgt > textureSize) || (bot > textureSize)) ? 0 : AppWindow.random.nextInt(10);
+        chipCount = ((rgt > textureSize) || (bot > textureSize)) ? 0 : AppWindow.random.nextInt(5);
         for (n = 0; n != chipCount; n++) {
 
             if (vert) {
-                x1 = lft + (AppWindow.random.nextInt((rgt - lft) - maxChipSize));
+                x1 = (lft + edgeSize) + (AppWindow.random.nextInt((rgt - lft) - maxChipSize));
                 y1 = bot - edgeSize;
                 x2 = x1 + (edgeSize + AppWindow.random.nextInt(maxChipSize));
-                y2 = bot;
+                y2 = bot - edgeSize;
                 x3 = (x1 + x2) / 2;
                 y3 = y2 - (edgeSize + AppWindow.random.nextInt(maxChipLen));
             } else {
-                x1 = rgt;
-                y1 = top + (AppWindow.random.nextInt((bot - top) - maxChipSize));
-                x2 = rgt;
+                x1 = rgt - edgeSize;
+                y1 = (top + edgeSize) + (AppWindow.random.nextInt((bot - top) - maxChipSize));
+                x2 = rgt - edgeSize;
                 y2 = y1 + (edgeSize + AppWindow.random.nextInt(maxChipSize));
                 x3 = x2 + (edgeSize + AppWindow.random.nextInt(maxChipLen));
                 y3 = (y1 + y2) / 2;
             }
 
-            darkenTriangle(x1, y1, x2, y2, x3, y3, true, (0.5f + AppWindow.random.nextFloat(0.2f)));
+            darkenTriangle(x1, y1, x2, y2, x3, y3, true, (0.4f + AppWindow.random.nextFloat(0.2f)));
         }
 
         // the board edge

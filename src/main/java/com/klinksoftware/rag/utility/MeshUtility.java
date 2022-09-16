@@ -1137,9 +1137,9 @@ public class MeshUtility {
     // build a cylinder around axis
     public static Mesh createCylinderAroundAxis(String name, String bitmapName, int axis, RagPoint pnt1, RagPoint pnt2, float radius, int aroundCount) {
         int n;
-        float ang, angAdd, rd;
+        float ang, angAdd, rd, u, uAdd;
         float tx, ty, tz, bx, by, bz;
-        ArrayList<Float> vertexArray, normalArray;
+        ArrayList<Float> vertexArray, normalArray, uvArray;
         ArrayList<Integer> indexArray;
         int[] indexes;
         float[] vertexes, normals, tangents, uvs;
@@ -1148,6 +1148,7 @@ public class MeshUtility {
         // allocate arrays
         vertexArray = new ArrayList<>();
         normalArray = new ArrayList<>();
+        uvArray = new ArrayList<>();
         indexArray = new ArrayList<>();
 
         normal = new RagPoint(0.0f, 0.0f, 0.0f);
@@ -1155,6 +1156,9 @@ public class MeshUtility {
         // the cylinder vertexes
         ang = 0.0f;
         angAdd = 360.0f / (float) aroundCount;
+
+        u = 0.0f;
+        uAdd = 1.0f / (float) (aroundCount + 1);
 
         // we need to dupliacte the seam so the uvs work
         for (n = 0; n != (aroundCount + 1); n++) {
@@ -1192,13 +1196,16 @@ public class MeshUtility {
             normal.setFromValues((tx - pnt1.x), (ty - pnt1.y), (tz - pnt1.z));
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+            uvArray.addAll(Arrays.asList(u, 0.0f));
 
             vertexArray.addAll(Arrays.asList(bx, by, bz));
             normal.setFromValues((bx - pnt2.x), (by - pnt2.y), (bz - pnt2.z));
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+            uvArray.addAll(Arrays.asList(u, 1.0f));
 
             ang += angAdd;
+            u += uAdd;
         }
 
         // the cylinder triangles
@@ -1214,7 +1221,7 @@ public class MeshUtility {
         // create the mesh
         vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
         normals = MeshUtility.floatArrayListToFloat(normalArray);
-        uvs = MeshUtility.buildUVs(vertexes, normals, (1.0f / MapBase.SEGMENT_SIZE));
+        uvs = MeshUtility.floatArrayListToFloat(uvArray);
         indexes = MeshUtility.intArrayListToInt(indexArray);
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 

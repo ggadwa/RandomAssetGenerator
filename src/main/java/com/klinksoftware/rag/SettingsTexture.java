@@ -34,7 +34,7 @@ public class SettingsTexture extends SettingsBase {
         textureTypeList = addList(y, "Texture Type", getAnnotationClasses("com.klinksoftware.rag.bitmap", "bitmap", BitmapInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
-        textureSizeCombo = addComboBox(y, "Texture Size", TEXTURE_SIZE, 0);
+        textureSizeCombo = addComboBox(y, "Texture Size", TEXTURE_SIZE, 1);
         y += (ROW_HEIGHT + ROW_GAP);
 
         exportTextureButton = addButton(y, "Export Texture", BUTTON_EXPORT_TEXTURE);

@@ -193,7 +193,7 @@ public class BitmapComputer extends BitmapMonitor {
 
     private void generateComputerComponentDials(int lft, int top, int rgt, int bot) {
         int x, y, mx, my, xCount, yCount, xMargin, yMargin;
-        int margin, dx, dy, dx2, dy2, sz;
+        int margin, dx, dy, dx2, dy2, sz, charSize, charMargin;
         RagColor dialColor, outlineColor;
         RagPoint pnt;
 
@@ -261,6 +261,10 @@ public class BitmapComputer extends BitmapMonitor {
                 drawLineColor((mx + 1), my, ((mx + 1) + (int) pnt.x), (my + (int) pnt.z), outlineColor);
                 drawLineNormal(mx, my, (mx + (int) pnt.x), (my + (int) pnt.z), NORMAL_LEFT_45);
                 drawLineNormal((mx + 1), my, ((mx + 1) + (int) pnt.x), (my + (int) pnt.z), NORMAL_RIGHT_45);
+
+                charSize = (int) ((float) sz * 0.1f);
+                charMargin = (int) ((float) charSize * 0.1f);
+                generateRandomCharacterLine((mx - ((charSize + charMargin) * 3)), (my + (charSize + (charMargin * 2))), charSize, charSize, charMargin, 6, COLOR_BLACK, null);
             }
         }
     }
@@ -335,7 +339,7 @@ public class BitmapComputer extends BitmapMonitor {
         charPadding = textureSize / 250;
         charMargin = ((textureSize / 100) + edgeSize);
 
-        generateRandomCharacterLine((lft + charMargin), (top + charMargin), charWid, charHigh, charPadding, (3 + AppWindow.random.nextInt(3)), adjustColorRandom(altPanelColor, 0.5f, 0.8f), null);
+        generateRandomCharacterLine((lft + charMargin), (top + charMargin), charWid, charHigh, charPadding, (3 + AppWindow.random.nextInt(3)), COLOR_BLACK, null);
     }
 
     protected void generateComputerComponents(RagColor panelColor, int edgeSize) {

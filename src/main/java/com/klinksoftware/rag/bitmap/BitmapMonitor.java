@@ -61,6 +61,12 @@ public class BitmapMonitor extends BitmapBase {
         barCount = 5 + AppWindow.random.nextInt(3);
         barHigh = ((bot - top) - (margin * 4)) / barCount;
 
+        if (barHigh < 2) {
+            barHigh = 2;
+            margin = 1;
+            barCount = (bot - top) / (barHigh + margin);
+        }
+
         y = top + (margin * 2);
 
         for (n = 0; n != barCount; n++) {

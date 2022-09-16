@@ -29,7 +29,7 @@ public class BitmapRockCracked extends BitmapBase {
 
         normal = new RagPoint(0.0f, 0.0f, 0.0f);
 
-        sWid = 3 + AppWindow.random.nextInt(10);
+        sWid = (textureSize / 170) + AppWindow.random.nextInt(textureSize / 50);
 
         dx = sx;
         dy = sy;
@@ -44,7 +44,7 @@ public class BitmapRockCracked extends BitmapBase {
                 dy2 = ey;
                 dWid2 = sWid;
             } else {
-                dWid2 = 5 + AppWindow.random.nextInt(8);
+                dWid2 = (textureSize / 100) + AppWindow.random.nextInt(textureSize / 60);
                 dx2 = sx + (AppWindow.random.nextInt(cutVarient) * (AppWindow.random.nextBoolean() ? 1 : -1));
                 if (dx2 < dWid2) {
                     dx2 = dWid2;
@@ -122,7 +122,7 @@ public class BitmapRockCracked extends BitmapBase {
 
         normal = new RagPoint(0.0f, 0.0f, 0.0f);
 
-        sWid = 10 + AppWindow.random.nextInt(10);
+        sWid = (textureSize / 50) + AppWindow.random.nextInt(textureSize / 50);
 
         dx = sx;
         dy = sy;
@@ -136,7 +136,7 @@ public class BitmapRockCracked extends BitmapBase {
                 dWid2 = sWid;
 
             } else {
-                dWid2 = 5 + AppWindow.random.nextInt(8);
+                dWid2 = (textureSize / 100) + AppWindow.random.nextInt(textureSize / 60);
                 dx2 = sx + (int) ((float) ((ex - sx) * (n + 1)) / (float) segCount);
                 dy2 = sy + (AppWindow.random.nextInt(cutVarient) * (AppWindow.random.nextBoolean() ? 1 : -1));
                 if (dy2 < dWid2) {
@@ -217,14 +217,14 @@ public class BitmapRockCracked extends BitmapBase {
 
     @Override
     public void generateInternal() {
-        int n, x, lx, rx, cutVarient, pIdx, pIdx2;
+        int n, x, lx, cutVarient, pIdx, pIdx2;
         ArrayList<Integer> xs;
         ArrayList<Pair<Integer, Integer>> pnts1, pnts2;
         RagColor caveColor;
 
         caveColor = getRandomColor();
 
-        cutVarient = 5 + AppWindow.random.nextInt(20);
+        cutVarient = (textureSize / 100) + AppWindow.random.nextInt(textureSize / 25);
 
         // get the rock stripes
         x = cutVarient;
@@ -232,7 +232,7 @@ public class BitmapRockCracked extends BitmapBase {
         xs.add(0);
 
         while (true) {
-            x += (cutVarient + AppWindow.random.nextInt(100));
+            x += (cutVarient + AppWindow.random.nextInt(textureSize / 10));
             if (x < (textureSize - cutVarient)) {
                 xs.add(x);
             } else {
