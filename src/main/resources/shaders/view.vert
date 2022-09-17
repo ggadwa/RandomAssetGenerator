@@ -4,9 +4,12 @@ in highp vec3 vertexPosition;
 in highp vec3 vertexNormal;
 in highp vec3 vertexTangent;
 in highp vec2 vertexUV;
+in highp vec4 vertexJoint;
+in highp vec4 vertexWeight;
 
 uniform highp mat4 perspectiveMatrix;
 uniform highp mat4 viewMatrix,modelMatrix;
+uniform highp mat4 jointMatrix[128];
 
 uniform int displayType;
 uniform bool skinned;
@@ -21,9 +24,16 @@ void main(void)
     highp mat3 normalMatrix;
 
     // calculate the position
-    pos=viewMatrix*modelMatrix*vec4(vertexPosition,1.0);
-    normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)));
-    
+    if (skinned) {
+        highp mat4 skinMatrix=(vertexWeight.x*jointMatrix[int(vertexJoint.x)])+(vertexWeight.y*jointMatrix[int(vertexJoint.y)])+(vertexWeight.z*jointMatrix[int(vertexJoint.z)])+(vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
+        pos=viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
+        normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(skinMatrix)));
+    }
+    else {
+        pos=viewMatrix*modelMatrix*vec4(vertexPosition,1.0);
+        normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)));
+    }
+
     // the frag position
     gl_Position=perspectiveMatrix*pos;
 

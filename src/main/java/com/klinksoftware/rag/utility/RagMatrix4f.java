@@ -220,5 +220,59 @@ public class RagMatrix4f {
         data[14]=d14;
         data[15]=d15;
     }
+    public void setFromMultiple(RagMatrix4f mat1, RagMatrix4f mat2) {
+        data[0] = (mat1.data[0] * mat2.data[0]) + (mat1.data[4] * mat2.data[1]) + (mat1.data[8] * mat2.data[2]) + (mat1.data[12] * mat2.data[3]);
+        data[4] = (mat1.data[0] * mat2.data[4]) + (mat1.data[4] * mat2.data[5]) + (mat1.data[8] * mat2.data[6]) + (mat1.data[12] * mat2.data[7]);
+        data[8] = (mat1.data[0] * mat2.data[8]) + (mat1.data[4] * mat2.data[9]) + (mat1.data[8] * mat2.data[10]) + (mat1.data[12] * mat2.data[11]);
+        data[12] = (mat1.data[0] * mat2.data[12]) + (mat1.data[4] * mat2.data[13]) + (mat1.data[8] * mat2.data[14]) + (mat1.data[12] * mat2.data[15]);
+
+        data[1] = (mat1.data[1] * mat2.data[0]) + (mat1.data[5] * mat2.data[1]) + (mat1.data[9] * mat2.data[2]) + (mat1.data[13] * mat2.data[3]);
+        data[5] = (mat1.data[1] * mat2.data[4]) + (mat1.data[5] * mat2.data[5]) + (mat1.data[9] * mat2.data[6]) + (mat1.data[13] * mat2.data[7]);
+        data[9] = (mat1.data[1] * mat2.data[8]) + (mat1.data[5] * mat2.data[9]) + (mat1.data[9] * mat2.data[10]) + (mat1.data[13] * mat2.data[11]);
+        data[13] = (mat1.data[1] * mat2.data[12]) + (mat1.data[5] * mat2.data[13]) + (mat1.data[9] * mat2.data[14]) + (mat1.data[13] * mat2.data[15]);
+
+        data[2] = (mat1.data[2] * mat2.data[0]) + (mat1.data[6] * mat2.data[1]) + (mat1.data[10] * mat2.data[2]) + (mat1.data[14] * mat2.data[3]);
+        data[6] = (mat1.data[2] * mat2.data[4]) + (mat1.data[6] * mat2.data[5]) + (mat1.data[10] * mat2.data[6]) + (mat1.data[14] * mat2.data[7]);
+        data[10] = (mat1.data[2] * mat2.data[8]) + (mat1.data[6] * mat2.data[9]) + (mat1.data[10] * mat2.data[10]) + (mat1.data[14] * mat2.data[11]);
+        data[14] = (mat1.data[2] * mat2.data[12]) + (mat1.data[6] * mat2.data[13]) + (mat1.data[10] * mat2.data[14]) + (mat1.data[14] * mat2.data[15]);
+
+        data[3] = (mat1.data[3] * mat2.data[0]) + (mat1.data[7] * mat2.data[1]) + (mat1.data[11] * mat2.data[2]) + (mat1.data[15] * mat2.data[3]);
+        data[7] = (mat1.data[3] * mat2.data[4]) + (mat1.data[7] * mat2.data[5]) + (mat1.data[11] * mat2.data[6]) + (mat1.data[15] * mat2.data[7]);
+        data[11] = (mat1.data[3] * mat2.data[8]) + (mat1.data[7] * mat2.data[9]) + (mat1.data[11] * mat2.data[10]) + (mat1.data[15] * mat2.data[11]);
+        data[15] = (mat1.data[3] * mat2.data[12]) + (mat1.data[7] * mat2.data[13]) + (mat1.data[11] * mat2.data[14]) + (mat1.data[15] * mat2.data[15]);
+    }
+
+    public void setFromInvertMatrix(RagMatrix4f mat) {
+        int n;
+        float det;
+
+        data[0] = (mat.data[5] * mat.data[10] * mat.data[15]) - (mat.data[5] * mat.data[11] * mat.data[14]) - (mat.data[9] * mat.data[6] * mat.data[15]) + (mat.data[9] * mat.data[7] * mat.data[14]) + (mat.data[13] * mat.data[6] * mat.data[11]) - (mat.data[13] * mat.data[7] * mat.data[10]);
+        data[4] = (-mat.data[4] * mat.data[10] * mat.data[15]) + (mat.data[4] * mat.data[11] * mat.data[14]) + (mat.data[8] * mat.data[6] * mat.data[15]) - (mat.data[8] * mat.data[7] * mat.data[14]) - (mat.data[12] * mat.data[6] * mat.data[11]) + (mat.data[12] * mat.data[7] * mat.data[10]);
+        data[8] = (mat.data[4] * mat.data[9] * mat.data[15]) - (mat.data[4] * mat.data[11] * mat.data[13]) - (mat.data[8] * mat.data[5] * mat.data[15]) + (mat.data[8] * mat.data[7] * mat.data[13]) + (mat.data[12] * mat.data[5] * mat.data[11]) - (mat.data[12] * mat.data[7] * mat.data[9]);
+        data[12] = (-mat.data[4] * mat.data[9] * mat.data[14]) + (mat.data[4] * mat.data[10] * mat.data[13]) + (mat.data[8] * mat.data[5] * mat.data[14]) - (mat.data[8] * mat.data[6] * mat.data[13]) - (mat.data[12] * mat.data[5] * mat.data[10]) + (mat.data[12] * mat.data[6] * mat.data[9]);
+        data[1] = (-mat.data[1] * mat.data[10] * mat.data[15]) + (mat.data[1] * mat.data[11] * mat.data[14]) + (mat.data[9] * mat.data[2] * mat.data[15]) - (mat.data[9] * mat.data[3] * mat.data[14]) - (mat.data[13] * mat.data[2] * mat.data[11]) + (mat.data[13] * mat.data[3] * mat.data[10]);
+        data[5] = (mat.data[0] * mat.data[10] * mat.data[15]) - (mat.data[0] * mat.data[11] * mat.data[14]) - (mat.data[8] * mat.data[2] * mat.data[15]) + (mat.data[8] * mat.data[3] * mat.data[14]) + (mat.data[12] * mat.data[2] * mat.data[11]) - (mat.data[12] * mat.data[3] * mat.data[10]);
+        data[9] = (-mat.data[0] * mat.data[9] * mat.data[15]) + (mat.data[0] * mat.data[11] * mat.data[13]) + (mat.data[8] * mat.data[1] * mat.data[15]) - (mat.data[8] * mat.data[3] * mat.data[13]) - (mat.data[12] * mat.data[1] * mat.data[11]) + (mat.data[12] * mat.data[3] * mat.data[9]);
+        data[13] = (mat.data[0] * mat.data[9] * mat.data[14]) - (mat.data[0] * mat.data[10] * mat.data[13]) - (mat.data[8] * mat.data[1] * mat.data[14]) + (mat.data[8] * mat.data[2] * mat.data[13]) + (mat.data[12] * mat.data[1] * mat.data[10]) - (mat.data[12] * mat.data[2] * mat.data[9]);
+        data[2] = (mat.data[1] * mat.data[6] * mat.data[15]) - (mat.data[1] * mat.data[7] * mat.data[14]) - (mat.data[5] * mat.data[2] * mat.data[15]) + (mat.data[5] * mat.data[3] * mat.data[14]) + (mat.data[13] * mat.data[2] * mat.data[7]) - (mat.data[13] * mat.data[3] * mat.data[6]);
+        data[6] = (-mat.data[0] * mat.data[6] * mat.data[15]) + (mat.data[0] * mat.data[7] * mat.data[14]) + (mat.data[4] * mat.data[2] * mat.data[15]) - (mat.data[4] * mat.data[3] * mat.data[14]) - (mat.data[12] * mat.data[2] * mat.data[7]) + (mat.data[12] * mat.data[3] * mat.data[6]);
+        data[10] = (mat.data[0] * mat.data[5] * mat.data[15]) - (mat.data[0] * mat.data[7] * mat.data[13]) - (mat.data[4] * mat.data[1] * mat.data[15]) + (mat.data[4] * mat.data[3] * mat.data[13]) + (mat.data[12] * mat.data[1] * mat.data[7]) - (mat.data[12] * mat.data[3] * mat.data[5]);
+        data[14] = (-mat.data[0] * mat.data[5] * mat.data[14]) + (mat.data[0] * mat.data[6] * mat.data[13]) + (mat.data[4] * mat.data[1] * mat.data[14]) - (mat.data[4] * mat.data[2] * mat.data[13]) - (mat.data[12] * mat.data[1] * mat.data[6]) + (mat.data[12] * mat.data[2] * mat.data[5]);
+        data[3] = (-mat.data[1] * mat.data[6] * mat.data[11]) + (mat.data[1] * mat.data[7] * mat.data[10]) + (mat.data[5] * mat.data[2] * mat.data[11]) - (mat.data[5] * mat.data[3] * mat.data[10]) - (mat.data[9] * mat.data[2] * mat.data[7]) + (mat.data[9] * mat.data[3] * mat.data[6]);
+        data[7] = (mat.data[0] * mat.data[6] * mat.data[11]) - (mat.data[0] * mat.data[7] * mat.data[10]) - (mat.data[4] * mat.data[2] * mat.data[11]) + (mat.data[4] * mat.data[3] * mat.data[10]) + (mat.data[8] * mat.data[2] * mat.data[7]) - (mat.data[8] * mat.data[3] * mat.data[6]);
+        data[11] = (-mat.data[0] * mat.data[5] * mat.data[11]) + (mat.data[0] * mat.data[7] * mat.data[9]) + (mat.data[4] * mat.data[1] * mat.data[11]) - (mat.data[4] * mat.data[3] * mat.data[9]) - (mat.data[8] * mat.data[1] * mat.data[7]) + (mat.data[8] * mat.data[3] * mat.data[5]);
+        data[15] = (mat.data[0] * mat.data[5] * mat.data[10]) - (mat.data[0] * mat.data[6] * mat.data[9]) - (mat.data[4] * mat.data[1] * mat.data[10]) + (mat.data[4] * mat.data[2] * mat.data[9]) + (mat.data[8] * mat.data[1] * mat.data[6]) - (mat.data[8] * mat.data[2] * mat.data[5]);
+
+        det = (mat.data[0] * data[0]) + (mat.data[1] * data[4]) + (mat.data[2] * data[8]) + (mat.data[3] * data[12]);
+        if (det == 0) {
+            return;
+        }
+
+        det = 1.0f / det;
+
+        for (n = 0; n != 16; n++) {
+            data[n] *= det;
+        }
+    }
 
 }

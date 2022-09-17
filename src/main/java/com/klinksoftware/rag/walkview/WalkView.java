@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.walkview;
 
+import com.klinksoftware.rag.scene.Animation;
 import com.klinksoftware.rag.scene.Scene;
 import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.scene.Mesh;
@@ -35,8 +36,9 @@ public class WalkView extends AWTGLCanvas {
 
     public int wid, high;
     private int vertexShaderId,fragmentShaderId,programId;
-    private int vertexPositionAttribute,vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute;
+    private int vertexPositionAttribute, vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute, vertexJointAttribute, vertexWeightAttribute;
     private int perspectiveMatrixUniformId, viewMatrixUniformId, modelMatrixUniformId, lightPositionIntensityUniformId;
+    private int[] jointMatrixesUniformId;
     private int skinnedUniformId, displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId, baseColorUniformId;
     private int displayType, skeletonLineCount;
     private long nextPaintTick;
@@ -82,6 +84,7 @@ public class WalkView extends AWTGLCanvas {
     // start up and shutdown
     @Override
     public void initGL() {
+        int n;
         String vertexSource, fragmentSource;
         String errorStr;
 
@@ -196,6 +199,12 @@ public class WalkView extends AWTGLCanvas {
         viewMatrixUniformId = glGetUniformLocation(programId, "viewMatrix");
         modelMatrixUniformId = glGetUniformLocation(programId, "modelMatrix");
 
+        jointMatrixesUniformId = new int[Animation.JOINT_COUNT];
+
+        for (n = 0; n != Animation.JOINT_COUNT; n++) {
+            jointMatrixesUniformId[n] = glGetUniformLocation(programId, ("jointMatrix[" + Integer.toString(n) + "]"));
+        }
+
         skinnedUniformId = glGetUniformLocation(programId, "skinned");
         displayTypeUniformId = glGetUniformLocation(programId, "displayType");
 
@@ -211,7 +220,9 @@ public class WalkView extends AWTGLCanvas {
         vertexPositionAttribute=glGetAttribLocation(programId,"vertexPosition");
         vertexUVAttribute=glGetAttribLocation(programId,"vertexUV");
         vertexNormalAttribute=glGetAttribLocation(programId,"vertexNormal");
-        vertexTangentAttribute=glGetAttribLocation(programId,"vertexTangent");
+        vertexTangentAttribute = glGetAttribLocation(programId, "vertexTangent");
+        vertexJointAttribute = glGetAttribLocation(programId, "vertexJoint");
+        vertexWeightAttribute = glGetAttribLocation(programId, "vertexWeight");
 
         // enable everything we need to draw
         glUseProgram(programId);
@@ -223,6 +234,8 @@ public class WalkView extends AWTGLCanvas {
         glEnableVertexAttribArray(vertexUVAttribute);
         glEnableVertexAttribArray(vertexNormalAttribute);
         glEnableVertexAttribArray(vertexTangentAttribute);
+        glEnableVertexAttribArray(vertexJointAttribute);
+        glEnableVertexAttribArray(vertexWeightAttribute);
         glUseProgram(0);
 
         // redraw timing
@@ -482,6 +495,28 @@ public class WalkView extends AWTGLCanvas {
     }
 
     //
+    // animations
+    //
+    private void setupAnimation(MemoryStack stack, long tick) {
+        int n;
+        FloatBuffer buf;
+        ArrayList<RagMatrix4f> jointMatrixes;
+
+        // no skin, no animation
+        if (!scene.skinned) {
+            return;
+        }
+
+        // get all the current animation matrixes
+        jointMatrixes = scene.animation.buildJointMatrixesForAnimation(tick);
+        for (n = 0; n != Animation.JOINT_COUNT; n++) {
+            buf = stack.mallocFloat(16);
+            buf.put(jointMatrixes.get(n).data).flip();
+            glUniformMatrix4fv(jointMatrixesUniformId[n], false, buf);
+        }
+    }
+
+    //
     // drawing utilities
     //
     private void switchTexture(WalkViewTexture texture, long tick) {
@@ -525,6 +560,14 @@ public class WalkView extends AWTGLCanvas {
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh.vboTangentId);
         glVertexAttribPointer(vertexTangentAttribute, 3, GL_FLOAT, false, 0, 0);
+
+        if (scene.skinned) {
+            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboJointId);
+            glVertexAttribPointer(vertexJointAttribute, 4, GL_FLOAT, false, 0, 0);
+
+            glBindBuffer(GL_ARRAY_BUFFER, mesh.vboWeightId);
+            glVertexAttribPointer(vertexWeightAttribute, 4, GL_FLOAT, false, 0, 0);
+        }
     }
 
     //
@@ -768,6 +811,8 @@ public class WalkView extends AWTGLCanvas {
             glUniform4fv(lightPositionIntensityUniformId, buf);
 
             glUniform1i(displayTypeUniformId, displayType);
+
+            setupAnimation(stack, tick);
         }
 
         // setup culling frustum

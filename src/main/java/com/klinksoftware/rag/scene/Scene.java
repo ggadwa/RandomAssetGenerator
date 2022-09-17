@@ -59,7 +59,7 @@ public class Scene {
                 return (node);
             }
         }
-        return (rootNode);
+        return (null);
     }
 
     // convience routine to get all meshes from the tree
@@ -157,8 +157,30 @@ public class Scene {
         }
     }
 
+    // we use this to shift the absolute vertexes to be relative to the
+    // node the mesh is attached to.  We use this for maps
     public void shiftAbsoluteMeshesToNodeRelativeMeshes() {
         shiftAbsoluteMeshesToNodeRelativeMeshesRecursive(rootNode, new RagPoint(0.0f, 0.0f, 0.0f));
+    }
+
+    // we use this to shift the absolute vertexes to stay absolute but
+    // be attached only to the root node.  We do this so skinned animations can
+    // work with all nodes
+    public void attachAllAbsoluteMeshesToRootNode() {
+        ArrayList<Mesh> meshes;
+
+        // get this first otherwise it gets cleared
+        meshes = getAllMeshes();
+
+        // clear all nodes first
+        for (Node node : getAllNodes()) {
+            node.clearMeshes();
+        }
+
+        // now attach all meshes to root node
+        for (Mesh mesh : meshes) {
+            rootNode.addMesh(mesh);
+        }
     }
 
     // setup all the gl buffers for meshes in the node tree
@@ -268,7 +290,9 @@ public class Scene {
         rootNode.addMesh(new Mesh("cube", "bitmap", vertexes, normals, tangents, uvs, indexes));
     }
 
-    // find nearest node
+    // find nearest node, only works on items where
+    // the vertexes are absolute and the absolute node
+    // points have been calculated
     public Node findNearestNode(RagPoint pnt) {
         float dist, currentDist;
         Node currentNode;
@@ -277,7 +301,7 @@ public class Scene {
         currentDist = 0.0f;
 
         for (Node node : getAllNodes()) {
-            dist = node.pnt.distance(pnt);
+            dist = node.getAbsolutePoint().distance(pnt);
             if (currentNode == null) {
                 currentDist = dist;
                 currentNode = node;
@@ -292,10 +316,7 @@ public class Scene {
         return ((currentNode == null) ? rootNode : currentNode);
     }
 
-
     // create joints and weights for each vertexes
-    // we need to create a flat list of nodes here so we can reach them
-    // by index, which is what is in the joints x/y/z/w floats
     public void createJointsAndWeights() {
         for (Mesh mesh : getAllMeshes()) {
             mesh.createJointsAndWeights(this);

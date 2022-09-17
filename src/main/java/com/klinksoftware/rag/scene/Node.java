@@ -7,7 +7,6 @@ import java.util.ArrayList;
 // a gltf file, has list of child nodes and list of child meshes,
 // the meshes become primitives in the gltf
 public class Node {
-
     public int index;
     public String name;
     public Node parentNode;

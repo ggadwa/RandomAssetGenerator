@@ -259,7 +259,7 @@ public class SkeletonBuilder
         Node parentNode, headNode, jawNode;
         RagPoint pnt, meshScale, globeRadius, rotAngle;
 
-        parentNode = scene.findNodeByName("Torso_Shoulder");
+        parentNode = scene.findNodeByName("torso_shoulder");
         neckRadius = headRadius * (0.3f + AppWindow.random.nextFloat(0.3f));
 
         // the head nodes
@@ -311,7 +311,7 @@ public class SkeletonBuilder
             }
         }
 
-        parentNode = scene.findNodeByName("Torso_Top");
+        parentNode = scene.findNodeByName("torso_top");
         neckRadius = headRadius * (0.2f + AppWindow.random.nextFloat(0.3f));
         headLength = headRadius * (0.9f + (AppWindow.random.nextFloat(0.6f)));
 
@@ -372,28 +372,28 @@ public class SkeletonBuilder
 
         // the spine
         hipPnt = new RagPoint(0, hipHigh, 0);
-        hipNode = new Node("Hip", hipPnt);
+        hipNode = new Node("hip", hipPnt);
         scene.rootNode.addChild(hipNode);
 
         waistPnt = new RagPoint(0, (0.5f + AppWindow.random.nextFloat(0.7f)), 0);
         if (hunchAng != 0.0f) {
             waistPnt.rotateX(hunchAng - (0.5f + (AppWindow.random.nextFloat(0.05f))));
         }
-        waistNode = new Node("Waist", waistPnt);
+        waistNode = new Node("waist", waistPnt);
         hipNode.addChild(waistNode);
 
         torsoBottomPnt = new RagPoint(0, (0.5f + AppWindow.random.nextFloat(0.6f)), 0);
         if (hunchAng != 0.0f) {
             torsoBottomPnt.rotateX(hunchAng - (0.5f + (AppWindow.random.nextFloat(0.05f))));
         }
-        torsoBottomNode = new Node("Torso_Bottom", torsoBottomPnt);
+        torsoBottomNode = new Node("torso_bottom", torsoBottomPnt);
         waistNode.addChild(torsoBottomNode);
 
         torsoShoulderPnt = new RagPoint(0, (0.5f + AppWindow.random.nextFloat(0.6f)), 0);
         if (hunchAng != 0.0f) {
             torsoShoulderPnt.rotateX(hunchAng - (0.5f + (AppWindow.random.nextFloat(0.05f))));
         }
-        torsoShoulderNode = new Node("Torso_Shoulder", torsoShoulderPnt);
+        torsoShoulderNode = new Node("torso_shoulder", torsoShoulderPnt);
         torsoBottomNode.addChild(torsoShoulderNode);
 
         if (modelType == MODEL_TYPE_ANIMAL) {
@@ -406,7 +406,7 @@ public class SkeletonBuilder
         if (hunchAng != 0.0f) {
             torsoTopPnt.rotateX(hunchAng - (0.5f + (AppWindow.random.nextFloat(0.05f))));
         }
-        torsoTopNode = new Node("Torso_Top", torsoTopPnt);
+        torsoTopNode = new Node("torso_top", torsoTopPnt);
         torsoShoulderNode.addChild(torsoTopNode);
 
         // body limbs
@@ -421,7 +421,7 @@ public class SkeletonBuilder
         if (modelType == MODEL_TYPE_ANIMAL) {
             buttPnt = new RagPoint(0, 0, -(legRadius + (0.3f + AppWindow.random.nextFloat(0.3f))));
             buttRadius = bodyRadius * (0.2f + (AppWindow.random.nextFloat(0.3f)));
-            buttNode = new Node("Butt", buttPnt);
+            buttNode = new Node("butt", buttPnt);
             hipNode.addChild(buttNode);
             limbs.add(new Limb("butt", "body", Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, axis, meshScale, hipNode, hipRadius, buttNode, buttRadius));
         }
@@ -430,7 +430,7 @@ public class SkeletonBuilder
         if (modelType == MODEL_TYPE_HUMANOID) {
             groinPnt = new RagPoint(0, -(0.2f + AppWindow.random.nextFloat(0.3f)), 0);
             groinRadius = bodyRadius * (0.1f + (AppWindow.random.nextFloat(0.1f)));
-            groinNode = new Node("Groin", groinPnt);
+            groinNode = new Node("groin", groinPnt);
             hipNode.addChild(groinNode);
             limbs.add(new Limb("groin", "body", Limb.MESH_TYPE_CYLINDER_CLOSE_TOP, axis, meshScale, hipNode, hipRadius, groinNode, groinRadius));
         }
@@ -495,7 +495,7 @@ public class SkeletonBuilder
             // the arm pairs
 
         if (topArms) {
-            node = scene.findNodeByName("Torso_Shoulder");
+            node = scene.findNodeByName("torso_shoulder");
 
             if (!bilateral) {
                 buildArmsRandomSet(node, armCount, 0, armLength, handRadius, fingerCount, fingerLength);
@@ -506,7 +506,7 @@ public class SkeletonBuilder
         }
 
         if (midArms) {
-            node = scene.findNodeByName("Torso_Bottom");
+            node = scene.findNodeByName("torso_bottom");
 
             if (!bilateral) {
                 buildArmsRandomSet(node, armCount, armCount, armLength, handRadius, fingerCount, fingerLength);
@@ -540,7 +540,7 @@ public class SkeletonBuilder
 
             // hip legs
 
-        node = scene.findNodeByName("Hip");
+        node = scene.findNodeByName("hip");
         switch (modelType) {
             case MODEL_TYPE_ANIMAL:
                 legOffset = hipRadius - (legRadius * 1.7f);
@@ -560,7 +560,7 @@ public class SkeletonBuilder
             // front legs
 
         if (modelType == MODEL_TYPE_ANIMAL) {
-            node = scene.findNodeByName("Torso_Shoulder");
+            node = scene.findNodeByName("torso_shoulder");
             switch (modelType) {
                 case MODEL_TYPE_ANIMAL:
                     legOffset = shoulderRadius - (legRadius * 1.7f);
@@ -594,7 +594,7 @@ public class SkeletonBuilder
 
         whipLength = 0.7f + AppWindow.random.nextFloat(1.0f);
 
-        node = scene.findNodeByName("Hip");
+        node = scene.findNodeByName("hip");
         buildLimbWhip(5, node, whipLength, 180.0f, false);
     }
 

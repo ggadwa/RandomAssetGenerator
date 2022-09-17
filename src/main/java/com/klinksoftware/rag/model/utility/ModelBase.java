@@ -86,6 +86,8 @@ public class ModelBase {
     }
 
     // build a model
+    // note: models are build with absolute vertexes, but unlike maps,
+    // we leave the vertexes absolute and just attach them to
     public void build(int textureSize, boolean bilateral, float roughness) {
         this.textureSize = textureSize;
         this.bilateral = bilateral;
@@ -96,9 +98,12 @@ public class ModelBase {
         // run the internal mesh build
         buildMeshes();
 
-        // models are build with absolute vertexes, we
-        // need to adjust these to be relative to nodes
-        scene.shiftAbsoluteMeshesToNodeRelativeMeshes();
+        // models are build with absolute vertexes, but since
+        // they are skinned, we need to leave the vertexes absolute
+        // but attach all meshes to the root node.  In this way any
+        // node can have an inversebindmatrix and any vertexes can
+        // be attached to them
+        scene.attachAllAbsoluteMeshesToRootNode();
 
         // need to build unique indexes for all nodes
         // and meshes, which is how they refer to each other in
@@ -110,8 +115,14 @@ public class ModelBase {
             // has to happen after node indexes are created
             scene.createJointsAndWeights();
 
-            // default no animation joints
-            scene.animation.createJointMatrixComponentsFromNodes();
+            // the inversebind matrixes for nodes
+            scene.animation.createInverseBindMatrixForNodes();
+
+            // pre-allocate joint matrixes
+            scene.animation.setupJointMatrixesForAnimation();
+
+            // setup the animation channels
+            scene.animation.setupChannelsForAnimation();
 
             // run the internal animation build
             buildAnimations();

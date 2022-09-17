@@ -1,11 +1,11 @@
 
 
 
+- skeletons need to have animations on them, too (they break on animations)
+
+- move up textures to 1024 on map/model
 
 
-
-
-- work on the animation joint stuff, just with identity etc joints
 
 rendering:
 - rethink this part of fragment shader, maybe get more expressive textures
@@ -18,34 +18,6 @@ rendering:
     pixel.rgb+=(min(metallic,1.0)*lightCol); // maybe clamp at end, or no clamp?
     if (hasEmissive) pixel.rgb+=(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
     pixel.a=tex.a;
-
-
-
-animations:
-- need to redo all the skin/joint/weight/jointmatrix stuff
-- eventually needs to be exported
-
-for (n=0;n!==this.core.MAX_SKELETON_JOINT;n++) {
-            name='jointMatrix['+n+']';
-            this.jointMatrixUniformArray.push(gl.getUniformLocation(this.program,name));
-        }
-
-uniform highp mat4 jointMatrix[64];
-
-    highp vec4 pos;
-    highp mat3 normalMatrix;
-
-    if (!noSkin) {
-        highp mat4 skinMatrix=(vertexWeight.x*jointMatrix[int(vertexJoint.x)])+(vertexWeight.y*jointMatrix[int(vertexJoint.y)])+(vertexWeight.z*jointMatrix[int(vertexJoint.z)])+(vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
-        pos=viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
-        normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(skinMatrix)));
-    }
-    else {
-        pos=viewMatrix*modelMatrix*noSkinAttachedNodeMatrix*vec4(vertexPosition,1.0);
-        normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(noSkinAttachedNodeMatrix)));
-    }
-
-
 
 
 map

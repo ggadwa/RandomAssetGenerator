@@ -13,15 +13,14 @@ import static org.lwjgl.opengl.GL15.glGenBuffers;
 import org.lwjgl.system.MemoryUtil;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
-public class Mesh
-{
+public class Mesh {
 
     public int index;
     public boolean hasEmissive;
     public String name,bitmapName;
     public int[] indexes;
     public float[] vertexes, normals, tangents, uvs, joints, weights;
-    public int vboVertexId, vboNormalId, vboTangentId, vboUVId;
+    public int vboVertexId, vboNormalId, vboTangentId, vboUVId, vboJointId, vboWeightId;
     public RagBound xBound, yBound, zBound;
     public boolean highlight;
     public RagMatrix4f modelMatrix;
@@ -339,22 +338,23 @@ public class Mesh
         }
     }
 
-    // finds the closest node and makes that the only connected
+    // for each vertex find the closest node and makes that the only connected
     // node, weight at 100%.  Note that this will need to be updated
     // in the future to find more node to make better skinning animations
     // this can only be run after the indexes are created on the nodes
     public void createJointsAndWeights(Scene scene) {
-        int n, idx, vertexCount;
+        int n, idx, vertexLength, vertexCount;
         Node node;
         RagPoint pnt = new RagPoint(0.0f, 0.0f, 0.0f);
 
-        vertexCount = vertexes.length / 3;
+        vertexLength = vertexes.length;
+        vertexCount = vertexLength / 3;
 
         idx = 0;
         joints = new float[vertexCount * 4]; // 4 point vector, 4 possible node connections
         weights = new float[vertexCount * 4]; // same as above, 1 weight for every 1 node connection
 
-        for (n = 0; n < vertexCount; n += 3) {
+        for (n = 0; n < vertexLength; n += 3) {
             pnt.setFromValues(vertexes[n], vertexes[n + 1], vertexes[n + 2]);
             node = scene.findNearestNode(pnt);
 
@@ -412,6 +412,30 @@ public class Mesh
         glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
         memFree(buf);
 
+        // joints
+        vboJointId = glGenBuffers();
+
+        if (joints != null) {
+            buf = MemoryUtil.memAllocFloat(joints.length);
+            buf.put(joints).flip();
+
+            glBindBuffer(GL_ARRAY_BUFFER, vboJointId);
+            glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+            memFree(buf);
+        }
+
+        // weights
+        vboWeightId = glGenBuffers();
+
+        if (weights != null) {
+            buf = MemoryUtil.memAllocFloat(weights.length);
+            buf.put(weights).flip();
+
+            glBindBuffer(GL_ARRAY_BUFFER, vboWeightId);
+            glBufferData(GL_ARRAY_BUFFER, buf, GL_STATIC_DRAW);
+            memFree(buf);
+        }
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         // create the model matrix
@@ -427,6 +451,8 @@ public class Mesh
         glDeleteBuffers(vboUVId);
         glDeleteBuffers(vboNormalId);
         glDeleteBuffers(vboTangentId);
+        glDeleteBuffers(vboJointId);
+        glDeleteBuffers(vboWeightId);
     }
 
 }
