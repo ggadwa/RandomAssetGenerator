@@ -554,8 +554,8 @@ public class SkeletonBuilder
                 ang = 255.0f + AppWindow.random.nextFloat(30.0f);
                 break;
         }
-        buildLimbLeg(1, node, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, -ang);
-        buildLimbLeg(2, node, footLength, footRadius, footRot, toeCount, toeLength, legOffset, ang);
+        buildLimbLeg(0, node, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, -ang);
+        buildLimbLeg(1, node, footLength, footRadius, footRot, toeCount, toeLength, legOffset, ang);
 
             // front legs
 
@@ -574,8 +574,8 @@ public class SkeletonBuilder
                     ang = 75.0f + AppWindow.random.nextFloat(30.0f);
                     break;
             }
-            buildLimbLeg(3, node, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, ang);
-            buildLimbLeg(4, node, footLength, footRadius, footRot, toeCount, toeLength, legOffset, -ang);
+            buildLimbLeg(2, node, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, ang);
+            buildLimbLeg(3, node, footLength, footRadius, footRot, toeCount, toeLength, legOffset, -ang);
         }
     }
 

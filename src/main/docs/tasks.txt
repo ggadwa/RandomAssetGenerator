@@ -1,6 +1,8 @@
 
 
-
+- do poses recursively (mult quats together)
+- export animations
+- get rid of model hard coded seed
 - skeletons need to have animations on them, too (they break on animations)
 
 - move up textures to 1024 on map/model

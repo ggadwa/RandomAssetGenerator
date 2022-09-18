@@ -67,34 +67,20 @@ public class Animation {
 
         channels = new ArrayList<>();
         for (n = 0; n != nodeCount; n++) {
-            channels.add(new AnimationChannel());
+            channels.add(new AnimationChannel(scene.getNodeForIndex(n)));
         }
+
+        channels.get(scene.findNodeByName("hip_0").index).testX(); // testing
+        channels.get(scene.findNodeByName("head_0").index).testY(); // testing
     }
 
     public ArrayList<RagMatrix4f> buildJointMatrixesForAnimation(long tick) {
         int n, nodeCount;
-        Node node;
 
         nodeCount = scene.getNodeCount();
 
-        tick = tick / 100;
-        System.out.println("cont=" + (float) (tick % 360));
-
-        int testJointIdx = scene.findNodeByName("head_0").index;
-
         for (n = 0; n != nodeCount; n++) {
-            node = scene.getNodeForIndex(n);
-
-            poseMatrix.setIdentity();
-            poseMatrix.setTranslationFromPoint(node.getAbsolutePoint());
-            if (n == testJointIdx) {
-                RagMatrix4f rotMatrix = new RagMatrix4f();
-                rotMatrix.setRotationFromYAngle((float) (tick % 360));
-                poseMatrix.multiply(rotMatrix);
-            } else {
-                poseMatrix.setTranslationFromPoint(node.getAbsolutePoint());
-            }
-
+            channels.get(n).calculatePoseMatrixForTick(poseMatrix, tick);
             jointMatrixes.get(n).setFromMultiple(poseMatrix, inverseBindMatrixes.get(n));
         }
 

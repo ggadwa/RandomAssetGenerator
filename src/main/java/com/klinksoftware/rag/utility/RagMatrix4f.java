@@ -179,6 +179,30 @@ public class RagMatrix4f {
         data[2]=-data[8];
     }
 
+    public void setRotationFromQuaternion(RagQuaternion quant) {
+        float xx = quant.x * quant.x;
+        float xy = quant.x * quant.y;
+        float xz = quant.x * quant.z;
+        float xw = quant.x * quant.w;
+        float yy = quant.y * quant.y;
+        float yz = quant.y * quant.z;
+        float yw = quant.y * quant.w;
+        float zz = quant.z * quant.z;
+        float zw = quant.z * quant.w;
+
+        setIdentity();
+
+        data[0] = 1.0f - (2.0f * (yy + zz));
+        data[4] = 2.0f * (xy - zw);
+        data[8] = 2.0f * (xz + yw);
+        data[1] = 2.0f * (xy + zw);
+        data[5] = 1.0f - (2.0f * (xx + zz));
+        data[9] = 2.0f * (yz - xw);
+        data[2] = 2.0f * (xz - yw);
+        data[6] = 2.0f * (yz + xw);
+        data[10] = 1.0f - (2.0f * (xx + yy));
+    }
+
     // math
 
     public void multiply(RagMatrix4f mat)
