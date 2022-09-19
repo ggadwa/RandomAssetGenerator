@@ -122,6 +122,13 @@ public class RagPoint
         return((x*vct.x)+(y*vct.y)+(z*vct.z));
     }
 
+    public void tween(RagPoint pnt1, RagPoint pnt2, float factor) {
+        x = pnt1.x + (pnt2.x - pnt1.x) * factor;
+        y = pnt1.y + (pnt2.y - pnt1.y) * factor;
+        z = pnt1.z + (pnt2.z - pnt1.z) * factor;
+    }
+
+
     public void rotateAroundPoint(RagPoint centerPnt, RagPoint ang) {
         float rd, sn, cs, rx, ry, rz;
 

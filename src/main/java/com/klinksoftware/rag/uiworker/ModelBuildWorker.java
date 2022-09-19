@@ -32,7 +32,7 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
 
         // set the seed for model
         seed = Calendar.getInstance().getTimeInMillis();
-        seed = 1663387204703L;
+        //seed = 1663387204703L;
         AppWindow.random.setSeed(seed);
         System.out.println("seed=" + seed);
 

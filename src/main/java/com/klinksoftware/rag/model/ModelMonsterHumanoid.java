@@ -4,6 +4,7 @@ import com.klinksoftware.rag.model.utility.ModelInterface;
 import com.klinksoftware.rag.model.utility.ModelBase;
 import com.klinksoftware.rag.model.utility.SkeletonBuilder;
 import com.klinksoftware.rag.AppWindow;
+import com.klinksoftware.rag.model.utility.AnimationBuilder;
 
 @ModelInterface
 public class ModelMonsterHumanoid extends ModelBase {
@@ -39,6 +40,10 @@ public class ModelMonsterHumanoid extends ModelBase {
 
     @Override
     public void buildAnimations() {
+        AnimationBuilder animationBuilder;
+
+        animationBuilder = new AnimationBuilder(scene);
+        animationBuilder.build();
     }
 
 }

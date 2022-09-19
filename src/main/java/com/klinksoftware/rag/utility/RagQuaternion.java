@@ -50,6 +50,10 @@ public class RagQuaternion {
         w = (cr * cp * cy) + (sr * sp * sy);
     }
 
+    public void setFromPoint(RagPoint pnt) {
+        setFromEuler(pnt.x, pnt.y, pnt.z);
+    }
+
     public void multiply(RagQuaternion quat) {
         float x2 = (x * quat.w) + (y * quat.z) - (z * quat.y) + (w * quat.x);
         float y2 = (-x * quat.z) + (y * quat.w) + (z * quat.x) + (w * quat.y);

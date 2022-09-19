@@ -1,14 +1,16 @@
 package com.klinksoftware.rag.scene;
 
 import com.klinksoftware.rag.utility.RagMatrix4f;
+import com.klinksoftware.rag.utility.RagPoint;
 import com.klinksoftware.rag.utility.RagQuaternion;
 import java.util.ArrayList;
 
 public class AnimationChannel {
-    public static final int TOTAL_ANIMATION_MSEC = 1000;
+
+    public static final float ANIMATION_FPS = 60.0f;
 
     public Node node;
-    public RagMatrix4f rotMatrix;
+    public RagMatrix4f rotMatrix, poseMatrix;
     public ArrayList<AnimationChannelSample> samples;
 
     public AnimationChannel(Node node) {
@@ -19,58 +21,49 @@ public class AnimationChannel {
 
         samples = new ArrayList<>();
 
-        // every channel has a single default 0 animation
-        quat = new RagQuaternion();
-        samples.add(new AnimationChannelSample(0.0f, quat));
+        // the calculated pose matrix for this node
+        poseMatrix = new RagMatrix4f();
     }
 
-    public void testX() {
-        int n;
-        float sec;
+    public void addSamples(float secs, RagPoint fromRot, RagPoint toRot) {
+        int n, sampleCount;
+        float f, lastSec;
+        RagPoint rot;
         RagQuaternion quat;
 
         quat = new RagQuaternion();
-        samples.clear();
 
-        for (n = 0; n != 100; n++) {
-            sec = ((float) (n * 10)) / 1000.0f;
+        sampleCount = (int) (secs * ANIMATION_FPS);
+        rot = fromRot.copy();
+
+        if (samples.isEmpty()) {
+            lastSec = 0.0f;
+        } else {
+            lastSec = samples.get(samples.size() - 1).globalTimeSecond;
+        }
+
+        for (n = 0; n != sampleCount; n++) {
+            f = (float) n / (float) sampleCount;
+            rot.tween(fromRot, toRot, f);
             quat.setIdentity();
-            quat.setFromEuler(((float) n * 3.6f), 0.0f, 0.0f);
-            samples.add(new AnimationChannelSample(sec, quat));
+            quat.setFromPoint(rot);
+            samples.add(new AnimationChannelSample((lastSec + (f * secs)), quat));
         }
     }
 
-    public void testY() {
-        int n;
-        float sec;
-        RagQuaternion quat;
-
-        quat = new RagQuaternion();
-        samples.clear();
-
-        for (n = 0; n != 100; n++) {
-            sec = ((float) (n * 10)) / 1000.0f;
-            quat.setIdentity();
-            quat.setFromEuler(0.0f, ((float) n * 3.6f), 0.0f);
-            samples.add(new AnimationChannelSample(sec, quat));
-        }
-    }
-
-    public void calculatePoseMatrixForTick(RagMatrix4f poseMatrix, long tick) {
+    public RagQuaternion getRotateQuaternionForTick(long tick) {
         int n, sampleIdx;
+        long lastMilliSec;
         float loopSecond;
 
-        // the default pose is just the node translation
-        poseMatrix.setIdentity();
-        poseMatrix.setTranslationFromPoint(node.getAbsolutePoint());
-
-        // if no samples, then it's just the default
+        // no sample, then identity rotation
         if (samples.isEmpty()) {
-            return;
+            return (new RagQuaternion());
         }
 
         // tick within the animation loop
-        loopSecond = ((float) (tick % (long) TOTAL_ANIMATION_MSEC)) / 1000.0f;
+        lastMilliSec = (long) (samples.get(samples.size() - 1).globalTimeSecond * 1000.0f);
+        loopSecond = ((float) (tick % lastMilliSec)) / 1000.0f;
 
         // find closest sample
         sampleIdx = 0;
@@ -81,8 +74,13 @@ public class AnimationChannel {
             sampleIdx = n;
         }
 
-        // build pose from sample
-        rotMatrix.setRotationFromQuaternion(samples.get(sampleIdx).rotation);
+        return (samples.get(sampleIdx).rotation);
+    }
+
+    public void setPoseMatrix(RagPoint pnt, RagQuaternion rotQuat) {
+        poseMatrix.setIdentity();
+        poseMatrix.setTranslationFromPoint(pnt);
+        rotMatrix.setRotationFromQuaternion(rotQuat);
         poseMatrix.multiply(rotMatrix);
     }
 }

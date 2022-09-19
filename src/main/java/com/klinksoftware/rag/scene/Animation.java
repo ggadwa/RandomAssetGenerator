@@ -1,6 +1,8 @@
 package com.klinksoftware.rag.scene;
 
 import com.klinksoftware.rag.utility.RagMatrix4f;
+import com.klinksoftware.rag.utility.RagPoint;
+import com.klinksoftware.rag.utility.RagQuaternion;
 import java.util.ArrayList;
 
 public class Animation {
@@ -10,7 +12,7 @@ public class Animation {
     public ArrayList<RagMatrix4f> jointMatrixes, inverseBindMatrixes;
     public ArrayList<AnimationChannel> channels;
 
-    private RagMatrix4f poseMatrix;
+    private RagMatrix4f rotMatrix;
 
     public Animation(Scene scene) {
         this.scene = scene;
@@ -20,7 +22,7 @@ public class Animation {
 
         channels = null;
 
-        poseMatrix = new RagMatrix4f(); // pre-allocate
+        rotMatrix = new RagMatrix4f(); // pre-allocate
     }
 
     public void createInverseBindMatrixForNodes() {
@@ -69,19 +71,64 @@ public class Animation {
         for (n = 0; n != nodeCount; n++) {
             channels.add(new AnimationChannel(scene.getNodeForIndex(n)));
         }
+    }
 
-        channels.get(scene.findNodeByName("hip_0").index).testX(); // testing
-        channels.get(scene.findNodeByName("head_0").index).testY(); // testing
+    public AnimationChannel findChannelByNodeName(String name) {
+        return (channels.get(scene.findNodeByName(name).index));
+    }
+
+    public void buildJointMatrixesForAnimationRecurse(Node node, RagPoint pnt, RagQuaternion rotQuat, long tick) {
+        RagPoint nextPnt, nodePnt;
+        RagQuaternion nextRotQuat;
+        AnimationChannel channel;
+
+        // get channel for this node
+        channel = channels.get(node.index);
+
+        // we need to rotate the node offset (from the parent)
+        // by the commulative rotational offsets
+        nodePnt = node.pnt.copy();
+
+        rotMatrix.setIdentity();
+        rotMatrix.setRotationFromQuaternion(rotQuat);
+        nodePnt.matrixMultiply(rotMatrix);
+
+        // now add it in to the last offset
+        nextPnt = pnt.copy();
+        nextPnt.addPoint(nodePnt);
+
+        // add in the next rotation
+        nextRotQuat = rotQuat.copy();
+        nextRotQuat.multiply(channel.getRotateQuaternionForTick(tick));
+
+        // calculate the joint pose matrix from the commulative
+        // offsets and rotations up to here
+        channel.setPoseMatrix(nextPnt, nextRotQuat);
+
+        // pass this on to the children
+        for (Node childNode : node.childNodes) {
+            buildJointMatrixesForAnimationRecurse(childNode, nextPnt, nextRotQuat, tick);
+        }
     }
 
     public ArrayList<RagMatrix4f> buildJointMatrixesForAnimation(long tick) {
         int n, nodeCount;
+        RagPoint pnt;
+        RagQuaternion rotQuat;
 
+        // recurse through the nodes to build out all the pose matrixes
+        // we only do rotations so we just need to push the rotation
+        // quaternion around, and we start with the identity
+        pnt = new RagPoint(0.0f, 0.0f, 0.0f); // root starts at 0,0,0
+        rotQuat = new RagQuaternion();
+        buildJointMatrixesForAnimationRecurse(scene.rootNode, pnt, rotQuat, tick);
+
+        // and now return all the calculated joint matrixes
+        // for the pose and inverse binds
         nodeCount = scene.getNodeCount();
 
         for (n = 0; n != nodeCount; n++) {
-            channels.get(n).calculatePoseMatrixForTick(poseMatrix, tick);
-            jointMatrixes.get(n).setFromMultiple(poseMatrix, inverseBindMatrixes.get(n));
+            jointMatrixes.get(n).setFromMultiple(channels.get(n).poseMatrix, inverseBindMatrixes.get(n));
         }
 
         return (jointMatrixes);
