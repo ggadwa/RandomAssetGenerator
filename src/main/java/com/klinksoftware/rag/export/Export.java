@@ -3,6 +3,8 @@ package com.klinksoftware.rag.export;
 import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.klinksoftware.rag.scene.AnimationChannel;
+import com.klinksoftware.rag.scene.AnimationChannelSample;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.scene.Node;
@@ -214,6 +216,14 @@ public class Export
             accessorIdx = addBinData(5126, (mesh.uvs.length / 2), "VEC2", floatArrayToFloatBytes(mesh.uvs), accessorsArr, bufferViewsArr, null, null, bin);
             attributeObj.put("TEXCOORD_0", accessorIdx);
 
+            if (scene.skinned) {
+                accessorIdx = addBinData(5126, (mesh.joints.length / 4), "VEC4", floatArrayToFloatBytes(mesh.joints), accessorsArr, bufferViewsArr, null, null, bin);
+                attributeObj.put("JOINTS_0", accessorIdx);
+
+                accessorIdx = addBinData(5126, (mesh.weights.length / 4), "VEC4", floatArrayToFloatBytes(mesh.weights), accessorsArr, bufferViewsArr, null, null, bin);
+                attributeObj.put("WEIGHTS_0", accessorIdx);
+            }
+
             primitiveObj.put("attributes", attributeObj);
 
             accessorIdx = addBinData(5123, mesh.indexes.length, "SCALAR", intArrayToShortBytes(mesh.indexes), accessorsArr, bufferViewsArr, null, null, bin);
@@ -229,6 +239,92 @@ public class Export
         meshesArr.add(meshObj);
     }
 
+    //
+    // adding an animation
+    //
+    private void addAnimationChannelAndSampler(Node node, String path, int valueSize, ArrayList<Object> channelsArr, ArrayList<Object> samplersArr, float[] timeData, float[] valueData, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
+        LinkedHashMap<String, Object> channelObj, targetObj, samplerObj;
+
+        channelObj = new LinkedHashMap<>();
+
+        targetObj = new LinkedHashMap<>();
+        targetObj.put("node", node.index);
+        targetObj.put("path", path);
+        channelObj.put("target", targetObj);
+
+        channelObj.put("sampler", samplersArr.size());
+        channelsArr.add(channelObj);
+
+        samplerObj = new LinkedHashMap<>();
+
+        samplerObj.put("input", addBinData(5126, timeData.length, "SCALAR", floatArrayToFloatBytes(timeData), accessorsArr, bufferViewsArr, null, null, bin));
+        samplerObj.put("interpolation", "LINEAR");
+        samplerObj.put("output", addBinData(5126, (valueData.length / valueSize), ((valueSize == 3) ? "VEC3" : "VEC4"), floatArrayToFloatBytes(valueData), accessorsArr, bufferViewsArr, null, null, bin));
+
+        samplersArr.add(samplerObj);
+    }
+
+    private void addAnimation(Scene scene, ArrayList<Object> animationsArr, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
+        int n, nodeCount, timeIdx, valueIdx;
+        float[] timeData, valueData;
+        ArrayList<Object> channelsArr, samplersArr;
+        LinkedHashMap<String, Object> animationObj;
+        Node node;
+        AnimationChannel channel;
+
+        // the animation object
+        animationObj = new LinkedHashMap<>();
+
+        // the channels and samplers
+        channelsArr = new ArrayList<>();
+        samplersArr = new ArrayList<>();
+
+        nodeCount = scene.getNodeCount();
+
+        for (n = 0; n != nodeCount; n++) {
+            node = scene.getNodeForIndex(n);
+
+            // the single translation channel, right
+            // now we only animate by rotation, this is the
+            // node absolute point
+            timeData = new float[1];
+            timeData[0] = 0.0f;
+
+            valueData = new float[3];
+            valueData[0] = node.pnt.x;
+            valueData[1] = node.pnt.y;
+            valueData[2] = node.pnt.z;
+
+            addAnimationChannelAndSampler(node, "translation", 3, channelsArr, samplersArr, timeData, valueData, accessorsArr, bufferViewsArr, bin);
+
+            // and now all the rotation objects
+            channel = scene.animation.channels.get(n);
+            if (channel.samples.isEmpty()) {
+                continue;
+            }
+
+            timeIdx = 0;
+            timeData = new float[channel.samples.size()];
+            valueIdx = 0;
+            valueData = new float[channel.samples.size() * 4];
+
+            for (AnimationChannelSample sample : channel.samples) {
+                timeData[timeIdx++] = sample.globalTimeSecond;
+                valueData[valueIdx++] = sample.rotation.x;
+                valueData[valueIdx++] = sample.rotation.y;
+                valueData[valueIdx++] = sample.rotation.z;
+                valueData[valueIdx++] = sample.rotation.w;
+            }
+
+            addAnimationChannelAndSampler(node, "rotation", 4, channelsArr, samplersArr, timeData, valueData, accessorsArr, bufferViewsArr, bin);
+        }
+
+        animationObj.put("channels", channelsArr);
+        animationObj.put("samplers", samplersArr);
+
+        animationsArr.add(animationObj);
+    }
+
         //
         // main export
         //
@@ -241,7 +337,7 @@ public class Export
         ByteArrayOutputStream bin;
         Node node;
         ArrayList<Integer> children;
-        ArrayList<Object> arrList, nodesArr, meshesArr;
+        ArrayList<Object> arrList, nodesArr, meshesArr, animationsArr;
         ArrayList<Object> accessorsArr, bufferViewsArr, bufferArr;
         ArrayList<Object> samplerArr, materialsArr, texturesArr, imagesArr;
         LinkedHashMap<String, Object> json, obj2, nodeObj, bufferObj, samplerObj;
@@ -335,7 +431,15 @@ public class Export
             addMeshes(scene, node, meshesArr, materialsArr, texturesArr, imagesArr, accessorsArr, bufferViewsArr, bin);
         }
 
-        json.put("meshes",meshesArr);
+        json.put("meshes", meshesArr);
+
+        // the animations, which are parallel to the nodes
+        // node = channel, sampler = one transformation data
+        if (scene.skinned) {
+            animationsArr = new ArrayList<>();
+            addAnimation(scene, animationsArr, accessorsArr, bufferViewsArr, bin);
+            json.put("animations", animationsArr);
+        }
 
         // the materials, pointed to from mesh primitives
         // this is generated while building the meshes

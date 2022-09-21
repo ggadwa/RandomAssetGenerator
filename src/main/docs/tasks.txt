@@ -1,10 +1,15 @@
 
-- figure out missing vertex bones in legs
+
 - vertex connections are bad, maybe remember limb, can only connect one up (parent) and one down (any child)
 
-- export animations
-   - need a "translation" and "rotation" channel + samples for each node
-   - translation is one single sample at 0.0f (it never changes)
+- skins:
+ "skins" : [ 
+   {
+    "inverseBindMatrices" : 4,
+    "joints" : [ 1, 2 ]
+   }
+  ],
+---> joints probably just equal to nodes?
 
 - skeletons need to have animations on them, too (they break on animations)
 

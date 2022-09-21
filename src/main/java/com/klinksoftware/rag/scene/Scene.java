@@ -301,6 +301,12 @@ public class Scene {
         currentDist = 0.0f;
 
         for (Node node : getAllNodes()) {
+            // always ignore root node
+            if (node == rootNode) {
+                continue;
+            }
+
+            // get nearest node
             dist = node.getAbsolutePoint().distance(pnt);
             if (currentNode == null) {
                 currentDist = dist;
