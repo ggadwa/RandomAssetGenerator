@@ -22,7 +22,7 @@ public class Scene {
 
     private int nodeIndex, meshIndex;
 
-    public int vboVertexId;
+    public int vboSkeletonVertexId, vboSkeletonJointId, vboSkeletonWeightId;
     public boolean skyBox, skinned;
     public Node rootNode;
     public HashMap<String, BitmapBase> bitmaps;
@@ -382,7 +382,7 @@ public class Scene {
     public int setupGLBuffersForSkeletonDrawing() {
         int nodeCount, lineCount;
         RagPoint absPnt, absPnt2;
-        FloatBuffer vertexBuf;
+        FloatBuffer vertexBuf, jointBuf, weightBuf;
         ArrayList<Node> nodes;
 
         nodes = getAllNodes();
@@ -397,6 +397,13 @@ public class Scene {
 
         // memory for vertexes
         vertexBuf = MemoryUtil.memAllocFloat(((lineCount * 2) + nodeCount) * 3);
+        if (skinned) {
+            jointBuf = MemoryUtil.memAllocFloat(((lineCount * 2) + nodeCount) * 4);
+            weightBuf = MemoryUtil.memAllocFloat(((lineCount * 2) + nodeCount) * 4);
+        } else {
+            jointBuf = null;
+            weightBuf = null;
+        }
 
         // vertexes for lines
         for (Node node : nodes) {
@@ -407,6 +414,14 @@ public class Scene {
 
                 absPnt2 = node2.getAbsolutePoint();
                 vertexBuf.put(absPnt2.x).put(absPnt2.y).put(absPnt2.z);
+
+                if (skinned) {
+                    jointBuf.put((float) node.index).put(0.0f).put(0.0f).put(0.0f);
+                    weightBuf.put(1.0f).put(0.0f).put(0.0f).put(0.0f);
+
+                    jointBuf.put((float) node2.index).put(0.0f).put(0.0f).put(0.0f);
+                    weightBuf.put(1.0f).put(0.0f).put(0.0f).put(0.0f);
+                }
             }
         }
 
@@ -414,21 +429,42 @@ public class Scene {
         for (Node node : nodes) {
             absPnt = node.getAbsolutePoint();
             vertexBuf.put(absPnt.x).put(absPnt.y).put(absPnt.z);
+            if (skinned) {
+                jointBuf.put((float) node.index).put(0.0f).put(0.0f).put(0.0f);
+                weightBuf.put(1.0f).put(0.0f).put(0.0f).put(0.0f);
+            }
         }
 
         // put it in gl buffer
         vertexBuf.flip();
-
-        vboVertexId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboVertexId);
+        vboSkeletonVertexId = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, vboSkeletonVertexId);
         glBufferData(GL_ARRAY_BUFFER, vertexBuf, GL_STATIC_DRAW);
         memFree(vertexBuf);
+
+        if (skinned) {
+            jointBuf.flip();
+            vboSkeletonJointId = glGenBuffers();
+            glBindBuffer(GL_ARRAY_BUFFER, vboSkeletonJointId);
+            glBufferData(GL_ARRAY_BUFFER, jointBuf, GL_STATIC_DRAW);
+            memFree(jointBuf);
+
+            weightBuf.flip();
+            vboSkeletonWeightId = glGenBuffers();
+            glBindBuffer(GL_ARRAY_BUFFER, vboSkeletonWeightId);
+            glBufferData(GL_ARRAY_BUFFER, weightBuf, GL_STATIC_DRAW);
+            memFree(weightBuf);
+        }
 
         return (lineCount);
     }
 
     // release buffers for opengl drawing
     public void releaseGLBuffersForSkeletonDrawing() {
-        glDeleteBuffers(vboVertexId);
+        glDeleteBuffers(vboSkeletonVertexId);
+        if (skinned) {
+            glDeleteBuffers(vboSkeletonJointId);
+            glDeleteBuffers(vboSkeletonWeightId);
+        }
     }
 }

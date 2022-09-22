@@ -710,6 +710,8 @@ public class WalkView extends AWTGLCanvas {
 
         nodeCount = scene.getNodeCount();
 
+        // need a fake matrix as we don't have offset meshes here
+        // i.e., identity, i.e., the root node
         try ( MemoryStack stack = stackPush()) {
             buf = stack.mallocFloat(16);
             buf.put(skeletonModelMatrix.data).flip(); // the identity
@@ -717,8 +719,15 @@ public class WalkView extends AWTGLCanvas {
         }
 
         // bind the scene based skeleton node data
-        glBindBuffer(GL_ARRAY_BUFFER, scene.vboVertexId);
+        glBindBuffer(GL_ARRAY_BUFFER, scene.vboSkeletonVertexId);
         glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
+
+        if (scene.skinned) {
+            glBindBuffer(GL_ARRAY_BUFFER, scene.vboSkeletonJointId);
+            glVertexAttribPointer(vertexJointAttribute, 4, GL_FLOAT, false, 0, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, scene.vboSkeletonWeightId);
+            glVertexAttribPointer(vertexWeightAttribute, 4, GL_FLOAT, false, 0, 0);
+        }
 
         // the line points, these draw in green
         try ( MemoryStack stack = stackPush()) {

@@ -325,6 +325,42 @@ public class Export
         animationsArr.add(animationObj);
     }
 
+    private void addSkins(Scene scene, LinkedHashMap<String, Object> json, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
+        int n, nodeCount;
+        float[] matData;
+        ArrayList<Object> skinsArr, jointsArr;
+        LinkedHashMap<String, Object> skinObj;
+
+        // we have a single skin
+        skinObj = new LinkedHashMap<>();
+
+        nodeCount = scene.getNodeCount();
+
+        // build the inverse bind matrixes
+        matData = new float[nodeCount * 16];
+
+        for (n = 0; n != nodeCount; n++) {
+            System.arraycopy(scene.animation.inverseBindMatrixes.get(n).data, 0, matData, (n * 16), 16);
+        }
+
+        skinObj.put("inverseBindMatrices", addBinData(5126, nodeCount, "MAT4", floatArrayToFloatBytes(matData), accessorsArr, bufferViewsArr, null, null, bin));
+
+        // joints array
+        jointsArr = new ArrayList<>();
+
+        for (n = 0; n != nodeCount; n++) {
+            jointsArr.add(n);
+        }
+
+        skinObj.put("joints", jointsArr);
+
+        // one single skin in the skin array
+        skinsArr = new ArrayList<>();
+        skinsArr.add(skinObj);
+
+        json.put("skins", skinsArr);
+    }
+
         //
         // main export
         //
@@ -439,6 +475,7 @@ public class Export
             animationsArr = new ArrayList<>();
             addAnimation(scene, animationsArr, accessorsArr, bufferViewsArr, bin);
             json.put("animations", animationsArr);
+            addSkins(scene, json, accessorsArr, bufferViewsArr, bin);
         }
 
         // the materials, pointed to from mesh primitives

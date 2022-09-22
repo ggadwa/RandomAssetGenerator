@@ -2,16 +2,7 @@
 
 - vertex connections are bad, maybe remember limb, can only connect one up (parent) and one down (any child)
 
-- skins:
- "skins" : [ 
-   {
-    "inverseBindMatrices" : 4,
-    "joints" : [ 1, 2 ]
-   }
-  ],
----> joints probably just equal to nodes?
-
-- skeletons need to have animations on them, too (they break on animations)
+- animation export bad at vertex level
 
 - move up textures to 1024 on map/model
 
