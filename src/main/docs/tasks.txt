@@ -1,10 +1,9 @@
 
 
-- vertex connections are bad, maybe remember limb, can only connect one up (parent) and one down (any child)
+[ ] top torso/mid torso don't have to have same radius
+[ ] vertex connections better at limb changes (seems not 100% on end point)
 
-- animation export bad at vertex level
-
-- move up textures to 1024 on map/model
+[ ] move up textures to 1024 on map/model
 
 
 
@@ -41,7 +40,6 @@ model
  - robot model needs to be chunkier
  - skeletons can build two heads
  - faces by meshes
- - animations
  - need meshscale for each end of limb
  - limb wrapping: don't do radius changes linearly, do it by sin
  - vertex snaps for humanoid, etc (find and implement: scene.snapVertexes)

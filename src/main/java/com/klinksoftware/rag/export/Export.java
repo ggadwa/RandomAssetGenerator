@@ -3,8 +3,8 @@ package com.klinksoftware.rag.export;
 import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.klinksoftware.rag.scene.AnimationChannel;
-import com.klinksoftware.rag.scene.AnimationChannelSample;
+import com.klinksoftware.rag.scene.ChannelSample;
+import com.klinksoftware.rag.scene.Joint;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.scene.Node;
@@ -180,7 +180,8 @@ public class Export
         //
 
     private void addMeshes(Scene scene, Node node, ArrayList<Object> meshesArr, ArrayList<Object> materialsArr, ArrayList<Object> texturesArr, ArrayList<Object> imagesArr, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
-        int accessorIdx, materialIdx;
+        int n, accessorIdx, materialIdx;
+        int[] joints;
         ArrayList<Object> primitiveArr;
         LinkedHashMap<String, Object> meshObj, primitiveObj, attributeObj;
         RagPoint min, max;
@@ -217,7 +218,12 @@ public class Export
             attributeObj.put("TEXCOORD_0", accessorIdx);
 
             if (scene.skinned) {
-                accessorIdx = addBinData(5126, (mesh.joints.length / 4), "VEC4", floatArrayToFloatBytes(mesh.joints), accessorsArr, bufferViewsArr, null, null, bin);
+                joints = new int[mesh.joints.length];
+                for (n = 0; n != mesh.joints.length; n++) {
+                    joints[n] = (int) mesh.joints[n];
+                }
+
+                accessorIdx = addBinData(5123, (joints.length / 4), "VEC4", intArrayToShortBytes(joints), accessorsArr, bufferViewsArr, null, null, bin);
                 attributeObj.put("JOINTS_0", accessorIdx);
 
                 accessorIdx = addBinData(5126, (mesh.weights.length / 4), "VEC4", floatArrayToFloatBytes(mesh.weights), accessorsArr, bufferViewsArr, null, null, bin);
@@ -242,13 +248,49 @@ public class Export
     //
     // adding an animation
     //
-    private void addAnimationChannelAndSampler(Node node, String path, int valueSize, ArrayList<Object> channelsArr, ArrayList<Object> samplersArr, float[] timeData, float[] valueData, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
+    private void addSkins(Scene scene, LinkedHashMap<String, Object> json, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
+        int n, jointCount;
+        float[] matData;
+        ArrayList<Object> skinsArr, jointsArr;
+        LinkedHashMap<String, Object> skinObj;
+
+        // we have a single skin
+        skinObj = new LinkedHashMap<>();
+
+        jointCount = scene.animation.joints.size();
+
+        // build the inverse bind matrixes
+        matData = new float[jointCount * 16];
+
+        for (n = 0; n != jointCount; n++) {
+            System.arraycopy(scene.animation.joints.get(n).inverseBindMatrix.data, 0, matData, (n * 16), 16);
+        }
+
+        skinObj.put("inverseBindMatrices", addBinData(5126, jointCount, "MAT4", floatArrayToFloatBytes(matData), accessorsArr, bufferViewsArr, null, null, bin));
+
+        // joints array
+        jointsArr = new ArrayList<>();
+
+        for (n = 0; n != jointCount; n++) {
+            jointsArr.add(scene.animation.joints.get(n).node.index);
+        }
+
+        skinObj.put("joints", jointsArr);
+
+        // one single skin in the skin array
+        skinsArr = new ArrayList<>();
+        skinsArr.add(skinObj);
+
+        json.put("skins", skinsArr);
+    }
+
+    private void addAnimationChannelAndSampler(Joint joint, String path, int valueSize, ArrayList<Object> channelsArr, ArrayList<Object> samplersArr, float[] timeData, float[] valueData, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
         LinkedHashMap<String, Object> channelObj, targetObj, samplerObj;
 
         channelObj = new LinkedHashMap<>();
 
         targetObj = new LinkedHashMap<>();
-        targetObj.put("node", node.index);
+        targetObj.put("node", joint.node.index);
         targetObj.put("path", path);
         channelObj.put("target", targetObj);
 
@@ -264,51 +306,59 @@ public class Export
         samplersArr.add(samplerObj);
     }
 
-    private void addAnimation(Scene scene, ArrayList<Object> animationsArr, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
-        int n, nodeCount, timeIdx, valueIdx;
+    private void addAnimation(Scene scene, LinkedHashMap<String, Object> json, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
+        int n, jointCount, timeIdx, valueIdx;
+        float lastSec;
         float[] timeData, valueData;
-        ArrayList<Object> channelsArr, samplersArr;
+        ArrayList<Object> animationsArr, channelsArr, samplersArr;
         LinkedHashMap<String, Object> animationObj;
-        Node node;
-        AnimationChannel channel;
+        Joint joint;
 
-        // the animation object
+        // we need to get total length of animation
+        // so we can bookend with two translation events
+        // as this never changes
+        lastSec = scene.animation.getAnimationLengthInSec();
+
+        // an animation object
         animationObj = new LinkedHashMap<>();
 
         // the channels and samplers
         channelsArr = new ArrayList<>();
         samplersArr = new ArrayList<>();
 
-        nodeCount = scene.getNodeCount();
+        jointCount = scene.animation.joints.size();
 
-        for (n = 0; n != nodeCount; n++) {
-            node = scene.getNodeForIndex(n);
+        for (n = 0; n != jointCount; n++) {
+            joint = scene.animation.joints.get(n);
 
-            // the single translation channel, right
-            // now we only animate by rotation, this is the
-            // node absolute point
-            timeData = new float[1];
+            // two translation channel, right
+            // now it's just offset point of node, and one
+            // at the start and end of animation
+            timeData = new float[2];
             timeData[0] = 0.0f;
+            timeData[1] = lastSec;
 
-            valueData = new float[3];
-            valueData[0] = node.pnt.x;
-            valueData[1] = node.pnt.y;
-            valueData[2] = node.pnt.z;
+            valueData = new float[6];
+            valueData[0] = joint.node.pnt.x;
+            valueData[1] = joint.node.pnt.y;
+            valueData[2] = joint.node.pnt.z;
+            valueData[3] = joint.node.pnt.x;
+            valueData[4] = joint.node.pnt.y;
+            valueData[5] = joint.node.pnt.z;
 
-            addAnimationChannelAndSampler(node, "translation", 3, channelsArr, samplersArr, timeData, valueData, accessorsArr, bufferViewsArr, bin);
+            addAnimationChannelAndSampler(joint, "translation", 3, channelsArr, samplersArr, timeData, valueData, accessorsArr, bufferViewsArr, bin);
 
             // and now all the rotation objects
-            channel = scene.animation.channels.get(n);
-            if (channel.samples.isEmpty()) {
+            if (joint.samples.isEmpty()) {
                 continue;
             }
 
             timeIdx = 0;
-            timeData = new float[channel.samples.size()];
+            timeData = new float[joint.samples.size()];
             valueIdx = 0;
-            valueData = new float[channel.samples.size() * 4];
+            valueData = new float[joint.samples.size() * 4];
 
-            for (AnimationChannelSample sample : channel.samples) {
+            for (ChannelSample sample : joint.samples) {
                 timeData[timeIdx++] = sample.globalTimeSecond;
                 valueData[valueIdx++] = sample.rotation.x;
                 valueData[valueIdx++] = sample.rotation.y;
@@ -316,49 +366,18 @@ public class Export
                 valueData[valueIdx++] = sample.rotation.w;
             }
 
-            addAnimationChannelAndSampler(node, "rotation", 4, channelsArr, samplersArr, timeData, valueData, accessorsArr, bufferViewsArr, bin);
+            addAnimationChannelAndSampler(joint, "rotation", 4, channelsArr, samplersArr, timeData, valueData, accessorsArr, bufferViewsArr, bin);
         }
 
+        animationObj.put("name", "rag_animation");
         animationObj.put("channels", channelsArr);
         animationObj.put("samplers", samplersArr);
 
+        // on single animation in the animations array
+        animationsArr = new ArrayList<>();
         animationsArr.add(animationObj);
-    }
 
-    private void addSkins(Scene scene, LinkedHashMap<String, Object> json, ArrayList<Object> accessorsArr, ArrayList<Object> bufferViewsArr, ByteArrayOutputStream bin) throws Exception {
-        int n, nodeCount;
-        float[] matData;
-        ArrayList<Object> skinsArr, jointsArr;
-        LinkedHashMap<String, Object> skinObj;
-
-        // we have a single skin
-        skinObj = new LinkedHashMap<>();
-
-        nodeCount = scene.getNodeCount();
-
-        // build the inverse bind matrixes
-        matData = new float[nodeCount * 16];
-
-        for (n = 0; n != nodeCount; n++) {
-            System.arraycopy(scene.animation.inverseBindMatrixes.get(n).data, 0, matData, (n * 16), 16);
-        }
-
-        skinObj.put("inverseBindMatrices", addBinData(5126, nodeCount, "MAT4", floatArrayToFloatBytes(matData), accessorsArr, bufferViewsArr, null, null, bin));
-
-        // joints array
-        jointsArr = new ArrayList<>();
-
-        for (n = 0; n != nodeCount; n++) {
-            jointsArr.add(n);
-        }
-
-        skinObj.put("joints", jointsArr);
-
-        // one single skin in the skin array
-        skinsArr = new ArrayList<>();
-        skinsArr.add(skinObj);
-
-        json.put("skins", skinsArr);
+        json.put("animations", animationsArr);
     }
 
         //
@@ -366,14 +385,14 @@ public class Export
         //
 
     public void export(Scene scene, String path, String name) throws Exception {
-        int n, nodeCount;
+        int n, nodeCount, meshIdx;
         byte[] binBytes;
         float[] translation, rotation, scale;
         String path2;
         ByteArrayOutputStream bin;
         Node node;
         ArrayList<Integer> children;
-        ArrayList<Object> arrList, nodesArr, meshesArr, animationsArr;
+        ArrayList<Object> arrList, nodesArr, meshesArr;
         ArrayList<Object> accessorsArr, bufferViewsArr, bufferArr;
         ArrayList<Object> samplerArr, materialsArr, texturesArr, imagesArr;
         LinkedHashMap<String, Object> json, obj2, nodeObj, bufferObj, samplerObj;
@@ -412,11 +431,15 @@ public class Export
         // correctly ordered
         // we give a single mesh to each node, and then the multiple meshes
         // per node as primitives in that mesh
+        // some nodes can have no meshes, that can mess up some importers so
+        // we skip those
         rotation = new float[]{0.0f, 0.0f, 0.0f, 1.0f}; // always the same, we can share
         scale=new float[]{1.0f,1.0f,1.0f};
 
         nodeCount = scene.getNodeCount();
-        nodesArr=new ArrayList<>();
+        nodesArr = new ArrayList<>();
+
+        meshIdx = 0;
 
         for (n = 0; n != nodeCount; n++) {
             node = scene.getNodeForIndex(n);
@@ -424,14 +447,21 @@ public class Export
             nodeObj=new LinkedHashMap<>();
 
             nodeObj.put("name", node.name);
-            translation=new float[3];
-            translation[0] = node.pnt.x;
-            translation[1] = node.pnt.y;
-            translation[2] = node.pnt.z;
-            nodeObj.put("translation",translation);
-            nodeObj.put("rotation",rotation);
-            nodeObj.put("scale",scale);
-            nodeObj.put("mesh", n); // same index as this node
+            if (!node.pnt.isZero()) {
+                translation = new float[3];
+                translation[0] = node.pnt.x;
+                translation[1] = node.pnt.y;
+                translation[2] = node.pnt.z;
+                nodeObj.put("translation", translation);
+            }
+            //nodeObj.put("rotation",rotation);
+            //nodeObj.put("scale",scale);
+
+            // no meshes for nodes without any
+            if (!node.meshes.isEmpty()) {
+                nodeObj.put("mesh", meshIdx);
+                meshIdx++;
+            }
 
             children = new ArrayList<>();
             for (Node childNode : node.childNodes) {
@@ -448,7 +478,8 @@ public class Export
         json.put("nodes",nodesArr);
 
         // the meshes, pointed from nodes
-        // one for each mesh, parallel with the nodes
+        // one for each node, parallel with the nodes
+        // (not counting skipped meshes)
         // the multiple meshes per node are primitives in
         // this single mesh
 
@@ -464,18 +495,17 @@ public class Export
 
         for (n = 0; n != nodeCount; n++) {
             node = scene.getNodeForIndex(n);
-            addMeshes(scene, node, meshesArr, materialsArr, texturesArr, imagesArr, accessorsArr, bufferViewsArr, bin);
+            if (!node.meshes.isEmpty()) {
+                addMeshes(scene, node, meshesArr, materialsArr, texturesArr, imagesArr, accessorsArr, bufferViewsArr, bin);
+            }
         }
 
         json.put("meshes", meshesArr);
 
-        // the animations, which are parallel to the nodes
-        // node = channel, sampler = one transformation data
+        // the animations
         if (scene.skinned) {
-            animationsArr = new ArrayList<>();
-            addAnimation(scene, animationsArr, accessorsArr, bufferViewsArr, bin);
-            json.put("animations", animationsArr);
             addSkins(scene, json, accessorsArr, bufferViewsArr, bin);
+            addAnimation(scene, json, accessorsArr, bufferViewsArr, bin);
         }
 
         // the materials, pointed to from mesh primitives

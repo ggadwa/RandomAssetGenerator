@@ -47,6 +47,9 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
 
         generatedModel = model;
 
+        // reset toolbar
+        AppWindow.toolBar.reset(model.scene.skinned);
+
         // and set the walk view
         AppWindow.walkView.setCameraCenterRotate(model.getCameraDistance(), model.getCameraRotateX(), model.getCameraRotateY(), model.getCameraOffsetY(), model.getCameraLightDistance());
         AppWindow.walkView.setIncommingScene(model.scene);

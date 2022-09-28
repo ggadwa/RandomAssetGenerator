@@ -6,6 +6,7 @@ import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.klinksoftware.rag.export.Export;
 import com.klinksoftware.rag.scene.Scene;
 import com.klinksoftware.rag.model.utility.MeshModelUtility;
+import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.RagPoint;
 import java.util.ArrayList;
 
@@ -37,9 +38,16 @@ public class ModelBase {
 
     // limb wrapping (for humanoid, etc models)
     // builds a mesh around two nodes and adds the mesh to first node of limb
+    // we remember the nodes here to help attach joints and weights later
     public void wrapLimbs(ArrayList<Limb> limbs, boolean organic) {
+        Mesh mesh;
+
         for (Limb limb : limbs) {
-            limb.node1.addMesh(MeshModelUtility.buildMeshAroundNodeLimb(scene, limb, organic));
+            mesh = MeshModelUtility.buildMeshAroundNodeLimb(scene, limb, organic);
+            mesh.limbNode1 = limb.node1;
+            mesh.limbNode2 = limb.node2;
+
+            limb.node1.addMesh(mesh);
         }
     }
 
@@ -98,12 +106,9 @@ public class ModelBase {
         // run the internal mesh build
         buildMeshes();
 
-        // models are build with absolute vertexes, but since
-        // they are skinned, we need to leave the vertexes absolute
-        // but attach all meshes to the root node.  In this way any
-        // node can have an inversebindmatrix and any vertexes can
-        // be attached to them
-        scene.attachAllAbsoluteMeshesToRootNode();
+        // models are build with absolute vertexes, we
+        // need to adjust these to be relative to nodes
+        scene.shiftAbsoluteMeshesToNodeRelativeMeshes();
 
         // need to build unique indexes for all nodes
         // and meshes, which is how they refer to each other in
@@ -111,21 +116,20 @@ public class ModelBase {
         scene.createNodeAndMeshIndexes();
 
         if (scene.skinned) {
-            // create joints and weights for animation
-            // has to happen after node indexes are created
+            // create joints for all animation nodes, which
+            // at this point is every node but the root
+            scene.animation.createJointsForAnimatedNodes();
+
+            // run the internal animation build, we add
+            // any required joints here
+            buildAnimations();
+
+            // the joint and limbs for every vertex in every
+            // mesh, using connections when the limbs were built
             scene.createJointsAndWeights();
 
             // the inversebind matrixes for nodes
-            scene.animation.createInverseBindMatrixForNodes();
-
-            // pre-allocate joint matrixes
-            scene.animation.setupJointMatrixesForAnimation();
-
-            // setup the animation channels
-            scene.animation.setupChannelsForAnimation();
-
-            // run the internal animation build
-            buildAnimations();
+            scene.animation.createInverseBindMatrixForJoints();
         }
     }
 }

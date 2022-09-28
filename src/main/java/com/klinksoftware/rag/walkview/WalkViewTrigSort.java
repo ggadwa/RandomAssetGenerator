@@ -1,6 +1,7 @@
 package com.klinksoftware.rag.walkview;
 
 import com.klinksoftware.rag.scene.Mesh;
+import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.utility.RagPoint;
 
 public class WalkViewTrigSort {
@@ -29,7 +30,7 @@ public class WalkViewTrigSort {
         trigCount = 0;
     }
 
-    public void addTrigsFromMesh(Mesh mesh, RagPoint cameraPnt) {
+    public void addTrigsFromMesh(Node node, Mesh mesh, RagPoint cameraPnt) {
         int n, k, indexTrigCount, idx;
         float dist;
 
@@ -67,6 +68,7 @@ public class WalkViewTrigSort {
 
             // add to list
             if (idx == -1) {
+                trigArray[trigCount].node = node;
                 trigArray[trigCount].mesh = mesh;
                 trigArray[trigCount].trigIdx = n;
                 trigArray[trigCount].distance = dist;
@@ -75,6 +77,7 @@ public class WalkViewTrigSort {
                     trigArray[k + 1] = trigArray[k];
                 }
 
+                trigArray[idx].node = node;
                 trigArray[idx].mesh = mesh;
                 trigArray[idx].trigIdx = n;
                 trigArray[idx].distance = dist;
@@ -85,6 +88,8 @@ public class WalkViewTrigSort {
     }
 
     public class SortedTrig {
+
+        public Node node;
         public Mesh mesh;
         public int trigIdx;
         public float distance;

@@ -530,7 +530,7 @@ public class MeshUtility {
     }
 
     public static Mesh createCubeRotated(String bitmapName, float xMin, float xMax, float yMin, float yMax, float zMin, float zMax, RagPoint rotAngle, boolean left, boolean right, boolean front, boolean back, boolean top, boolean bottom, boolean normalsIn, int uvMode)        {
-        return (createCubeRotated(bitmapName, xMin, xMax, yMin, yMax, zMin, zMax, rotAngle, left, right, front, back, top, bottom, normalsIn, uvMode));
+        return (createCubeRotated("cube", bitmapName, xMin, xMax, yMin, yMax, zMin, zMax, rotAngle, left, right, front, back, top, bottom, normalsIn, uvMode));
     }
 
     public static Mesh createCube(String bitmapName, float xMin, float xMax, float yMin, float yMax, float zMin, float zMax, boolean left, boolean right, boolean front, boolean back, boolean top, boolean bottom, boolean normalsIn, int uvMode) {

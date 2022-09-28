@@ -254,4 +254,8 @@ public class RagPoint
     public boolean hasXZValues() {
         return ((x != 0.0f) || (z != 0.0f));
     }
+
+    public boolean isZero() {
+        return ((x == 0.0f) && (y == 0.0f) && (z == 0.0f));
+    }
 }

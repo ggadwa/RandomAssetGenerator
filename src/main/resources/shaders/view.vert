@@ -24,7 +24,7 @@ void main(void)
     highp mat3 normalMatrix;
 
     // calculate the position
-    if (skinned) {
+    if ((skinned) && (displayType!=5)) {
         highp mat4 skinMatrix=(vertexWeight.x*jointMatrix[int(vertexJoint.x)])+(vertexWeight.y*jointMatrix[int(vertexJoint.y)])+(vertexWeight.z*jointMatrix[int(vertexJoint.z)])+(vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
         pos=viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
         normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(skinMatrix)));

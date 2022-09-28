@@ -40,7 +40,7 @@ public class WalkView extends AWTGLCanvas {
     private int perspectiveMatrixUniformId, viewMatrixUniformId, modelMatrixUniformId, lightPositionIntensityUniformId;
     private int[] jointMatrixesUniformId;
     private int skinnedUniformId, displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId, baseColorUniformId;
-    private int displayType, skeletonLineCount;
+    private int displayType;
     private long nextPaintTick;
     private float aspectRatio;
     public float cameraRotateDistance;
@@ -131,8 +131,6 @@ public class WalkView extends AWTGLCanvas {
         fixedLightPoint = null;
 
         currentLightIntensity = RAG_LIGHT_LOW_INTENSITY;
-
-        skeletonLineCount = 0;
 
         // start opengl
         createCapabilities();
@@ -320,7 +318,7 @@ public class WalkView extends AWTGLCanvas {
         // remove old scene meshes
         if (scene != null) {
             scene.releaseGLBuffersForAllMeshes();
-            scene.releaseGLBuffersForSkeletonDrawing();
+            scene.animation.releaseGLBuffersForSkeletonDrawing();
         }
 
         // remove old textures
@@ -333,7 +331,7 @@ public class WalkView extends AWTGLCanvas {
         // setup the scene, we setup all the gl buffers for the meshes
         // and the special one for skeleton drawing
         incommingScene.setupGLBuffersForAllMeshes();
-        skeletonLineCount = incommingScene.setupGLBuffersForSkeletonDrawing();
+        incommingScene.animation.setupGLBuffersForSkeletonDrawing();
 
         textures = new HashMap<>();
         for (String bitmapName : incommingScene.bitmaps.keySet()) {
@@ -498,9 +496,8 @@ public class WalkView extends AWTGLCanvas {
     // animations
     //
     private void setupAnimation(MemoryStack stack, long tick) {
-        int n;
+        int n, jointCount;
         FloatBuffer buf;
-        ArrayList<RagMatrix4f> jointMatrixes;
 
         // no skin, no animation
         if (!scene.skinned) {
@@ -508,10 +505,13 @@ public class WalkView extends AWTGLCanvas {
         }
 
         // get all the current animation matrixes
-        jointMatrixes = scene.animation.buildJointMatrixesForAnimation(tick);
-        for (n = 0; n != Animation.JOINT_COUNT; n++) {
+        scene.animation.buildJointMatrixesForAnimation(tick);
+
+        jointCount = scene.animation.joints.size();
+
+        for (n = 0; n != jointCount; n++) {
             buf = stack.mallocFloat(16);
-            buf.put(jointMatrixes.get(n).data).flip();
+            buf.put(scene.animation.joints.get(n).jointMatrix.data).flip();
             glUniformMatrix4fv(jointMatrixesUniformId[n], false, buf);
         }
     }
@@ -540,12 +540,12 @@ public class WalkView extends AWTGLCanvas {
         }
     }
 
-    private void setupMeshBuffers(Mesh mesh) {
+    private void setupMeshBuffers(Node node, Mesh mesh) {
         FloatBuffer buf;
 
         try ( MemoryStack stack = stackPush()) {
             buf = stack.mallocFloat(16);
-            buf.put(mesh.modelMatrix.data).flip();
+            buf.put(node.modelMatrix.data).flip();
             glUniformMatrix4fv(modelMatrixUniformId, false, buf);
         }
 
@@ -598,7 +598,7 @@ public class WalkView extends AWTGLCanvas {
             }
 
             // draw the mesh
-            setupMeshBuffers(mesh);
+            setupMeshBuffers(node, mesh);
 
             intBuf = MemoryUtil.memAllocInt(mesh.indexes.length);
             intBuf.put(mesh.indexes).flip();
@@ -634,7 +634,7 @@ public class WalkView extends AWTGLCanvas {
             }
 
             // add to trig sort array
-            trigSort.addTrigsFromMesh(mesh, cameraPoint);
+            trigSort.addTrigsFromMesh(node, mesh, cameraPoint);
         }
 
         // next nodes
@@ -646,6 +646,7 @@ public class WalkView extends AWTGLCanvas {
     private void drawSortedTransparentTrigs(long tick) {
         int n, trigIndexIdx;
         Mesh mesh, lastUsedMesh;
+        Node node;
         WalkViewTexture texture;
         IntBuffer intBuf;
 
@@ -658,11 +659,12 @@ public class WalkView extends AWTGLCanvas {
 
         for (n = 0; n != trigSort.trigCount; n++) {
             mesh = trigSort.trigArray[n].mesh;
+            node = trigSort.trigArray[n].node;
 
             // new mesh?
             if (lastUsedMesh != mesh) {
                 lastUsedMesh = mesh;
-                setupMeshBuffers(mesh);
+                setupMeshBuffers(node, mesh);
 
                 // new texture?
                 texture = textures.get(mesh.bitmapName);
@@ -704,14 +706,18 @@ public class WalkView extends AWTGLCanvas {
     //
     // draw skeleton scene
     //
-    private void drawSkeletonScene() {
-        int nodeCount;
+    private void drawSkeletonScene(long tick) {
+        int nodeCount, skeletonLineCount;
         FloatBuffer buf;
+
+        // update all the skeleton buffers for the current animation tick
+        skeletonLineCount = scene.animation.updateGLBuffersForSkeletonDrawing(tick);
 
         nodeCount = scene.getNodeCount();
 
         // need a fake matrix as we don't have offset meshes here
-        // i.e., identity, i.e., the root node
+        // i.e., identity, as all the skeleton points are pre-multiplied
+        // by the node matrices and are absolute points
         try ( MemoryStack stack = stackPush()) {
             buf = stack.mallocFloat(16);
             buf.put(skeletonModelMatrix.data).flip(); // the identity
@@ -719,15 +725,8 @@ public class WalkView extends AWTGLCanvas {
         }
 
         // bind the scene based skeleton node data
-        glBindBuffer(GL_ARRAY_BUFFER, scene.vboSkeletonVertexId);
+        glBindBuffer(GL_ARRAY_BUFFER, scene.animation.vboSkeletonVertexId);
         glVertexAttribPointer(vertexPositionAttribute, 3, GL_FLOAT, false, 0, 0);
-
-        if (scene.skinned) {
-            glBindBuffer(GL_ARRAY_BUFFER, scene.vboSkeletonJointId);
-            glVertexAttribPointer(vertexJointAttribute, 4, GL_FLOAT, false, 0, 0);
-            glBindBuffer(GL_ARRAY_BUFFER, scene.vboSkeletonWeightId);
-            glVertexAttribPointer(vertexWeightAttribute, 4, GL_FLOAT, false, 0, 0);
-        }
 
         // the line points, these draw in green
         try ( MemoryStack stack = stackPush()) {
@@ -792,6 +791,12 @@ public class WalkView extends AWTGLCanvas {
         // clear
         glClear(((scene.skyBox) && (displayType != this.WV_DISPLAY_SKELETON)) ? GL_DEPTH_BUFFER_BIT : GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // setup the model matrixes, which move the meshes to
+        // the node's absolute position, when skinning, the vertexes are
+        // absolute so these just become the identity
+        scene.setupNodeModelMatrixes();
+
+
         // start the program and setup
         // the drawing matrixes
         glUseProgram(programId);
@@ -831,7 +836,7 @@ public class WalkView extends AWTGLCanvas {
         if (displayType != WV_DISPLAY_SKELETON) {
             drawRegularScene(tick);
         } else {
-            drawSkeletonScene();
+            drawSkeletonScene(tick);
         }
 
         // clean up any binds and stop program

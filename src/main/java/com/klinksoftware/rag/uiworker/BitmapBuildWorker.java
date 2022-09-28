@@ -47,6 +47,10 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         scene = new Scene();
         scene.makeSceneSimpleCube(bitmap);
 
+        // reset toolbar
+        AppWindow.toolBar.reset(false);
+
+        // and set the walk view
         AppWindow.walkView.setCameraCenterRotate(4.0f, -25.0f, 225.0f, 0.0f, -2.0f);
         AppWindow.walkView.setIncommingScene(scene);
 

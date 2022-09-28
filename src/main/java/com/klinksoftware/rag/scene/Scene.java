@@ -3,18 +3,9 @@ package com.klinksoftware.rag.scene;
 import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
-import org.lwjgl.system.MemoryUtil;
-import static org.lwjgl.system.MemoryUtil.memFree;
 
 // this is our internal representation of a gltf file
 // root node is created automatically
@@ -22,7 +13,6 @@ public class Scene {
 
     private int nodeIndex, meshIndex;
 
-    public int vboSkeletonVertexId, vboSkeletonJointId, vboSkeletonWeightId;
     public boolean skyBox, skinned;
     public Node rootNode;
     public HashMap<String, BitmapBase> bitmaps;
@@ -163,30 +153,10 @@ public class Scene {
         shiftAbsoluteMeshesToNodeRelativeMeshesRecursive(rootNode, new RagPoint(0.0f, 0.0f, 0.0f));
     }
 
-    // we use this to shift the absolute vertexes to stay absolute but
-    // be attached only to the root node.  We do this so skinned animations can
-    // work with all nodes
-    public void attachAllAbsoluteMeshesToRootNode() {
-        ArrayList<Mesh> meshes;
-
-        // get this first otherwise it gets cleared
-        meshes = getAllMeshes();
-
-        // clear all nodes first
-        for (Node node : getAllNodes()) {
-            node.clearMeshes();
-        }
-
-        // now attach all meshes to root node
-        for (Mesh mesh : meshes) {
-            rootNode.addMesh(mesh);
-        }
-    }
-
     // setup all the gl buffers for meshes in the node tree
     public void setupGLBuffersForAllMeshesRecursive(Node node) {
         for (Mesh mesh : node.meshes) {
-            mesh.setupGLBuffers(node);
+            mesh.setupGLBuffers(node, skinned);
         }
 
         for (Node childNode : node.childNodes) {
@@ -323,9 +293,10 @@ public class Scene {
     }
 
     // create joints and weights for each vertexes
+    // this is based off of information compiled when building the limbs
     public void createJointsAndWeights() {
         for (Mesh mesh : getAllMeshes()) {
-            mesh.createJointsAndWeights(this);
+            mesh.createJointsAndWeightsForLimbNodes(this);
         }
     }
 
@@ -378,93 +349,18 @@ public class Scene {
         throw new RuntimeException("Something is wrong with mesh list");
     }
 
-    // gl buffers for drawing skeletons
-    public int setupGLBuffersForSkeletonDrawing() {
-        int nodeCount, lineCount;
-        RagPoint absPnt, absPnt2;
-        FloatBuffer vertexBuf, jointBuf, weightBuf;
-        ArrayList<Node> nodes;
-
-        nodes = getAllNodes();
-        nodeCount = nodes.size();
-
-        // count the # of lines we will need
-        lineCount = 0;
-
-        for (Node node : nodes) {
-            lineCount += node.childNodes.size();
-        }
-
-        // memory for vertexes
-        vertexBuf = MemoryUtil.memAllocFloat(((lineCount * 2) + nodeCount) * 3);
-        if (skinned) {
-            jointBuf = MemoryUtil.memAllocFloat(((lineCount * 2) + nodeCount) * 4);
-            weightBuf = MemoryUtil.memAllocFloat(((lineCount * 2) + nodeCount) * 4);
-        } else {
-            jointBuf = null;
-            weightBuf = null;
-        }
-
-        // vertexes for lines
-        for (Node node : nodes) {
-            absPnt = node.getAbsolutePoint();
-
-            for (Node node2 : node.childNodes) {
-                vertexBuf.put(absPnt.x).put(absPnt.y).put(absPnt.z);
-
-                absPnt2 = node2.getAbsolutePoint();
-                vertexBuf.put(absPnt2.x).put(absPnt2.y).put(absPnt2.z);
-
-                if (skinned) {
-                    jointBuf.put((float) node.index).put(0.0f).put(0.0f).put(0.0f);
-                    weightBuf.put(1.0f).put(0.0f).put(0.0f).put(0.0f);
-
-                    jointBuf.put((float) node2.index).put(0.0f).put(0.0f).put(0.0f);
-                    weightBuf.put(1.0f).put(0.0f).put(0.0f).put(0.0f);
-                }
+    // setup the node matrixes for drawing, in regular drawing
+    // the node matrix is just the absolute point for the node,
+    // but when skinned, since the vertexes for skin is a single
+    // unit with absolute vertexes, we just use the identity
+    public void setupNodeModelMatrixes() {
+        for (Node node : getAllNodes()) {
+            if (!skinned) {
+                node.modelMatrix.setTranslationFromPoint(node.getAbsolutePoint());
+            } else {
+                node.modelMatrix.setIdentity();
             }
         }
-
-        // vertexes for bones
-        for (Node node : nodes) {
-            absPnt = node.getAbsolutePoint();
-            vertexBuf.put(absPnt.x).put(absPnt.y).put(absPnt.z);
-            if (skinned) {
-                jointBuf.put((float) node.index).put(0.0f).put(0.0f).put(0.0f);
-                weightBuf.put(1.0f).put(0.0f).put(0.0f).put(0.0f);
-            }
-        }
-
-        // put it in gl buffer
-        vertexBuf.flip();
-        vboSkeletonVertexId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboSkeletonVertexId);
-        glBufferData(GL_ARRAY_BUFFER, vertexBuf, GL_STATIC_DRAW);
-        memFree(vertexBuf);
-
-        if (skinned) {
-            jointBuf.flip();
-            vboSkeletonJointId = glGenBuffers();
-            glBindBuffer(GL_ARRAY_BUFFER, vboSkeletonJointId);
-            glBufferData(GL_ARRAY_BUFFER, jointBuf, GL_STATIC_DRAW);
-            memFree(jointBuf);
-
-            weightBuf.flip();
-            vboSkeletonWeightId = glGenBuffers();
-            glBindBuffer(GL_ARRAY_BUFFER, vboSkeletonWeightId);
-            glBufferData(GL_ARRAY_BUFFER, weightBuf, GL_STATIC_DRAW);
-            memFree(weightBuf);
-        }
-
-        return (lineCount);
     }
 
-    // release buffers for opengl drawing
-    public void releaseGLBuffersForSkeletonDrawing() {
-        glDeleteBuffers(vboSkeletonVertexId);
-        if (skinned) {
-            glDeleteBuffers(vboSkeletonJointId);
-            glDeleteBuffers(vboSkeletonWeightId);
-        }
-    }
 }

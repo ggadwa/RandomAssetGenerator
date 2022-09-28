@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.scene;
 
+import com.klinksoftware.rag.utility.RagMatrix4f;
 import com.klinksoftware.rag.utility.RagPoint;
 import java.util.ArrayList;
 
@@ -10,13 +11,18 @@ public class Node {
     public int index;
     public String name;
     public Node parentNode;
-    public RagPoint pnt;
+    public RagPoint pnt, skeletonPnt;
+    public RagMatrix4f modelMatrix;
     public ArrayList<Node> childNodes;
     public ArrayList<Mesh> meshes;
 
     public Node(String name, RagPoint pnt) {
         this.name = name;
         this.pnt = pnt.copy();
+
+        skeletonPnt = new RagPoint(0.0f, 0.0f, 0.0f); // for skeleton drawing
+
+        modelMatrix = new RagMatrix4f();
 
         parentNode = null;
         childNodes = new ArrayList<>();

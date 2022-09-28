@@ -77,12 +77,19 @@ public class ToolBar extends JToolBar {
         return (button);
     }
 
-    public void reset() {
+    public void reset(boolean enableSkeleton) {
         lightButton.setSelected(false);
+        flyButton.setSelected(false);
+        renderButton.setSelected(true);
         colorButton.setSelected(false);
         normalButton.setSelected(false);
         MetallicRoughnessButton.setSelected(false);
         emissiveButton.setSelected(false);
+        skeletonButton.setSelected(false);
+
+        skeletonButton.setEnabled(enableSkeleton);
+
+        AppWindow.walkView.setDisplayType(WalkView.WV_DISPLAY_RENDER);
     }
 
 }

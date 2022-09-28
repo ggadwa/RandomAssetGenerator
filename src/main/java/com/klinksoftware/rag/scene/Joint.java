@@ -5,24 +5,32 @@ import com.klinksoftware.rag.utility.RagPoint;
 import com.klinksoftware.rag.utility.RagQuaternion;
 import java.util.ArrayList;
 
-public class AnimationChannel {
+public class Joint {
 
     public static final float ANIMATION_FPS = 60.0f;
 
     public Node node;
-    public RagMatrix4f rotMatrix, poseMatrix;
-    public ArrayList<AnimationChannelSample> samples;
+    public RagMatrix4f rotMatrix, poseMatrix, jointMatrix, inverseBindMatrix;
+    public ArrayList<ChannelSample> samples;
 
-    public AnimationChannel(Node node) {
-        RagQuaternion quat;
-
+    public Joint(Node node) {
         this.node = node;
-        rotMatrix = new RagMatrix4f(); // pre-allocate
 
         samples = new ArrayList<>();
 
-        // the calculated pose matrix for this node
         poseMatrix = new RagMatrix4f();
+        rotMatrix = new RagMatrix4f();
+        jointMatrix = new RagMatrix4f();
+        inverseBindMatrix = new RagMatrix4f();
+    }
+
+    // the inverse bind matrix puts a vertex back into
+    // the local space of the joint, so the inverse bind
+    // matrix is just the negative translate from the absolute
+    // position of the joint's node
+    public void createInverseBindMatrix() {
+        inverseBindMatrix = new RagMatrix4f();
+        inverseBindMatrix.setNegativeTranslationFromPoint(node.getAbsolutePoint());
     }
 
     public void addSamples(float secs, RagPoint fromRot, RagPoint toRot) {
@@ -47,8 +55,12 @@ public class AnimationChannel {
             rot.tween(fromRot, toRot, f);
             quat.setIdentity();
             quat.setFromPoint(rot);
-            samples.add(new AnimationChannelSample((lastSec + (f * secs)), quat));
+            samples.add(new ChannelSample((lastSec + (f * secs)), quat));
         }
+    }
+
+    public float getLastSampleSec() {
+        return (samples.isEmpty() ? 0.0f : samples.get(samples.size() - 1).globalTimeSecond);
     }
 
     public RagQuaternion getRotateQuaternionForTick(long tick) {
@@ -82,5 +94,11 @@ public class AnimationChannel {
         poseMatrix.setTranslationFromPoint(pnt);
         rotMatrix.setRotationFromQuaternion(rotQuat);
         poseMatrix.multiply(rotMatrix);
+    }
+
+    // the joint matrix is just the pose matrix * the inverse bind matrix
+    // this is what eventually gets passed to the shader
+    public void buildJointMatrix() {
+        jointMatrix.setFromMultiply(poseMatrix, inverseBindMatrix);
     }
 }

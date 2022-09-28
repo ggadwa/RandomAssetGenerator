@@ -30,6 +30,10 @@ public class RagMatrix4f {
         data[15]=1.0f;
     }
 
+    public void setFromMatrix(RagMatrix4f mat) {
+        System.arraycopy(mat.data, 0, data, 0, 16);
+    }
+
     public void setPerspectiveMatrix(float viewFOV,float viewAspect,float glNearZ,float glFarZ) {
         float fov=1.0f/(float)Math.tan(viewFOV*0.5f);
         float dist=1.0f/(glNearZ-glFarZ);
@@ -244,7 +248,7 @@ public class RagMatrix4f {
         data[14]=d14;
         data[15]=d15;
     }
-    public void setFromMultiple(RagMatrix4f mat1, RagMatrix4f mat2) {
+    public void setFromMultiply(RagMatrix4f mat1, RagMatrix4f mat2) {
         data[0] = (mat1.data[0] * mat2.data[0]) + (mat1.data[4] * mat2.data[1]) + (mat1.data[8] * mat2.data[2]) + (mat1.data[12] * mat2.data[3]);
         data[4] = (mat1.data[0] * mat2.data[4]) + (mat1.data[4] * mat2.data[5]) + (mat1.data[8] * mat2.data[6]) + (mat1.data[12] * mat2.data[7]);
         data[8] = (mat1.data[0] * mat2.data[8]) + (mat1.data[4] * mat2.data[9]) + (mat1.data[8] * mat2.data[10]) + (mat1.data[12] * mat2.data[11]);
@@ -288,7 +292,7 @@ public class RagMatrix4f {
         data[15] = (mat.data[0] * mat.data[5] * mat.data[10]) - (mat.data[0] * mat.data[6] * mat.data[9]) - (mat.data[4] * mat.data[1] * mat.data[10]) + (mat.data[4] * mat.data[2] * mat.data[9]) + (mat.data[8] * mat.data[1] * mat.data[6]) - (mat.data[8] * mat.data[2] * mat.data[5]);
 
         det = (mat.data[0] * data[0]) + (mat.data[1] * data[4]) + (mat.data[2] * data[8]) + (mat.data[3] * data[12]);
-        if (det == 0) {
+        if (det == 0.0f) {
             return;
         }
 
