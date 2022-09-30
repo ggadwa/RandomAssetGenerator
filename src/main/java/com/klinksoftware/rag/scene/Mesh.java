@@ -23,7 +23,6 @@ public class Mesh {
     public int vboVertexId, vboNormalId, vboTangentId, vboUVId, vboJointId, vboWeightId;
     public RagBound xBound, yBound, zBound;
     public boolean highlight;
-    public Node limbNode1, limbNode2;
 
     public Mesh(String name,String bitmapName,float[] vertexes,float[] normals,float[] tangents,float[] uvs,int[] indexes)
     {
@@ -37,9 +36,6 @@ public class Mesh {
 
         joints = null;
         weights = null;
-
-        limbNode1 = null; // remember these to help build vertex joints and weights
-        limbNode2 = null;
     }
 
     public void getMinMaxVertex(RagPoint min,RagPoint max)
@@ -339,19 +335,8 @@ public class Mesh {
         }
     }
 
-    // build the joints and weights for a skinned model, we go between
-    // the two nodes of the limb which were set when the mesh was built
-    // around the limb
-    public void createJointsAndWeightsForLimbNodes(Scene scene) {
+    public void setAllVertexesToSingleJoint(int jointIdx) {
         int n, idx, vertexLength, vertexCount;
-        int joint1Idx, joint2Idx;
-        float dist1, dist2, f1, f2;
-        RagPoint absPnt1, absPnt2;
-        RagPoint pnt = new RagPoint(0.0f, 0.0f, 0.0f);
-
-        // get joints for nodes
-        joint1Idx = scene.animation.findJointIndexForNodeIndex(limbNode1.index);
-        joint2Idx = (limbNode2 == null) ? 0 : scene.animation.findJointIndexForNodeIndex(limbNode2.index);
 
         // joints and weights parallel to vertexes
         vertexLength = vertexes.length;
@@ -361,78 +346,14 @@ public class Mesh {
         joints = new float[vertexCount * 4]; // 4 point vector, 4 possible node connections
         weights = new float[vertexCount * 4]; // same as above, 1 weight for every 1 node connection
 
-        // special case where only one node
-        if (limbNode2 == null) {
-            for (n = 0; n < vertexLength; n += 3) {
-                joints[idx] = (float) joint1Idx;
-                joints[idx + 1] = 0.0f;
-                joints[idx + 2] = 0.0f;
-                joints[idx + 3] = 0.0f;
-
-                weights[idx] = 1.0f;
-                weights[idx + 1] = 0.0f;
-                weights[idx + 2] = 0.0f;
-                weights[idx + 3] = 0.0f;
-
-                idx += 4;
-            }
-            return;
-        }
-
-        // otherwise tween between nodes
-        absPnt1 = limbNode1.getAbsolutePoint();
-        absPnt2 = limbNode2.getAbsolutePoint();
-
         for (n = 0; n < vertexLength; n += 3) {
-
-            // find factor of distance between each node
-            // vertexes are relative to node1, so add in that for absolute
-            pnt.setFromValues((vertexes[n] + absPnt1.x), (vertexes[n + 1] + absPnt1.y), (vertexes[n + 2] + absPnt1.z));
-            dist1 = absPnt1.distance(pnt);
-            dist2 = absPnt2.distance(pnt);
-
-            f1 = 1.0f - (dist1 / (dist1 + dist2));
-            f2 = 1.0f - (dist2 / (dist1 + dist2));
-
-            // any node that is within 20% is the only node
-            if (f1 > 0.8f) {
-                joints[idx] = (float) joint1Idx;
-                joints[idx + 1] = 0.0f;
-                joints[idx + 2] = 0.0f;
-                joints[idx + 3] = 0.0f;
-
-                weights[idx] = 1.0f;
-                weights[idx + 1] = 0.0f;
-                weights[idx + 2] = 0.0f;
-                weights[idx + 3] = 0.0f;
-
-                idx += 4;
-                continue;
-            }
-
-            if (f2 > 0.8f) {
-                joints[idx] = (float) joint2Idx;
-                joints[idx + 1] = 0.0f;
-                joints[idx + 2] = 0.0f;
-                joints[idx + 3] = 0.0f;
-
-                weights[idx] = 1.0f;
-                weights[idx + 1] = 0.0f;
-                weights[idx + 2] = 0.0f;
-                weights[idx + 3] = 0.0f;
-
-                idx += 4;
-                continue;
-            }
-
-            // otherwise it's both nodes
-            joints[idx] = (float) joint1Idx;
-            joints[idx + 1] = (float) joint2Idx;
+            joints[idx] = (float) jointIdx;
+            joints[idx + 1] = 0.0f;
             joints[idx + 2] = 0.0f;
             joints[idx + 3] = 0.0f;
 
-            weights[idx] = f1;
-            weights[idx + 1] = (1.0f - f1);
+            weights[idx] = 1.0f;
+            weights[idx + 1] = 0.0f;
             weights[idx + 2] = 0.0f;
             weights[idx + 3] = 0.0f;
 

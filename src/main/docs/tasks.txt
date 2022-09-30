@@ -1,7 +1,10 @@
 
 
 [ ] top torso/mid torso don't have to have same radius
-[ ] vertex connections better at limb changes (seems not 100% on end point)
+[ ] leg animations in method
+
+
+
 
 [ ] move up textures to 1024 on map/model
 
@@ -27,7 +30,6 @@ map
  - open ceiling
  - windows
  - skybox has bad uv (lines)
- - put back in decorations
 
 bitmaps
  - gravel (like dirt)

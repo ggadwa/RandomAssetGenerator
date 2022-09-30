@@ -12,7 +12,22 @@ public class AnimationBuilder {
         this.scene = scene;
     }
 
+    public void buildArm(int armIndex, float flip) {
+        Joint joint;
+
+        joint = scene.animation.findJointForNodeName("shoulder_" + Integer.toString(armIndex));
+        if (joint == null) {
+            return;
+        }
+
+        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, (70.0f * flip)), new RagPoint(0.0f, (-15.0f * flip), (60.0f * flip)));
+        joint.addSamples(0.5f, new RagPoint(0.0f, (-15.0f * flip), (60.0f * flip)), new RagPoint(0.0f, 0.0f, (70.0f * flip)));
+        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, (70.0f * flip)), new RagPoint(0.0f, (15.0f * flip), (60.0f * flip)));
+        joint.addSamples(0.5f, new RagPoint(0.0f, (15.0f * flip), (60.0f * flip)), new RagPoint(0.0f, 0.0f, (70.0f * flip)));
+    }
+
     public void build() {
+        int n;
         Joint joint;
 
         joint = scene.animation.findJointForNodeName("hip_0");
@@ -56,5 +71,9 @@ public class AnimationBuilder {
         joint.addSamples(0.5f, new RagPoint(0.0f, 15.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
         joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(0.0f, -15.0f, 0.0f));
         joint.addSamples(0.5f, new RagPoint(0.0f, -15.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+
+        for (n = 0; n != 4; n++) {
+            buildArm(n, (((n % 2) == 0) ? -1.0f : 1.0f));
+        }
     }
 }

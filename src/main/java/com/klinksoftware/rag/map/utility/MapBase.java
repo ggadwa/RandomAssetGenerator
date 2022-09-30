@@ -3,7 +3,6 @@ package com.klinksoftware.rag.map.utility;
 import com.klinksoftware.rag.map.utility.MapRoom;
 import com.klinksoftware.rag.map.utility.MapPieceList;
 import com.klinksoftware.rag.scene.Scene;
-import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.export.Export;
@@ -161,8 +160,7 @@ public class MapBase {
                     touchIdx = room.touches(rooms);
                     if (touchIdx != -1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            room.node = new Node(name, room.getNodePoint());
-                            scene.rootNode.addChild(room.node);
+                            room.node = scene.addChildNode(scene.rootNode, name, room.getNodePoint());
                             rooms.add(room);
                             return (room);
                         }
@@ -176,8 +174,7 @@ public class MapBase {
                     touchIdx = room.touches(rooms);
                     if (touchIdx != -1) {
                         if (room.hasSharedWalls(rooms.get(touchIdx))) {
-                            room.node = new Node(name, room.getNodePoint());
-                            scene.rootNode.addChild(room.node);
+                            room.node = scene.addChildNode(scene.rootNode, name, room.getNodePoint());
                             rooms.add(room);
                             return (room);
                         }
@@ -220,8 +217,7 @@ public class MapBase {
 
         name = "room_" + Integer.toString(rooms.size());
 
-        room.node = new Node(name, room.getNodePoint());
-        scene.rootNode.addChild(room.node);
+        room.node = scene.addChildNode(scene.rootNode, name, room.getNodePoint());
         rooms.add(room);
 
         lastRoom=room;
@@ -254,8 +250,7 @@ public class MapBase {
                 room.z=connectRoom.z;     // on left
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        room.node = new Node(name, room.getNodePoint());
-                        scene.rootNode.addChild(room.node);
+                        room.node = scene.addChildNode(scene.rootNode, name, room.getNodePoint());
                         rooms.add(room);
                         break;
                     }
@@ -265,8 +260,7 @@ public class MapBase {
                 room.z=connectRoom.z;     // on right
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        room.node = new Node(name, room.getNodePoint());
-                        scene.rootNode.addChild(room.node);
+                        room.node = scene.addChildNode(scene.rootNode, name, room.getNodePoint());
                         rooms.add(room);
                         break;
                     }
@@ -276,8 +270,7 @@ public class MapBase {
                 room.z=connectRoom.z-room.piece.sizeZ;     // on top
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        room.node = new Node(name, room.getNodePoint());
-                        scene.rootNode.addChild(room.node);
+                        room.node = scene.addChildNode(scene.rootNode, name, room.getNodePoint());
                         rooms.add(room);
                         break;
                     }
@@ -287,8 +280,7 @@ public class MapBase {
                 room.z=connectRoom.z+connectRoom.piece.sizeZ;     // on bottom
                 if (!room.collides(rooms)) {
                     if (room.hasSharedWalls(connectRoom)) {
-                        room.node = new Node(name, room.getNodePoint());
-                        scene.rootNode.addChild(room.node);
+                        room.node = scene.addChildNode(scene.rootNode, name, room.getNodePoint());
                         rooms.add(room);
                         break;
                     }
@@ -533,10 +525,10 @@ public class MapBase {
         // need to adjust these to be relative to nodes
         scene.shiftAbsoluteMeshesToNodeRelativeMeshes();
 
-        // need to build unique indexes for all nodes
-        // and meshes, which is how they refer to each other in
+        // need to build unique indexes for all the meshes,
+        // which is how they refer to each other in
         // the gltf
-        scene.createNodeAndMeshIndexes();
+        scene.createMeshIndexes();
     }
 
     public void writeToFile(String path) {

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 // this is a node in the scene, equivalent to what you see in
 // a gltf file, has list of child nodes and list of child meshes,
 // the meshes become primitives in the gltf
+// index is used for the flat list in the gltf
 public class Node {
     public int index;
     public String name;
@@ -16,8 +17,9 @@ public class Node {
     public ArrayList<Node> childNodes;
     public ArrayList<Mesh> meshes;
 
-    public Node(String name, RagPoint pnt) {
+    public Node(String name, int index, RagPoint pnt) {
         this.name = name;
+        this.index = index;
         this.pnt = pnt.copy();
 
         skeletonPnt = new RagPoint(0.0f, 0.0f, 0.0f); // for skeleton drawing

@@ -44,9 +44,6 @@ public class ModelBase {
 
         for (Limb limb : limbs) {
             mesh = MeshModelUtility.buildMeshAroundNodeLimb(scene, limb, organic);
-            mesh.limbNode1 = limb.node1;
-            mesh.limbNode2 = limb.node2;
-
             limb.node1.addMesh(mesh);
         }
     }
@@ -110,23 +107,15 @@ public class ModelBase {
         // need to adjust these to be relative to nodes
         scene.shiftAbsoluteMeshesToNodeRelativeMeshes();
 
-        // need to build unique indexes for all nodes
-        // and meshes, which is how they refer to each other in
+        // need to build unique indexes for the meshes,
+        // which is how they refer to each other in
         // the gltf
-        scene.createNodeAndMeshIndexes();
+        scene.createMeshIndexes();
 
         if (scene.skinned) {
-            // create joints for all animation nodes, which
-            // at this point is every node but the root
-            scene.animation.createJointsForAnimatedNodes();
-
             // run the internal animation build, we add
             // any required joints here
             buildAnimations();
-
-            // the joint and limbs for every vertex in every
-            // mesh, using connections when the limbs were built
-            scene.createJointsAndWeights();
 
             // the inversebind matrixes for nodes
             scene.animation.createInverseBindMatrixForJoints();

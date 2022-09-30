@@ -55,7 +55,7 @@ public class Animation {
             }
         }
 
-        throw new RuntimeException("Joint setup is missing joint: " + nodeName);
+        return (null);
     }
 
     public int findJointIndexForNodeIndex(int index) {

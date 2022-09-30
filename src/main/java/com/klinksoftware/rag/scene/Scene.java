@@ -11,7 +11,7 @@ import java.util.HashMap;
 // root node is created automatically
 public class Scene {
 
-    private int nodeIndex, meshIndex;
+    private int nodeIndex;
 
     public boolean skyBox, skinned;
     public Node rootNode;
@@ -19,12 +19,32 @@ public class Scene {
     public Animation animation;
 
     public Scene() {
-        rootNode = new Node("root", new RagPoint(0.0f, 0.0f, 0.0f));
+        nodeIndex = 0;
+
+        rootNode = new Node("root", nodeIndex++, new RagPoint(0.0f, 0.0f, 0.0f));
         bitmaps = new HashMap<>();
         animation = new Animation(this);
 
         skyBox = false;
         skinned = false;
+    }
+
+    // add a node
+    public Node addChildNode(Node parentNode, String name, RagPoint pnt) {
+        Node node;
+
+        node = new Node(name, nodeIndex++, pnt);
+        parentNode.addChild(node);
+
+        return (node);
+    }
+
+    public Node addChildNodeAndJoint(Node parentNode, String name, RagPoint pnt) {
+        Node node;
+
+        node = addChildNode(parentNode, name, pnt);
+        animation.joints.add(new Joint(node));
+        return (node);
     }
 
     // convience routine to get all nodes from the tree
@@ -292,33 +312,12 @@ public class Scene {
         return ((currentNode == null) ? rootNode : currentNode);
     }
 
-    // create joints and weights for each vertexes
-    // this is based off of information compiled when building the limbs
-    public void createJointsAndWeights() {
+    public void createMeshIndexes() {
+        int meshIndex = 0;
+
         for (Mesh mesh : getAllMeshes()) {
-            mesh.createJointsAndWeightsForLimbNodes(this);
-        }
-    }
-
-    // traverse the tree to give every node and every mesh a index
-    // gltf's refer to nodes and meshes this way
-    private void createNodeAndMeshIndexesRecursive(Node node) {
-        node.index = nodeIndex++;
-
-        for (Mesh mesh : node.meshes) {
             mesh.index = meshIndex++;
         }
-
-        for (Node childNode : node.childNodes) {
-            createNodeAndMeshIndexesRecursive(childNode);
-        }
-    }
-
-    public void createNodeAndMeshIndexes() {
-        nodeIndex = 0;
-        meshIndex = 0;
-
-        createNodeAndMeshIndexesRecursive(rootNode);
     }
 
     public int getNodeCount() {

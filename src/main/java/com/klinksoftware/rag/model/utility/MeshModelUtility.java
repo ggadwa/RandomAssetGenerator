@@ -1,10 +1,8 @@
 package com.klinksoftware.rag.model.utility;
 
 import com.klinksoftware.rag.model.utility.Limb;
-import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.scene.Scene;
-import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
@@ -18,22 +16,26 @@ public class MeshModelUtility
     private static final int CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT = 4;
 
     // build a cylinder around a limb
-    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, RagPoint topPnt, float topRadius, int aroundCount, int acrossCount) {
+    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, int botJointIdx, RagPoint topPnt, float topRadius, int topJointIdx, int aroundCount, int acrossCount) {
         int n, k, rowIdx, row2Idx, vIdx, vStartIdx;
         float ang, angAdd, acrossPos, acrossAdd;
         float tx, ty, tz;
-        float rd, rAdd, rad, u, uAdd;
-        ArrayList<Float> vertexArray, normalArray, uvArray;
+        float f, rd, rAdd, rad, u, uAdd;
+        ArrayList<Float> vertexArray, normalArray, uvArray, jointArray, weightArray;
         ArrayList<Integer> indexArray;
+        List<Float> acrossJoint, acrossWeight;
         int[] indexes;
         float[] vertexes, normals, tangents, uvs;
         RagPoint normal, centerPnt;
+        Mesh mesh;
 
         // allocate arrays
         vertexArray = new ArrayList<>();
         normalArray = new ArrayList<>();
         uvArray = new ArrayList<>();
         indexArray = new ArrayList<>();
+        jointArray = new ArrayList<>();
+        weightArray = new ArrayList<>();
 
         normal = new RagPoint(0.0f, 0.0f, 0.0f);
         centerPnt = new RagPoint(0.0f, 0.0f, 0.0f);
@@ -71,6 +73,20 @@ public class MeshModelUtility
             u = 0.0f;
             uAdd = 1.0f / (float) (aroundCount + 1);
 
+            if (k == 0) {
+                acrossJoint = Arrays.asList((float) botJointIdx, 0.0f, 0.0f, 0.0f);
+                acrossWeight = Arrays.asList(1.0f, 0.0f, 0.0f, 0.0f);
+            } else {
+                if (k == acrossCount) {
+                    acrossJoint = Arrays.asList((float) topJointIdx, 0.0f, 0.0f, 0.0f);
+                    acrossWeight = Arrays.asList(1.0f, 0.0f, 0.0f, 0.0f);
+                } else {
+                    f = (float) k / (float) acrossCount;
+                    acrossJoint = Arrays.asList((float) botJointIdx, (float) topJointIdx, 0.0f, 0.0f);
+                    acrossWeight = Arrays.asList((1.0f - f), f, 0.0f, 0.0f);
+                }
+            }
+
             // we need to dupliacte the seam so the uvs work
             for (n = 0; n != (aroundCount + 1); n++) {
 
@@ -104,6 +120,9 @@ public class MeshModelUtility
                 normal.normalize();
                 normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
                 uvArray.addAll(Arrays.asList(u, ((float) k / (float) acrossCount)));
+
+                jointArray.addAll(acrossJoint);
+                weightArray.addAll(acrossWeight);
 
                 ang += angAdd;
                 u += uAdd;
@@ -143,6 +162,8 @@ public class MeshModelUtility
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
             uvArray.addAll(Arrays.asList(0.5f, 0.0f));
+            jointArray.addAll(Arrays.asList((float) topJointIdx, 0.0f, 0.0f, 0.0f));
+            weightArray.addAll(Arrays.asList(1.0f, 0.0f, 0.0f, 0.0f));
 
             for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
@@ -163,6 +184,8 @@ public class MeshModelUtility
             normal.normalize();
             normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
             uvArray.addAll(Arrays.asList(0.5f, 1.0f));
+            jointArray.addAll(Arrays.asList((float) botJointIdx, 0.0f, 0.0f, 0.0f));
+            weightArray.addAll(Arrays.asList(1.0f, 0.0f, 0.0f, 0.0f));
 
             for (n = 0; n != aroundCount; n++) {
                 indexArray.add(vStartIdx);
@@ -180,7 +203,12 @@ public class MeshModelUtility
         indexes = MeshUtility.intArrayListToInt(indexArray);
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
-        return (new Mesh(name, bitmapName, vertexes, normals, tangents, uvs, indexes));
+        mesh = new Mesh(name, bitmapName, vertexes, normals, tangents, uvs, indexes);
+
+        mesh.joints = MeshUtility.floatArrayListToFloat(jointArray);
+        mesh.weights = MeshUtility.floatArrayListToFloat(weightArray);
+
+        return (mesh);
     }
 
     // rebuild the normal by finding the nearest node point
@@ -217,6 +245,7 @@ public class MeshModelUtility
 
     // build mesh around limb
     public static Mesh buildMeshAroundNodeLimb(Scene scene, Limb limb, boolean organic) {
+        int joint1Idx, joint2Idx;
         RagPoint absPnt1, absPnt2;
         Mesh mesh;
 
@@ -228,6 +257,7 @@ public class MeshModelUtility
                 mesh = MeshUtility.createCubeSimple(limb.name, limb.bitmapName, limb.node1.getAbsolutePoint(), limb.globeRadius);
             }
 
+            mesh.setAllVertexesToSingleJoint(scene.animation.findJointIndexForNodeIndex(limb.node1.index));
             mesh.clipFloorVertexes();
 
             return (mesh);
@@ -237,11 +267,14 @@ public class MeshModelUtility
         absPnt1 = limb.node1.getAbsolutePoint();
         absPnt2 = limb.node2.getAbsolutePoint();
 
+        joint1Idx = scene.animation.findJointIndexForNodeIndex(limb.node1.index);
+        joint2Idx = scene.animation.findJointIndexForNodeIndex(limb.node2.index);
+
         // build the cylinder around the nodes
         if (organic) {
-            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.radius1, absPnt2, limb.radius2, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.radius1, joint1Idx, absPnt2, limb.radius2, joint2Idx, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
         } else {
-            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.radius1, absPnt2, limb.radius2, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.radius1, joint1Idx, absPnt2, limb.radius2, joint2Idx, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
         }
 
         rebuildNormals(mesh, absPnt1, absPnt2);

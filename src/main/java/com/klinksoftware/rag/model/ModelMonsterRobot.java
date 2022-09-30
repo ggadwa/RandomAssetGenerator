@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.model;
 
+import com.klinksoftware.rag.model.utility.AnimationBuilder;
 import com.klinksoftware.rag.model.utility.ModelInterface;
 import com.klinksoftware.rag.model.utility.ModelBase;
 import com.klinksoftware.rag.model.utility.SkeletonBuilder;
@@ -34,7 +35,10 @@ public class ModelMonsterRobot extends ModelBase {
 
     @Override
     public void buildAnimations() {
+        AnimationBuilder animationBuilder;
 
+        animationBuilder = new AnimationBuilder(scene);
+        animationBuilder.build();
     }
 
 }
