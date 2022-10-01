@@ -1,26 +1,9 @@
 
 
-[ ] top torso/mid torso don't have to have same radius
-[ ] leg animations in method
-
-
 
 
 [ ] move up textures to 1024 on map/model
-
-
-
-rendering:
-- rethink this part of fragment shader, maybe get more expressive textures
-    lightCol*=bump;
-    lightCol=clamp(lightCol,0.2,1.0); // maybe at end after all calculations or not at all
-
-        // finally create the pixel
-
-    pixel.rgb=(tex.rgb*lightCol);
-    pixel.rgb+=(min(metallic,1.0)*lightCol); // maybe clamp at end, or no clamp?
-    if (hasEmissive) pixel.rgb+=(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
-    pixel.a=tex.a;
+[ ] half globes for parts of body?
 
 
 map

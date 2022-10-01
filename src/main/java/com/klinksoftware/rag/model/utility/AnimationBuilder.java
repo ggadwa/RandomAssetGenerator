@@ -12,7 +12,54 @@ public class AnimationBuilder {
         this.scene = scene;
     }
 
-    public void buildArm(int armIndex, float flip) {
+    public void buildLeg(int legIndex, boolean flip) {
+        Joint joint;
+
+        joint = scene.animation.findJointForNodeName("hip_" + Integer.toString(legIndex));
+        if (joint == null) {
+            return;
+        }
+
+        if (flip) {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(-45.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(-45.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(45.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(45.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+        } else {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(45.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(45.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(-45.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(-45.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+        }
+
+        joint = scene.animation.findJointForNodeName("knee_" + Integer.toString(legIndex));
+        if (flip) {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(25.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(25.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(40.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(40.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+        } else {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(40.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(40.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(25.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(25.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+        }
+
+        joint = scene.animation.findJointForNodeName("ankle_" + Integer.toString(legIndex));
+        if (flip) {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(25.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(25.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(10.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(10.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+        } else {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(25.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(25.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(10.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(10.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+        }
+    }
+
+    public void buildArm(int armIndex, boolean flip) {
         Joint joint;
 
         joint = scene.animation.findJointForNodeName("shoulder_" + Integer.toString(armIndex));
@@ -20,51 +67,39 @@ public class AnimationBuilder {
             return;
         }
 
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, (70.0f * flip)), new RagPoint(0.0f, (-15.0f * flip), (60.0f * flip)));
-        joint.addSamples(0.5f, new RagPoint(0.0f, (-15.0f * flip), (60.0f * flip)), new RagPoint(0.0f, 0.0f, (70.0f * flip)));
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, (70.0f * flip)), new RagPoint(0.0f, (15.0f * flip), (60.0f * flip)));
-        joint.addSamples(0.5f, new RagPoint(0.0f, (15.0f * flip), (60.0f * flip)), new RagPoint(0.0f, 0.0f, (70.0f * flip)));
+        if (flip) {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, -70.0f), new RagPoint(0.0f, 15.0f, -60.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 15.0f, -60.0f), new RagPoint(0.0f, 0.0f, -70.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, -70.0f), new RagPoint(0.0f, -15.0f, -60.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, -15.0f, -60.0f), new RagPoint(0.0f, 0.0f, -70.0f));
+        } else {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 70.0f), new RagPoint(0.0f, -15.0f, 60.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, -15.0f, 60.0f), new RagPoint(0.0f, 0.0f, 70.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 70.0f), new RagPoint(0.0f, 15.0f, 60.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 15.0f, 60.0f), new RagPoint(0.0f, 0.0f, 70.0f));
+        }
+
+        joint = scene.animation.findJointForNodeName("elbow_" + Integer.toString(armIndex));
+        if (joint == null) {
+            return;
+        }
+
+        if (flip) {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(0.0f, -20.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, -20.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(0.0f, 20.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 20.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+        } else {
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(0.0f, 20.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 20.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(0.0f, -20.0f, 0.0f));
+            joint.addSamples(0.5f, new RagPoint(0.0f, -20.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
+        }
     }
 
     public void build() {
         int n;
         Joint joint;
-
-        joint = scene.animation.findJointForNodeName("hip_0");
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(-45.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(-45.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(45.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(45.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-
-        joint = scene.animation.findJointForNodeName("knee_0");
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(25.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(25.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(40.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(40.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-
-        joint = scene.animation.findJointForNodeName("ankle_0");
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(25.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(25.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(10.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(10.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-
-        joint = scene.animation.findJointForNodeName("hip_1");
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(45.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(45.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(-45.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(-45.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-
-        joint = scene.animation.findJointForNodeName("knee_1");
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(40.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(40.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(25.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(25.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-
-        joint = scene.animation.findJointForNodeName("ankle_1");
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(10.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(10.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(25.0f, 0.0f, 0.0f));
-        joint.addSamples(0.5f, new RagPoint(25.0f, 0.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
 
         joint = scene.animation.findJointForNodeName("torso_shoulder");
         joint.addSamples(0.5f, new RagPoint(0.0f, 0.0f, 0.0f), new RagPoint(0.0f, 15.0f, 0.0f));
@@ -73,7 +108,11 @@ public class AnimationBuilder {
         joint.addSamples(0.5f, new RagPoint(0.0f, -15.0f, 0.0f), new RagPoint(0.0f, 0.0f, 0.0f));
 
         for (n = 0; n != 4; n++) {
-            buildArm(n, (((n % 2) == 0) ? -1.0f : 1.0f));
+            buildLeg(n, ((n % 2) == 0));
+        }
+
+        for (n = 0; n != 4; n++) {
+            buildArm(n, ((n % 2) == 0));
         }
     }
 }

@@ -111,7 +111,7 @@ public class SkeletonBuilder
         float shoulderArmRadius, fingerRadius;
         Node shoulderNode, elbowNode, wristNode, handNode, jointNode, fingerNode;
         RagPoint shoulderPnt, elbowPnt, wristPnt, handPnt;
-        RagPoint jointPnt, fingerPnt, jointAdd, meshScale;
+        RagPoint jointPnt, fingerPnt, jointAdd, meshScale, rotAngle, globeRadius;
 
         // size and position around body
         axis=(((rotOffset>315)||(rotOffset<45))||((rotOffset>135)&&(rotOffset<225)))?Limb.LIMB_AXIS_Z:Limb.LIMB_AXIS_X;
@@ -144,7 +144,14 @@ public class SkeletonBuilder
         handPnt.rotateY(rotOffset);
         handNode = scene.addChildNodeAndJoint(wristNode, ("hand_" + Integer.toString(limbIdx)), handPnt);
 
-        limbs.add(new Limb(("hand_" + Integer.toString(limbIdx)), "hand", Limb.MESH_TYPE_CYLINDER_CLOSE_ALL, axis, meshScale, wristNode, handRadius, handNode, handRadius));
+        globeRadius = new RagPoint((axis == Limb.LIMB_AXIS_Z ? armRadius : handRadius), handRadius, (axis == Limb.LIMB_AXIS_X ? armRadius : (handRadius * scaleFactor)));
+
+        rotAngle = null;
+        if (modelType != MODEL_TYPE_ROBOT) {
+            rotAngle = new RagPoint((AppWindow.random.nextFloat(20.0f) - 10.0f), 0.0f, 0.0f);
+        }
+
+        limbs.add(new Limb(("hand_" + Integer.toString(limbIdx)), "hand", Limb.MESH_TYPE_GLOBE, wristNode, globeRadius, rotAngle));
 
         // finger limbs
         if (fingerCount == 0) {
@@ -154,10 +161,9 @@ public class SkeletonBuilder
             fingerCount = 2;  // always at least two fingers
         }
 
-        fingerRadius = (((handRadius * (1.5f + AppWindow.random.nextFloat(0.5f))) * meshScale.y) / (float) fingerCount) * 0.5f;
+        fingerRadius = (((handRadius * 0.9f) * meshScale.y) / (float) fingerCount) * 0.5f;
 
         jointPnt = new RagPoint(0.0f, -((((float) fingerCount * (fingerRadius * 2.0f)) * 0.5f) - fingerRadius), 0.0f);
-        jointPnt.rotateY(rotOffset);
 
         fingerPnt = new RagPoint(0.0f, 0.0f, fingerLength);
         fingerPnt.rotateY(rotOffset);
@@ -198,11 +204,11 @@ public class SkeletonBuilder
         }
 
         // size and position around body
-        pnt = new RagPoint(0.0f, 0.0f, (whipLength * 0.4f));
+        pnt = new RagPoint(0.0f, 0.0f, (whipLength * 0.3f));
         pnt.rotateY(rotOffset);
         whip0Node = scene.addChildNodeAndJoint(parentNode, ("whip_" + Integer.toString(limbIdx) + "_0"), pnt);
 
-        pnt = new RagPoint(0.0f, 0.0f, (whipLength * 0.35f));
+        pnt = new RagPoint(0.0f, 0.0f, (whipLength * 0.3f));
         pnt.rotateY(rotOffset);
         whip1Node = scene.addChildNodeAndJoint(whip0Node, ("whip_" + Integer.toString(limbIdx) + "_1"), pnt);
 
@@ -210,7 +216,7 @@ public class SkeletonBuilder
         pnt.rotateY(rotOffset);
         whip2Node = scene.addChildNodeAndJoint(whip1Node, ("whip_" + Integer.toString(limbIdx) + "_2"), pnt);
 
-        pnt = new RagPoint(0.0f, 0.0f, (whipLength * 0.05f));
+        pnt = new RagPoint(0.0f, 0.0f, (whipLength * 0.2f));
         pnt.rotateY(rotOffset);
         whip3Node = scene.addChildNodeAndJoint(whip2Node, ("whip_" + Integer.toString(limbIdx) + "_3"), pnt);
 
@@ -266,7 +272,7 @@ public class SkeletonBuilder
         limbs.add(new Limb(("jaw_" + Integer.toString(limbIdx)), "head", Limb.MESH_TYPE_CYLINDER_CLOSE_ALL, Limb.LIMB_AXIS_Z, meshScale, headNode, jawRadius, jawNode, jawRadius));
 
         // head limb
-        globeRadius = new RagPoint((headRadius * 0.8f), headRadius, headLength);
+        globeRadius = new RagPoint((headRadius * (0.3f + AppWindow.random.nextFloat(0.5f))), headRadius, headLength);
         globeRadius.scale(scaleFactor);
 
         rotAngle = null;
@@ -371,10 +377,10 @@ public class SkeletonBuilder
 
         if (modelType == MODEL_TYPE_ANIMAL) {
             torsoTopPnt = new RagPoint(0, (0.5f + AppWindow.random.nextFloat(0.4f)), 0);
-            topRadius = bodyRadius * (0.3f + AppWindow.random.nextFloat(0.2f));
+            topRadius = shoulderRadius * (0.3f + AppWindow.random.nextFloat(0.2f));
         } else {
             torsoTopPnt = new RagPoint(0, (0.3f + AppWindow.random.nextFloat(0.3f)), 0);
-            topRadius = bodyRadius * (0.5f + AppWindow.random.nextFloat(0.2f));
+            topRadius = shoulderRadius * (0.5f + AppWindow.random.nextFloat(0.2f));
         }
         if (hunchAng != 0.0f) {
             torsoTopPnt.rotateX(hunchAng - (0.5f + (AppWindow.random.nextFloat(0.05f))));
@@ -503,10 +509,10 @@ public class SkeletonBuilder
 
         // some settings
         footRot = AppWindow.random.nextFloat(15.0f);
-        footLength = legRadius + (AppWindow.random.nextFloat(legRadius * 2.0f));
-        footRadius = legRadius + (legRadius * AppWindow.random.nextFloat(0.1f));
+        footLength = legRadius + (AppWindow.random.nextFloat(legRadius));
+        footRadius = legRadius + AppWindow.random.nextFloat(legRadius * 0.2f);
         toeCount = (modelType == MODEL_TYPE_ROBOT) ? 0 : AppWindow.random.nextInt(5);
-        toeLength = footRadius * (0.1f + AppWindow.random.nextFloat(2.0f));
+        toeLength = footLength * AppWindow.random.nextFloat(footLength * 0.5f);
 
             // hip legs
 
@@ -616,10 +622,10 @@ public class SkeletonBuilder
         legRadius = armRadius + (AppWindow.random.nextFloat(0.2f));
         whipRadius = 0.2f + (AppWindow.random.nextFloat(0.2f));
         bodyRadius = 0.4f + AppWindow.random.nextFloat(1.5f);
-        if (bodyRadius < (legRadius * 2.0f)) {
-            bodyRadius = legRadius * (2.0f + AppWindow.random.nextFloat(0.3f));
+        if (bodyRadius < (legRadius * 4.0f)) {
+            bodyRadius = legRadius * (4.0f + AppWindow.random.nextFloat(0.3f));
         }
-        shoulderRadius = bodyRadius * (1.1f + AppWindow.random.nextFloat(0.2f));
+        shoulderRadius = 0.4f + AppWindow.random.nextFloat(1.5f);
         headRadius = 0.3f + AppWindow.random.nextFloat(1.3f);
         headRadius = (headRadius > bodyRadius) ? bodyRadius : headRadius;
         headRadius = (headRadius < legRadius) ? legRadius : headRadius;
