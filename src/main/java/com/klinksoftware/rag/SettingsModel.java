@@ -35,7 +35,7 @@ public class SettingsModel extends SettingsBase {
         modelTypeList = addList(y, "Model Type", getAnnotationClasses("com.klinksoftware.rag.model", "model", ModelInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
-        textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 0);
+        textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 1);
         y += (ROW_HEIGHT + ROW_GAP);
 
         bilateralCheckBox = addCheckBox(y, "Bilateral", true);

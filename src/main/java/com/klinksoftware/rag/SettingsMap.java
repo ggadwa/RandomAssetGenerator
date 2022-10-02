@@ -41,7 +41,7 @@ public class SettingsMap extends SettingsBase {
         mapTypeList = addList(y, "Map Type", getAnnotationClasses("com.klinksoftware.rag.map", "map", MapInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
-        textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 0);
+        textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 1);
         y += (ROW_HEIGHT + ROW_GAP);
 
         mainFloorSizeSlider = addSlider(y, "Main Floor Size", 0.6f);

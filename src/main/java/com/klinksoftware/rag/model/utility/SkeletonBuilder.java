@@ -622,10 +622,11 @@ public class SkeletonBuilder
         legRadius = armRadius + (AppWindow.random.nextFloat(0.2f));
         whipRadius = 0.2f + (AppWindow.random.nextFloat(0.2f));
         bodyRadius = 0.4f + AppWindow.random.nextFloat(1.5f);
+        shoulderRadius = 0.4f + AppWindow.random.nextFloat(1.5f);
         if (bodyRadius < (legRadius * 4.0f)) {
             bodyRadius = legRadius * (4.0f + AppWindow.random.nextFloat(0.3f));
+            shoulderRadius = legRadius * (4.0f + AppWindow.random.nextFloat(0.3f));
         }
-        shoulderRadius = 0.4f + AppWindow.random.nextFloat(1.5f);
         headRadius = 0.3f + AppWindow.random.nextFloat(1.3f);
         headRadius = (headRadius > bodyRadius) ? bodyRadius : headRadius;
         headRadius = (headRadius < legRadius) ? legRadius : headRadius;

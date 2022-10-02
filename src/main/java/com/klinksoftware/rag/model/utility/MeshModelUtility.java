@@ -20,7 +20,7 @@ public class MeshModelUtility
         int n, k, rowIdx, row2Idx, vIdx, vStartIdx;
         float ang, angAdd, acrossPos, acrossAdd;
         float tx, ty, tz;
-        float f, rd, rAdd, rad, u, uAdd;
+        float f, rd, rad, u, uAdd;
         ArrayList<Float> vertexArray, normalArray, uvArray, jointArray, weightArray;
         ArrayList<Integer> indexArray;
         List<Float> acrossJoint, acrossWeight;
@@ -58,11 +58,19 @@ public class MeshModelUtility
                 break;
         }
 
-        rad = botRadius;
-        rAdd = (topRadius - botRadius) / (float) acrossCount;
-
         // the cylinder vertexes
         for (k = 0; k != (acrossCount + 1); k++) {
+
+            // radius
+            if (k == 0) {
+                rad = botRadius;
+            } else {
+                if (k == acrossCount) {
+                    rad = topRadius;
+                } else {
+                    rad = botRadius + ((topRadius - botRadius) * (1.0f - (float) Math.cos(1.5708f * ((float) (k + 1) / (float) (acrossCount + 1)))));
+                }
+            }
 
             // move center point along line
             centerPnt.x = botPnt.x + (((topPnt.x - botPnt.x) * (float) k) / (float) acrossCount);
@@ -128,7 +136,6 @@ public class MeshModelUtility
                 u += uAdd;
             }
 
-            rad += rAdd;
             acrossPos += acrossAdd;
         }
 
