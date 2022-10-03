@@ -18,7 +18,7 @@ public class ModelStorage extends ModelBase {
         RagPoint rotAngle;
         Mesh mesh, mesh2;
 
-        addBitmap("box", new String[]{"Storage"});
+        scene.bitmapGroup.add("box", new String[]{"Storage"});
 
         // box size
         boxSize = (MapBase.SEGMENT_SIZE * 0.2f) + (AppWindow.random.nextFloat() * (MapBase.SEGMENT_SIZE * 0.2f));

@@ -41,7 +41,7 @@ public class AppWindow extends JFrame {
     public static WalkView walkView;
     public static SoundView soundView;
     public static SettingsMap settingsMap;
-    public static SettingsModel settingsModel;
+    public static SettingsProp settingsProp;
     public static SettingsTexture settingsTexture;
     public static SettingsSound settingsSound;
     public static ToolBar toolBar;
@@ -106,12 +106,12 @@ public class AppWindow extends JFrame {
         settingsTab.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.black));
         add(settingsTab, new GridBagConstraints(1, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
-        // map pane
+        // tabs
         settingsMap = new SettingsMap(this);
         settingsTab.addTab("Map", settingsMap);
 
-        settingsModel = new SettingsModel(this);
-        settingsTab.addTab("Model", settingsModel);
+        settingsProp = new SettingsProp(this);
+        settingsTab.addTab("Prop", settingsProp);
 
         settingsTexture = new SettingsTexture(this);
         settingsTab.addTab("Texture", settingsTexture);
@@ -146,7 +146,7 @@ public class AppWindow extends JFrame {
     public void startBuild() {
         settingsTab.setEnabled(false);
         settingsMap.enableAll(false);
-        settingsModel.enableAll(false);
+        settingsProp.enableAll(false);
         settingsTexture.enableAll(false);
         settingsSound.enableAll(false);
 
@@ -156,7 +156,7 @@ public class AppWindow extends JFrame {
     public void stopBuild() {
         settingsTab.setEnabled(true);
         settingsMap.enableAll(true);
-        settingsModel.enableAll(true);
+        settingsProp.enableAll(true);
         settingsTexture.enableAll(true);
         settingsSound.enableAll(true);
 

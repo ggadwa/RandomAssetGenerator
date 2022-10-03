@@ -32,8 +32,8 @@ public class ModelPillar extends ModelBase {
         RagPoint centerPnt;
         Mesh mesh, mesh2;
 
-        addBitmap("pillar", new String[]{"BrickPattern", "BrickRow", "Metal", "Mosaic", "Temple", "Tile"});
-        addBitmap("cap", new String[]{"BrickPattern", "BrickRow", "Metal", "Mosaic", "Temple", "Tile"});
+        scene.bitmapGroup.add("pillar", new String[]{"BrickPattern", "BrickRow", "Metal", "Mosaic", "Temple", "Tile"});
+        scene.bitmapGroup.add("cap", new String[]{"BrickPattern", "BrickRow", "Metal", "Mosaic", "Temple", "Tile"});
 
         columnSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
         baseTopSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];

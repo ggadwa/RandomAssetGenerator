@@ -5,17 +5,16 @@ import com.klinksoftware.rag.model.utility.ModelBase;
 import java.util.*;
 import javax.swing.*;
 
-public class ModelBuildWorker extends SwingWorker<Integer,Void>
-{
+public class PropBuildWorker extends SwingWorker<Integer, Void> {
     private AppWindow appWindow;
     private int textureSize;
     private String modelName;
     private boolean bilateral;
     private float roughness;
 
-    public static ModelBase generatedModel = null;
+    public static ModelBase generatedProp = null;
 
-    public ModelBuildWorker(AppWindow appWindow, String modelName, int textureSize, boolean bilateral, float roughness) {
+    public PropBuildWorker(AppWindow appWindow, String modelName, int textureSize, boolean bilateral, float roughness) {
         this.appWindow = appWindow;
         this.modelName = modelName;
         this.textureSize = textureSize;
@@ -30,13 +29,13 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
 
         appWindow.startBuild();
 
-        // set the seed for model
+        // set the seed for prop
         seed = Calendar.getInstance().getTimeInMillis();
         //seed = 1663387204703L;
         AppWindow.random.setSeed(seed);
         System.out.println("seed=" + seed);
 
-        // run the model builder
+        // run the prop builder
         try {
             model = (ModelBase) (Class.forName("com.klinksoftware.rag.model.Model" + modelName.replace(" ", ""))).getConstructor().newInstance();
             model.build(textureSize, bilateral, roughness);
@@ -45,7 +44,7 @@ public class ModelBuildWorker extends SwingWorker<Integer,Void>
             return (0);
         }
 
-        generatedModel = model;
+        generatedProp = model;
 
         // reset toolbar
         AppWindow.toolBar.reset(model.scene.skinned);

@@ -13,12 +13,12 @@ public class ModelMonsterHumanoid extends ModelBase {
     public void buildMeshes() {
         SkeletonBuilder skeletonBuilder;
 
-        addBitmap("body", new String[]{"Fur", "Organic", "Scale"});
-        addBitmap("leg", new String[]{"Fur", "Organic", "Scale"});
-        addBitmap("foot", new String[]{"Fur", "Organic", "Scale"});
-        addBitmap("arm", new String[]{"Fur", "Organic", "Scale"});
-        addBitmap("hand", new String[]{"Fur", "Organic", "Scale"});
-        addBitmap("head", new String[]{"Fur", "Organic", "Scale"});
+        scene.bitmapGroup.add("body", new String[]{"Fur", "Organic", "Scale"});
+        scene.bitmapGroup.add("leg", new String[]{"Fur", "Organic", "Scale"});
+        scene.bitmapGroup.add("foot", new String[]{"Fur", "Organic", "Scale"});
+        scene.bitmapGroup.add("arm", new String[]{"Fur", "Organic", "Scale"});
+        scene.bitmapGroup.add("hand", new String[]{"Fur", "Organic", "Scale"});
+        scene.bitmapGroup.add("head", new String[]{"Fur", "Organic", "Scale"});
 
         // build the skeleton
         skeletonBuilder = new SkeletonBuilder(scene, SkeletonBuilder.MODEL_TYPE_HUMANOID, bilateral);

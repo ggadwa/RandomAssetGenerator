@@ -1,6 +1,5 @@
 package com.klinksoftware.rag.export;
 
-import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.klinksoftware.rag.scene.ChannelSample;
@@ -44,7 +43,7 @@ public class Export
         return(texturesArr.size()-1);
     }
 
-    private int addMaterial(String name, HashMap<String, BitmapBase> bitmaps, ArrayList<Object> materialsArr, ArrayList<Object> texturesArr, ArrayList<Object> imagesArr) {
+    private int addMaterial(String name, boolean hasEmissive, ArrayList<Object> materialsArr, ArrayList<Object> texturesArr, ArrayList<Object> imagesArr) {
         int n, textureIdx;
         LinkedHashMap<String, Object> materialObj, normalObj, pbrObj;
         LinkedHashMap<String, Object> colorObj, metallicRoughnessObj;
@@ -93,7 +92,7 @@ public class Export
 
             // any emissives
 
-        if (bitmaps.get(name).hasEmissive()) {
+        if (hasEmissive) {
             textureIdx=addTextureAndImage((name+"_emissive"),texturesArr,imagesArr);
 
             emissiveObj=new LinkedHashMap<>();
@@ -198,7 +197,7 @@ public class Export
             primitiveObj = new LinkedHashMap<>();
 
             // the material
-            materialIdx = addMaterial(mesh.bitmapName, scene.bitmaps, materialsArr, texturesArr, imagesArr);
+            materialIdx = addMaterial(mesh.bitmapName, scene.bitmapGroup.getBitmap(mesh.bitmapName).hasEmissive(), materialsArr, texturesArr, imagesArr);
 
             // figure out the min and max of vertex data
             min = new RagPoint(0.0f, 0.0f, 0.0f);
@@ -574,8 +573,8 @@ public class Export
         path2 = path + File.separator + "textures";
         (new File(path2)).mkdir();
 
-        for (String bitmapName : scene.bitmaps.keySet()) {
-            scene.bitmaps.get(bitmapName).writeToFile(path2, bitmapName);
+        for (String bitmapName : scene.bitmapGroup.getBitmapNames()) {
+            scene.bitmapGroup.getBitmap(bitmapName).writeToFile(path2, bitmapName);
         }
     }
 }

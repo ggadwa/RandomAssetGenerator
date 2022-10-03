@@ -1,7 +1,6 @@
 package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.klinksoftware.rag.map.utility.MapInterface;
 import com.klinksoftware.rag.map.utility.MapBase;
 import static com.klinksoftware.rag.map.utility.MapBase.FLOOR_HEIGHT;
@@ -35,11 +34,11 @@ public class MapOutdoor extends MapBase {
         String[] outsideFloorBitmaps = {"Dirt", "Grass", "StonePattern"};
         String[] skyBoxBitmaps = {"SkyBoxMountain"};
 
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "wall_main", wallBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "floor", outsideFloorBitmaps, textureSize);
+        scene.bitmapGroup.add("wall_main", wallBitmaps);
+        scene.bitmapGroup.add("floor", outsideFloorBitmaps);
 
         if (skyBox) {
-            BitmapBase.mapBitmapLoader(scene.bitmaps, "sky_box", skyBoxBitmaps, textureSize);
+            scene.bitmapGroup.add("sky_box", skyBoxBitmaps);
         }
     }
 

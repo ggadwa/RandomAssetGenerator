@@ -23,7 +23,6 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
     @Override
     protected Integer doInBackground() throws Exception {
         long seed;
-        BitmapBase bitmap;
         Scene scene;
 
         appWindow.startBuild();
@@ -34,18 +33,12 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         AppWindow.random.setSeed(seed);
         System.out.println("seed=" + seed);
 
-        try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmap.Bitmap" + bitmapName.replace(" ", ""))).getConstructor(int.class).newInstance(textureSize);
-            bitmap.generate();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return (0);
-        }
+        scene = new Scene(textureSize);
+        scene.bitmapGroup.add("bitmap", bitmapName);
+        scene.makeSceneSimpleCube();
+        scene.bitmapGroup.generateAll();
 
-        generatedBitmap = bitmap;
-
-        scene = new Scene();
-        scene.makeSceneSimpleCube(bitmap);
+        generatedBitmap = scene.bitmapGroup.getBitmap("bitmap");
 
         // reset toolbar
         AppWindow.toolBar.reset(false);

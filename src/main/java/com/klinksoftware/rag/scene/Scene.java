@@ -1,11 +1,9 @@
 package com.klinksoftware.rag.scene;
 
-import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 // this is our internal representation of a gltf file
 // root node is created automatically
@@ -15,14 +13,14 @@ public class Scene {
 
     public boolean skyBox, skinned;
     public Node rootNode;
-    public HashMap<String, BitmapBase> bitmaps;
+    public BitmapGroup bitmapGroup;
     public Animation animation;
 
-    public Scene() {
+    public Scene(int textureSize) {
         nodeIndex = 0;
 
         rootNode = new Node("root", nodeIndex++, new RagPoint(0.0f, 0.0f, 0.0f));
-        bitmaps = new HashMap<>();
+        bitmapGroup = new BitmapGroup(textureSize);
         animation = new Animation(this);
 
         skyBox = false;
@@ -196,15 +194,12 @@ public class Scene {
     }
 
     // creates a scene that is a simple cube
-    public void makeSceneSimpleCube(BitmapBase bitmap) {
+    public void makeSceneSimpleCube() {
         int idx;
         ArrayList<Float> vertexArray, uvArray;
         ArrayList<Integer> indexArray;
         int[] indexes;
         float[] vertexes, normals, tangents, uvs;
-
-        // the single bitmap
-        bitmaps.put("bitmap", bitmap);
 
         // allocate proper buffers
         vertexArray = new ArrayList<>();
@@ -276,6 +271,7 @@ public class Scene {
         uvs = MeshUtility.floatArrayListToFloat(uvArray);
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
+        // single bitmap needs to be named "bitmap"
         rootNode.clearMeshes();
         rootNode.addMesh(new Mesh("cube", "bitmap", vertexes, normals, tangents, uvs, indexes));
     }

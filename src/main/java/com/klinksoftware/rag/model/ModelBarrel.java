@@ -23,7 +23,7 @@ public class ModelBarrel extends ModelBase {
         RagPoint centerPnt;
         Mesh mesh;
 
-        addBitmap("barrel", new String[]{"Metal"});
+        scene.bitmapGroup.add("barrel", new String[]{"Metal"});
 
         barrelSectionRadius = (MapBase.SEGMENT_SIZE * (0.2f + AppWindow.random.nextFloat(0.2f))) * 0.5f;
         barrelRingRadius = barrelSectionRadius + (MapBase.SEGMENT_SIZE * 0.02f);

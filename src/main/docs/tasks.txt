@@ -1,15 +1,13 @@
 
-[ ] put bitmap creation into class you add to and then it does a execute thread for them
 
 [ ] separate models into props & characters
     [ ] characters has a "robot" checkbox
 
-[ ] move up textures to 1024 on map/model
 [ ] half globes for parts of body?
+[ ] shoulders are % of hips instead of their own random
 
 
 map
- - thread bitmap creation
  - stop getting caught on walls
  - going up ramps is sometimes broken
  - open ceiling

@@ -1,15 +1,15 @@
 package com.klinksoftware.rag;
 
 import com.klinksoftware.rag.model.utility.ModelInterface;
-import com.klinksoftware.rag.uiworker.ModelBuildWorker;
-import com.klinksoftware.rag.uiworker.ModelExportWorker;
+import com.klinksoftware.rag.uiworker.PropBuildWorker;
+import com.klinksoftware.rag.uiworker.PropExportWorker;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JSlider;
 
-public class SettingsModel extends SettingsBase {
+public class SettingsProp extends SettingsBase {
 
     private static final int BUTTON_GENERATE_MODEL = 0;
     private static final int BUTTON_EXPORT_MODEL = 1;
@@ -20,7 +20,7 @@ public class SettingsModel extends SettingsBase {
     private JCheckBox bilateralCheckBox;
     private JComboBox textureSizeCombo;
 
-    public SettingsModel(AppWindow appWindow) {
+    public SettingsProp(AppWindow appWindow) {
         super(appWindow);
 
         int y;
@@ -51,7 +51,7 @@ public class SettingsModel extends SettingsBase {
     public void buttonClick(int id) {
         switch (id) {
             case BUTTON_GENERATE_MODEL:
-                (new ModelBuildWorker(
+                (new PropBuildWorker(
                         appWindow,
                         (String) modelTypeList.getModel().getElementAt(modelTypeList.getSelectedIndex()),
                         getIntFromStringCombo(textureSizeCombo),
@@ -60,7 +60,7 @@ public class SettingsModel extends SettingsBase {
                 )).execute();
                 return;
             case BUTTON_EXPORT_MODEL:
-                (new ModelExportWorker(appWindow)).execute();
+                (new PropExportWorker(appWindow)).execute();
                 return;
         }
     }

@@ -77,9 +77,9 @@ public class ModelDesk extends ModelBase {
         float deskLegWidth, deskLegHeight, deskStandOffset;
         float deskHalfLength, deskHalfDepth;
 
-        addBitmap("desk", new String[]{"Metal", "MetalPlank", "WoodPanel"});
-        addBitmap("stand", new String[]{"Metal", "MetalPlank", "WoodPanel"});
-        addBitmap("drawer", new String[]{"Metal", "WoodPanel"});
+        scene.bitmapGroup.add("desk", new String[]{"Metal", "MetalPlank", "WoodPanel"});
+        scene.bitmapGroup.add("stand", new String[]{"Metal", "MetalPlank", "WoodPanel"});
+        scene.bitmapGroup.add("drawer", new String[]{"Metal", "WoodPanel"});
 
         // sizes
         deskLength = MapBase.SEGMENT_SIZE * (0.6f + AppWindow.random.nextFloat(0.4f));

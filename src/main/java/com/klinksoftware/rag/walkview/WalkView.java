@@ -334,8 +334,8 @@ public class WalkView extends AWTGLCanvas {
         incommingScene.animation.setupGLBuffersForSkeletonDrawing();
 
         textures = new HashMap<>();
-        for (String bitmapName : incommingScene.bitmaps.keySet()) {
-            textures.put(bitmapName, WalkViewTexture.createTexture(incommingScene.bitmaps.get(bitmapName)));
+        for (String bitmapName : incommingScene.bitmapGroup.getBitmapNames()) {
+            textures.put(bitmapName, WalkViewTexture.createTexture(incommingScene.bitmapGroup.getBitmap(bitmapName)));
         }
 
         // unbind any textures

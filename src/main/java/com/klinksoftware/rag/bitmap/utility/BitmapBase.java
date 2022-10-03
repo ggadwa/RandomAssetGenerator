@@ -1,7 +1,6 @@
 package com.klinksoftware.rag.bitmap.utility;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.bitmap.BitmapTest;
 import com.klinksoftware.rag.utility.*;
 import java.awt.Point;
 import java.awt.Transparency;
@@ -16,7 +15,6 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 public class BitmapBase
@@ -4092,27 +4090,6 @@ public class BitmapBase
         if (hasEmissive) {
             writeImageData(emissiveData, false, (path + File.separator + name + "_emissive.png"));
         }
-    }
-
-    //
-    // bitmap loading helper
-    //
-    public static void mapBitmapLoader(HashMap<String, BitmapBase> bitmaps, String name, String[] classNames, int textureSize) {
-        BitmapBase bitmap;
-
-        if (bitmaps.containsKey(name)) {
-            return;
-        }
-
-        try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmap.Bitmap" + classNames[AppWindow.random.nextInt(classNames.length)].replace(" ", ""))).getConstructor(int.class).newInstance(textureSize);
-        } catch (Exception e) {
-            e.printStackTrace();
-            bitmap = new BitmapTest(textureSize);
-        }
-
-        bitmap.generate();
-        bitmaps.put(name, bitmap);
     }
 
 }

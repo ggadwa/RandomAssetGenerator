@@ -12,12 +12,12 @@ public class ModelMonsterRobot extends ModelBase {
     public void buildMeshes() {
         SkeletonBuilder skeletonBuilder;
 
-        addBitmap("body", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
-        addBitmap("leg", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
-        addBitmap("foot", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
-        addBitmap("arm", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
-        addBitmap("hand", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
-        addBitmap("head", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        scene.bitmapGroup.add("body", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        scene.bitmapGroup.add("leg", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        scene.bitmapGroup.add("foot", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        scene.bitmapGroup.add("arm", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        scene.bitmapGroup.add("hand", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
+        scene.bitmapGroup.add("head", new String[]{"Metal", "MetalCorrugated", "MetalPlank", "MetalPlate"});
 
         // build the skeleton
         skeletonBuilder = new SkeletonBuilder(scene, SkeletonBuilder.MODEL_TYPE_ROBOT, bilateral);

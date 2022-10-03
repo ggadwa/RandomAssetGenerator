@@ -1,7 +1,6 @@
 package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.klinksoftware.rag.map.utility.MapInterface;
 import com.klinksoftware.rag.map.utility.MapBase;
 import static com.klinksoftware.rag.map.utility.MapBase.FLOOR_HEIGHT;
@@ -92,19 +91,19 @@ public class MapIndoor extends MapBase {
         String[] stairBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "StonePattern", "WoodBoard"};
         String[] skyBoxBitmaps = {"SkyBoxMountain"};
 
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "wall_main", wallBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "wall_upper", wallBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "wall_lower", wallBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "floor", insideFloorBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "floor_lower", insideFloorBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "ceiling", ceilingBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "ceiling_upper", ceilingBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "platform", platformBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "railing", railingBitmaps, textureSize);
-        BitmapBase.mapBitmapLoader(scene.bitmaps, "stair", stairBitmaps, textureSize);
+        scene.bitmapGroup.add("wall_main", wallBitmaps);
+        scene.bitmapGroup.add("wall_upper", wallBitmaps);
+        scene.bitmapGroup.add("wall_lower", wallBitmaps);
+        scene.bitmapGroup.add("floor", insideFloorBitmaps);
+        scene.bitmapGroup.add("floor_lower", insideFloorBitmaps);
+        scene.bitmapGroup.add("ceiling", ceilingBitmaps);
+        scene.bitmapGroup.add("ceiling_upper", ceilingBitmaps);
+        scene.bitmapGroup.add("platform", platformBitmaps);
+        scene.bitmapGroup.add("railing", railingBitmaps);
+        scene.bitmapGroup.add("stair", stairBitmaps);
 
         if (skyBox) {
-            BitmapBase.mapBitmapLoader(scene.bitmaps, "sky_box", skyBoxBitmaps, textureSize);
+            scene.bitmapGroup.add("sky_box", skyBoxBitmaps);
         }
     }
 

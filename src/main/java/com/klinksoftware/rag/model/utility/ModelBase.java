@@ -1,8 +1,6 @@
 package com.klinksoftware.rag.model.utility;
 
 import com.klinksoftware.rag.model.utility.Limb;
-import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.klinksoftware.rag.export.Export;
 import com.klinksoftware.rag.scene.Scene;
 import com.klinksoftware.rag.model.utility.MeshModelUtility;
@@ -17,24 +15,6 @@ public class ModelBase {
     public int textureSize;
     public boolean bilateral;
     public float roughness;
-
-    // bitmaps
-    public void addBitmap(String name, String[] bitmapList) {
-        int len;
-        String bitmapName;
-        BitmapBase bitmap;
-
-        len = bitmapList.length;
-        bitmapName = bitmapList[AppWindow.random.nextInt(len)];
-
-        try {
-            bitmap = (BitmapBase) (Class.forName("com.klinksoftware.rag.bitmap.Bitmap" + bitmapName.replace(" ", ""))).getConstructor(int.class).newInstance(textureSize);
-            bitmap.generate();
-            scene.bitmaps.put(name, bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     // limb wrapping (for humanoid, etc models)
     // builds a mesh around two nodes and adds the mesh to first node of limb
@@ -98,7 +78,7 @@ public class ModelBase {
         this.bilateral = bilateral;
         this.roughness = roughness;
 
-        scene = new Scene();
+        scene = new Scene(textureSize);
 
         // run the internal mesh build
         buildMeshes();
@@ -120,5 +100,8 @@ public class ModelBase {
             // the inversebind matrixes for nodes
             scene.animation.createInverseBindMatrixForJoints();
         }
+
+        // generate the bitmaps
+        scene.bitmapGroup.generateAll();
     }
 }

@@ -490,8 +490,8 @@ public class ModelPipe extends ModelBase {
      */
     @Override
     public void buildMeshes() {
+        scene.bitmapGroup.add("pipe", new String[]{"Pipe"});
 
-        addBitmap("pipe", new String[]{"Pipe"});
 
     }
 }

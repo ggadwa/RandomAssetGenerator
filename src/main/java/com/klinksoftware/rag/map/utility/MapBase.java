@@ -513,7 +513,7 @@ public class MapBase {
         this.skyBox = skyBox;
 
         // blank scene
-        scene = new Scene();
+        scene = new Scene(textureSize);
 
         // map construction classes
         mapPieceList = new MapPieceList();
@@ -529,6 +529,9 @@ public class MapBase {
         // which is how they refer to each other in
         // the gltf
         scene.createMeshIndexes();
+
+        // generate the bitmaps
+        scene.bitmapGroup.generateAll();
     }
 
     public void writeToFile(String path) {

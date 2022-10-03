@@ -78,8 +78,8 @@ public class ModelPC extends ModelBase {
         float standWid, standHalfWid, standHigh;
         RagPoint rotAngle;
 
-        addBitmap("monitor", new String[]{"Monitor"});
-        addBitmap("case", new String[]{"Metal", "MetalPlank"});
+        scene.bitmapGroup.add("monitor", new String[]{"Monitor"});
+        scene.bitmapGroup.add("case", new String[]{"Metal", "MetalPlank"});
 
         // monitor
         standWid = MapBase.SEGMENT_SIZE * (0.051f + AppWindow.random.nextFloat(0.05f));

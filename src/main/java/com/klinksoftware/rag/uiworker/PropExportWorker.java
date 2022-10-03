@@ -4,11 +4,11 @@ import com.klinksoftware.rag.AppWindow;
 import java.io.*;
 import javax.swing.*;
 
-public class ModelExportWorker extends SwingWorker<Integer, Void> {
+public class PropExportWorker extends SwingWorker<Integer, Void> {
 
     private AppWindow appWindow;
 
-    public ModelExportWorker(AppWindow appWindow) {
+    public PropExportWorker(AppWindow appWindow) {
         this.appWindow = appWindow;
     }
 
@@ -18,8 +18,8 @@ public class ModelExportWorker extends SwingWorker<Integer, Void> {
         JFileChooser fileChooser;
 
         // skip if nothing generated
-        if (ModelBuildWorker.generatedModel == null) {
-            JOptionPane.showMessageDialog(appWindow, "Generate a model first.");
+        if (PropBuildWorker.generatedProp == null) {
+            JOptionPane.showMessageDialog(appWindow, "Generate a prop first.");
             return (0);
         }
 
@@ -30,7 +30,7 @@ public class ModelExportWorker extends SwingWorker<Integer, Void> {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         if (fileChooser.showSaveDialog(appWindow) == JFileChooser.APPROVE_OPTION) {
             file = fileChooser.getSelectedFile();
-            ModelBuildWorker.generatedModel.writeToFile(file.getAbsolutePath());
+            PropBuildWorker.generatedProp.writeToFile(file.getAbsolutePath());
         }
 
         return (0);

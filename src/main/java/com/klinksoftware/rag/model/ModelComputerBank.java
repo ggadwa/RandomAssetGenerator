@@ -55,10 +55,10 @@ public class ModelComputerBank extends ModelBase {
         float computerWidth, wid, midX, midZ, margin;
         float pedestalWidth, pedestalHeight;
 
-        addBitmap("computer", new String[]{"Computer"});
-        addBitmap("panel", new String[]{"Metal", "MetalPlank", "MetalPlate"});
-        addBitmap("spacer", new String[]{"Metal", "MetalPlank", "MetalPlate"});
-        addBitmap("pedestal", new String[]{"Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "WoodPanel"});
+        scene.bitmapGroup.add("computer", new String[]{"Computer"});
+        scene.bitmapGroup.add("panel", new String[]{"Metal", "MetalPlank", "MetalPlate"});
+        scene.bitmapGroup.add("spacer", new String[]{"Metal", "MetalPlank", "MetalPlate"});
+        scene.bitmapGroup.add("pedestal", new String[]{"Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "WoodPanel"});
 
         // computer size
         computerWidth = MapBase.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.3f));
@@ -80,22 +80,22 @@ public class ModelComputerBank extends ModelBase {
                 buildSingleBank("computer", -computerWidth, computerWidth, -computerWidth, computerWidth, true, pedestalHeight, computerWidth);
                 break;
             case 1:
-                addBitmap("computer4", new String[]{"Computer"});
+                scene.bitmapGroup.add("computer4", new String[]{"Computer"});
                 buildSingleBank("computer", -(wid + margin), -margin, -(wid + margin), -margin, false, pedestalHeight, wid);
                 //buildSingleBank("computer2", margin, (wid + margin), -(wid + margin), -margin, false, pedestalHeight, wid);
                 buildSingleBank("computer4", margin, (wid + margin), margin, (wid + margin), true, pedestalHeight, wid);
                 break;
             case 2:
-                addBitmap("computer2", new String[]{"Computer"});
-                addBitmap("computer3", new String[]{"Computer"});
+                scene.bitmapGroup.add("computer2", new String[]{"Computer"});
+                scene.bitmapGroup.add("computer3", new String[]{"Computer"});
                 buildSingleBank("computer", -(wid + margin), -margin, -(wid + margin), -margin, false, pedestalHeight, wid);
                 buildSingleBank("computer2", margin, (wid + margin), -(wid + margin), -margin, false, pedestalHeight, wid);
                 buildSingleBank("computer3", -(wid + margin), -margin, margin, (wid + margin), true, pedestalHeight, wid);
                 break;
             case 3:
-                addBitmap("computer2", new String[]{"Computer"});
-                addBitmap("computer3", new String[]{"Computer"});
-                addBitmap("computer4", new String[]{"Computer"});
+                scene.bitmapGroup.add("computer2", new String[]{"Computer"});
+                scene.bitmapGroup.add("computer3", new String[]{"Computer"});
+                scene.bitmapGroup.add("computer4", new String[]{"Computer"});
                 buildSingleBank("computer", -(wid + margin), -margin, -(wid + margin), -margin, false, pedestalHeight, wid);
                 buildSingleBank("computer2", margin, (wid + margin), -(wid + margin), -margin, false, pedestalHeight, wid);
                 buildSingleBank("computer3", -(wid + margin), -margin, margin, (wid + margin), true, pedestalHeight, wid);

@@ -19,9 +19,9 @@ public class ModelJunction extends ModelBase {
         RagPoint rotAngle, centerPnt, pipePnt;
         Mesh mesh, mesh2;
 
-        addBitmap("computer", new String[]{"Computer"});
-        addBitmap("panel", new String[]{"Metal", "MetalPlank", "MetalPlate"});
-        addBitmap("pipe", new String[]{"Pipe"});
+        scene.bitmapGroup.add("computer", new String[]{"Computer"});
+        scene.bitmapGroup.add("panel", new String[]{"Metal", "MetalPlank", "MetalPlate"});
+        scene.bitmapGroup.add("pipe", new String[]{"Pipe"});
 
         // sizes
         junctionWidth = MapBase.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f));
