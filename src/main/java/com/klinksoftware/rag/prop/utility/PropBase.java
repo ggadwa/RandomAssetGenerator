@@ -1,37 +1,18 @@
-package com.klinksoftware.rag.model.utility;
+package com.klinksoftware.rag.prop.utility;
 
-import com.klinksoftware.rag.model.utility.Limb;
 import com.klinksoftware.rag.export.Export;
 import com.klinksoftware.rag.scene.Scene;
-import com.klinksoftware.rag.model.utility.MeshModelUtility;
-import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.RagPoint;
-import java.util.ArrayList;
 
-public class ModelBase {
+public class PropBase {
 
     public Scene scene;
-
     public int textureSize;
-    public boolean bilateral;
-    public float roughness;
-
-    // limb wrapping (for humanoid, etc models)
-    // builds a mesh around two nodes and adds the mesh to first node of limb
-    // we remember the nodes here to help attach joints and weights later
-    public void wrapLimbs(ArrayList<Limb> limbs, boolean organic) {
-        Mesh mesh;
-
-        for (Limb limb : limbs) {
-            mesh = MeshModelUtility.buildMeshAroundNodeLimb(scene, limb, organic);
-            limb.node1.addMesh(mesh);
-        }
-    }
 
     // export model
     public void writeToFile(String path) {
         try {
-            (new Export()).export(scene, path, "model");
+            (new Export()).export(scene, path, "prop");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,10 +54,8 @@ public class ModelBase {
     // build a model
     // note: models are build with absolute vertexes, but unlike maps,
     // we leave the vertexes absolute and just attach them to
-    public void build(int textureSize, boolean bilateral, float roughness) {
+    public void build(int textureSize) {
         this.textureSize = textureSize;
-        this.bilateral = bilateral;
-        this.roughness = roughness;
 
         scene = new Scene(textureSize);
 
@@ -91,15 +70,6 @@ public class ModelBase {
         // which is how they refer to each other in
         // the gltf
         scene.createMeshIndexes();
-
-        if (scene.skinned) {
-            // run the internal animation build, we add
-            // any required joints here
-            buildAnimations();
-
-            // the inversebind matrixes for nodes
-            scene.animation.createInverseBindMatrixForJoints();
-        }
 
         // generate the bitmaps
         scene.bitmapGroup.generateAll();

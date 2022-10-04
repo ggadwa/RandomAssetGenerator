@@ -1,31 +1,27 @@
 package com.klinksoftware.rag.uiworker;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.model.utility.ModelBase;
+import com.klinksoftware.rag.prop.utility.PropBase;
 import java.util.*;
 import javax.swing.*;
 
 public class PropBuildWorker extends SwingWorker<Integer, Void> {
     private AppWindow appWindow;
     private int textureSize;
-    private String modelName;
-    private boolean bilateral;
-    private float roughness;
+    private String propName;
 
-    public static ModelBase generatedProp = null;
+    public static PropBase generatedProp = null;
 
-    public PropBuildWorker(AppWindow appWindow, String modelName, int textureSize, boolean bilateral, float roughness) {
+    public PropBuildWorker(AppWindow appWindow, String propName, int textureSize) {
         this.appWindow = appWindow;
-        this.modelName = modelName;
+        this.propName = propName;
         this.textureSize = textureSize;
-        this.bilateral = bilateral;
-        this.roughness = roughness;
     }
 
     @Override
     protected Integer doInBackground() throws Exception {
         long seed;
-        ModelBase model;
+        PropBase prop;
 
         appWindow.startBuild();
 
@@ -37,21 +33,21 @@ public class PropBuildWorker extends SwingWorker<Integer, Void> {
 
         // run the prop builder
         try {
-            model = (ModelBase) (Class.forName("com.klinksoftware.rag.model.Model" + modelName.replace(" ", ""))).getConstructor().newInstance();
-            model.build(textureSize, bilateral, roughness);
+            prop = (PropBase) (Class.forName("com.klinksoftware.rag.prop.Prop" + propName.replace(" ", ""))).getConstructor().newInstance();
+            prop.build(textureSize);
         } catch (Exception e) {
             e.printStackTrace();
             return (0);
         }
 
-        generatedProp = model;
+        generatedProp = prop;
 
         // reset toolbar
-        AppWindow.toolBar.reset(model.scene.skinned);
+        AppWindow.toolBar.reset(false);
 
         // and set the walk view
-        AppWindow.walkView.setCameraCenterRotate(model.getCameraDistance(), model.getCameraRotateX(), model.getCameraRotateY(), model.getCameraOffsetY(), model.getCameraLightDistance());
-        AppWindow.walkView.setIncommingScene(model.scene);
+        AppWindow.walkView.setCameraCenterRotate(prop.getCameraDistance(), prop.getCameraRotateX(), prop.getCameraRotateY(), prop.getCameraOffsetY(), prop.getCameraLightDistance());
+        AppWindow.walkView.setIncommingScene(prop.scene);
 
         appWindow.walkLabel.setGeneratedTitle("Model", seed);
         appWindow.switchView("walkView");

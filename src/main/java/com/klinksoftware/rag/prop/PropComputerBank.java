@@ -1,13 +1,13 @@
-package com.klinksoftware.rag.model;
+package com.klinksoftware.rag.prop;
 
-import com.klinksoftware.rag.model.utility.ModelInterface;
-import com.klinksoftware.rag.model.utility.ModelBase;
+import com.klinksoftware.rag.prop.utility.PropBase;
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.utility.MapBase;
 import com.klinksoftware.rag.utility.MeshUtility;
+import com.klinksoftware.rag.prop.utility.PropInterface;
 
-@ModelInterface
-public class ModelComputerBank extends ModelBase {
+@PropInterface
+public class PropComputerBank extends PropBase {
 
     @Override
     public float getCameraDistance() {

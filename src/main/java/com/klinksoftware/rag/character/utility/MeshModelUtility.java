@@ -1,6 +1,6 @@
-package com.klinksoftware.rag.model.utility;
+package com.klinksoftware.rag.character.utility;
 
-import com.klinksoftware.rag.model.utility.Limb;
+import com.klinksoftware.rag.character.utility.Limb;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.scene.Scene;
 import com.klinksoftware.rag.utility.MeshUtility;
@@ -16,7 +16,7 @@ public class MeshModelUtility
     private static final int CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT = 4;
 
     // build a cylinder around a limb
-    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, int botJointIdx, RagPoint topPnt, float topRadius, int topJointIdx, int aroundCount, int acrossCount) {
+    public static Mesh buildCylinderAroundLimb(String name, String bitmapName, int meshType, int axis, RagPoint meshScale, RagPoint botPnt, float botRadius, int botJointIdx, RagPoint topPnt, float topRadius, int topJointIdx, int aroundCount, int acrossCount, boolean linear) {
         int n, k, rowIdx, row2Idx, vIdx, vStartIdx;
         float ang, angAdd, acrossPos, acrossAdd;
         float tx, ty, tz;
@@ -68,7 +68,11 @@ public class MeshModelUtility
                 if (k == acrossCount) {
                     rad = topRadius;
                 } else {
-                    rad = botRadius + ((topRadius - botRadius) * (1.0f - (float) Math.cos(1.5708f * ((float) (k + 1) / (float) (acrossCount + 1)))));
+                    if (linear) {
+                        rad = botRadius + ((topRadius - botRadius) * (1.0f - ((float) (k + 1) / (float) (acrossCount + 1))));
+                    } else {
+                        rad = botRadius + ((topRadius - botRadius) * (1.0f - (float) Math.cos(1.5708f * ((float) (k + 1) / (float) (acrossCount + 1)))));
+                    }
                 }
             }
 
@@ -279,9 +283,9 @@ public class MeshModelUtility
 
         // build the cylinder around the nodes
         if (organic) {
-            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.radius1, joint1Idx, absPnt2, limb.radius2, joint2Idx, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.radius1, joint1Idx, absPnt2, limb.radius2, joint2Idx, CYLINDER_ORGANIC_AROUND_SURFACE_COUNT, CYLINDER_ORGANIC_ACROSS_SURFACE_COUNT, false);
         } else {
-            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.radius1, joint1Idx, absPnt2, limb.radius2, joint2Idx, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT);
+            mesh = buildCylinderAroundLimb(limb.name, limb.bitmapName, limb.meshType, limb.axis, limb.scale, absPnt1, limb.radius1, joint1Idx, absPnt2, limb.radius2, joint2Idx, CYLINDER_MECHANICAL_AROUND_SURFACE_COUNT, CYLINDER_MECHANICAL_ACROSS_SURFACE_COUNT, true);
         }
 
         rebuildNormals(mesh, absPnt1, absPnt2);

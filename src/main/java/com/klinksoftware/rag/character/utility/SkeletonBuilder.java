@@ -1,6 +1,6 @@
-package com.klinksoftware.rag.model.utility;
+package com.klinksoftware.rag.character.utility;
 
-import com.klinksoftware.rag.model.utility.Limb;
+import com.klinksoftware.rag.character.utility.Limb;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.scene.Scene;
@@ -12,21 +12,21 @@ public class SkeletonBuilder
     public static final int MODEL_TYPE_HUMANOID = 0;
     public static final int MODEL_TYPE_ANIMAL = 1;
     public static final int MODEL_TYPE_BLOB = 2;
-    public static final int MODEL_TYPE_ROBOT = 3;
 
     public Scene scene;
     public ArrayList<Limb> limbs;
 
     private int modelType;
-    private boolean bilateral;
-    private float bodyRadius, shoulderRadius, hipRadius, torsoRadius, headRadius;
+    private boolean bilateral, organic;
+    private float bodyRadius, shoulderRadius, hipRadius, headRadius;
     private float armRadius, legRadius, whipRadius;
     private float hunchAng, scaleFactor;
 
-    public SkeletonBuilder(Scene scene, int modelType, boolean bilateral) {
+    public SkeletonBuilder(Scene scene, int modelType, boolean bilateral, boolean organic) {
         this.scene = scene;
         this.modelType = modelType;
         this.bilateral = bilateral;
+        this.organic = organic;
 
         limbs = new ArrayList<>();
     }
@@ -147,11 +147,16 @@ public class SkeletonBuilder
         globeRadius = new RagPoint((axis == Limb.LIMB_AXIS_Z ? armRadius : handRadius), handRadius, (axis == Limb.LIMB_AXIS_X ? armRadius : (handRadius * scaleFactor)));
 
         rotAngle = null;
-        if (modelType != MODEL_TYPE_ROBOT) {
+        if (organic) {
             rotAngle = new RagPoint((AppWindow.random.nextFloat(20.0f) - 10.0f), 0.0f, 0.0f);
         }
 
         limbs.add(new Limb(("hand_" + Integer.toString(limbIdx)), "hand", Limb.MESH_TYPE_GLOBE, wristNode, globeRadius, rotAngle));
+
+        // robots have shoulder bits
+        if (!organic) {
+            limbs.add(new Limb(("shoulder_bit_" + Integer.toString(limbIdx)), "hand", Limb.MESH_TYPE_GLOBE, shoulderNode, globeRadius, rotAngle));
+        }
 
         // finger limbs
         if (fingerCount == 0) {
@@ -276,7 +281,7 @@ public class SkeletonBuilder
         globeRadius.scale(scaleFactor);
 
         rotAngle = null;
-        if (modelType != MODEL_TYPE_ROBOT) {
+        if (organic) {
             rotAngle = new RagPoint((AppWindow.random.nextFloat(20.0f) - 10.0f), 0.0f, 0.0f);
         }
 
@@ -301,7 +306,7 @@ public class SkeletonBuilder
 
         // the head nodes
         pnt = new RagPoint(0.0f, (neckRadius + (headLength * 0.5f)), 0.0f);
-        if (modelType != MODEL_TYPE_ROBOT) {
+        if (organic) {
             pnt.rotateX(AppWindow.random.nextFloat(10.0f) - 5.0f);
             pnt.rotateZ(AppWindow.random.nextFloat(5.0f) - 2.5f);
         }
@@ -317,7 +322,7 @@ public class SkeletonBuilder
         globeRadius.scale(scaleFactor);
 
         rotAngle = null;
-        if (modelType != MODEL_TYPE_ROBOT) {
+        if (organic) {
             rotAngle = new RagPoint((AppWindow.random.nextFloat(10.0f) - 5.0f), 0.0f, 0.0f);
         }
 
@@ -499,7 +504,7 @@ public class SkeletonBuilder
 
     public void buildLegs() {
         int toeCount;
-        float footRot, footLength, footRadius, toeLength, legOffset, ang;
+        float footRot, footLength, footRadius, toeLength, legOffset, legPosWid, ang;
         Node node;
 
         // blobs have no legs
@@ -509,27 +514,25 @@ public class SkeletonBuilder
 
         // some settings
         footRot = AppWindow.random.nextFloat(15.0f);
-        footLength = legRadius + (AppWindow.random.nextFloat(legRadius));
+        footLength = legRadius + (organic ? (AppWindow.random.nextFloat(legRadius)) : (AppWindow.random.nextFloat(legRadius * 2.0f)));
         footRadius = legRadius + AppWindow.random.nextFloat(legRadius * 0.2f);
-        toeCount = (modelType == MODEL_TYPE_ROBOT) ? 0 : AppWindow.random.nextInt(5);
-        toeLength = footLength * AppWindow.random.nextFloat(footLength * 0.5f);
+        toeCount = organic ? AppWindow.random.nextInt(5) : 0;
+        toeLength = footLength * (0.2f + AppWindow.random.nextFloat(0.4f));
 
-            // hip legs
-
+        // hip legs
         node = scene.findNodeByName("hip");
         switch (modelType) {
             case MODEL_TYPE_ANIMAL:
-                legOffset = hipRadius - (legRadius * 1.7f);
                 ang = 250.0f + AppWindow.random.nextFloat(15.0f);
                 break;
-            case MODEL_TYPE_ROBOT:
-                legOffset = hipRadius - (legRadius * 1.1f);
-                ang = 90.0f;
             default:
-                legOffset = hipRadius - (legRadius * 1.5f);
-                ang = 255.0f + AppWindow.random.nextFloat(30.0f);
+                ang = organic ? (255.0f + AppWindow.random.nextFloat(30.0f)) : 90.0f;
                 break;
         }
+
+        legPosWid = hipRadius - (legRadius * 3.0f);
+        legOffset = legRadius + AppWindow.random.nextFloat(Math.max(0.0f, legPosWid));
+
         buildLimbLeg(0, node, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, -ang);
         buildLimbLeg(1, node, footLength, footRadius, footRot, toeCount, toeLength, legOffset, ang);
 
@@ -539,17 +542,16 @@ public class SkeletonBuilder
             node = scene.findNodeByName("torso_shoulder");
             switch (modelType) {
                 case MODEL_TYPE_ANIMAL:
-                    legOffset = shoulderRadius - (legRadius * 1.7f);
                     ang = 70.0f + AppWindow.random.nextFloat(15.0f);
                     break;
-                case MODEL_TYPE_ROBOT:
-                    legOffset = shoulderRadius - (legRadius * 1.1f);
-                    ang = 90.0f;
                 default:
-                    legOffset = shoulderRadius - (legRadius * 1.5f);
-                    ang = 75.0f + AppWindow.random.nextFloat(30.0f);
+                    ang = organic ? (75.0f + AppWindow.random.nextFloat(30.0f)) : 90.0f;
                     break;
             }
+
+            legPosWid = shoulderRadius - (legRadius * 3.0f);
+            legOffset = legRadius + AppWindow.random.nextFloat(Math.max(0.0f, legPosWid));
+
             buildLimbLeg(2, node, footLength, footRadius, -footRot, toeCount, toeLength, legOffset, ang);
             buildLimbLeg(3, node, footLength, footRadius, footRot, toeCount, toeLength, legOffset, -ang);
         }
@@ -563,8 +565,8 @@ public class SkeletonBuilder
         float whipLength;
         Node node;
 
-        // robots have no tails, or random no tail
-        if ((modelType == MODEL_TYPE_ROBOT) || (AppWindow.random.nextFloat() < 0.7f)) {
+        // only organics can have a tail
+        if ((!organic) || (AppWindow.random.nextFloat() < 0.7f)) {
             return;
         }
 
@@ -600,19 +602,15 @@ public class SkeletonBuilder
         // skeleton hunch angle
         switch (modelType) {
             case MODEL_TYPE_ANIMAL:
-                hunchAng = (70.0f + (AppWindow.random.nextFloat(40.0f)));
+                hunchAng = organic ? (75.0f + (AppWindow.random.nextFloat(30.0f))) : 90.0f;
                 scaleFactor = thin ? (0.4f + (AppWindow.random.nextFloat(0.4f))) : (0.6f + (AppWindow.random.nextFloat(0.4f)));
                 break;
             case MODEL_TYPE_BLOB:
-                hunchAng = AppWindow.random.nextFloat(20.0f) - 10.0f;
-                scaleFactor = thin ? (0.4f + (AppWindow.random.nextFloat(0.4f))) : (0.8f + (AppWindow.random.nextFloat(0.2f)));
-                break;
-            case MODEL_TYPE_ROBOT:
-                hunchAng = 0.0f;
+                hunchAng = organic ? (AppWindow.random.nextFloat(20.0f) - 10.0f) : 0.0f;
                 scaleFactor = thin ? (0.4f + (AppWindow.random.nextFloat(0.4f))) : (0.8f + (AppWindow.random.nextFloat(0.2f)));
                 break;
             default:    // humanoid
-                hunchAng = AppWindow.random.nextFloat(20.0f) - 5.0f;
+                hunchAng = organic ? (AppWindow.random.nextFloat(20.0f) - 5.0f) : 0.0f;
                 scaleFactor = thin ? (0.4f + (AppWindow.random.nextFloat(0.4f))) : (0.6f + (AppWindow.random.nextFloat(0.4f)));
                 break;
         }
@@ -622,14 +620,11 @@ public class SkeletonBuilder
         legRadius = armRadius + (AppWindow.random.nextFloat(0.2f));
         whipRadius = 0.2f + (AppWindow.random.nextFloat(0.2f));
         bodyRadius = 0.4f + AppWindow.random.nextFloat(1.5f);
-        shoulderRadius = 0.4f + AppWindow.random.nextFloat(1.5f);
         if (bodyRadius < (legRadius * 4.0f)) {
             bodyRadius = legRadius * (4.0f + AppWindow.random.nextFloat(0.3f));
-            shoulderRadius = legRadius * (4.0f + AppWindow.random.nextFloat(0.3f));
         }
-        headRadius = 0.3f + AppWindow.random.nextFloat(1.3f);
-        headRadius = (headRadius > bodyRadius) ? bodyRadius : headRadius;
-        headRadius = (headRadius < legRadius) ? legRadius : headRadius;
+        shoulderRadius = bodyRadius * (0.75f + AppWindow.random.nextFloat(0.5f));
+        headRadius = shoulderRadius * (0.3f + AppWindow.random.nextFloat(0.6f));
 
         // build the skeleton
         buildBody();

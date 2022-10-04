@@ -1,23 +1,19 @@
 package com.klinksoftware.rag;
 
-import com.klinksoftware.rag.model.utility.ModelInterface;
 import com.klinksoftware.rag.uiworker.PropBuildWorker;
 import com.klinksoftware.rag.uiworker.PropExportWorker;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JList;
-import javax.swing.JSlider;
+import com.klinksoftware.rag.prop.utility.PropInterface;
 
 public class SettingsProp extends SettingsBase {
 
-    private static final int BUTTON_GENERATE_MODEL = 0;
-    private static final int BUTTON_EXPORT_MODEL = 1;
+    private static final int BUTTON_GENERATE_PROP = 0;
+    private static final int BUTTON_EXPORT_PROP = 1;
 
-    private JButton generateModelButton, exportModelButton;
-    private JList modelTypeList;
-    private JSlider roughnessSlider;
-    private JCheckBox bilateralCheckBox;
+    private JButton generatePropButton, exportPropButton;
+    private JList propTypeList;
     private JComboBox textureSizeCombo;
 
     public SettingsProp(AppWindow appWindow) {
@@ -29,37 +25,29 @@ public class SettingsProp extends SettingsBase {
 
         y = 0;
 
-        generateModelButton = addButton(y, "Generate Model", BUTTON_GENERATE_MODEL);
+        generatePropButton = addButton(y, "Generate Prop", BUTTON_GENERATE_PROP);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        modelTypeList = addList(y, "Model Type", getAnnotationClasses("com.klinksoftware.rag.model", "model", ModelInterface.class), 0);
+        propTypeList = addList(y, "Prop Type", getAnnotationClasses("com.klinksoftware.rag.prop", "prop", PropInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 1);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        bilateralCheckBox = addCheckBox(y, "Bilateral", true);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        roughnessSlider = addSlider(y, "Roughness", 0.2f);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        exportModelButton = addButton(y, "Export Model", BUTTON_EXPORT_MODEL);
+        exportPropButton = addButton(y, "Export Prop", BUTTON_EXPORT_PROP);
     }
 
     @Override
     public void buttonClick(int id) {
         switch (id) {
-            case BUTTON_GENERATE_MODEL:
+            case BUTTON_GENERATE_PROP:
                 (new PropBuildWorker(
                         appWindow,
-                        (String) modelTypeList.getModel().getElementAt(modelTypeList.getSelectedIndex()),
-                        getIntFromStringCombo(textureSizeCombo),
-                        bilateralCheckBox.isSelected(),
-                        ((float) roughnessSlider.getValue() / 100.0f)
+                        (String) propTypeList.getModel().getElementAt(propTypeList.getSelectedIndex()),
+                        getIntFromStringCombo(textureSizeCombo)
                 )).execute();
                 return;
-            case BUTTON_EXPORT_MODEL:
+            case BUTTON_EXPORT_PROP:
                 (new PropExportWorker(appWindow)).execute();
                 return;
         }

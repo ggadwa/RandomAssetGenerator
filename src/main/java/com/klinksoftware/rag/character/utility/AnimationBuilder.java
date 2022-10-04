@@ -1,4 +1,4 @@
-package com.klinksoftware.rag.model.utility;
+package com.klinksoftware.rag.character.utility;
 
 import com.klinksoftware.rag.scene.Joint;
 import com.klinksoftware.rag.scene.Scene;

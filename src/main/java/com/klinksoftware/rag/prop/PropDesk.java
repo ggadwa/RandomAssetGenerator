@@ -1,15 +1,14 @@
-package com.klinksoftware.rag.model;
+package com.klinksoftware.rag.prop;
 
-import com.klinksoftware.rag.model.utility.ModelInterface;
-import com.klinksoftware.rag.model.utility.ModelBase;
+import com.klinksoftware.rag.prop.utility.PropBase;
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.utility.MapBase;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.MeshUtility;
-import com.klinksoftware.rag.utility.RagPoint;
+import com.klinksoftware.rag.prop.utility.PropInterface;
 
-@ModelInterface
-public class ModelPC extends ModelBase {
+@PropInterface
+public class PropDesk extends PropBase {
 
     private Mesh deskMesh, standMesh, drawerMesh;
 
@@ -74,27 +73,52 @@ public class ModelPC extends ModelBase {
 
     @Override
     public void buildMeshes() {
-        float y, monitorWidth;
-        float standWid, standHalfWid, standHigh;
-        RagPoint rotAngle;
+        float deskLength, deskDepth, deskTopMargin, deskTopHeight;
+        float deskLegWidth, deskLegHeight, deskStandOffset;
+        float deskHalfLength, deskHalfDepth;
 
-        scene.bitmapGroup.add("monitor", new String[]{"Monitor"});
-        scene.bitmapGroup.add("case", new String[]{"Metal", "MetalPlank"});
+        scene.bitmapGroup.add("desk", new String[]{"Metal", "MetalPlank", "WoodPanel"});
+        scene.bitmapGroup.add("stand", new String[]{"Metal", "MetalPlank", "WoodPanel"});
+        scene.bitmapGroup.add("drawer", new String[]{"Metal", "WoodPanel"});
 
-        // monitor
-        standWid = MapBase.SEGMENT_SIZE * (0.051f + AppWindow.random.nextFloat(0.05f));
-        standHalfWid = standWid * 0.5f;
-        standHigh = MapBase.SEGMENT_SIZE * (0.1f + AppWindow.random.nextFloat(0.1f));
-        monitorWidth = MapBase.SEGMENT_SIZE * (0.6f + AppWindow.random.nextFloat(0.4f));
+        // sizes
+        deskLength = MapBase.SEGMENT_SIZE * (0.6f + AppWindow.random.nextFloat(0.4f));
+        deskHalfLength = deskLength * 0.5f;
+        deskStandOffset = 0.3f + AppWindow.random.nextFloat(0.2f);
+        deskDepth = deskLength * (0.3f + AppWindow.random.nextFloat(0.3f));
+        deskHalfDepth = deskDepth * 0.5f;
+        deskTopMargin = deskDepth * (0.05f + AppWindow.random.nextFloat(0.05f));
+        deskTopHeight = MapBase.FLOOR_HEIGHT * (0.1f + AppWindow.random.nextFloat(0.2f));
+        deskLegHeight = MapBase.SEGMENT_SIZE * (0.2f + AppWindow.random.nextFloat(0.2f));
+        deskLegWidth = deskDepth * (0.05f + AppWindow.random.nextFloat(0.05f));
 
-        y = 0.0f;
+        // the desk
+        deskMesh = MeshUtility.createCube("desk", -deskHalfLength, deskHalfLength, deskLegHeight, (deskLegHeight + deskTopHeight), -deskHalfDepth, deskHalfDepth, true, true, true, true, true, true, false, MeshUtility.UV_MAP);
 
-        rotAngle = new RagPoint(0.0f, (160.0f + AppWindow.random.nextFloat(40.0f)), 0.0f);
-        scene.rootNode.addMesh(MeshUtility.createCubeRotated("case", -standHalfWid, standHalfWid, y, (y + standHigh), -standHalfWid, standHalfWid, rotAngle, true, true, true, true, false, false, false, MeshUtility.UV_MAP));
+        drawerMesh = null;
+        standMesh = null;
 
-        // the monitor
-        y += standHigh;
-        scene.rootNode.addMesh(MeshUtility.createCubeRotated("monitor", -monitorWidth, monitorWidth, y, (y + ((monitorWidth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, false, false, true, false, false, false, false, MeshUtility.UV_WHOLE));
-        scene.rootNode.addMesh(MeshUtility.createCubeRotated("case", -monitorWidth, monitorWidth, y, (y + ((monitorWidth * 6) / 9)), -standHalfWid, standHalfWid, rotAngle, true, true, false, true, true, true, false, MeshUtility.UV_MAP));
+        if (AppWindow.random.nextBoolean()) {
+            addSideStand(-(deskHalfLength - deskTopMargin), -(deskHalfLength * deskStandOffset), deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
+        } else {
+            addSideLegs(-(deskHalfLength - deskTopMargin), deskLegWidth, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
+        }
+        if (AppWindow.random.nextBoolean()) {
+            addSideStand((deskHalfLength * deskStandOffset), (deskHalfLength - deskTopMargin), deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
+        } else {
+            addSideLegs((deskHalfLength - (deskTopMargin + deskLegWidth)), deskLegWidth, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
+        }
+
+        if (AppWindow.random.nextBoolean()) {
+            deskMesh.combine(MeshUtility.createCube("desk", -(deskHalfLength - deskTopMargin), (deskHalfLength - deskTopMargin), 0.0f, deskLegHeight, -deskHalfDepth, -(deskHalfDepth - deskTopMargin), true, true, true, true, false, true, false, MeshUtility.UV_MAP));
+        }
+
+        scene.rootNode.addMesh(deskMesh);
+        if (standMesh != null) {
+            scene.rootNode.addMesh(standMesh);
+        }
+        if (drawerMesh != null) {
+            scene.rootNode.addMesh(drawerMesh);
+        }
     }
 }

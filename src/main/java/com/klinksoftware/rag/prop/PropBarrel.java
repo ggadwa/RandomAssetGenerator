@@ -1,15 +1,15 @@
-package com.klinksoftware.rag.model;
+package com.klinksoftware.rag.prop;
 
-import com.klinksoftware.rag.model.utility.ModelInterface;
-import com.klinksoftware.rag.model.utility.ModelBase;
+import com.klinksoftware.rag.prop.utility.PropBase;
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.map.utility.MapBase;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
+import com.klinksoftware.rag.prop.utility.PropInterface;
 
-@ModelInterface
-public class ModelBarrel extends ModelBase {
+@PropInterface
+public class PropBarrel extends PropBase {
 
     @Override
     public float getCameraRotateY() {

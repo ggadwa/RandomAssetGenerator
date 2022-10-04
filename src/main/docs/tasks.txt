@@ -1,10 +1,6 @@
 
 
-[ ] separate models into props & characters
-    [ ] characters has a "robot" checkbox
-
 [ ] half globes for parts of body?
-[ ] shoulders are % of hips instead of their own random
 
 
 map
@@ -18,21 +14,21 @@ bitmaps
  - gravel (like dirt)
  - computer access panels have handles?
 
+characters
+ - skeletons can build two heads
+ - faces by meshes
+ - need meshscale for each end of limb
+ - vertex snaps for humanoid, etc (find and implement: scene.snapVertexes)
+ - humanoid / etc - more items (spikes, etc.)
+
 model
  - anything with bars (like table, etc) can switch between simple cylinder + cube
  - add: chair, bed, couch, dresser, storage tank, pc (can put on desk), bookcase (books?), electrical box
  - some models need to have flags for "on wall" or "on desk, table, etc"
- - robot model needs to be chunkier
- - skeletons can build two heads
- - faces by meshes
- - need meshscale for each end of limb
- - limb wrapping: don't do radius changes linearly, do it by sin
- - vertex snaps for humanoid, etc (find and implement: scene.snapVertexes)
  - finish junction
  - finish pipes
  - table: bars on legs
  - lab tube: extra pipes, maybe base, maybe control unit
- - humanoid / etc - more items (spikes, etc.)
 
 all
  - need to export tangents

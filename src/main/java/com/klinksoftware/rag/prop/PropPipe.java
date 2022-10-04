@@ -1,10 +1,10 @@
-package com.klinksoftware.rag.model;
+package com.klinksoftware.rag.prop;
 
-import com.klinksoftware.rag.model.utility.ModelInterface;
-import com.klinksoftware.rag.model.utility.ModelBase;
+import com.klinksoftware.rag.prop.utility.PropBase;
+import com.klinksoftware.rag.prop.utility.PropInterface;
 
-@ModelInterface
-public class ModelPipe extends ModelBase {
+@PropInterface
+public class PropPipe extends PropBase {
 
     /*
 

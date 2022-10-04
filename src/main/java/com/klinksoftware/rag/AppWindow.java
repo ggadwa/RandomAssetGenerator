@@ -42,6 +42,7 @@ public class AppWindow extends JFrame {
     public static SoundView soundView;
     public static SettingsMap settingsMap;
     public static SettingsProp settingsProp;
+    public static SettingsCharacter settingsCharacter;
     public static SettingsTexture settingsTexture;
     public static SettingsSound settingsSound;
     public static ToolBar toolBar;
@@ -113,6 +114,9 @@ public class AppWindow extends JFrame {
         settingsProp = new SettingsProp(this);
         settingsTab.addTab("Prop", settingsProp);
 
+        settingsCharacter = new SettingsCharacter(this);
+        settingsTab.addTab("Character", settingsCharacter);
+
         settingsTexture = new SettingsTexture(this);
         settingsTab.addTab("Texture", settingsTexture);
 
@@ -147,6 +151,7 @@ public class AppWindow extends JFrame {
         settingsTab.setEnabled(false);
         settingsMap.enableAll(false);
         settingsProp.enableAll(false);
+        settingsCharacter.enableAll(false);
         settingsTexture.enableAll(false);
         settingsSound.enableAll(false);
 
@@ -157,6 +162,7 @@ public class AppWindow extends JFrame {
         settingsTab.setEnabled(true);
         settingsMap.enableAll(true);
         settingsProp.enableAll(true);
+        settingsCharacter.enableAll(true);
         settingsTexture.enableAll(true);
         settingsSound.enableAll(true);
 

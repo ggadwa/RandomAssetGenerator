@@ -1,4 +1,4 @@
-package com.klinksoftware.rag.model.utility;
+package com.klinksoftware.rag.character.utility;
 
 import com.klinksoftware.rag.scene.Node;
 import com.klinksoftware.rag.utility.*;
