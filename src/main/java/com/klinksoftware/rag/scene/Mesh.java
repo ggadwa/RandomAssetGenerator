@@ -167,6 +167,50 @@ public class Mesh {
         }
     }
 
+    public void move(RagPoint add) {
+        int n, vIdx, nVertex;
+
+        vIdx = 0;
+        nVertex = vertexes.length / 3;
+
+        for (n = 0; n != nVertex; n++) {
+            vertexes[vIdx] = vertexes[vIdx] + add.x;
+            vertexes[vIdx + 1] = vertexes[vIdx + 1] + add.y;
+            vertexes[vIdx + 2] = vertexes[vIdx + 2] + add.z;
+
+            vIdx += 3;
+        }
+    }
+
+    public void rotate(RagPoint centerPnt, RagPoint ang) {
+        int n, vIdx, nVertex;
+        RagPoint vertex, normal;
+
+        vertex = new RagPoint(0.0f, 0.0f, 0.0f);
+        normal = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        vIdx = 0;
+        nVertex = vertexes.length / 3;
+
+        for (n = 0; n != nVertex; n++) {
+            vertex.setFromValues(vertexes[vIdx], vertexes[vIdx + 1], vertexes[vIdx + 2]);
+            normal.setFromValues(normals[vIdx], normals[vIdx + 1], normals[vIdx + 2]);
+            vertex.rotateAroundPoint(centerPnt, ang);
+            normal.rotateAroundPoint(centerPnt, ang);
+            normal.normalize();
+
+            vertexes[vIdx] = vertex.x;
+            vertexes[vIdx + 1] = vertex.y;
+            vertexes[vIdx + 2] = vertex.z;
+
+            normals[vIdx] = normal.x;
+            normals[vIdx + 1] = normal.y;
+            normals[vIdx + 2] = normal.z;
+
+            vIdx += 3;
+        }
+    }
+
     public void randomizeVertexes(float percentMove, float moveFactor, ArrayList<Mesh> meshes) {
         int n, k, vIdx, nVertex, nCheckVertex;
         RagPoint normal, vertex, origVertex, checkVertex;

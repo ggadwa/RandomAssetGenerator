@@ -29,7 +29,7 @@ public class MapOutdoor extends MapBase {
         }
     }
 
-    private void buildRequiredBitmaps(int textureSize, boolean skyBox) {
+    private void buildRequiredBitmaps(boolean skyBox) {
         String[] wallBitmaps = {"BrickPattern", "BrickRow", "BrickRowWood", "Geometric", "Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StonePattern", "StoneRound", "StoneRow", "StoneRowWood", "Temple", "Tile", "WoodBoard"};
         String[] outsideFloorBitmaps = {"Dirt", "Grass", "StonePattern"};
         String[] skyBoxBitmaps = {"SkyBoxMountain"};
@@ -63,7 +63,7 @@ public class MapOutdoor extends MapBase {
         removeSharedWalls(rooms);
 
         // required textures for map
-        buildRequiredBitmaps(textureSize, skyBox);
+        buildRequiredBitmaps(skyBox);
 
         // now create the meshes
         createRoomMeshes(rooms);

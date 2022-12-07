@@ -81,7 +81,7 @@ public class MapIndoor extends MapBase {
         }
     }
 
-    private void buildRequiredBitmaps(int textureSize, boolean skyBox) {
+    private void buildRequiredBitmaps(boolean skyBox) {
         String[] wallBitmaps = {"BrickPattern", "BrickRow", "BrickRowWood", "Geometric", "Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StonePattern", "StoneRound", "StoneRow", "StoneRowWood", "Temple", "Tile", "WoodBoard"};
         String[] insideFloorBitmaps = {"BrickPattern", "BrickRow", "Concrete", "Hexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "StonePattern", "WoodBoard"};
         String[] outsideFloorBitmaps = {"Dirt", "Grass", "StonePattern"};
@@ -141,7 +141,7 @@ public class MapIndoor extends MapBase {
         removeSharedWalls(rooms);
 
         // required textures for map
-        buildRequiredBitmaps(textureSize, skyBox);
+        buildRequiredBitmaps(skyBox);
 
         // now create the meshes
         createRoomMeshes(rooms);

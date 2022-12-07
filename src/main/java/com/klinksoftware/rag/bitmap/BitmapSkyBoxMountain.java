@@ -136,7 +136,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         int n, lft, top, qtr, cloudCount, cloudXSize, cloudYSize;
         int edgeSize, sunSize, mountainCount;
         float colorAdjustSize, colorAdjustAdd, colorAdjust;
-        RagColor cloudColor, skyColor, sunColor, mountainColor;
+        RagColor cloudColor, skyColor, sunColor, mountainColor, groundColor;
 
         qtr = textureSize / 4;
 
@@ -144,9 +144,14 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         skyColor = adjustColor(new RagColor(0.1f, 0.95f, 1.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
         sunColor = adjustColor(new RagColor(1.0f, 0.75f, 0.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
         mountainColor = new RagColor(0.65f, 0.35f, 0.0f);
+        groundColor = adjustColor(mountainColor, 0.5f);
 
         createPerlinNoiseData(32, 32);
         createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
+
+        // fill top and bottom with sky/ground color as default
+        drawRect(0, 0, textureSize, (qtr * 2), skyColor);
+        drawRect(0, (qtr * 2), textureSize, textureSize, groundColor);
 
         // top
         drawRect(qtr, 0, (qtr * 2), qtr, skyColor);
@@ -166,7 +171,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         blur(colorData, qtr, 0, (qtr + qtr), qtr, (textureSize / 100), true);
 
         // bottom
-        drawRect(qtr, (qtr * 2), (qtr * 2), (qtr * 3), adjustColor(mountainColor, 0.5f));
+        drawRect(qtr, (qtr * 2), (qtr * 2), (qtr * 3), groundColor);
 
         // sides
         drawVerticalGradient(0, qtr, (qtr * 4), (qtr * 2), skyColor, adjustColor(skyColor, (0.6f + AppWindow.random.nextFloat(0.3f))));

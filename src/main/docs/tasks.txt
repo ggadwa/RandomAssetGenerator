@@ -1,9 +1,14 @@
+- remove all options, make them random to
+- have indoor complex/simple (remove complex and turn off up/down stairs)
 
-
-[ ] half globes for parts of body?
+MapIndoorComplexMultiFloor
+MapIndoorComplexSingleFloor
+MapIndoorSimpleMultiFloor
+MapIndoorSimpleSingleFloor
 
 
 map
+ - underground (mostly hallways and then randomize)
  - stop getting caught on walls
  - going up ramps is sometimes broken
  - open ceiling
@@ -15,18 +20,21 @@ bitmaps
  - computer access panels have handles?
 
 characters
+ - half globes for parts of body
  - skeletons can build two heads
  - faces by meshes
  - need meshscale for each end of limb
  - vertex snaps for humanoid, etc (find and implement: scene.snapVertexes)
  - humanoid / etc - more items (spikes, etc.)
 
-model
+prop
+ - desk: handles, possible pad on top
+ - barrel has different ribs, maybe opening lid, dents
+ - finish pc
  - anything with bars (like table, etc) can switch between simple cylinder + cube
  - add: chair, bed, couch, dresser, storage tank, pc (can put on desk), bookcase (books?), electrical box
  - some models need to have flags for "on wall" or "on desk, table, etc"
  - finish junction
- - finish pipes
  - table: bars on legs
  - lab tube: extra pipes, maybe base, maybe control unit
 

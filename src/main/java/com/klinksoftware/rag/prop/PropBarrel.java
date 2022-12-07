@@ -11,6 +11,8 @@ import com.klinksoftware.rag.prop.utility.PropInterface;
 @PropInterface
 public class PropBarrel extends PropBase {
 
+    private static int BARREL_SIDE_COUNT = 24;
+
     @Override
     public float getCameraRotateY() {
         return (10.0f);
@@ -33,23 +35,23 @@ public class PropBarrel extends PropBase {
         // barrel parts
         by = 0;
         centerPnt = new RagPoint(0, (barrelRingHeight * 0.5f), 0);
-        mesh = MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true);
+        mesh = MeshUtility.createMeshCylinderSimple("barrel", BARREL_SIDE_COUNT, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true);
 
         by += barrelRingHeight;
         centerPnt = new RagPoint(0, (by + (barrelSectionHeight * 0.5f)), 0);
-        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelSectionHeight), barrelSectionRadius, false, false));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", BARREL_SIDE_COUNT, centerPnt, by, (by + barrelSectionHeight), barrelSectionRadius, false, false));
 
         by += barrelSectionHeight;
         centerPnt = new RagPoint(0, (by + (barrelRingHeight * 0.5f)), 0);
-        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", BARREL_SIDE_COUNT, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
 
         by += barrelRingHeight;
         centerPnt = new RagPoint(0, (by + (barrelSectionHeight * 0.5f)), 0);
-        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelSectionHeight), barrelSectionRadius, false, false));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", BARREL_SIDE_COUNT, centerPnt, by, (by + barrelSectionHeight), barrelSectionRadius, false, false));
 
         by += barrelSectionHeight;
         centerPnt = new RagPoint(0, (by + (barrelRingHeight * 0.5f)), 0);
-        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", 16, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
+        mesh.combine(MeshUtility.createMeshCylinderSimple("barrel", BARREL_SIDE_COUNT, centerPnt, by, (by + barrelRingHeight), barrelRingRadius, true, true));
 
         scene.rootNode.addMesh(mesh);
     }

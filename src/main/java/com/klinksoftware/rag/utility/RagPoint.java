@@ -128,7 +128,6 @@ public class RagPoint
         z = pnt1.z + (pnt2.z - pnt1.z) * factor;
     }
 
-
     public void rotateAroundPoint(RagPoint centerPnt, RagPoint ang) {
         float rd, sn, cs, rx, ry, rz;
 

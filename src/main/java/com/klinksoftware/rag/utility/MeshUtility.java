@@ -751,6 +751,149 @@ public class MeshUtility {
         return (createCylinder(bitmapName, sideCount, centerPnt, ty, by, new float[]{1.0f, 1.0f}, radius, addTop, addBot));
     }
 
+    public static Mesh createMeshCylinderCorner(String bitmapName, int sideCount, int curveCount, RagPoint startPnt, float radius) {
+        int n, k, t, iIdx;
+        float rd, tx, tz, tx2, tz2, bx, bz, bx2, bz2, u1, u2, v1, v2;
+        float zTurnAdd, yAdd, ang, ang2, angAdd;
+        int[] indexes;
+        float[] vertexes, normals, tangents, uvs;
+        ArrayList<Float> vertexArray, normalArray, uvArray;
+        ArrayList<Integer> indexArray;
+        RagPoint pnt, nextPnt, addPnt, pipeAng, nextPipeAng, vertex, normal;
+
+        // allocate proper buffers
+        vertexArray = new ArrayList<>();
+        normalArray = new ArrayList<>();
+        uvArray = new ArrayList<>();
+        indexArray = new ArrayList<>();
+
+        vertex = new RagPoint(0.0f, 0.0f, 0.0f);
+        normal = new RagPoint(0.0f, 0.0f, 0.0f);
+        pnt = startPnt.copy();
+        nextPnt = new RagPoint(0.0f, 0.0f, 0.0f);
+        addPnt = new RagPoint(0.0f, 0.0f, 0.0f);
+        pipeAng = new RagPoint(0.0f, 0.0f, 0.0f);
+        nextPipeAng = new RagPoint(0.0f, 0.0f, 0.0f);
+
+        // turn segments
+        yAdd = -(radius * 2.0f) / (float) curveCount;
+        zTurnAdd = -90.0f / (float) curveCount;
+
+        iIdx = 0;
+        angAdd = 360.0f / (float) sideCount;
+
+        for (k = 0; k != curveCount; k++) {
+
+            nextPnt.setFromPoint(pnt);
+            addPnt.setFromValues(0.0f, -yAdd, 0.0f);
+            addPnt.rotateAroundPoint(null, pipeAng);
+            nextPnt.addPoint(addPnt);
+
+            nextPipeAng.setFromPoint(pipeAng);
+            nextPipeAng.z += zTurnAdd;
+
+            v1 = (float) k / (float) curveCount;
+            v2 = (float) (k + 1) / (float) curveCount;
+
+            // cyliner faces
+            ang = 0.0f;
+
+            for (n = 0; n != sideCount; n++) {
+                ang2 = ang + angAdd;
+
+                // the two Us
+                u1 = (float) n / (float) sideCount;
+                u2 = (float) (n + 1) / (float) sideCount;
+
+                // force last segment to wrap
+                if (n == (sideCount - 1)) {
+                    ang2 = 0.0f;
+                }
+
+                rd = ang * ((float) Math.PI / 180.0f);
+                tx = nextPnt.x + (radius * (float) Math.cos(rd));
+                tz = nextPnt.z + (radius * (float) Math.sin(rd));
+
+                bx = pnt.x + (radius * (float) Math.cos(rd));
+                bz = pnt.z + (radius * (float) Math.sin(rd));
+
+                rd = ang2 * ((float) Math.PI / 180.0f);
+                tx2 = nextPnt.x + (radius * (float) Math.cos(rd));
+                tz2 = nextPnt.z + (radius * (float) Math.sin(rd));
+
+                bx2 = pnt.x + (radius * (float) Math.cos(rd));
+                bz2 = pnt.z + (radius * (float) Math.sin(rd));
+
+                // the points
+                vertex.setFromValues(tx, nextPnt.y, tz);
+                vertex.rotateAroundPoint(nextPnt, nextPipeAng);
+                vertexArray.addAll(Arrays.asList(vertex.x, vertex.y, vertex.z));
+                normal.setFromSubPoint(vertex, nextPnt);
+                normal.normalize();
+                normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+                uvArray.addAll(Arrays.asList(u1, v1));
+
+                vertex.setFromValues(tx2, nextPnt.y, tz2);
+                vertex.rotateAroundPoint(nextPnt, nextPipeAng);
+                vertexArray.addAll(Arrays.asList(vertex.x, vertex.y, vertex.z));
+                normal.setFromSubPoint(vertex, nextPnt);
+                normal.normalize();
+                normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+                uvArray.addAll(Arrays.asList(u2, v1));
+
+                vertex.setFromValues(bx, pnt.y, bz);
+                vertex.rotateAroundPoint(pnt, pipeAng);
+                vertexArray.addAll(Arrays.asList(vertex.x, vertex.y, vertex.z));
+                normal.setFromSubPoint(vertex, nextPnt);
+                normal.normalize();
+                normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+                uvArray.addAll(Arrays.asList(u1, v2));
+
+                vertex.setFromValues(tx2, nextPnt.y, tz2);
+                vertex.rotateAroundPoint(nextPnt, nextPipeAng);
+                vertexArray.addAll(Arrays.asList(vertex.x, vertex.y, vertex.z));
+                normal.setFromSubPoint(vertex, nextPnt);
+                normal.normalize();
+                normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+                uvArray.addAll(Arrays.asList(u2, v1));
+
+                vertex.setFromValues(bx2, pnt.y, bz2);
+                vertex.rotateAroundPoint(pnt, pipeAng);
+                vertexArray.addAll(Arrays.asList(vertex.x, vertex.y, vertex.z));
+                normal.setFromSubPoint(vertex, nextPnt);
+                normal.normalize();
+                normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+                uvArray.addAll(Arrays.asList(u2, v2));
+
+                vertex.setFromValues(bx, pnt.y, bz);
+                vertex.rotateAroundPoint(pnt, pipeAng);
+                vertexArray.addAll(Arrays.asList(vertex.x, vertex.y, vertex.z));
+                normal.setFromSubPoint(vertex, nextPnt);
+                normal.normalize();
+                normalArray.addAll(Arrays.asList(normal.x, normal.y, normal.z));
+                uvArray.addAll(Arrays.asList(u1, v2));
+
+                for (t = 0; t != 6; t++) {
+                    indexArray.add(iIdx++);
+                }
+
+                ang = ang2;
+            }
+
+            pnt.setFromPoint(nextPnt);
+            pipeAng.setFromPoint(nextPipeAng);
+        }
+
+        // create the mesh
+        vertexes = floatArrayListToFloat(vertexArray);
+        normals = floatArrayListToFloat(normalArray);
+        uvs = floatArrayListToFloat(uvArray);
+        indexes = intArrayListToInt(indexArray);
+        tangents = buildTangents(vertexes, uvs, indexes);
+
+        return (new Mesh("cylinder_corner", bitmapName, vertexes, normals, tangents, uvs, indexes));
+    }
+
     // ramp
     public static Mesh createRamp(String bitmapName, float x, float y, float z, int dir, float rampWidth, float rampHeight, float rampLength, boolean back) {
         int trigIdx;
@@ -1226,6 +1369,25 @@ public class MeshUtility {
         tangents = MeshUtility.buildTangents(vertexes, uvs, indexes);
 
         return (new Mesh(name, bitmapName, vertexes, normals, tangents, uvs, indexes));
+    }
+
+    // create bar (square or cynlinder)
+    public static Mesh createBar(float x, float y, float z, float radius, float length, int axis, boolean square) {
+        switch (axis) {
+            case MeshUtility.AXIS_Y:
+                if (square) {
+                    return (MeshUtility.createCube("stand", (x - radius), (x + radius), y, (y + length), (z - radius), (z + radius), true, true, true, true, true, true, false, MeshUtility.UV_MAP));
+                }
+                return (MeshUtility.createCylinderAroundAxis("stand", "stand", MeshUtility.AXIS_Y, new RagPoint((x + radius), length, (z + radius)), new RagPoint((x + radius), 0, (z + radius)), radius, 8));
+            case MeshUtility.AXIS_Z:
+                if (square) {
+                    return (MeshUtility.createCube("stand", (x - radius), (x + radius), (y - radius), (y + radius), z, (z + length), true, true, true, true, true, true, false, MeshUtility.UV_MAP));
+                }
+                return (MeshUtility.createCylinderAroundAxis("stand", "stand", MeshUtility.AXIS_Z, new RagPoint((x + radius), (y + radius), (z + radius)), new RagPoint((x + radius), (y + radius), ((z + radius) + length)), radius, 8));
+
+        }
+
+        return (null);
     }
 
 }

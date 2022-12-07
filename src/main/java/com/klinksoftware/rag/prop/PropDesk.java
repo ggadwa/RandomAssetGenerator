@@ -12,13 +12,13 @@ public class PropDesk extends PropBase {
 
     private Mesh deskMesh, standMesh, drawerMesh;
 
-    private void addSideStand(float minX, float maxX, float deskLegHeight, float minZ, float maxZ) {
-        int n, drawCount;
-        float y, high, margin;
+    private void addSideStand(float minX, float maxX, float by, float ty, float minZ, float maxZ, int drawerCount, float drawerMargin) {
+        int n;
+        float y, high;
         Mesh mesh;
 
         // the stand
-        mesh = MeshUtility.createCube("stand", minX, maxX, 0, deskLegHeight, minZ, maxZ, true, true, true, true, false, true, false, MeshUtility.UV_MAP);
+        mesh = MeshUtility.createCube("stand", minX, maxX, by, ty, minZ, maxZ, true, true, true, true, false, true, false, MeshUtility.UV_MAP);
         if (standMesh == null) {
             standMesh = mesh;
         } else {
@@ -26,14 +26,12 @@ public class PropDesk extends PropBase {
         }
 
         // drawers
-        drawCount = 2 + AppWindow.random.nextInt(2);
-        margin = deskLegHeight * 0.02f;
-        high = (deskLegHeight - margin) / drawCount;
+        high = ((ty - by) - drawerMargin) / drawerCount;
 
-        y = margin;
+        y = by + drawerMargin;
 
-        for (n = 0; n != drawCount; n++) {
-            mesh = MeshUtility.createCube("drawer", (minX + margin), (maxX - margin), y, (y + (high - margin)), maxZ, (maxZ + margin), true, true, false, true, false, true, false, MeshUtility.UV_MAP);
+        for (n = 0; n != drawerCount; n++) {
+            mesh = MeshUtility.createCube("drawer", (minX + drawerMargin), (maxX - drawerMargin), y, (y + (high - drawerMargin)), maxZ, (maxZ + drawerMargin), true, true, false, true, false, true, false, MeshUtility.UV_MAP);
             if (drawerMesh == null) {
                 drawerMesh = mesh;
             } else {
@@ -43,39 +41,43 @@ public class PropDesk extends PropBase {
         }
     }
 
-    private void addSideLegs(float x, float deskLegWidth, float deskLegHeight, float minZ, float maxZ) {
+    private void addSideLegs(float x, float deskLegWidth, float deskLegHeight, float minZ, float maxZ, boolean square, boolean cross1, boolean cross2, boolean cross3) {
         float y;
         Mesh mesh;
 
         // legs
-        mesh = MeshUtility.createCube("stand", x, (x + deskLegWidth), 0, deskLegHeight, minZ, (minZ + deskLegWidth), true, true, true, true, false, true, false, MeshUtility.UV_MAP);
+        mesh = MeshUtility.createBar((x + (deskLegWidth / 2)), 0, (minZ + (deskLegWidth / 2)), (deskLegWidth / 2), deskLegHeight, MeshUtility.AXIS_Y, square);
         if (standMesh == null) {
             standMesh = mesh;
         } else {
             standMesh.combine(mesh);
         }
-        standMesh.combine(MeshUtility.createCube("stand", x, (x + deskLegWidth), 0, deskLegHeight, (maxZ - deskLegWidth), maxZ, true, true, true, true, false, true, false, MeshUtility.UV_MAP));
+
+        standMesh.combine(MeshUtility.createBar((x + (deskLegWidth / 2)), 0, (maxZ - (deskLegWidth / 2)), (deskLegWidth / 2), deskLegHeight, MeshUtility.AXIS_Y, square));
 
         // crossbars
-        if (AppWindow.random.nextBoolean()) {
+        if (cross1) {
             y = deskLegWidth + (deskLegWidth * 0.5f);
-            standMesh.combine(MeshUtility.createCube("stand", x, (x + deskLegWidth), y, (y + deskLegWidth), (minZ + deskLegWidth), (maxZ - deskLegWidth), true, true, false, false, true, true, false, MeshUtility.UV_MAP));
+            standMesh.combine(MeshUtility.createBar((x + (deskLegWidth / 2)), y, (minZ + (deskLegWidth / 2)), (deskLegWidth / 2), ((maxZ - minZ) - deskLegWidth), MeshUtility.AXIS_Z, square));
         }
-        if (AppWindow.random.nextBoolean()) {
+        if (cross2) {
             y = (deskLegHeight * 0.5f) + (deskLegWidth * 0.5f);
-            standMesh.combine(MeshUtility.createCube("stand", x, (x + deskLegWidth), y, (y + deskLegWidth), (minZ + deskLegWidth), (maxZ - deskLegWidth), true, true, false, false, true, true, false, MeshUtility.UV_MAP));
+            standMesh.combine(MeshUtility.createBar((x + (deskLegWidth / 2)), y, (minZ + (deskLegWidth / 2)), (deskLegWidth / 2), ((maxZ - minZ) - deskLegWidth), MeshUtility.AXIS_Z, square));
         }
-        if (AppWindow.random.nextBoolean()) {
+        if (cross3) {
             y = deskLegHeight - (deskLegWidth + (deskLegWidth * 0.5f));
-            standMesh.combine(MeshUtility.createCube("stand", x, (x + deskLegWidth), y, (y + deskLegWidth), (minZ + deskLegWidth), (maxZ - deskLegWidth), true, true, false, false, true, true, false, MeshUtility.UV_MAP));
+            standMesh.combine(MeshUtility.createBar((x + (deskLegWidth / 2)), y, (minZ + (deskLegWidth / 2)), (deskLegWidth / 2), ((maxZ - minZ) - deskLegWidth), MeshUtility.AXIS_Z, square));
         }
     }
 
     @Override
     public void buildMeshes() {
+        int drawerCount;
+        float drawerHigh, drawerMargin;
         float deskLength, deskDepth, deskTopMargin, deskTopHeight;
         float deskLegWidth, deskLegHeight, deskStandOffset;
         float deskHalfLength, deskHalfDepth;
+        boolean square, cross1, cross2, cross3;
 
         scene.bitmapGroup.add("desk", new String[]{"Metal", "MetalPlank", "WoodPanel"});
         scene.bitmapGroup.add("stand", new String[]{"Metal", "MetalPlank", "WoodPanel"});
@@ -98,15 +100,27 @@ public class PropDesk extends PropBase {
         drawerMesh = null;
         standMesh = null;
 
+        drawerCount = 2 + AppWindow.random.nextInt(2);
+        drawerMargin = deskLegHeight * (0.02f + AppWindow.random.nextFloat(0.01f));
+        square = AppWindow.random.nextBoolean();
+        cross1 = AppWindow.random.nextBoolean();
+        cross2 = AppWindow.random.nextBoolean();
+        cross3 = AppWindow.random.nextBoolean();
+
         if (AppWindow.random.nextBoolean()) {
-            addSideStand(-(deskHalfLength - deskTopMargin), -(deskHalfLength * deskStandOffset), deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
+            addSideStand(-(deskHalfLength - deskTopMargin), -(deskHalfLength * deskStandOffset), 0, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin), drawerCount, drawerMargin);
         } else {
-            addSideLegs(-(deskHalfLength - deskTopMargin), deskLegWidth, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
+            addSideLegs(-(deskHalfLength - deskTopMargin), deskLegWidth, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin), square, cross1, cross2, cross3);
         }
         if (AppWindow.random.nextBoolean()) {
-            addSideStand((deskHalfLength * deskStandOffset), (deskHalfLength - deskTopMargin), deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
+            addSideStand((deskHalfLength * deskStandOffset), (deskHalfLength - deskTopMargin), 0, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin), drawerCount, drawerMargin);
         } else {
-            addSideLegs((deskHalfLength - (deskTopMargin + deskLegWidth)), deskLegWidth, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin));
+            addSideLegs((deskHalfLength - (deskTopMargin + deskLegWidth)), deskLegWidth, deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin), square, cross1, cross2, cross3);
+        }
+
+        if (AppWindow.random.nextBoolean()) {
+            drawerHigh = deskLegHeight * (0.1f + AppWindow.random.nextFloat(0.1f));
+            addSideStand(-(deskHalfLength * deskStandOffset), (deskHalfLength * deskStandOffset), (deskLegHeight - drawerHigh), deskLegHeight, -(deskHalfDepth - deskTopMargin), (deskHalfDepth - deskTopMargin), 1, drawerMargin);
         }
 
         if (AppWindow.random.nextBoolean()) {
