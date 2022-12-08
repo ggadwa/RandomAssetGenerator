@@ -6,6 +6,11 @@ MapIndoorComplexSingleFloor
 MapIndoorSimpleMultiFloor
 MapIndoorSimpleSingleFloor
 
+- more space for "type" (just use type & texture)
+- put spaces in name (and they get erased on the next way through)
+- skybox is awful at 4096
+- add robot to character
+
 
 map
  - underground (mostly hallways and then randomize)

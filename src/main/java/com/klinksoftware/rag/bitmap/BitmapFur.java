@@ -8,8 +8,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapFur extends BitmapBase {
 
-    public BitmapFur(int textureSize) {
-        super(textureSize);
+    public BitmapFur() {
+        super();
 
         hasNormal = true;
         hasMetallicRoughness = true;

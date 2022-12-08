@@ -3,7 +3,6 @@ package com.klinksoftware.rag;
 import com.klinksoftware.rag.character.utility.CharacterInterface;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JSlider;
 import com.klinksoftware.rag.uiworker.CharacterBuildWorker;
@@ -18,7 +17,6 @@ public class SettingsCharacter extends SettingsBase {
     private JList characterTypeList;
     private JSlider roughnessSlider;
     private JCheckBox bilateralCheckBox, organicCheckBox;
-    private JComboBox textureSizeCombo;
 
     public SettingsCharacter(AppWindow appWindow) {
         super(appWindow);
@@ -34,9 +32,6 @@ public class SettingsCharacter extends SettingsBase {
 
         characterTypeList = addList(y, "Character Type", getAnnotationClasses("com.klinksoftware.rag.character", "character", CharacterInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
-
-        textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 1);
-        y += (ROW_HEIGHT + ROW_GAP);
 
         bilateralCheckBox = addCheckBox(y, "Bilateral", true);
         y += (ROW_HEIGHT + ROW_GAP);
@@ -57,7 +52,6 @@ public class SettingsCharacter extends SettingsBase {
                 (new CharacterBuildWorker(
                         appWindow,
                         (String) characterTypeList.getModel().getElementAt(characterTypeList.getSelectedIndex()),
-                        getIntFromStringCombo(textureSizeCombo),
                         bilateralCheckBox.isSelected(),
                         organicCheckBox.isSelected(),
                         ((float) roughnessSlider.getValue() / 100.0f)

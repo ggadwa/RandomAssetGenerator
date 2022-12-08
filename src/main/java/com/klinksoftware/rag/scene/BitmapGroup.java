@@ -10,12 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BitmapGroup {
 
-    private int textureSize;
     private HashMap<String, String> bitmapList;
     public ConcurrentHashMap<String, BitmapBase> loadedBitmaps;
 
-    public BitmapGroup(int textureSize) {
-        this.textureSize = textureSize;
+    public BitmapGroup() {
         bitmapList = new HashMap<>();
         loadedBitmaps = new ConcurrentHashMap<>();
     }
@@ -67,13 +65,10 @@ public class BitmapGroup {
 
     private class BitmapGeneratorThread implements Runnable {
 
-        private String name, bitmapName;
-        //private ConcurrentHashMap<String,BitmapBase> loadedBitmaps;
+        private String name;
 
         public BitmapGeneratorThread(String name) {
             this.name = name;
-            //this.bitmapName=bitmapName;
-            //this.loadedBitmaps=loadedBitmaps;
         }
 
         @Override
@@ -81,10 +76,10 @@ public class BitmapGroup {
             BitmapBase bitmap;
 
             try {
-                bitmap = (BitmapBase) Class.forName(bitmapList.get(name)).getConstructor(int.class).newInstance(textureSize);
+                bitmap = (BitmapBase) Class.forName(bitmapList.get(name)).getConstructor().newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
-                bitmap = new BitmapTest(textureSize);
+                bitmap = new BitmapTest();
             }
 
             bitmap.generate();

@@ -8,8 +8,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapMosaic extends BitmapBase
 {
-    public BitmapMosaic(int textureSize) {
-        super(textureSize);
+    public BitmapMosaic() {
+        super();
 
         hasNormal=true;
         hasMetallicRoughness=true;

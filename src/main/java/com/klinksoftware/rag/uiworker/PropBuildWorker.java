@@ -7,15 +7,13 @@ import javax.swing.*;
 
 public class PropBuildWorker extends SwingWorker<Integer, Void> {
     private AppWindow appWindow;
-    private int textureSize;
     private String propName;
 
     public static PropBase generatedProp = null;
 
-    public PropBuildWorker(AppWindow appWindow, String propName, int textureSize) {
+    public PropBuildWorker(AppWindow appWindow, String propName) {
         this.appWindow = appWindow;
         this.propName = propName;
-        this.textureSize = textureSize;
     }
 
     @Override
@@ -34,7 +32,7 @@ public class PropBuildWorker extends SwingWorker<Integer, Void> {
         // run the prop builder
         try {
             prop = (PropBase) (Class.forName("com.klinksoftware.rag.prop.Prop" + propName.replace(" ", ""))).getConstructor().newInstance();
-            prop.build(textureSize);
+            prop.build();
         } catch (Exception e) {
             e.printStackTrace();
             return (0);

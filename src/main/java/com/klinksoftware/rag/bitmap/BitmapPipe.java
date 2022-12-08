@@ -8,8 +8,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapPipe extends BitmapBase {
 
-    public BitmapPipe(int textureSize) {
-        super(textureSize);
+    public BitmapPipe() {
+        super();
 
         hasNormal = true;
         hasMetallicRoughness = true;

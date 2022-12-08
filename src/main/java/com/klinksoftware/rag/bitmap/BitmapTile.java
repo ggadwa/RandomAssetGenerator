@@ -8,8 +8,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapTile extends BitmapBase
 {
-    public BitmapTile(int textureSize) {
-        super(textureSize);
+    public BitmapTile() {
+        super();
 
         hasNormal=true;
         hasMetallicRoughness=true;

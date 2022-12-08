@@ -10,8 +10,8 @@ import java.util.ArrayList;
 @BitmapInterface
 public class BitmapDirt extends BitmapBase {
 
-    public BitmapDirt(int textureSize) {
-        super(textureSize);
+    public BitmapDirt() {
+        super();
 
         hasNormal = true;
         hasMetallicRoughness = true;

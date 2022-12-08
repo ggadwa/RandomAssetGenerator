@@ -8,9 +8,10 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapSkyBoxMountain extends BitmapBase {
 
-    public BitmapSkyBoxMountain(int textureSize) {
-        super(textureSize);
+    public BitmapSkyBoxMountain() {
+        super();
 
+        textureSize = DEFAULT_SKYBOX_TEXTURE_SIZE;
         hasNormal = false;
         hasMetallicRoughness = false;
         hasEmissive = false;

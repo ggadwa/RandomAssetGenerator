@@ -12,8 +12,8 @@ public class BitmapComputer extends BitmapMonitor {
         new RagColor(1.0f, 0.0f, 0.0f)
     };
 
-    public BitmapComputer(int textureSize) {
-        super(textureSize);
+    public BitmapComputer() {
+        super();
 
         hasNormal=true;
         hasMetallicRoughness=true;

@@ -31,8 +31,7 @@ public class MapPieceList {
     }
 
     private MapPiece dupTransformPiece(MapPiece origPiece, boolean rotate, boolean flipX, boolean flipZ) {
-        int n, k, x, z;
-        int[] tempGrid;
+        int n;
         float f;
         MapPiece piece;
 

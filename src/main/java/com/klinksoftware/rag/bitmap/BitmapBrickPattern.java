@@ -8,8 +8,8 @@ import java.util.ArrayList;
 @BitmapInterface
 public class BitmapBrickPattern extends BitmapBrickRow {
 
-    public BitmapBrickPattern(int textureSize) {
-        super(textureSize);
+    public BitmapBrickPattern() {
+        super();
 
         hasNormal = true;
         hasMetallicRoughness = true;

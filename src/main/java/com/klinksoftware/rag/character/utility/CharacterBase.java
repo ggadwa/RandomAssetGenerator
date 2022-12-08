@@ -12,7 +12,6 @@ public class CharacterBase {
 
     public Scene scene;
 
-    public int textureSize;
     public boolean bilateral;
     public boolean organic;
     public float roughness;
@@ -74,13 +73,12 @@ public class CharacterBase {
     // build a model
     // note: models are build with absolute vertexes, but unlike maps,
     // we leave the vertexes absolute and just attach them to
-    public void build(int textureSize, boolean bilateral, boolean organic, float roughness) {
-        this.textureSize = textureSize;
+    public void build(boolean bilateral, boolean organic, float roughness) {
         this.bilateral = bilateral;
         this.organic = organic;
         this.roughness = roughness;
 
-        scene = new Scene(textureSize);
+        scene = new Scene();
         scene.skinned = true;
 
         // run the internal mesh build

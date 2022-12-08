@@ -28,17 +28,10 @@ public class MapBase {
     public RagPoint viewCenterPoint;
     public MapPieceList mapPieceList;
 
-    public int textureSize;
-    public float mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompactFactor, tallRoom, sunkenRoom;
-    public boolean complex, skyBox;
-
     public MapBase() {
     }
 
-        //
-        // deleting shared walls, floors, and ceilings
-        //
-
+    // deleting shared walls, floors, and ceilings
     protected void removeSharedWalls(ArrayList<MapRoom> rooms) {
         int n, k, roomCount, vIdx, vIdx2;
         int nextIdx, nextIdx2, vertexCount, vertexCount2;
@@ -102,9 +95,7 @@ public class MapBase {
         }
     }
 
-        //
-        // build floors
-    //
+    // build floors
     protected MapRoom createRoomAndGravityIn(ArrayList<MapRoom> rooms, MapRoom lastRoom, int story, float mapCompactFactor, boolean complex) {
         int failCount, placeCount, moveCount;
         int touchIdx;
@@ -494,26 +485,86 @@ public class MapBase {
         scene.skyBox = true;
     }
 
-    //
-        // build a map
-        //
+    // room meshes
+    protected void createRoomMeshes(ArrayList<MapRoom> rooms, boolean hasCeiling) {
+        int n, roomCount;
+        MapRoom room;
+        RagPoint centerPnt;
+
+        roomCount = rooms.size();
+
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+            centerPnt = new RagPoint((((room.x * SEGMENT_SIZE) + (room.piece.sizeX * SEGMENT_SIZE)) * 0.5f), ((SEGMENT_SIZE + FLOOR_HEIGHT) + (SEGMENT_SIZE * 0.5f)), (((room.z * SEGMENT_SIZE) + (room.piece.sizeZ * SEGMENT_SIZE)) * 0.5f));
+
+            MeshMapUtility.buildRoomIndoorWalls(room, centerPnt, n);
+            MeshMapUtility.buildRoomFloorCeiling(room, centerPnt, n, true);
+            if (hasCeiling) {
+                MeshMapUtility.buildRoomFloorCeiling(room, centerPnt, n, false);
+            }
+        }
+    }
+
+    // room steps
+    protected void buildSteps(ArrayList<MapRoom> rooms) {
+        int n, roomCount;
+        MapStair mapStair;
+        MapRoom room;
+
+        roomCount = rooms.size();
+        mapStair = new MapStair(rooms);
+
+        // stairs when changing to upper or lower
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+            if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
+                mapStair.buildPlatformStair(room, n, true);
+                continue;
+            }
+            if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
+                mapStair.buildPlatformStair(room, n, false);
+            }
+        }
+
+        // stairs for sunken rooms
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+            if (room.story == MapRoom.ROOM_STORY_SUNKEN_EXTENSION) {
+                mapStair.buildSunkenStairs(room, n);
+            }
+        }
+    }
+
+    // room platforms
+    protected void buildPlatforms(ArrayList<MapRoom> rooms) {
+        int n, roomCount;
+        MapRoom room;
+        MapPlatform mapPlatform;
+
+        roomCount = rooms.size();
+        mapPlatform = new MapPlatform(rooms);
+
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+            if (room.story == MapRoom.ROOM_STORY_UPPER_EXTENSION) {
+                mapPlatform.build(room, n, true);
+                continue;
+            }
+            if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
+                mapPlatform.build(room, n, false);
+            }
+        }
+    }
+
+    // main override
     public RagPoint buildMeshes() {
         return (new RagPoint(0.0f, 0.0f, 0.0f));
     }
 
-    public void build(int textureSize, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompactFactor, float tallRoom, float sunkenRoom, boolean complex, boolean skyBox) {
-        this.textureSize = textureSize;
-        this.mainFloorMapSize = mainFloorMapSize;
-        this.upperFloorMapSize = upperFloorMapSize;
-        this.lowerFloorMapSize = lowerFloorMapSize;
-        this.mapCompactFactor = mapCompactFactor;
-        this.tallRoom = tallRoom;
-        this.sunkenRoom = sunkenRoom;
-        this.complex = complex;
-        this.skyBox = skyBox;
-
+    // build a map
+    public void build() {
         // blank scene
-        scene = new Scene(textureSize);
+        scene = new Scene();
 
         // map construction classes
         mapPieceList = new MapPieceList();

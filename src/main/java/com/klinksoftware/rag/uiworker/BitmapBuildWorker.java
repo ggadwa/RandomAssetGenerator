@@ -9,14 +9,12 @@ import javax.swing.*;
 public class BitmapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
-    private int textureSize;
     private String bitmapName;
 
     public static BitmapBase generatedBitmap = null;
 
-    public BitmapBuildWorker(AppWindow appWindow, int textureSize, String bitmapName) {
+    public BitmapBuildWorker(AppWindow appWindow, String bitmapName) {
         this.appWindow = appWindow;
-        this.textureSize = textureSize;
         this.bitmapName = bitmapName;
     }
 
@@ -33,7 +31,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         AppWindow.random.setSeed(seed);
         System.out.println("seed=" + seed);
 
-        scene = new Scene(textureSize);
+        scene = new Scene();
         scene.bitmapGroup.add("bitmap", bitmapName);
         scene.makeSceneSimpleCube();
         scene.bitmapGroup.generateAll();

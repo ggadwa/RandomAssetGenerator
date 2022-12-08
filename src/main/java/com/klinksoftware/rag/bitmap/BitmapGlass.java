@@ -7,8 +7,8 @@ import com.klinksoftware.rag.*;
 @BitmapInterface
 public class BitmapGlass extends BitmapBase
 {
-    public BitmapGlass(int textureSize) {
-        super(textureSize);
+    public BitmapGlass() {
+        super();
 
         hasNormal=true;
         hasMetallicRoughness=true;

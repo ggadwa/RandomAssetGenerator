@@ -10,8 +10,8 @@ public class BitmapGeometric extends BitmapBase {
 
     private static final int SNAKE_PIXEL_SIZE = 32;
 
-    public BitmapGeometric(int textureSize) {
-        super(textureSize);
+    public BitmapGeometric() {
+        super();
 
         hasNormal = true;
         hasMetallicRoughness = true;

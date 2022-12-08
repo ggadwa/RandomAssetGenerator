@@ -7,7 +7,6 @@ import com.klinksoftware.rag.utility.RagPoint;
 public class PropBase {
 
     public Scene scene;
-    public int textureSize;
 
     // export model
     public void writeToFile(String path) {
@@ -54,10 +53,8 @@ public class PropBase {
     // build a model
     // note: models are build with absolute vertexes, but unlike maps,
     // we leave the vertexes absolute and just attach them to
-    public void build(int textureSize) {
-        this.textureSize = textureSize;
-
-        scene = new Scene(textureSize);
+    public void build() {
+        scene = new Scene();
 
         // run the internal mesh build
         buildMeshes();

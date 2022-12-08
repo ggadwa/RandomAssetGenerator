@@ -16,11 +16,11 @@ public class Scene {
     public BitmapGroup bitmapGroup;
     public Animation animation;
 
-    public Scene(int textureSize) {
+    public Scene() {
         nodeIndex = 0;
 
         rootNode = new Node("root", nodeIndex++, new RagPoint(0.0f, 0.0f, 0.0f));
-        bitmapGroup = new BitmapGroup(textureSize);
+        bitmapGroup = new BitmapGroup();
         animation = new Animation(this);
 
         skyBox = false;

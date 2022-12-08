@@ -8,8 +8,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapScale extends BitmapBase {
 
-    public BitmapScale(int textureSize) {
-        super(textureSize);
+    public BitmapScale() {
+        super();
 
         hasNormal = true;
         hasMetallicRoughness = true;

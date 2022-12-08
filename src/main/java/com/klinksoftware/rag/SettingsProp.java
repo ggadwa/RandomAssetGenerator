@@ -3,7 +3,6 @@ package com.klinksoftware.rag;
 import com.klinksoftware.rag.uiworker.PropBuildWorker;
 import com.klinksoftware.rag.uiworker.PropExportWorker;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JList;
 import com.klinksoftware.rag.prop.utility.PropInterface;
 
@@ -14,7 +13,6 @@ public class SettingsProp extends SettingsBase {
 
     private JButton generatePropButton, exportPropButton;
     private JList propTypeList;
-    private JComboBox textureSizeCombo;
 
     public SettingsProp(AppWindow appWindow) {
         super(appWindow);
@@ -31,9 +29,6 @@ public class SettingsProp extends SettingsBase {
         propTypeList = addList(y, "Prop Type", getAnnotationClasses("com.klinksoftware.rag.prop", "prop", PropInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
-        textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 1);
-        y += (ROW_HEIGHT + ROW_GAP);
-
         exportPropButton = addButton(y, "Export Prop", BUTTON_EXPORT_PROP);
     }
 
@@ -43,8 +38,7 @@ public class SettingsProp extends SettingsBase {
             case BUTTON_GENERATE_PROP:
                 (new PropBuildWorker(
                         appWindow,
-                        (String) propTypeList.getModel().getElementAt(propTypeList.getSelectedIndex()),
-                        getIntFromStringCombo(textureSizeCombo)
+                        (String) propTypeList.getModel().getElementAt(propTypeList.getSelectedIndex())
                 )).execute();
                 return;
             case BUTTON_EXPORT_PROP:

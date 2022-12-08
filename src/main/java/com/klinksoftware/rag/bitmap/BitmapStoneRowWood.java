@@ -7,8 +7,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapStoneRowWood extends BitmapStoneRow {
 
-    public BitmapStoneRowWood(int textureSize) {
-        super(textureSize);
+    public BitmapStoneRowWood() {
+        super();
 
         hasNormal = true;
         hasMetallicRoughness = true;

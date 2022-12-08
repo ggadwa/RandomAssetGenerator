@@ -8,25 +8,13 @@ import javax.swing.*;
 public class MapBuildWorker extends SwingWorker<Integer,Void>
 {
     private AppWindow appWindow;
-    private int textureSize;
-    private float mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, tallRoom, sunkenRoom;
-    private boolean complex, skyBox;
     private String mapName;
 
     public static MapBase generatedMap = null;
 
-    public MapBuildWorker(AppWindow appWindow, String mapName, int textureSize, float mainFloorMapSize, float upperFloorMapSize, float lowerFloorMapSize, float mapCompact, float tallRoom, float sunkenRoom, boolean complex, boolean skyBox) {
+    public MapBuildWorker(AppWindow appWindow, String mapName) {
         this.appWindow = appWindow;
         this.mapName = mapName;
-        this.textureSize = textureSize;
-        this.mainFloorMapSize = mainFloorMapSize;
-        this.upperFloorMapSize = upperFloorMapSize;
-        this.lowerFloorMapSize = lowerFloorMapSize;
-        this.mapCompact = mapCompact;
-        this.tallRoom = tallRoom;
-        this.sunkenRoom = sunkenRoom;
-        this.complex = complex;
-        this.skyBox = skyBox;
     }
 
     @Override
@@ -45,7 +33,7 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
         // run the map builder
         try {
             map = (MapBase) (Class.forName("com.klinksoftware.rag.map.Map" + mapName.replace(" ", ""))).getConstructor().newInstance();
-            map.build(textureSize, mainFloorMapSize, upperFloorMapSize, lowerFloorMapSize, mapCompact, tallRoom, sunkenRoom, complex, skyBox);
+            map.build();
         } catch (Exception e) {
             e.printStackTrace();
             return (0);

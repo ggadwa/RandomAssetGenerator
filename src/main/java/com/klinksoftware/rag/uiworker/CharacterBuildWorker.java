@@ -7,17 +7,15 @@ import javax.swing.*;
 
 public class CharacterBuildWorker extends SwingWorker<Integer, Void> {
     private AppWindow appWindow;
-    private int textureSize;
     private String propName;
     private boolean bilateral, organic;
     private float roughness;
 
     public static CharacterBase generatedCharacter = null;
 
-    public CharacterBuildWorker(AppWindow appWindow, String propName, int textureSize, boolean bilateral, boolean organic, float roughness) {
+    public CharacterBuildWorker(AppWindow appWindow, String propName, boolean bilateral, boolean organic, float roughness) {
         this.appWindow = appWindow;
         this.propName = propName;
-        this.textureSize = textureSize;
         this.bilateral = bilateral;
         this.organic = organic;
         this.roughness = roughness;
@@ -39,7 +37,7 @@ public class CharacterBuildWorker extends SwingWorker<Integer, Void> {
         // run the prop builder
         try {
             character = (CharacterBase) (Class.forName("com.klinksoftware.rag.character.Character" + propName.replace(" ", ""))).getConstructor().newInstance();
-            character.build(textureSize, bilateral, organic, roughness);
+            character.build(bilateral, organic, roughness);
         } catch (Exception e) {
             e.printStackTrace();
             return (0);

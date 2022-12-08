@@ -75,14 +75,8 @@ public class SettingsBase extends JPanel {
     }
 
     protected JList addList(int y, String title, ArrayList<String> items, int selectedIndex) {
-        JLabel label;
         JScrollPane scroll;
         JList list;
-
-        label = new JLabel(title + ":");
-        label.setHorizontalAlignment(JLabel.RIGHT);
-        add(label);
-        label.setBounds(5, (y + 5), (FIELD_LEFT - 10), ROW_HEIGHT);
 
         list = new JList(items.toArray(new String[0]));
         list.setSelectedIndex(selectedIndex);
@@ -91,7 +85,7 @@ public class SettingsBase extends JPanel {
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         add(scroll);
-        scroll.setBounds(FIELD_LEFT, (y + 5), FIELD_SIZE, ROW_LIST_HEIGHT);
+        scroll.setBounds(5, (y + 5), (AppWindow.SETTING_WIDTH - 15), ROW_LIST_HEIGHT);
 
         return (list);
     }

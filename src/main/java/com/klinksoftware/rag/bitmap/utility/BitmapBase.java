@@ -19,6 +19,10 @@ import javax.imageio.ImageIO;
 
 public class BitmapBase
 {
+
+    public static final int DEFAULT_TEXTURE_SIZE = 1024;
+    public static final int DEFAULT_SKYBOX_TEXTURE_SIZE = 2048;
+
     public static final RagPoint NORMAL_CLEAR=new RagPoint(0.0f,0.0f,1.0f);
 
     public static final RagPoint NORMAL_LEFT_45=new RagPoint(-0.65f,0.02f,0.75f);
@@ -76,8 +80,8 @@ public class BitmapBase
     protected float[] colorData, normalData, metallicRoughnessData, emissiveData;
     protected float[] perlinNoiseColorFactor, noiseNormals, blurData;
 
-    public BitmapBase(int textureSize) {
-        this.textureSize = textureSize;
+    public BitmapBase() {
+        textureSize = DEFAULT_TEXTURE_SIZE;
 
         // will be reset in child classes
         hasNormal=true;

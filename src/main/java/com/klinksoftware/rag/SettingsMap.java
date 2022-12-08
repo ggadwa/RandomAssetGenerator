@@ -6,10 +6,7 @@ import com.klinksoftware.rag.map.utility.MapInterface;
 import com.klinksoftware.rag.uiworker.MapBuildWorker;
 import com.klinksoftware.rag.uiworker.MapExportWorker;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JList;
-import javax.swing.JSlider;
 
 public class SettingsMap extends SettingsBase {
 
@@ -22,9 +19,6 @@ public class SettingsMap extends SettingsBase {
 
     private JButton generateMapButton, exportMapButton;
     private JList mapTypeList;
-    private JComboBox textureSizeCombo;
-    private JSlider mainFloorSizeSlider, upperFloorSizeSlider, lowerFloorSizeSlider, compactSlider, tallRoomSlider, sunkenRoomSlider;
-    private JCheckBox complexCheckBox, skyBoxCheckBox;
 
     public SettingsMap(AppWindow appWindow) {
         super(appWindow);
@@ -41,33 +35,6 @@ public class SettingsMap extends SettingsBase {
         mapTypeList = addList(y, "Map Type", getAnnotationClasses("com.klinksoftware.rag.map", "map", MapInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
-        textureSizeCombo = addComboBox(y, "Texture Size", SettingsTexture.TEXTURE_SIZE, 1);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        mainFloorSizeSlider = addSlider(y, "Main Floor Size", 0.6f);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        upperFloorSizeSlider = addSlider(y, "Upper Floor Size", 0.2f);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        lowerFloorSizeSlider = addSlider(y, "Lower Floor Size", 0.2f);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        compactSlider = addSlider(y, "Compact", 0.6f);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        tallRoomSlider = addSlider(y, "Tall Room", 0.4f);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        sunkenRoomSlider = addSlider(y, "Sunken Room", 0.4f);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        complexCheckBox = addCheckBox(y, "Complex", true);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        skyBoxCheckBox = addCheckBox(y, "Sky Box", true);
-        y += (ROW_HEIGHT + ROW_GAP);
-
         exportMapButton = addButton(y, "Export Map", BUTTON_EXPORT_MAP);
     }
 
@@ -77,16 +44,7 @@ public class SettingsMap extends SettingsBase {
             case BUTTON_GENERATE_MAP:
                 (new MapBuildWorker(
                         appWindow,
-                        (String) mapTypeList.getModel().getElementAt(mapTypeList.getSelectedIndex()),
-                        getIntFromStringCombo(textureSizeCombo),
-                        ((float) mainFloorSizeSlider.getValue() / 100.0f),
-                        ((float) upperFloorSizeSlider.getValue() / 100.0f),
-                        ((float) lowerFloorSizeSlider.getValue() / 100.0f),
-                        ((float) compactSlider.getValue() / 100.0f),
-                        ((float) tallRoomSlider.getValue() / 100.0f),
-                        ((float) sunkenRoomSlider.getValue() / 100.0f),
-                        complexCheckBox.isSelected(),
-                        skyBoxCheckBox.isSelected()
+                        (String) mapTypeList.getModel().getElementAt(mapTypeList.getSelectedIndex())
                 )).execute();
                 return;
             case BUTTON_EXPORT_MAP:

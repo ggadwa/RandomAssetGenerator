@@ -1,33 +1,34 @@
 package com.klinksoftware.rag.map;
 
 import com.klinksoftware.rag.AppWindow;
-import com.klinksoftware.rag.map.utility.MapInterface;
 import com.klinksoftware.rag.map.utility.MapBase;
-import static com.klinksoftware.rag.map.utility.MapBase.FLOOR_HEIGHT;
 import static com.klinksoftware.rag.map.utility.MapBase.SEGMENT_SIZE;
+import com.klinksoftware.rag.map.utility.MapInterface;
 import com.klinksoftware.rag.map.utility.MapRoom;
 import com.klinksoftware.rag.utility.RagPoint;
 import java.util.ArrayList;
 
 @MapInterface
-public class MapOutdoor extends MapBase {
+public class MapIndoorComplexSingleFloor extends MapBase {
 
     private void buildRequiredBitmaps() {
         String[] wallBitmaps = {"BrickPattern", "BrickRow", "BrickRowWood", "Geometric", "Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StonePattern", "StoneRound", "StoneRow", "StoneRowWood", "Temple", "Tile", "WoodBoard"};
-        String[] outsideFloorBitmaps = {"Dirt", "Grass", "StonePattern"};
+        String[] insideFloorBitmaps = {"BrickPattern", "BrickRow", "Concrete", "Hexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "StonePattern", "WoodBoard"};
+        String[] ceilingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "StonePattern", "WoodBoard"};
         String[] skyBoxBitmaps = {"SkyBoxMountain"};
 
         scene.bitmapGroup.add("wall_main", wallBitmaps);
-        scene.bitmapGroup.add("floor", outsideFloorBitmaps);
+        scene.bitmapGroup.add("floor", insideFloorBitmaps);
+        scene.bitmapGroup.add("ceiling", ceilingBitmaps);
         scene.bitmapGroup.add("sky_box", skyBoxBitmaps);
     }
 
     @Override
     public RagPoint buildMeshes() {
         int mainFloorRoomCount, mainFloorRoomExtensionCount;
+        float mapCompactFactor;
         MapRoom room;
         ArrayList<MapRoom> rooms;
-        RagPoint centerPnt;
 
         // create the rooms
         rooms = new ArrayList<>();
@@ -35,9 +36,10 @@ public class MapOutdoor extends MapBase {
         // the main rooms and extensions
         mainFloorRoomCount = 20 + AppWindow.random.nextInt(20);
         mainFloorRoomExtensionCount = 1 + AppWindow.random.nextInt(mainFloorRoomCount / 10);
+        mapCompactFactor = 0.5f + AppWindow.random.nextFloat(0.2f);
 
-        // just one floor
-        addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, 1.0f, false);
+        // main floor
+        addMainFloor(rooms, mainFloorRoomCount, mainFloorRoomExtensionCount, mapCompactFactor, true);
 
         // eliminate all combined walls
         removeSharedWalls(rooms);
@@ -46,21 +48,14 @@ public class MapOutdoor extends MapBase {
         buildRequiredBitmaps();
 
         // now create the meshes
-        createRoomMeshes(rooms, false);
+        createRoomMeshes(rooms, true);
 
-        // any skybox
+        // skybox
         buildSkyBox();
 
-        // get center point
-        room = rooms.get(0);
-        centerPnt = new RagPoint(((float) (room.piece.sizeX / 2) * SEGMENT_SIZE), (SEGMENT_SIZE * 0.5f), ((float) (room.piece.sizeZ / 2) * SEGMENT_SIZE));
-
-        // outdoor maps randomization
-        scene.randomizeWallVertexesFromCenter(0.5f, (SEGMENT_SIZE / 3.0f), centerPnt);
-        scene.randomizeFloorVertexes(0.5f, FLOOR_HEIGHT);
-
         // return the center point
-        return (centerPnt);
+        room = rooms.get(0);
+        return (new RagPoint(((float) (room.piece.sizeX / 2) * SEGMENT_SIZE), (SEGMENT_SIZE * 0.5f), ((float) (room.piece.sizeZ / 2) * SEGMENT_SIZE)));
     }
 
 }

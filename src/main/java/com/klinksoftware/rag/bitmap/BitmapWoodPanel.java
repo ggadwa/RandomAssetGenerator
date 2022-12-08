@@ -8,8 +8,8 @@ import com.klinksoftware.rag.utility.*;
 @BitmapInterface
 public class BitmapWoodPanel extends BitmapBase
 {
-    public BitmapWoodPanel(int textureSize) {
-        super(textureSize);
+    public BitmapWoodPanel() {
+        super();
 
         hasNormal=true;
         hasMetallicRoughness=true;

@@ -14,8 +14,8 @@ public class BitmapMetalTread extends BitmapBase {
         {{{0.5f, 0.0f}, {0.5f, 1.0f}}, {{0.0f, 0.5f}, {1.0f, 0.5f}}, {{0.0f, 0.5f}, {1.0f, 0.5f}}, {{0.5f, 0.0f}, {0.5f, 1.0f}}} // pluses
     };
 
-    public BitmapMetalTread(int textureSize) {
-        super(textureSize);
+    public BitmapMetalTread() {
+        super();
 
         hasNormal = true;
         hasMetallicRoughness = true;
