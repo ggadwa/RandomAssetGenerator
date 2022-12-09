@@ -19,9 +19,9 @@ public class PropJunction extends PropBase {
         RagPoint rotAngle, centerPnt, pipePnt;
         Mesh mesh, mesh2;
 
-        scene.bitmapGroup.add("computer", new String[]{"Computer"});
-        scene.bitmapGroup.add("panel", new String[]{"Metal", "MetalPlank", "MetalPlate"});
-        scene.bitmapGroup.add("pipe", new String[]{"Pipe"});
+        scene.bitmapGroup.add("computer", new String[]{"BitmapComputer"});
+        scene.bitmapGroup.add("panel", new String[]{"BitmapMetal", "BitmapMetalPlank", "BitmapMetalPlate"});
+        scene.bitmapGroup.add("pipe", new String[]{"BitmapPipe"});
 
         // sizes
         junctionWidth = MapBase.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f));

@@ -23,9 +23,9 @@ public class PropTube extends PropBase {
         RagPoint centerPnt;
         Mesh mesh, mesh2;
 
-        scene.bitmapGroup.add("accessory", new String[]{"Metal", "WoodPanel"});
-        scene.bitmapGroup.add("glass", new String[]{"Glass"});
-        scene.bitmapGroup.add("liquid", new String[]{"Liquid"});
+        scene.bitmapGroup.add("accessory", new String[]{"BitmapMetal", "BitmapWoodPanel"});
+        scene.bitmapGroup.add("glass", new String[]{"BitmapGlass"});
+        scene.bitmapGroup.add("liquid", new String[]{"BitmapLiquid"});
 
         tubeCapRadius = (MapBase.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f))) * 0.5f;
         tubeRadius = tubeCapRadius * (0.7f + AppWindow.random.nextFloat(0.2f));

@@ -18,7 +18,7 @@ public class SettingsMap extends SettingsBase {
     private static final String[] MAP_TYPE = {"Indoor", "Outdoor"};
 
     private JButton generateMapButton, exportMapButton;
-    private JList mapTypeList;
+    private JList<String> mapTypeList;
 
     public SettingsMap(AppWindow appWindow) {
         super(appWindow);
@@ -32,7 +32,7 @@ public class SettingsMap extends SettingsBase {
         generateMapButton = addButton(y, "Generate Map", BUTTON_GENERATE_MAP);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        mapTypeList = addList(y, "Map Type", getAnnotationClasses("com.klinksoftware.rag.map", "map", MapInterface.class), 0);
+        mapTypeList = addList(y, "Map Type", getAnnotationClasses("com.klinksoftware.rag.map", "Map", MapInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         exportMapButton = addButton(y, "Export Map", BUTTON_EXPORT_MAP);
@@ -44,7 +44,7 @@ public class SettingsMap extends SettingsBase {
             case BUTTON_GENERATE_MAP:
                 (new MapBuildWorker(
                         appWindow,
-                        (String) mapTypeList.getModel().getElementAt(mapTypeList.getSelectedIndex())
+                        demangleDisplayNameForClass(mapTypeList, "Map")
                 )).execute();
                 return;
             case BUTTON_EXPORT_MAP:

@@ -29,7 +29,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         seed = Calendar.getInstance().getTimeInMillis();
         //seed = 1663272043095L;
         AppWindow.random.setSeed(seed);
-        System.out.println("seed=" + seed);
+        //System.out.println("seed=" + seed);
 
         scene = new Scene();
         scene.bitmapGroup.add("bitmap", bitmapName);

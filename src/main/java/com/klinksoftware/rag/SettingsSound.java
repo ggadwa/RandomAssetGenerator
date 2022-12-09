@@ -14,7 +14,7 @@ public class SettingsSound extends SettingsBase {
     private static final String[] SOUND_ITEMS = {"Alien", "Bang", "Explosion", "Monster"};
 
     private JButton generateSoundButton, exportSoundButton;
-    private JList soundTypeList;
+    private JList<String> soundTypeList;
 
     public SettingsSound(AppWindow appWindow) {
         super(appWindow);
@@ -28,7 +28,7 @@ public class SettingsSound extends SettingsBase {
         generateSoundButton = addButton(y, "Generate Sound", BUTTON_GENERATE_SOUND);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        soundTypeList = addList(y, "Sound Type", getAnnotationClasses("com.klinksoftware.rag.sound", "sound", SoundInterface.class), 0);
+        soundTypeList = addList(y, "Sound Type", getAnnotationClasses("com.klinksoftware.rag.sound", "Sound", SoundInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         exportSoundButton = addButton(y, "Export Sound", BUTTON_EXPORT_SOUND);
@@ -38,7 +38,10 @@ public class SettingsSound extends SettingsBase {
     public void buttonClick(int id) {
         switch (id) {
             case BUTTON_GENERATE_SOUND:
-                (new SoundBuildWorker(appWindow, (String) soundTypeList.getModel().getElementAt(soundTypeList.getSelectedIndex()))).execute();
+                (new SoundBuildWorker(
+                        appWindow,
+                        demangleDisplayNameForClass(soundTypeList, "Sound")
+                )).execute();
                 return;
             case BUTTON_EXPORT_SOUND:
                 (new SoundExportWorker(appWindow)).execute();

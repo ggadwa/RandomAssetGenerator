@@ -12,7 +12,7 @@ public class SettingsProp extends SettingsBase {
     private static final int BUTTON_EXPORT_PROP = 1;
 
     private JButton generatePropButton, exportPropButton;
-    private JList propTypeList;
+    private JList<String> propTypeList;
 
     public SettingsProp(AppWindow appWindow) {
         super(appWindow);
@@ -26,7 +26,7 @@ public class SettingsProp extends SettingsBase {
         generatePropButton = addButton(y, "Generate Prop", BUTTON_GENERATE_PROP);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        propTypeList = addList(y, "Prop Type", getAnnotationClasses("com.klinksoftware.rag.prop", "prop", PropInterface.class), 0);
+        propTypeList = addList(y, "Prop Type", getAnnotationClasses("com.klinksoftware.rag.prop", "Prop", PropInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         exportPropButton = addButton(y, "Export Prop", BUTTON_EXPORT_PROP);
@@ -38,7 +38,7 @@ public class SettingsProp extends SettingsBase {
             case BUTTON_GENERATE_PROP:
                 (new PropBuildWorker(
                         appWindow,
-                        (String) propTypeList.getModel().getElementAt(propTypeList.getSelectedIndex())
+                        demangleDisplayNameForClass(propTypeList, "Prop")
                 )).execute();
                 return;
             case BUTTON_EXPORT_PROP:

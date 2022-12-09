@@ -32,8 +32,8 @@ public class PropPillar extends PropBase {
         RagPoint centerPnt;
         Mesh mesh, mesh2;
 
-        scene.bitmapGroup.add("pillar", new String[]{"BrickPattern", "BrickRow", "Metal", "Mosaic", "Temple", "Tile"});
-        scene.bitmapGroup.add("cap", new String[]{"BrickPattern", "BrickRow", "Metal", "Mosaic", "Temple", "Tile"});
+        scene.bitmapGroup.add("pillar", new String[]{"BitmapBrickPattern", "BitmapBrickRow", "BitmapMetal", "BitmapMosaic", "BitmapTemple", "BitmapTile"});
+        scene.bitmapGroup.add("cap", new String[]{"BitmapBrickPattern", "BitmapBrickRow", "BitmapMetal", "BitmapMosaic", "BitmapTemple", "BitmapTile"});
 
         columnSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];
         baseTopSideCount = COLUMN_SIDE_COUNTS[AppWindow.random.nextInt(3)];

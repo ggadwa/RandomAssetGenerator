@@ -27,11 +27,11 @@ public class PropBuildWorker extends SwingWorker<Integer, Void> {
         seed = Calendar.getInstance().getTimeInMillis();
         //seed = 1663387204703L;
         AppWindow.random.setSeed(seed);
-        System.out.println("seed=" + seed);
+        //System.out.println("seed=" + seed);
 
         // run the prop builder
         try {
-            prop = (PropBase) (Class.forName("com.klinksoftware.rag.prop.Prop" + propName.replace(" ", ""))).getConstructor().newInstance();
+            prop = (PropBase) (Class.forName("com.klinksoftware.rag.prop." + propName.replace(" ", ""))).getConstructor().newInstance();
             prop.build();
         } catch (Exception e) {
             e.printStackTrace();

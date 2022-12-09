@@ -55,10 +55,10 @@ public class PropComputerBank extends PropBase {
         float computerWidth;
         float pedestalWidth, pedestalHeight;
 
-        scene.bitmapGroup.add("computer", new String[]{"Computer"});
-        scene.bitmapGroup.add("panel", new String[]{"Metal"});
-        scene.bitmapGroup.add("spacer", new String[]{"Metal", "MetalPlank", "MetalPlate"});
-        scene.bitmapGroup.add("pedestal", new String[]{"Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "WoodPanel"});
+        scene.bitmapGroup.add("computer", new String[]{"BitmapComputer"});
+        scene.bitmapGroup.add("panel", new String[]{"BitmapMetal"});
+        scene.bitmapGroup.add("spacer", new String[]{"BitmapMetal", "BitmapMetalPlank", "BitmapMetalPlate"});
+        scene.bitmapGroup.add("pedestal", new String[]{"BitmapHexagon", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapMosaic", "BitmapWoodPanel"});
 
         // computer size
         computerWidth = MapBase.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.3f));

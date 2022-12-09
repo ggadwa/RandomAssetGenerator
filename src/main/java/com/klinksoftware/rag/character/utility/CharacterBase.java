@@ -9,17 +9,12 @@ import com.klinksoftware.rag.utility.RagPoint;
 import java.util.ArrayList;
 
 public class CharacterBase {
-
     public Scene scene;
-
-    public boolean bilateral;
-    public boolean organic;
-    public float roughness;
 
     // limb wrapping (for humanoid, etc models)
     // builds a mesh around two nodes and adds the mesh to first node of limb
     // we remember the nodes here to help attach joints and weights later
-    public void wrapLimbs(ArrayList<Limb> limbs) {
+    public void wrapLimbs(ArrayList<Limb> limbs, boolean organic) {
         Mesh mesh;
 
         for (Limb limb : limbs) {
@@ -73,11 +68,7 @@ public class CharacterBase {
     // build a model
     // note: models are build with absolute vertexes, but unlike maps,
     // we leave the vertexes absolute and just attach them to
-    public void build(boolean bilateral, boolean organic, float roughness) {
-        this.bilateral = bilateral;
-        this.organic = organic;
-        this.roughness = roughness;
-
+    public void build() {
         scene = new Scene();
         scene.skinned = true;
 

@@ -31,7 +31,7 @@ public class PropTable extends PropBase {
         float tableXMin, tableXMax, tableZMin, tableZMax;
         Mesh mesh;
 
-        scene.bitmapGroup.add("table", new String[]{"Metal", "MetalPlank", "WoodPanel"});
+        scene.bitmapGroup.add("table", new String[]{"BitmapMetal", "BitmapMetalPlank", "BitmapWoodPanel"});
 
         tableHeight = MapBase.SEGMENT_SIZE * (0.2f + AppWindow.random.nextFloat(0.15f));
         tableLegWidth = MapBase.SEGMENT_SIZE * (0.03f + AppWindow.random.nextFloat(0.05f));

@@ -28,10 +28,10 @@ public class SoundBuildWorker extends SwingWorker<Integer, Void> {
         seed = Calendar.getInstance().getTimeInMillis();
         //seed=1662954358313L;
         AppWindow.random.setSeed(seed);
-        System.out.println("seed=" + seed);
+        //System.out.println("seed=" + seed);
 
         try {
-            sound = (SoundBase) (Class.forName("com.klinksoftware.rag.sound.Sound" + soundName.replace(" ", ""))).getConstructor().newInstance();
+            sound = (SoundBase) (Class.forName("com.klinksoftware.rag.sound." + soundName.replace(" ", ""))).getConstructor().newInstance();
             sound.generate();
         } catch (Exception e) {
             e.printStackTrace();

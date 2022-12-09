@@ -28,11 +28,11 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
         seed = Calendar.getInstance().getTimeInMillis();
         //seed = 1663256041086L;
         AppWindow.random.setSeed(seed);
-        System.out.println("seed=" + seed);
+        //System.out.println("seed=" + seed);
 
         // run the map builder
         try {
-            map = (MapBase) (Class.forName("com.klinksoftware.rag.map.Map" + mapName.replace(" ", ""))).getConstructor().newInstance();
+            map = (MapBase) (Class.forName("com.klinksoftware.rag.map." + mapName.replace(" ", ""))).getConstructor().newInstance();
             map.build();
         } catch (Exception e) {
             e.printStackTrace();

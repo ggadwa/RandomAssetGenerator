@@ -89,7 +89,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
             rangeY[(wid - 1) - x] = y;
 
             if (midCount <= 0) {
-                midCount = AppWindow.random.nextInt(textureSize / 20);
+                midCount = AppWindow.random.nextInt(textureSize / 100);
                 midDir = (y > midY) ? -1 : 1;
             }
 

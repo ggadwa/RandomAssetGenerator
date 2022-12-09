@@ -25,7 +25,7 @@ public class PropBarrel extends PropBase {
         RagPoint centerPnt;
         Mesh mesh;
 
-        scene.bitmapGroup.add("barrel", new String[]{"Metal"});
+        scene.bitmapGroup.add("barrel", new String[]{"BitmapMetal"});
 
         barrelSectionRadius = (MapBase.SEGMENT_SIZE * (0.2f + AppWindow.random.nextFloat(0.2f))) * 0.5f;
         barrelRingRadius = barrelSectionRadius + (MapBase.SEGMENT_SIZE * 0.02f);

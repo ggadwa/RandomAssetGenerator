@@ -9,7 +9,7 @@ import com.klinksoftware.rag.utility.RagPoint;
 import com.klinksoftware.rag.prop.utility.PropInterface;
 
 @PropInterface
-public class PropPC extends PropBase {
+public class PropComputerDesktop extends PropBase {
 
     private Mesh deskMesh, standMesh, drawerMesh;
 
@@ -78,8 +78,8 @@ public class PropPC extends PropBase {
         float standWid, standHalfWid, standHigh;
         RagPoint rotAngle;
 
-        scene.bitmapGroup.add("monitor", new String[]{"Monitor"});
-        scene.bitmapGroup.add("case", new String[]{"Metal", "MetalPlank"});
+        scene.bitmapGroup.add("monitor", new String[]{"BitmapMonitor"});
+        scene.bitmapGroup.add("case", new String[]{"BitmapMetal", "BitmapMetalPlank"});
 
         // monitor
         standWid = MapBase.SEGMENT_SIZE * (0.051f + AppWindow.random.nextFloat(0.05f));

@@ -79,9 +79,9 @@ public class PropDesk extends PropBase {
         float deskHalfLength, deskHalfDepth;
         boolean square, cross1, cross2, cross3;
 
-        scene.bitmapGroup.add("desk", new String[]{"Metal", "MetalPlank", "WoodPanel"});
-        scene.bitmapGroup.add("stand", new String[]{"Metal", "MetalPlank", "WoodPanel"});
-        scene.bitmapGroup.add("drawer", new String[]{"Metal", "WoodPanel"});
+        scene.bitmapGroup.add("desk", new String[]{"BitmapMetal", "BitmapMetalPlank", "BitmapWoodPanel"});
+        scene.bitmapGroup.add("stand", new String[]{"BitmapMetal", "BitmapMetalPlank", "BitmapWoodPanel"});
+        scene.bitmapGroup.add("drawer", new String[]{"BitmapMetal", "BitmapWoodPanel"});
 
         // sizes
         deskLength = MapBase.SEGMENT_SIZE * (0.6f + AppWindow.random.nextFloat(0.4f));

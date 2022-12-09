@@ -20,13 +20,13 @@ public class BitmapGroup {
 
     public void add(String name, String[] classNames) {
         if (!bitmapList.containsKey(name)) {
-            bitmapList.put(name, ("com.klinksoftware.rag.bitmap.Bitmap" + classNames[AppWindow.random.nextInt(classNames.length)].replace(" ", "")));
+            bitmapList.put(name, ("com.klinksoftware.rag.bitmap." + classNames[AppWindow.random.nextInt(classNames.length)].replace(" ", "")));
         }
     }
 
     public void add(String name, String bitmapName) {
         if (!bitmapList.containsKey(name)) {
-            bitmapList.put(name, ("com.klinksoftware.rag.bitmap.Bitmap" + bitmapName.replace(" ", "")));
+            bitmapList.put(name, ("com.klinksoftware.rag.bitmap." + bitmapName.replace(" ", "")));
         }
     }
 

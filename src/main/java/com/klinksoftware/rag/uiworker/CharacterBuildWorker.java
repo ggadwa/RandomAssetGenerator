@@ -7,18 +7,13 @@ import javax.swing.*;
 
 public class CharacterBuildWorker extends SwingWorker<Integer, Void> {
     private AppWindow appWindow;
-    private String propName;
-    private boolean bilateral, organic;
-    private float roughness;
+    private String characterName;
 
     public static CharacterBase generatedCharacter = null;
 
-    public CharacterBuildWorker(AppWindow appWindow, String propName, boolean bilateral, boolean organic, float roughness) {
+    public CharacterBuildWorker(AppWindow appWindow, String characterName) {
         this.appWindow = appWindow;
-        this.propName = propName;
-        this.bilateral = bilateral;
-        this.organic = organic;
-        this.roughness = roughness;
+        this.characterName = characterName;
     }
 
     @Override
@@ -32,12 +27,12 @@ public class CharacterBuildWorker extends SwingWorker<Integer, Void> {
         seed = Calendar.getInstance().getTimeInMillis();
         //seed = 1663387204703L;
         AppWindow.random.setSeed(seed);
-        System.out.println("seed=" + seed);
+        //System.out.println("seed=" + seed);
 
-        // run the prop builder
+        // run the character builder
         try {
-            character = (CharacterBase) (Class.forName("com.klinksoftware.rag.character.Character" + propName.replace(" ", ""))).getConstructor().newInstance();
-            character.build(bilateral, organic, roughness);
+            character = (CharacterBase) (Class.forName("com.klinksoftware.rag.character." + characterName.replace(" ", ""))).getConstructor().newInstance();
+            character.build();
         } catch (Exception e) {
             e.printStackTrace();
             return (0);

@@ -2,9 +2,7 @@ package com.klinksoftware.rag;
 
 import com.klinksoftware.rag.character.utility.CharacterInterface;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JList;
-import javax.swing.JSlider;
 import com.klinksoftware.rag.uiworker.CharacterBuildWorker;
 import com.klinksoftware.rag.uiworker.CharacterExportWorker;
 
@@ -14,9 +12,7 @@ public class SettingsCharacter extends SettingsBase {
     private static final int BUTTON_EXPORT_CHARACTER = 1;
 
     private JButton generateCharacterButton, exportCharacterButton;
-    private JList characterTypeList;
-    private JSlider roughnessSlider;
-    private JCheckBox bilateralCheckBox, organicCheckBox;
+    private JList<String> characterTypeList;
 
     public SettingsCharacter(AppWindow appWindow) {
         super(appWindow);
@@ -30,17 +26,8 @@ public class SettingsCharacter extends SettingsBase {
         generateCharacterButton = addButton(y, "Generate Character", BUTTON_GENERATE_CHARACTER);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        characterTypeList = addList(y, "Character Type", getAnnotationClasses("com.klinksoftware.rag.character", "character", CharacterInterface.class), 0);
+        characterTypeList = addList(y, "Character Type", getAnnotationClasses("com.klinksoftware.rag.character", "Character", CharacterInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
-
-        bilateralCheckBox = addCheckBox(y, "Bilateral", true);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        organicCheckBox = addCheckBox(y, "Organic", true);
-        y += (ROW_HEIGHT + ROW_GAP);
-
-        roughnessSlider = addSlider(y, "Roughness", 0.2f);
-        y += (ROW_HEIGHT + ROW_GAP);
 
         exportCharacterButton = addButton(y, "Export Character", BUTTON_EXPORT_CHARACTER);
     }
@@ -51,10 +38,7 @@ public class SettingsCharacter extends SettingsBase {
             case BUTTON_GENERATE_CHARACTER:
                 (new CharacterBuildWorker(
                         appWindow,
-                        (String) characterTypeList.getModel().getElementAt(characterTypeList.getSelectedIndex()),
-                        bilateralCheckBox.isSelected(),
-                        organicCheckBox.isSelected(),
-                        ((float) roughnessSlider.getValue() / 100.0f)
+                        demangleDisplayNameForClass(characterTypeList, "Character")
                 )).execute();
                 return;
             case BUTTON_EXPORT_CHARACTER:

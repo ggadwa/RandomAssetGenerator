@@ -53,8 +53,8 @@ public class PropShelf extends PropBase {
         boolean hasBack;
         Mesh shelfMesh, boxMesh, mesh2;
 
-        scene.bitmapGroup.add("shelf", new String[]{"Metal", "MetalPlank", "WoodPanel"});
-        scene.bitmapGroup.add("box", new String[]{"Storage"});
+        scene.bitmapGroup.add("shelf", new String[]{"BitmapMetal", "BitmapMetalPlank", "BitmapWoodPanel"});
+        scene.bitmapGroup.add("box", new String[]{"BitmapStorage"});
 
         shelfHeight = MapBase.SEGMENT_SIZE * (0.3f + AppWindow.random.nextFloat(0.35f));
         shelfLegWidth = MapBase.SEGMENT_SIZE * (0.03f + AppWindow.random.nextFloat(0.05f));

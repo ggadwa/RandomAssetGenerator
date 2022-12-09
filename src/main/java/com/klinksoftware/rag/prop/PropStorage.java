@@ -18,7 +18,7 @@ public class PropStorage extends PropBase {
         RagPoint rotAngle;
         Mesh mesh, mesh2;
 
-        scene.bitmapGroup.add("box", new String[]{"Storage"});
+        scene.bitmapGroup.add("box", new String[]{"BitmapStorage"});
 
         // box size
         boxSize = (MapBase.SEGMENT_SIZE * 0.2f) + (AppWindow.random.nextFloat() * (MapBase.SEGMENT_SIZE * 0.2f));

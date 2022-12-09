@@ -12,13 +12,13 @@ import java.util.ArrayList;
 public class MapIndoorSimpleMultiFloor extends MapBase {
 
     private void buildRequiredBitmaps() {
-        String[] wallBitmaps = {"BrickPattern", "BrickRow", "BrickRowWood", "Geometric", "Hexagon", "MetalPlank", "MetalPlate", "Mosaic", "Organic", "Plaster", "RockCracked", "StonePattern", "StoneRound", "StoneRow", "StoneRowWood", "Temple", "Tile", "WoodBoard"};
-        String[] insideFloorBitmaps = {"BrickPattern", "BrickRow", "Concrete", "Hexagon", "MetalPlank", "MetalTread", "Mosaic", "Tile", "StonePattern", "WoodBoard"};
-        String[] ceilingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "Mosaic", "Plaster", "Tile", "StonePattern", "WoodBoard"};
-        String[] platformBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "StonePattern", "WoodBoard"};
-        String[] railingBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "StonePattern", "WoodBoard"};
-        String[] stairBitmaps = {"BrickPattern", "BrickRow", "Concrete", "MetalPlank", "MetalPlate", "StonePattern", "WoodBoard"};
-        String[] skyBoxBitmaps = {"SkyBoxMountain"};
+        String[] wallBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapBrickRowWood", "BitmapGeometric", "BitmapHexagon", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapMosaic", "BitmapOrganic", "BitmapPlaster", "BitmapRockCracked", "BitmapStonePattern", "BitmapStoneRound", "BitmapStoneRow", "BitmapStoneRowWood", "BitmapTemple", "BitmapTile", "BitmapWoodBoard"};
+        String[] insideFloorBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapHexagon", "BitmapMetalPlank", "BitmapMetalTread", "BitmapMosaic", "BitmapTile", "BitmapStonePattern", "BitmapWoodBoard"};
+        String[] ceilingBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapMosaic", "BitmapPlaster", "BitmapTile", "BitmapStonePattern", "BitmapWoodBoard"};
+        String[] platformBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapStonePattern", "BitmapWoodBoard"};
+        String[] railingBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapStonePattern", "BitmapWoodBoard"};
+        String[] stairBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapStonePattern", "BitmapWoodBoard"};
+        String[] skyBoxBitmaps = {"BitmapSkyBoxMountain"};
 
         scene.bitmapGroup.add("wall_main", wallBitmaps);
         scene.bitmapGroup.add("wall_upper", wallBitmaps);

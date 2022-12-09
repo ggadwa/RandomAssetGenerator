@@ -15,7 +15,7 @@ public class SettingsTexture extends SettingsBase {
     public static final String[] TEXTURE_SIZE = {"512", "1024", "2048", "4096"};
 
     private JButton generateTextureButton, exportTextureButton;
-    private JList textureTypeList;
+    private JList<String> textureTypeList;
 
     public SettingsTexture(AppWindow appWindow) {
         super(appWindow);
@@ -29,7 +29,7 @@ public class SettingsTexture extends SettingsBase {
         generateTextureButton = addButton(y, "Generate Texture", BUTTON_GENERATE_TEXTURE);
         y += (ROW_HEIGHT + ROW_GAP);
 
-        textureTypeList = addList(y, "Texture Type", getAnnotationClasses("com.klinksoftware.rag.bitmap", "bitmap", BitmapInterface.class), 0);
+        textureTypeList = addList(y, "Texture Type", getAnnotationClasses("com.klinksoftware.rag.bitmap", "Bitmap", BitmapInterface.class), 0);
         y += (ROW_LIST_HEIGHT + ROW_GAP);
 
         exportTextureButton = addButton(y, "Export Texture", BUTTON_EXPORT_TEXTURE);
@@ -41,7 +41,7 @@ public class SettingsTexture extends SettingsBase {
             case BUTTON_GENERATE_TEXTURE:
                 (new BitmapBuildWorker(
                         appWindow,
-                        (String) textureTypeList.getModel().getElementAt(textureTypeList.getSelectedIndex())
+                        demangleDisplayNameForClass(textureTypeList, "Bitmap")
                 )).execute();
                 return;
             case BUTTON_EXPORT_TEXTURE:
