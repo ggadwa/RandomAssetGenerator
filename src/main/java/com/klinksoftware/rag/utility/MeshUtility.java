@@ -984,7 +984,7 @@ public class MeshUtility {
                 break;
         }
 
-        centerPnt = new RagPoint(((x + x2) * 0.5f), ((y + y2) * 0.5f), ((z + z2) * 0.5f));
+        centerPnt = new RagPoint(((x + x2) * 0.5f), y, ((z + z2) * 0.5f));
 
         // create the mesh
         vertexes = MeshUtility.floatArrayListToFloat(vertexArray);

@@ -90,7 +90,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
 
             if (midCount <= 0) {
                 midCount = AppWindow.random.nextInt(textureSize / 100);
-                midDir = (y > midY) ? -1 : 1;
+                midDir = AppWindow.random.nextBoolean() ? -1 : 1;
             }
 
             y += (AppWindow.random.nextInt(rangeVerticalMove) * midDir);
@@ -210,7 +210,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         colorAdjust = 1.0f - colorAdjustSize;
 
         for (n = 0; n != mountainCount; n++) {
-            generateMountainsDraw(0, (qtr + (qtr / 4)), (qtr * 4), (qtr * 2), ((textureSize / 500) + AppWindow.random.nextInt(textureSize / 170)), (n == (mountainCount - 1)), mountainColor, colorAdjust);
+            generateMountainsDraw(0, (qtr + (qtr / 4)), (qtr * 4), (qtr * 2), (1 + AppWindow.random.nextInt(textureSize / 400)), true, mountainColor, colorAdjust);
             colorAdjust += colorAdjustAdd;
         }
 

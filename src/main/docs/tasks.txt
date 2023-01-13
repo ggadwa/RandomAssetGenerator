@@ -1,15 +1,13 @@
 
 
+- window build
 
-
-- skybox is awful at 4096
-
+- skybox is awful at 4096 
+  - use floats for mountains so not as sharp
 
 
 map
  - underground (mostly hallways and then randomize)
- - stop getting caught on walls
- - going up ramps is sometimes broken
  - open ceiling
  - windows
  - skybox has bad uv (lines)
@@ -19,7 +17,8 @@ bitmaps
  - computer access panels have handles?
 
 characters
- - half globes for parts of body
+ - body is two globes and cylinder
+ - animal heads at end of neck (heads stick out front not equal sides)
  - skeletons can build two heads
  - faces by meshes
  - need meshscale for each end of limb

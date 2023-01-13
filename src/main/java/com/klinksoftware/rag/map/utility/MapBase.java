@@ -16,6 +16,8 @@ public class MapBase {
     public static final float SEGMENT_SIZE = 10.0f;
     public static final float FLOOR_HEIGHT = 1.0f;
     public static final float SUNKEN_HEIGHT = 3.0f;
+    public static final float ROOM_WINDOW_BLOCK_DISTANCE = 20.0f;
+    public static final float ROOM_WINDOW_CHANCE = 0.1f;
 
     public static final int FC_MARK_EMPTY = 0;
     public static final int FC_MARK_FILL_INSIDE = 1;
@@ -91,6 +93,111 @@ public class MapBase {
 
                     vIdx++;
                 }
+            }
+        }
+    }
+
+    // add windows
+    protected void removeWindowSegments(ArrayList<MapRoom> rooms) {
+        int n, k, roomCount, vIdx;
+        int nextIdx, vertexCount, direction;
+        float x, z, x2, z2, lx, rx, tz, bz;
+        boolean blocked;
+        MapRoom room, checkRoom;
+
+        // run through rooms and look at the walls, any wall
+        // that doesn't look directly into another room can
+        // be a window
+        roomCount = rooms.size();
+
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+            vertexCount = room.piece.wallLines.length;
+
+            vIdx = 0;
+
+            while (vIdx < vertexCount) {
+                nextIdx = vIdx + 1;
+                if (nextIdx == vertexCount) {
+                    nextIdx = 0;
+                }
+
+                // the wall
+                x = room.x + room.piece.wallLines[vIdx][0];
+                z = room.z + room.piece.wallLines[vIdx][1];
+                x2 = room.x + room.piece.wallLines[nextIdx][0];
+                z2 = room.z + room.piece.wallLines[nextIdx][1];
+
+                // the view box
+                if (x == x2) {
+                    direction = MapWindow.WINDOW_DIR_X;
+                    if (x < ((x + x2) * 0.5f)) {
+                        lx = x - ROOM_WINDOW_BLOCK_DISTANCE;
+                        rx = x;
+                    } else {
+                        lx = x;
+                        rx = x + ROOM_WINDOW_BLOCK_DISTANCE;
+                    }
+                    if (z < z2) {
+                        tz = z;
+                        bz = z2;
+                    } else {
+                        tz = z2;
+                        bz = z;
+                    }
+                } else {
+                    direction = MapWindow.WINDOW_DIR_Z;
+                    if (z < ((z + z2) * 0.5f)) {
+                        tz = z - ROOM_WINDOW_BLOCK_DISTANCE;
+                        bz = z;
+                    } else {
+                        tz = z;
+                        bz = z + ROOM_WINDOW_BLOCK_DISTANCE;
+                    }
+                    if (x < x2) {
+                        lx = x;
+                        rx = x2;
+                    } else {
+                        lx = x2;
+                        rx = x;
+                    }
+                }
+
+                // is our view blocked by another room?
+                blocked = false;
+
+                for (k = 0; k != rooms.size(); k++) {
+                    if (k == n) {
+                        continue;
+                    }
+
+                    checkRoom = rooms.get(k);
+                    if (lx >= (checkRoom.x + checkRoom.piece.sizeX)) {
+                        continue;
+                    }
+                    if (rx <= checkRoom.x) {
+                        continue;
+                    }
+                    if (tz >= (checkRoom.z + checkRoom.piece.sizeZ)) {
+                        continue;
+                    }
+                    if (bz <= checkRoom.z) {
+                        continue;
+                    }
+
+                    blocked = true;
+                    break;
+                }
+
+                // we are a candidate for a window
+                if (!blocked) {
+                    if (AppWindow.random.nextFloat() < ROOM_WINDOW_CHANCE) {
+                        room.hideWall(vIdx);
+                        room.addWindow(lx, tz, direction);
+                    }
+                }
+
+                vIdx++;
             }
         }
     }
@@ -552,6 +659,22 @@ public class MapBase {
             }
             if (room.story == MapRoom.ROOM_STORY_LOWER_EXTENSION) {
                 mapPlatform.build(room, n, false);
+            }
+        }
+    }
+
+    // room windows
+    protected void buildWindows(ArrayList<MapRoom> rooms) {
+        int n, roomCount;
+        MapRoom room;
+
+        roomCount = rooms.size();
+
+        for (n = 0; n != roomCount; n++) {
+            room = rooms.get(n);
+
+            for (MapWindow window : room.windows) {
+                window.build(room, n);
             }
         }
     }

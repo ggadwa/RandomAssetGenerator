@@ -44,6 +44,9 @@ public class MapIndoorComplexSingleFloor extends MapBase {
         // eliminate all combined walls
         removeSharedWalls(rooms);
 
+        // remove segments for windows
+        removeWindowSegments(rooms);
+
         // required textures for map
         buildRequiredBitmaps();
 

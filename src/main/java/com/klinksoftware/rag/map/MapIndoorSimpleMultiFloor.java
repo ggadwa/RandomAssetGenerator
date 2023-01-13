@@ -75,9 +75,10 @@ public class MapIndoorSimpleMultiFloor extends MapBase {
         // skybox
         buildSkyBox();
 
-        // steps and platforms
+        // steps, platforms, windows
         buildSteps(rooms);
         buildPlatforms(rooms);
+        buildWindows(rooms);
 
         // return the center point
         room = rooms.get(0);

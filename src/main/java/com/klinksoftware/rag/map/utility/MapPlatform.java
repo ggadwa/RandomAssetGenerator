@@ -356,6 +356,10 @@ public class MapPlatform {
             }
         }
 
+        if (vertexArray.isEmpty()) {
+            return;
+        }
+
         vertexes = MeshUtility.floatArrayListToFloat(vertexArray);
         normals = MeshUtility.floatArrayListToFloat(normalArray);
         indexes = MeshUtility.intArrayListToInt(indexArray);

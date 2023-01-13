@@ -26,9 +26,8 @@ public class MapBuildWorker extends SwingWorker<Integer,Void>
 
         // set the seed for map
         seed = Calendar.getInstance().getTimeInMillis();
-        //seed = 1663256041086L;
+        //seed = 1673639078033L;
         AppWindow.random.setSeed(seed);
-        //System.out.println("seed=" + seed);
 
         // run the map builder
         try {

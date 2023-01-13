@@ -68,6 +68,9 @@ public class MapIndoorComplexMultiFloor extends MapBase {
         // eliminate all combined walls
         removeSharedWalls(rooms);
 
+        // remove segments for windows
+        removeWindowSegments(rooms);
+
         // required textures for map
         buildRequiredBitmaps();
 
@@ -77,9 +80,10 @@ public class MapIndoorComplexMultiFloor extends MapBase {
         // skybox
         buildSkyBox();
 
-        // steps and platforms
+        // steps, platforms, windows
         buildSteps(rooms);
         buildPlatforms(rooms);
+        buildWindows(rooms);
 
         // return the center point
         room = rooms.get(0);

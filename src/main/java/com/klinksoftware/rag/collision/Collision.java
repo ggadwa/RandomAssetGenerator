@@ -9,13 +9,15 @@ import java.util.ArrayList;
 
 public class Collision {
 
-    private static final float COLLISION_WIDTH = 1.4f;
+    private static final float COLLISION_WIDTH = 1.6f;
+    private static final float COLLISION_HEIGHT = 5.0f;
+    private static final float COLLISION_HEIGHT_COUNT = 8;
 
     private ArrayList<CollisionTrig> wallTrigs;
     private ArrayList<CollisionTrig> floorTrigs;
     private ArrayList<RagPoint> wallCollideSpokeVcts;
 
-    private RagPoint slidePnt, fallPnt, fallVct, hitPnt;
+    private RagPoint slidePnt, highPnt, fallPnt, fallVct, hitPnt;
 
     public Collision() {
         int ang;
@@ -36,6 +38,7 @@ public class Collision {
 
         // some preallocates
         slidePnt = new RagPoint(0.0f, 0.0f, 0.0f);
+        highPnt = new RagPoint(0.0f, 0.0f, 0.0f);
         fallPnt = new RagPoint(0.0f, 0.0f, 0.0f);
         fallVct = new RagPoint(0.0f, 0.0f, 0.0f);
         hitPnt = new RagPoint(0.0f, 0.0f, 0.0f);
@@ -94,7 +97,7 @@ public class Collision {
         buildFromSceneRecursive(scene.rootNode, new RagPoint(0.0f, 0.0f, 0.0f));
     }
 
-    public boolean collideWithWall(RagPoint rayPnt) {
+    public boolean collideSpokesWithWall(RagPoint rayPnt) {
         for (CollisionTrig trig : wallTrigs) {
             for (RagPoint rayVct : wallCollideSpokeVcts) {
                 if (trig.rayOverlapBounds(rayPnt, rayVct)) {
@@ -108,6 +111,23 @@ public class Collision {
         return (false);
     }
 
+    public boolean collideWithWall(RagPoint rayPnt) {
+        int n;
+        float yAdd;
+
+        yAdd = COLLISION_HEIGHT / (float) COLLISION_HEIGHT_COUNT;
+        highPnt.setFromPoint(rayPnt);
+
+        for (n = 0; n != COLLISION_HEIGHT_COUNT; n++) {
+            if (collideSpokesWithWall(highPnt)) {
+                return (true);
+            }
+            highPnt.y += yAdd;
+        }
+
+        return (false);
+    }
+
     public void slideWithWall(RagPoint rayPnt, RagPoint moveVct) {
         boolean xMove;
 
@@ -116,7 +136,7 @@ public class Collision {
         slidePnt.x += moveVct.x;
         slidePnt.z += moveVct.z;
 
-        if (!collideWithWall(rayPnt)) {
+        if (!collideWithWall(slidePnt)) {
             rayPnt.x += moveVct.x;
             rayPnt.z += moveVct.z;
             return;

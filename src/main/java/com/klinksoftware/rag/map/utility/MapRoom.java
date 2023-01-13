@@ -24,6 +24,7 @@ public class MapRoom
     public MapRoom extendedFromRoom;
     public Node node;
     public MapPiece piece;
+    public ArrayList<MapWindow> windows;
 
     public MapRoom(MapPiece piece) {
         this.piece=piece;
@@ -47,6 +48,9 @@ public class MapRoom
         // on every segment
         platformGrid = new boolean[piece.sizeX * piece.sizeZ];
         Arrays.fill(platformGrid, true);
+
+        // windows
+        windows = new ArrayList<>();
 
         // rooms remember a node to attach meshes to
         // this gets set later after creation
@@ -565,6 +569,11 @@ public class MapRoom
         for (x = 0; x != piece.sizeX; x++) {
             platformGrid[(z * piece.sizeX) + x] = value;
         }
+    }
+
+    // windows
+    public void addWindow(float x, float z, int direction) {
+        windows.add(new MapWindow(x, z, direction));
     }
 
 }
