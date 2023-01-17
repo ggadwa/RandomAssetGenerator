@@ -7,7 +7,6 @@ import java.util.Arrays;
 
 public class MapRoom
 {
-
     public static final int ROOM_STORY_MAIN = 0;
     public static final int ROOM_STORY_UPPER = 1;
     public static final int ROOM_STORY_LOWER = 2;
@@ -15,6 +14,10 @@ public class MapRoom
     public static final int ROOM_STORY_LOWER_EXTENSION = 4;
     public static final int ROOM_STORY_TALL_EXTENSION = 5;
     public static final int ROOM_STORY_SUNKEN_EXTENSION = 6;
+
+    public static final byte WALL_HIDE_NONE = 0x0;
+    public static final byte WALL_HIDE_FULL = 0x1;
+    public static final byte WALL_HIDE_WINDOW = 0x2;
 
     public int x, z, story;
     public int stairDir, stairX, stairZ;
@@ -531,14 +534,12 @@ public class MapRoom
         // the wall (ascending) to hide
         //
 
-    public void hideWall(int vertexOffset)
-    {
-        wallHideArray[vertexOffset]=0x1;
+    public void setWallHideType(int vertexOffset, byte hideType)    {
+        wallHideArray[vertexOffset] = hideType;
     }
 
-    public boolean isWallHidden(int vertexOffset)
-    {
-        return(wallHideArray[vertexOffset]==0x1);
+    public byte getWallHideType(int vertexOffset)    {
+        return (wallHideArray[vertexOffset]);
     }
 
         //
@@ -572,8 +573,8 @@ public class MapRoom
     }
 
     // windows
-    public void addWindow(float x, float z, int direction) {
-        windows.add(new MapWindow(x, z, direction));
+    public void addWindow(float x, float z, int direction, float depth, float width, float height) {
+        windows.add(new MapWindow(x, z, direction, depth, width, height));
     }
 
 }

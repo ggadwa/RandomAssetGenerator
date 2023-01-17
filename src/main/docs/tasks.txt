@@ -1,16 +1,13 @@
 
 
-- window build
 
-- skybox is awful at 4096 
-  - use floats for mountains so not as sharp
 
 
 map
  - underground (mostly hallways and then randomize)
  - open ceiling
- - windows
  - skybox has bad uv (lines)
+ - door frames?
 
 bitmaps
  - gravel (like dirt)

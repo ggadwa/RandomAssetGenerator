@@ -2,9 +2,7 @@ package com.klinksoftware.rag.map.utility;
 
 import com.klinksoftware.rag.map.utility.MapPiece;
 import com.klinksoftware.rag.map.utility.MapRoom;
-import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.scene.Mesh;
-import com.klinksoftware.rag.utility.*;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.utility.RagPoint;
 
@@ -160,22 +158,22 @@ public class MeshMapUtility
                 n2 = 0;
             }
 
-            if (room.isWallHidden(n)) {
-                continue;
+            if (room.getWallHideType(n) == MapRoom.WALL_HIDE_NONE) {
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBase.SEGMENT_SIZE), y2, ((piece.wallLines[n][1] + room.z) * MapBase.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBase.SEGMENT_SIZE), y2, ((piece.wallLines[n2][1] + room.z) * MapBase.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBase.SEGMENT_SIZE), y, ((piece.wallLines[n2][1] + room.z) * MapBase.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBase.SEGMENT_SIZE), y, ((piece.wallLines[n][1] + room.z) * MapBase.SEGMENT_SIZE)));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
             }
 
-            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBase.SEGMENT_SIZE), y2, ((piece.wallLines[n][1] + room.z) * MapBase.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBase.SEGMENT_SIZE), y2, ((piece.wallLines[n2][1] + room.z) * MapBase.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBase.SEGMENT_SIZE), y, ((piece.wallLines[n2][1] + room.z) * MapBase.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBase.SEGMENT_SIZE), y, ((piece.wallLines[n][1] + room.z) * MapBase.SEGMENT_SIZE)));
-            trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
-
             // small top wall (all versions have this, for doorway overheads)
-            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBase.SEGMENT_SIZE), (y2 + MapBase.FLOOR_HEIGHT), ((piece.wallLines[n][1] + room.z) * MapBase.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBase.SEGMENT_SIZE), (y2 + MapBase.FLOOR_HEIGHT), ((piece.wallLines[n2][1] + room.z) * MapBase.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBase.SEGMENT_SIZE), y2, ((piece.wallLines[n2][1] + room.z) * MapBase.SEGMENT_SIZE)));
-            vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBase.SEGMENT_SIZE), y2, ((piece.wallLines[n][1] + room.z) * MapBase.SEGMENT_SIZE)));
-            trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+            if (room.getWallHideType(n) != MapRoom.WALL_HIDE_FULL) {
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBase.SEGMENT_SIZE), (y2 + MapBase.FLOOR_HEIGHT), ((piece.wallLines[n][1] + room.z) * MapBase.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBase.SEGMENT_SIZE), (y2 + MapBase.FLOOR_HEIGHT), ((piece.wallLines[n2][1] + room.z) * MapBase.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n2][0] + room.x) * MapBase.SEGMENT_SIZE), y2, ((piece.wallLines[n2][1] + room.z) * MapBase.SEGMENT_SIZE)));
+                vertexArray.addAll(Arrays.asList(((piece.wallLines[n][0] + room.x) * MapBase.SEGMENT_SIZE), y2, ((piece.wallLines[n][1] + room.z) * MapBase.SEGMENT_SIZE)));
+                trigIdx = MeshUtility.addQuadToIndexes(indexArray, trigIdx);
+            }
         }
 
         if (trigIdx != 0) {
@@ -219,7 +217,7 @@ public class MeshMapUtility
                 n2 = 0;
             }
 
-            if (room.isWallHidden(n)) {
+            if (room.getWallHideType(n) == MapRoom.WALL_HIDE_FULL) {
                 continue;
             }
 
@@ -292,7 +290,7 @@ public class MeshMapUtility
                 n2 = 0;
             }
 
-            if (room.isWallHidden(n)) {
+            if (room.getWallHideType(n) == MapRoom.WALL_HIDE_FULL) {
                 continue;
             }
 

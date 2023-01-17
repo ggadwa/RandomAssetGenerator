@@ -80,11 +80,10 @@ public class MapBase {
 
                         if (((ax==bx) && (az==bz) && (ax2==bx2) && (az2==bz2)) || ((ax2==bx) && (az2==bz) && (ax==bx2) && (az==bz2))) {
 
-                                // only blank out walls that are at the same story
-
+                            // only blank out walls that are at the same story
                             if (room.storyEqual(room2)) {
-                                room.hideWall(vIdx);
-                                room2.hideWall(vIdx2);
+                                room.setWallHideType(vIdx, MapRoom.WALL_HIDE_FULL);
+                                room2.setWallHideType(vIdx2, MapRoom.WALL_HIDE_FULL);
                             }
                         }
 
@@ -102,8 +101,14 @@ public class MapBase {
         int n, k, roomCount, vIdx;
         int nextIdx, vertexCount, direction;
         float x, z, x2, z2, lx, rx, tz, bz;
+        float depth, width, height;
         boolean blocked;
         MapRoom room, checkRoom;
+
+        // all windows have same random look
+        depth = MapBase.FLOOR_HEIGHT * (0.4f + AppWindow.random.nextFloat(0.3f));
+        width = MapBase.SEGMENT_SIZE * (0.1f + AppWindow.random.nextFloat(0.35f));
+        height = MapBase.SEGMENT_SIZE * (0.1f + AppWindow.random.nextFloat(0.35f));
 
         // run through rooms and look at the walls, any wall
         // that doesn't look directly into another room can
@@ -112,11 +117,23 @@ public class MapBase {
 
         for (n = 0; n != roomCount; n++) {
             room = rooms.get(n);
+
+            // skip sunken/rise rooms
+            if ((room.story == MapRoom.ROOM_STORY_TALL_EXTENSION) || (room.story == MapRoom.ROOM_STORY_SUNKEN_EXTENSION)) {
+                continue;
+            }
+
             vertexCount = room.piece.wallLines.length;
 
             vIdx = 0;
 
             while (vIdx < vertexCount) {
+                // skip hidden walls
+                if (room.getWallHideType(vIdx) != MapRoom.WALL_HIDE_NONE) {
+                    vIdx++;
+                    continue;
+                }
+
                 nextIdx = vIdx + 1;
                 if (nextIdx == vertexCount) {
                     nextIdx = 0;
@@ -127,6 +144,12 @@ public class MapBase {
                 z = room.z + room.piece.wallLines[vIdx][1];
                 x2 = room.x + room.piece.wallLines[nextIdx][0];
                 z2 = room.z + room.piece.wallLines[nextIdx][1];
+
+                // skip non-straight walls
+                if ((x != x2) && (z != z2)) {
+                    vIdx++;
+                    continue;
+                }
 
                 // the view box
                 if (x == x2) {
@@ -192,8 +215,8 @@ public class MapBase {
                 // we are a candidate for a window
                 if (!blocked) {
                     if (AppWindow.random.nextFloat() < ROOM_WINDOW_CHANCE) {
-                        room.hideWall(vIdx);
-                        room.addWindow(lx, tz, direction);
+                        room.setWallHideType(vIdx, MapRoom.WALL_HIDE_WINDOW);
+                        room.addWindow((lx - room.x), (tz - room.z), direction, depth, width, height);
                     }
                 }
 
@@ -586,7 +609,7 @@ public class MapBase {
         max = Math.max(Math.max(maxPnt.x, maxPnt.y), maxPnt.z);
 
         // make skybox
-        scene.rootNode.addMesh(MeshUtility.createCube("sky_box", min, max, min, max, min, max, true, true, true, true, true, true, true, MeshUtility.UV_SKY_BOX));
+        scene.rootNode.addMesh(MeshUtility.createCube("sky_box", min, max, (min * 2), max, min, max, true, true, true, true, true, true, true, MeshUtility.UV_SKY_BOX));
 
         // so view drawer knows not to erase
         scene.skyBox = true;

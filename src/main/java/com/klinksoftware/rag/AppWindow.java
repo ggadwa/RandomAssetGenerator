@@ -31,8 +31,8 @@ public class AppWindow extends JFrame {
     public Semaphore glTerminated;
 
     public GradientLabel walkLabel;
-    private GradientLabel settingsLabel;
-    private JTabbedPane settingsTab;
+    private GradientLabel generatorsLabel;
+    private JTabbedPane generatorsTab;
     private JPanel displayPanel;
     private CardLayout displayPanelCardLayout;
     private SpinnerPane spinnerPane;
@@ -96,32 +96,32 @@ public class AppWindow extends JFrame {
         soundView = new SoundView();
         displayPanel.add("soundView", soundView);
 
-        // settings tabs
-        settingsLabel = new GradientLabel("Settings", new Color(196, 196, 255), new Color(128, 128, 255), true);
-        add(settingsLabel, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+        // generator tabs
+        generatorsLabel = new GradientLabel("Generators", new Color(196, 196, 255), new Color(128, 128, 255), true);
+        add(generatorsLabel, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
-        settingsTab = new JTabbedPane();
-        settingsTab.setPreferredSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
-        settingsTab.setMinimumSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
-        settingsTab.setMaximumSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
-        settingsTab.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.black));
-        add(settingsTab, new GridBagConstraints(1, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+        generatorsTab = new JTabbedPane();
+        generatorsTab.setPreferredSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
+        generatorsTab.setMinimumSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
+        generatorsTab.setMaximumSize(new Dimension(SETTING_WIDTH, Integer.MAX_VALUE));
+        generatorsTab.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.black));
+        add(generatorsTab, new GridBagConstraints(1, 2, 1, 1, 0.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 
         // tabs
+        settingsTexture = new SettingsTexture(this);
+        generatorsTab.addTab("Texture", settingsTexture);
+
         settingsMap = new SettingsMap(this);
-        settingsTab.addTab("Map", settingsMap);
+        generatorsTab.addTab("Map", settingsMap);
 
         settingsProp = new SettingsProp(this);
-        settingsTab.addTab("Prop", settingsProp);
+        generatorsTab.addTab("Prop", settingsProp);
 
         settingsCharacter = new SettingsCharacter(this);
-        settingsTab.addTab("Character", settingsCharacter);
-
-        settingsTexture = new SettingsTexture(this);
-        settingsTab.addTab("Texture", settingsTexture);
+        generatorsTab.addTab("Character", settingsCharacter);
 
         settingsSound = new SettingsSound(this);
-        settingsTab.addTab("Sound", settingsSound);
+        generatorsTab.addTab("Sound", settingsSound);
 
         // the spinner
         spinnerPane = new SpinnerPane();
@@ -148,22 +148,22 @@ public class AppWindow extends JFrame {
 
     // utility
     public void startBuild() {
-        settingsTab.setEnabled(false);
+        generatorsTab.setEnabled(false);
+        settingsTexture.enableAll(false);
         settingsMap.enableAll(false);
         settingsProp.enableAll(false);
         settingsCharacter.enableAll(false);
-        settingsTexture.enableAll(false);
         settingsSound.enableAll(false);
 
         spinnerPane.start();
     }
 
     public void stopBuild() {
-        settingsTab.setEnabled(true);
+        generatorsTab.setEnabled(true);
+        settingsTexture.enableAll(true);
         settingsMap.enableAll(true);
         settingsProp.enableAll(true);
         settingsCharacter.enableAll(true);
-        settingsTexture.enableAll(true);
         settingsSound.enableAll(true);
 
         spinnerPane.stop();

@@ -61,50 +61,54 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         }
     }
 
-    private void generateMountainsDraw(int lft, int top, int rgt, int bot, int rangeVerticalMove, boolean outline, RagColor col, float colorAdjust) {
-        int x, y, ty, oy, halfWid, midY, midDir, midCount;
-        int wid, maxOutlineSize, idx;
+    private void generateMountainsDraw(int lft, int rgt, int drawBot, int centerY, int trimTop, int trimBot, boolean outline, RagColor col) {
+        int x, y, lx, rx, quarterX, ty, oy;
+        int wid, idx;
         int[] rangeY;
         float colFactor, colorFactorAdd;
+        float fy, fyAdd, midY;
 
         wid = rgt - lft;
-        maxOutlineSize = textureSize / 100;
 
-        // we only do half the range, and reverse for the other half so
-        // they match up
-        halfWid = wid / 2;
-
-        // remember the mid point and we either favor going
-        // down or up if we pass it
-        midY = (top + bot) / 2;
-        midDir = 0;
-        midCount = 0;
-
-        // create the range
-        y = midY;
+        // create the range by random segments
+        midY = (float) centerY;
+        fy = (float) midY;
         rangeY = new int[wid];
 
-        for (x = 0; x != halfWid; x++) {
-            rangeY[x] = y;
-            rangeY[(wid - 1) - x] = y;
+        quarterX = (wid / 4) * 3;
 
-            if (midCount <= 0) {
-                midCount = AppWindow.random.nextInt(textureSize / 100);
-                midDir = AppWindow.random.nextBoolean() ? -1 : 1;
+        lx = 0;
+        while (true) {
+            // we want to crept close to equal when we are 75% of the way there
+            fyAdd = (0.1f + AppWindow.random.nextFloat(1.2f));
+            if (lx < quarterX) {
+                fyAdd *= (AppWindow.random.nextBoolean() ? -1.0f : 1.0f);
+            } else {
+                fyAdd *= ((fy < midY) ? 1.0f : -1.0f);
             }
 
-            y += (AppWindow.random.nextInt(rangeVerticalMove) * midDir);
-
-            if (y < top) {
-                y = top;
-                midDir = 1;
-            }
-            if (y > bot) {
-                y = bot;
-                midDir = -1;
+            rx = lx + ((textureSize / 500) + AppWindow.random.nextInt(textureSize / 20));
+            if (rx > wid) {
+                rx = wid;
+                fyAdd = (midY - fy) / (float) (rx - lx);
             }
 
-            midCount--;
+            for (x = lx; x < rx; x++) {
+                fy += fyAdd;
+                if (fy < (float) trimTop) {
+                    fy = (float) trimTop;
+                }
+                if (fy > (float) trimBot) {
+                    fy = (float) trimBot;
+                }
+
+                rangeY[x] = (int) fy;
+            }
+
+            lx = rx;
+            if (lx == wid) {
+                break;
+            }
         }
 
         // perlin noise for mountain
@@ -114,30 +118,29 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         // run through the ranges
         for (x = lft; x != rgt; x++) {
             ty = rangeY[x - lft];
-            oy = ty + AppWindow.random.nextInt(maxOutlineSize);
+            oy = ty + AppWindow.random.nextInt((drawBot - centerY) / 5);
 
-            for (y = ty; y <= bot; y++) {
+            for (y = ty; y <= drawBot; y++) {
                 colFactor = 0.5f + (colorFactorAdd * perlinNoiseColorFactor[(y * textureSize) + x]);
 
                 if ((outline) && (y < oy)) {
-                    colFactor *= 0.8f;
+                    colFactor *= (0.7f + (0.3f * ((float) (y - ty) / (float) (oy - ty))));
                 }
 
                 idx = ((y * wid) + x) * 4;
 
-                colorData[idx] = (col.r * colFactor) * colorAdjust;
-                colorData[idx + 1] = (col.g * colFactor) * colorAdjust;
-                colorData[idx + 2] = (col.b * colFactor) * colorAdjust;
+                colorData[idx] = (col.r * colFactor);
+                colorData[idx + 1] = (col.g * colFactor);
+                colorData[idx + 2] = (col.b * colFactor);
             }
         }
     }
 
     @Override
     public void generateInternal() {
-        int n, lft, top, qtr, cloudCount, cloudXSize, cloudYSize;
-        int edgeSize, sunSize, mountainCount;
-        float colorAdjustSize, colorAdjustAdd, colorAdjust;
-        RagColor cloudColor, skyColor, sunColor, mountainColor, groundColor;
+        int n, y, yAdd, lft, top, qtr, cloudCount, cloudXSize, cloudYSize;
+        int trimTop, trimBot, edgeSize, sunSize, mountainCount;
+        RagColor cloudColor, skyColor, sunColor, mountainColor;
 
         qtr = textureSize / 4;
 
@@ -145,17 +148,12 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         skyColor = adjustColor(new RagColor(0.1f, 0.95f, 1.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
         sunColor = adjustColor(new RagColor(1.0f, 0.75f, 0.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
         mountainColor = new RagColor(0.65f, 0.35f, 0.0f);
-        groundColor = adjustColor(mountainColor, 0.5f);
 
         createPerlinNoiseData(32, 32);
         createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
 
-        // fill top and bottom with sky/ground color as default
-        drawRect(0, 0, textureSize, (qtr * 2), skyColor);
-        drawRect(0, (qtr * 2), textureSize, textureSize, groundColor);
-
         // top
-        drawRect(qtr, 0, (qtr * 2), qtr, skyColor);
+        drawRect(0, 0, textureSize, qtr, skyColor);
 
         cloudCount = 1 + AppWindow.random.nextInt(5);
 
@@ -171,11 +169,8 @@ public class BitmapSkyBoxMountain extends BitmapBase {
 
         blur(colorData, qtr, 0, (qtr + qtr), qtr, (textureSize / 100), true);
 
-        // bottom
-        drawRect(qtr, (qtr * 2), (qtr * 2), (qtr * 3), groundColor);
-
         // sides
-        drawVerticalGradient(0, qtr, (qtr * 4), (qtr * 2), skyColor, adjustColor(skyColor, (0.6f + AppWindow.random.nextFloat(0.3f))));
+        drawVerticalGradient(0, qtr, (qtr * 4), (qtr * 3), skyColor, adjustColor(skyColor, (0.6f + AppWindow.random.nextFloat(0.3f))));
 
         //sun
         sunSize = (qtr / 5) + AppWindow.random.nextInt(qtr / 2);
@@ -203,16 +198,22 @@ public class BitmapSkyBoxMountain extends BitmapBase {
 
         blur(colorData, 0, qtr, textureSize, (qtr + qtr), (textureSize / 100), true);
 
-        // mountain on sides
+        // mountain on top sides
         mountainCount = 2 + AppWindow.random.nextInt(3);
-        colorAdjustSize = 0.4f + AppWindow.random.nextFloat(0.3f);
-        colorAdjustAdd = colorAdjustSize / (float) mountainCount;
-        colorAdjust = 1.0f - colorAdjustSize;
+
+        y = (qtr + (qtr / 2));
+        yAdd = qtr / mountainCount;
+        trimTop = qtr + (qtr / 4);
+        trimBot = (qtr * 3) - (qtr / 4);
 
         for (n = 0; n != mountainCount; n++) {
-            generateMountainsDraw(0, (qtr + (qtr / 4)), (qtr * 4), (qtr * 2), (1 + AppWindow.random.nextInt(textureSize / 400)), true, mountainColor, colorAdjust);
-            colorAdjust += colorAdjustAdd;
+            adjustColor(mountainColor, (1.1f + AppWindow.random.nextFloat(0.3f)));
+            generateMountainsDraw(0, textureSize, (qtr * 3), y, trimTop, trimBot, true, mountainColor);
+            y += yAdd;
         }
+
+        // bottom
+        drawRect(0, (qtr * 3), textureSize, textureSize, mountainColor);
 
         // never lit
         clearImageData(normalData, 0.5f, 0.5f, 1.0f, 1.0f);

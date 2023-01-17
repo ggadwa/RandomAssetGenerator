@@ -389,7 +389,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
                     break;
                 case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(0.0f, 0.26f, 0.0f, 0.49f, 0.25f, 0.49f, 0.25f, 0.26f));
+                    uvArray.addAll(Arrays.asList(0.0f, 0.25f, 0.0f, 0.75f, 0.25f, 0.75f, 0.25f, 0.25f));
                     break;
             }
 
@@ -409,8 +409,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
                     break;
                 case MeshUtility.UV_SKY_BOX:
-                    //uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-                    uvArray.addAll(Arrays.asList(0.75f, 0.26f, 0.75f, 0.49f, 0.5f, 0.49f, 0.5f, 0.26f));
+                    uvArray.addAll(Arrays.asList(0.75f, 0.25f, 0.75f, 0.75f, 0.5f, 0.75f, 0.5f, 0.25f));
                     break;
             }
 
@@ -430,7 +429,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
                     break;
                 case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(1.0f, 0.26f, 1.0f, 0.49f, 0.75f, 0.49f, 0.75f, 0.26f));
+                    uvArray.addAll(Arrays.asList(1.0f, 0.25f, 1.0f, 0.75f, 0.75f, 0.75f, 0.75f, 0.25f));
                     break;
             }
 
@@ -450,7 +449,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
                     break;
                 case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(0.25f, 0.26f, 0.25f, 0.49f, 0.49f, 0.49f, 0.49f, 0.26f));
+                    uvArray.addAll(Arrays.asList(0.25f, 0.25f, 0.25f, 0.75f, 0.5f, 0.75f, 0.5f, 0.25f));
                     break;
             }
 
@@ -470,7 +469,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f));
                     break;
                 case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(0.25f, 0.24f, 0.25f, 0.0f, 0.49f, 0.0f, 0.49f, 0.24f));
+                    uvArray.addAll(Arrays.asList(0.25f, 0.25f, 0.25f, 0.0f, 0.5f, 0.0f, 0.5f, 0.25f));
                     break;
             }
 
@@ -490,7 +489,7 @@ public class MeshUtility {
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
                     break;
                 case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(0.25f, 0.74f, 0.25f, 0.5f, 0.49f, 0.5f, 0.49f, 0.74f));
+                    uvArray.addAll(Arrays.asList(0.25f, 1.0f, 0.25f, 0.75f, 0.5f, 0.75f, 0.5f, 1.0f));
                     break;
             }
 
