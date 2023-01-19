@@ -61,7 +61,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         }
     }
 
-    private void generateMountainsDraw(int lft, int rgt, int drawBot, int centerY, int trimTop, int trimBot, boolean outline, RagColor col) {
+    private void generateMountainsDraw(int lft, int rgt, int drawBot, int centerY, int trimTop, int trimBot, RagColor col) {
         int x, y, lx, rx, quarterX, ty, oy;
         int wid, idx;
         int[] rangeY;
@@ -79,7 +79,7 @@ public class BitmapSkyBoxMountain extends BitmapBase {
 
         lx = 0;
         while (true) {
-            // we want to crept close to equal when we are 75% of the way there
+            // we want to creep close to equal when we are 75% of the way there
             fyAdd = (0.1f + AppWindow.random.nextFloat(1.2f));
             if (lx < quarterX) {
                 fyAdd *= (AppWindow.random.nextBoolean() ? -1.0f : 1.0f);
@@ -123,12 +123,84 @@ public class BitmapSkyBoxMountain extends BitmapBase {
             for (y = ty; y <= drawBot; y++) {
                 colFactor = 0.5f + (colorFactorAdd * perlinNoiseColorFactor[(y * textureSize) + x]);
 
-                if ((outline) && (y < oy)) {
-                    colFactor *= (0.7f + (0.3f * ((float) (y - ty) / (float) (oy - ty))));
+                if (y < oy) {
+                    if (y == ty) {
+                        colFactor = 0.2f;
+                    } else {
+                        colFactor *= (0.7f + (0.3f * ((float) (y - ty) / (float) (oy - ty))));
+                    }
                 }
 
                 idx = ((y * wid) + x) * 4;
+                colorData[idx] = (col.r * colFactor);
+                colorData[idx + 1] = (col.g * colFactor);
+                colorData[idx + 2] = (col.b * colFactor);
+            }
+        }
+    }
 
+    private void generateGrassDraw(int lft, int rgt, int drawBot, int centerY, int trimTop, int trimBot, RagColor col) {
+        int x, y, lx, rx, quarterX, ty;
+        int wid, idx;
+        int[] rangeY;
+        float colFactor, colorFactorAdd;
+        float fy, fyAdd, midY;
+
+        wid = rgt - lft;
+
+        // create the range by random segments
+        midY = (float) centerY;
+        fy = (float) midY;
+        rangeY = new int[wid];
+
+        quarterX = (wid / 4) * 3;
+
+        lx = 0;
+        while (true) {
+            // we want to creep close to equal when we are 75% of the way there
+            fyAdd = (0.05f + AppWindow.random.nextFloat(0.1f));
+            if (lx < quarterX) {
+                fyAdd *= (AppWindow.random.nextBoolean() ? -1.0f : 1.0f);
+            } else {
+                fyAdd *= ((fy < midY) ? 1.0f : -1.0f);
+            }
+
+            rx = lx + ((textureSize / 500) + AppWindow.random.nextInt(textureSize / 20));
+            if (rx > wid) {
+                rx = wid;
+                fyAdd = (midY - fy) / (float) (rx - lx);
+            }
+
+            for (x = lx; x < rx; x++) {
+                fy += fyAdd;
+                if (fy < (float) trimTop) {
+                    fy = (float) trimTop;
+                }
+                if (fy > (float) trimBot) {
+                    fy = (float) trimBot;
+                }
+
+                rangeY[x] = (int) fy;
+            }
+
+            lx = rx;
+            if (lx == wid) {
+                break;
+            }
+        }
+
+        // perlin noise for grass
+        createPerlinNoiseData(16, 16);
+        colorFactorAdd = 0.3f + AppWindow.random.nextFloat(0.2f);
+
+        // run through the ranges
+        for (x = lft; x != rgt; x++) {
+            ty = rangeY[x - lft];
+
+            for (y = ty; y < drawBot; y++) {
+                colFactor = (y == ty) ? 0.2f : (0.5f + (colorFactorAdd * perlinNoiseColorFactor[(y * textureSize) + x]));
+
+                idx = ((y * wid) + x) * 4;
                 colorData[idx] = (col.r * colFactor);
                 colorData[idx + 1] = (col.g * colFactor);
                 colorData[idx + 2] = (col.b * colFactor);
@@ -138,16 +210,15 @@ public class BitmapSkyBoxMountain extends BitmapBase {
 
     @Override
     public void generateInternal() {
-        int n, y, yAdd, lft, top, qtr, cloudCount, cloudXSize, cloudYSize;
-        int trimTop, trimBot, edgeSize, sunSize, mountainCount;
-        RagColor cloudColor, skyColor, sunColor, mountainColor;
+        int n, y, lft, top, qtr, cloudCount, cloudXSize, cloudYSize;
+        int edgeSize, sunSize;
+        RagColor cloudColor, skyColor, sunColor, mountainColor, grassColor;
 
         qtr = textureSize / 4;
 
         cloudColor = adjustColor(new RagColor(1.0f, 1.0f, 1.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
         skyColor = adjustColor(new RagColor(0.1f, 0.95f, 1.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
         sunColor = adjustColor(new RagColor(1.0f, 0.75f, 0.0f), (0.7f + AppWindow.random.nextFloat(0.3f)));
-        mountainColor = new RagColor(0.65f, 0.35f, 0.0f);
 
         createPerlinNoiseData(32, 32);
         createNormalNoiseData((2.0f + AppWindow.random.nextFloat(0.3f)), (0.3f + AppWindow.random.nextFloat(0.2f)));
@@ -199,21 +270,18 @@ public class BitmapSkyBoxMountain extends BitmapBase {
         blur(colorData, 0, qtr, textureSize, (qtr + qtr), (textureSize / 100), true);
 
         // mountain on top sides
-        mountainCount = 2 + AppWindow.random.nextInt(3);
+        y = qtr + qtr;
+        mountainColor = adjustColor(new RagColor(0.65f, 0.35f, 0.0f), (0.3f + AppWindow.random.nextFloat(0.3f)));
+        generateMountainsDraw(0, textureSize, (qtr * 3), y, (y - qtr), (y + qtr), mountainColor);
 
-        y = (qtr + (qtr / 2));
-        yAdd = qtr / mountainCount;
-        trimTop = qtr + (qtr / 4);
-        trimBot = (qtr * 3) - (qtr / 4);
+        y = qtr + qtr + (qtr / 3);
+        mountainColor = adjustColor(new RagColor(0.65f, 0.35f, 0.0f), (0.6f + AppWindow.random.nextFloat(0.3f)));
+        generateMountainsDraw(0, textureSize, (qtr * 3), y, (y - (qtr / 2)), (y + (qtr / 2)), mountainColor);
 
-        for (n = 0; n != mountainCount; n++) {
-            adjustColor(mountainColor, (1.1f + AppWindow.random.nextFloat(0.3f)));
-            generateMountainsDraw(0, textureSize, (qtr * 3), y, trimTop, trimBot, true, mountainColor);
-            y += yAdd;
-        }
-
-        // bottom
-        drawRect(0, (qtr * 3), textureSize, textureSize, mountainColor);
+        // grass on sides and also draw through to the bottom
+        y = (qtr * 3) - (qtr / 4);
+        grassColor = adjustColor(new RagColor(0.2f, 1.0f, 0.2f), (0.4f + AppWindow.random.nextFloat(0.3f)));
+        generateGrassDraw(0, textureSize, textureSize, y, (y - (qtr / 3)), (y + (qtr / 3)), grassColor);
 
         // never lit
         clearImageData(normalData, 0.5f, 0.5f, 1.0f, 1.0f);
