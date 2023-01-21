@@ -13,7 +13,7 @@ public class MapIndoorComplexMultiFloor extends MapBase {
 
     private void buildRequiredBitmaps() {
         String[] wallBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapBrickRowWood", "BitmapGeometric", "BitmapHexagon", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapMosaic", "BitmapOrganic", "BitmapPlaster", "BitmapRockCracked", "BitmapStonePattern", "BitmapStoneRound", "BitmapStoneRow", "BitmapStoneRowWood", "BitmapTemple", "BitmapTile", "BitmapWoodBoard"};
-        String[] insideFloorBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapHexagon", "BitmapMetalPlank", "BitmapMetalTread", "BitmapMosaic", "BitmapTile", "BitmapStonePattern", "BitmapWoodBoard"};
+        String[] floorBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapHexagon", "BitmapMetalPlank", "BitmapMetalTread", "BitmapMosaic", "BitmapTile", "BitmapStonePattern", "BitmapWoodBoard"};
         String[] ceilingBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapMosaic", "BitmapPlaster", "BitmapTile", "BitmapStonePattern", "BitmapWoodBoard"};
         String[] platformBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapStonePattern", "BitmapWoodBoard"};
         String[] railingBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapStonePattern", "BitmapWoodBoard"};
@@ -23,8 +23,8 @@ public class MapIndoorComplexMultiFloor extends MapBase {
         scene.bitmapGroup.add("wall_main", wallBitmaps);
         scene.bitmapGroup.add("wall_upper", wallBitmaps);
         scene.bitmapGroup.add("wall_lower", wallBitmaps);
-        scene.bitmapGroup.add("floor", insideFloorBitmaps);
-        scene.bitmapGroup.add("floor_lower", insideFloorBitmaps);
+        scene.bitmapGroup.add("floor", floorBitmaps);
+        scene.bitmapGroup.add("floor_lower", floorBitmaps);
         scene.bitmapGroup.add("ceiling", ceilingBitmaps);
         scene.bitmapGroup.add("ceiling_upper", ceilingBitmaps);
         scene.bitmapGroup.add("platform", platformBitmaps);
@@ -75,7 +75,7 @@ public class MapIndoorComplexMultiFloor extends MapBase {
         buildRequiredBitmaps();
 
         // now create the meshes
-        createRoomMeshes(rooms, true);
+        createRoomMeshes(rooms, true, false);
 
         // skybox
         buildSkyBox();

@@ -26,6 +26,8 @@ public class MapBase {
 
     public static final int FAIL_COUNT = 50;
 
+    public static final int MAZE_ROOM_SIZE = 32;
+
     public Scene scene;
     public RagPoint viewCenterPoint;
     public MapPieceList mapPieceList;
@@ -591,6 +593,127 @@ public class MapBase {
         }
     }
 
+    // maze/snake like rooms
+    private void recurseMazeDraw(byte[] mazeBytes, int x, int z, int dx, int dz, int branchCount, int pathCount, int maxPathCount) {
+        int n;
+        int offset;
+
+        // fill in a line of cubes for the count
+        for (n = 0; n != pathCount; n++) {
+            if (n != 0) {         // this is so x,y end at the end of the line, not after it
+                x += dx;
+                z += dz;
+            }
+
+            offset = (z * MAZE_ROOM_SIZE) + x;
+            if ((x < 0) || (z < 0) || (x >= MAZE_ROOM_SIZE) || (z >= MAZE_ROOM_SIZE) || (mazeBytes[offset] != 0)) {
+                return;
+            }
+
+            mazeBytes[offset] = 1;
+        }
+
+        // branch
+        branchCount--;
+        if (branchCount <= 0) {
+            return;
+        }
+
+        recurseMazeDraw(mazeBytes, x, (z - 1), 0, -1, branchCount, (1 + AppWindow.random.nextInt(maxPathCount)), maxPathCount);
+        recurseMazeDraw(mazeBytes, x, (z + 1), 0, 1, branchCount, (1 + AppWindow.random.nextInt(maxPathCount)), maxPathCount);
+        recurseMazeDraw(mazeBytes, (x - 1), z, -1, 0, branchCount, (1 + AppWindow.random.nextInt(maxPathCount)), maxPathCount);
+        recurseMazeDraw(mazeBytes, (x + 1), z, 1, 0, branchCount, (1 + AppWindow.random.nextInt(maxPathCount)), maxPathCount);
+    }
+
+    private boolean mazeFloodFill(byte[] roomBytes, int x, int z, int recurseCount) {
+        if (recurseCount > MAZE_ROOM_SIZE) {
+            return (false);
+        }
+        if (roomBytes[(z * MAZE_ROOM_SIZE) + x] != 0) {
+            return (true);
+        }
+
+        roomBytes[(z * MAZE_ROOM_SIZE) + x] = 2;
+
+        if (z > 0) {
+            if (roomBytes[((z - 1) * MAZE_ROOM_SIZE) + x] == 0) {
+                if (!mazeFloodFill(roomBytes, x, (z - 1), (recurseCount + 1))) {
+                    return (false);
+                }
+            }
+        }
+        if (z < (MAZE_ROOM_SIZE - 1)) {
+            if (roomBytes[((z + 1) * MAZE_ROOM_SIZE) + x] == 0) {
+                if (!mazeFloodFill(roomBytes, x, (z + 1), (recurseCount + 1))) {
+                    return (false);
+                }
+            }
+        }
+        if (x > 0) {
+            if (roomBytes[(z * MAZE_ROOM_SIZE) + (x - 1)] == 0) {
+                if (!mazeFloodFill(roomBytes, (x - 1), z, (recurseCount + 1))) {
+                    return (false);
+                }
+            }
+        }
+        if (x < (MAZE_ROOM_SIZE - 1)) {
+            if (roomBytes[(z * MAZE_ROOM_SIZE) + (x + 1)] == 0) {
+                if (!mazeFloodFill(roomBytes, (x + 1), z, (recurseCount + 1))) {
+                    return (false);
+                }
+            }
+        }
+
+        return (true);
+    }
+
+    public void generateMazeRooms(ArrayList<MapRoom> rooms, boolean floodFill) {
+        int x, z;
+        int maxPathCount, branchCount;
+        byte[] roomBytes, roomBackup;
+        String name;
+        MapRoom room;
+
+        // recurse maze draw into grid
+        roomBytes = new byte[MAZE_ROOM_SIZE * MAZE_ROOM_SIZE];
+        maxPathCount = (MAZE_ROOM_SIZE / 5) + AppWindow.random.nextInt(MAZE_ROOM_SIZE / 3);
+        branchCount = (MAZE_ROOM_SIZE / 4) + AppWindow.random.nextInt(MAZE_ROOM_SIZE / 4);
+
+        recurseMazeDraw(roomBytes, (MAZE_ROOM_SIZE / 2), (MAZE_ROOM_SIZE / 2), 0, 0, branchCount, 0, maxPathCount);
+
+        // flood fill small spots
+        if (floodFill) {
+            roomBackup = new byte[MAZE_ROOM_SIZE * MAZE_ROOM_SIZE];
+
+            for (z = 0; z != MAZE_ROOM_SIZE; z++) {
+                for (x = 0; x != MAZE_ROOM_SIZE; x++) {
+                    if (roomBytes[(z * MAZE_ROOM_SIZE) + x] != 0) {
+                        continue;
+                    }
+
+                    System.arraycopy(roomBytes, 0, roomBackup, 0, roomBytes.length);
+                    if (!mazeFloodFill(roomBytes, x, z, 0)) {
+                        System.arraycopy(roomBackup, 0, roomBytes, 0, roomBytes.length);
+                    }
+                }
+            }
+        }
+
+        // change to rooms
+        for (z = 0; z != MAZE_ROOM_SIZE; z++) {
+            for (x = 0; x != MAZE_ROOM_SIZE; x++) {
+                if (roomBytes[(z * MAZE_ROOM_SIZE) + x] == 1) {
+                    name = "room_" + Integer.toString(rooms.size());
+                    room = new MapRoom(mapPieceList.createSpecificRectangularPiece(1, 1));
+                    room.x = x;
+                    room.z = z;
+                    room.node = scene.addChildNode(scene.rootNode, name, room.getNodePoint());
+                    rooms.add(room);
+                }
+            }
+        }
+    }
+
     // sky boxes
     protected void buildSkyBox() {
         float min, max;
@@ -616,7 +739,7 @@ public class MapBase {
     }
 
     // room meshes
-    protected void createRoomMeshes(ArrayList<MapRoom> rooms, boolean hasCeiling) {
+    protected void createRoomMeshes(ArrayList<MapRoom> rooms, boolean hasCeiling, boolean textureSameAsWall) {
         int n, roomCount;
         MapRoom room;
         RagPoint centerPnt;
@@ -628,9 +751,9 @@ public class MapBase {
             centerPnt = new RagPoint((((room.x * SEGMENT_SIZE) + (room.piece.sizeX * SEGMENT_SIZE)) * 0.5f), ((SEGMENT_SIZE + FLOOR_HEIGHT) + (SEGMENT_SIZE * 0.5f)), (((room.z * SEGMENT_SIZE) + (room.piece.sizeZ * SEGMENT_SIZE)) * 0.5f));
 
             MeshMapUtility.buildRoomIndoorWalls(room, centerPnt, n);
-            MeshMapUtility.buildRoomFloorCeiling(room, centerPnt, n, true);
+            MeshMapUtility.buildRoomFloorCeiling(room, centerPnt, n, true, false);
             if (hasCeiling) {
-                MeshMapUtility.buildRoomFloorCeiling(room, centerPnt, n, false);
+                MeshMapUtility.buildRoomFloorCeiling(room, centerPnt, n, false, textureSameAsWall);
             }
         }
     }

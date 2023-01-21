@@ -16,7 +16,7 @@ public class MeshMapUtility
     public static final int STAIR_DIR_NEG_X=3;
 
     // room floor and ceilings
-    public static void buildRoomFloorCeiling(MapRoom room, RagPoint centerPnt, int roomNumber, boolean floor) {
+    public static void buildRoomFloorCeiling(MapRoom room, RagPoint centerPnt, int roomNumber, boolean floor, boolean textureSameAsWall) {
         int n, k, trigIdx, idx;
         float py;
         ArrayList<Float> vertexArray;
@@ -105,7 +105,11 @@ public class MeshMapUtility
         if (floor) {
             room.node.addMesh(new Mesh(("floor_" + Integer.toString(roomNumber)), (room.story == MapRoom.ROOM_STORY_MAIN ? "floor" : "floor_lower"), vertexes, normals, tangents, uvs, indexes));
         } else {
-            room.node.addMesh(new Mesh(("ceiling_" + Integer.toString(roomNumber)), (room.story == MapRoom.ROOM_STORY_MAIN ? "ceiling" : "ceiling_upper"), vertexes, normals, tangents, uvs, indexes));
+            if (textureSameAsWall) {
+                room.node.addMesh(new Mesh(("ceiling_" + Integer.toString(roomNumber)), "wall_main", vertexes, normals, tangents, uvs, indexes));
+            } else {
+                room.node.addMesh(new Mesh(("ceiling_" + Integer.toString(roomNumber)), (room.story == MapRoom.ROOM_STORY_MAIN ? "ceiling" : "ceiling_upper"), vertexes, normals, tangents, uvs, indexes));
+            }
         }
     }
 

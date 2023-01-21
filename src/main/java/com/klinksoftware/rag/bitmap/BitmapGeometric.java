@@ -104,8 +104,8 @@ public class BitmapGeometric extends BitmapBase {
 
         // recurse snake draw
         drawBytes = new byte[SNAKE_PIXEL_SIZE * SNAKE_PIXEL_SIZE];
-        maxPathCount = 25 + AppWindow.random.nextInt(25);
-        branchCount = 10 + AppWindow.random.nextInt(10);
+        maxPathCount = (SNAKE_PIXEL_SIZE / 5) + AppWindow.random.nextInt(SNAKE_PIXEL_SIZE / 3);
+        branchCount = (SNAKE_PIXEL_SIZE / 4) + AppWindow.random.nextInt(SNAKE_PIXEL_SIZE / 4);
 
         recurseSnakeDraw(drawBytes, (SNAKE_PIXEL_SIZE / 2), (SNAKE_PIXEL_SIZE / 2), 0, 0, branchCount, 0, maxPathCount);
 

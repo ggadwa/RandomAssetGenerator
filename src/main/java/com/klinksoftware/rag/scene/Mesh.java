@@ -324,7 +324,7 @@ public class Mesh {
         }
     }
 
-    public void randomizeFloorVertexes(float percentMove, float moveFactor, ArrayList<Mesh> meshes) {
+    public void randomizeFloorAndCeilingVertexes(float percentMove, float moveFactor, float moveDirection, float segmentNormal, ArrayList<Mesh> meshes) {
         int n, k, vIdx, nVertex, nCheckVertex;
         float y;
         RagPoint origVertex, checkVertex;
@@ -342,7 +342,7 @@ public class Mesh {
             vIdx = n * 3;
 
             // skip anything not a floor
-            if (normals[vIdx + 1] == 0.0f) {
+            if (normals[vIdx + 1] != segmentNormal) {
                 continue;
             }
 
@@ -350,7 +350,7 @@ public class Mesh {
             origVertex.setFromValues(vertexes[vIdx], vertexes[vIdx + 1], vertexes[vIdx + 2]);
 
             // move up randomly
-            y = vertexes[vIdx + 1] + (AppWindow.random.nextFloat(moveFactor));
+            y = vertexes[vIdx + 1] + (AppWindow.random.nextFloat(moveFactor) * moveDirection);
             vertexes[vIdx + 1] = y;
 
             // check for equal vertexes to move
@@ -365,7 +365,7 @@ public class Mesh {
                     vIdx = k * 3;
 
                     // skip anything not a floor
-                    if (mesh.normals[vIdx + 1] == 0.0f) {
+                    if (mesh.normals[vIdx + 1] != segmentNormal) {
                         continue;
                     }
 
@@ -377,6 +377,14 @@ public class Mesh {
                 }
             }
         }
+    }
+
+    public void randomizeFloorVertexes(float percentMove, float moveFactor, ArrayList<Mesh> meshes) {
+        randomizeFloorAndCeilingVertexes(percentMove, moveFactor, 1.0f, 1.0f, meshes);
+    }
+
+    public void randomizeCeilingVertexes(float percentMove, float moveFactor, ArrayList<Mesh> meshes) {
+        randomizeFloorAndCeilingVertexes(percentMove, moveFactor, -1.0f, -1.0f, meshes);
     }
 
     public void setAllVertexesToSingleJoint(int jointIdx) {

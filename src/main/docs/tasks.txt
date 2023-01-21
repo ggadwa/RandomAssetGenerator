@@ -4,9 +4,9 @@
 
 
 map
- - underground (mostly hallways and then randomize)
  - open ceiling
  - skybox has bad uv (lines)
+ - bigger skybox?  Move with player?
  - door frames?
 
 bitmaps

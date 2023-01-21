@@ -70,7 +70,7 @@ public class MapIndoorSimpleMultiFloor extends MapBase {
         buildRequiredBitmaps();
 
         // now create the meshes
-        createRoomMeshes(rooms, true);
+        createRoomMeshes(rooms, true, false);
 
         // skybox
         buildSkyBox();

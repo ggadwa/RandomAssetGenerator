@@ -148,6 +148,14 @@ public class Scene {
         }
     }
 
+    public void randomizeCeilingVertexes(float percentMove, float moveFactor) {
+        ArrayList<Mesh> meshes = getAllMeshes();
+
+        for (Mesh mesh : meshes) {
+            mesh.randomizeCeilingVertexes(percentMove, moveFactor, meshes);
+        }
+    }
+
     // some scenes are built with absolute vertexes and need to be
     // converted to relative (to the node) vertexes
     public void shiftAbsoluteMeshesToNodeRelativeMeshesRecursive(Node node, RagPoint pnt) {
