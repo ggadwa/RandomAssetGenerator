@@ -3,7 +3,6 @@ package com.klinksoftware.rag.map.utility;
 import com.klinksoftware.rag.map.utility.MapRoom;
 import com.klinksoftware.rag.map.utility.MapPieceList;
 import com.klinksoftware.rag.scene.Scene;
-import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.*;
 import com.klinksoftware.rag.export.Export;
 import com.klinksoftware.rag.utility.*;
@@ -712,30 +711,6 @@ public class MapBase {
                 }
             }
         }
-    }
-
-    // sky boxes
-    protected void buildSkyBox() {
-        float min, max;
-        RagPoint minPnt, maxPnt;
-
-        // get dimensions of sky box
-        minPnt = new RagPoint(0.0f, 0.0f, 0.0f);
-        maxPnt = new RagPoint(0.0f, 0.0f, 0.0f);
-
-        scene.getAbsoluteMixMaxVertexForAbsoluteVertexes(minPnt, maxPnt);
-
-        minPnt.scale(1.1f);
-        maxPnt.scale(1.1f);
-
-        min = Math.min(Math.min(minPnt.x, minPnt.y), minPnt.z);
-        max = Math.max(Math.max(maxPnt.x, maxPnt.y), maxPnt.z);
-
-        // make skybox
-        scene.rootNode.addMesh(MeshUtility.createCube("sky_box", min, max, (min * 2), max, min, max, true, true, true, true, true, true, true, MeshUtility.UV_SKY_BOX));
-
-        // so view drawer knows not to erase
-        scene.skyBox = true;
     }
 
     // room meshes

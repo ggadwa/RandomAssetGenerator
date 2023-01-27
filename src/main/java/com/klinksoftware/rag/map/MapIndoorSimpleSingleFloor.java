@@ -15,12 +15,10 @@ public class MapIndoorSimpleSingleFloor extends MapBase {
         String[] wallBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapBrickRowWood", "BitmapGeometric", "BitmapHexagon", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapMosaic", "BitmapOrganic", "BitmapPlaster", "BitmapRockCracked", "BitmapStonePattern", "BitmapStoneRound", "BitmapStoneRow", "BitmapStoneRowWood", "BitmapTemple", "BitmapTile", "BitmapWoodBoard"};
         String[] insideFloorBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapHexagon", "BitmapMetalPlank", "BitmapMetalTread", "BitmapMosaic", "BitmapTile", "BitmapStonePattern", "BitmapWoodBoard"};
         String[] ceilingBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapMosaic", "BitmapPlaster", "BitmapTile", "BitmapStonePattern", "BitmapWoodBoard"};
-        String[] skyBoxBitmaps = {"BitmapSkyBoxMountain"};
 
         scene.bitmapGroup.add("wall_main", wallBitmaps);
         scene.bitmapGroup.add("floor", insideFloorBitmaps);
         scene.bitmapGroup.add("ceiling", ceilingBitmaps);
-        scene.bitmapGroup.add("sky_box", skyBoxBitmaps);
     }
 
     @Override
@@ -47,9 +45,6 @@ public class MapIndoorSimpleSingleFloor extends MapBase {
 
         // now create the meshes
         createRoomMeshes(rooms, true, false);
-
-        // skybox
-        buildSkyBox();
 
         // return the center point
         room = rooms.get(0);

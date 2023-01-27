@@ -11,7 +11,7 @@ public class Scene {
 
     private int nodeIndex;
 
-    public boolean skyBox, skinned;
+    public boolean skinned;
     public Node rootNode;
     public BitmapGroup bitmapGroup;
     public Animation animation;
@@ -23,7 +23,6 @@ public class Scene {
         bitmapGroup = new BitmapGroup();
         animation = new Animation(this);
 
-        skyBox = false;
         skinned = false;
     }
 

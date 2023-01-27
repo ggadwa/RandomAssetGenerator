@@ -11,7 +11,6 @@ public class MeshUtility {
 
     public static final int UV_WHOLE = 0;
     public static final int UV_MAP = 1;
-    public static final int UV_SKY_BOX = 2;
 
     public static final int RAMP_DIR_POS_Z = 0;
     public static final int RAMP_DIR_NEG_Z = 1;
@@ -384,13 +383,8 @@ public class MeshUtility {
             vertexArray.addAll(Arrays.asList(xMin, yMin, zMax));
             vertexArray.addAll(Arrays.asList(xMin, yMax, zMax));
 
-            switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
-                    uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
-                    break;
-                case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(0.0f, 0.25f, 0.0f, 0.75f, 0.25f, 0.75f, 0.25f, 0.25f));
-                    break;
+            if (uvMode == MeshUtility.UV_WHOLE) {
+                uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
             }
 
             indexArray.addAll(Arrays.asList(idx, (idx + 1), (idx + 2), idx, (idx + 2), (idx + 3)));
@@ -404,13 +398,8 @@ public class MeshUtility {
             vertexArray.addAll(Arrays.asList(xMax, yMin, zMax));
             vertexArray.addAll(Arrays.asList(xMax, yMax, zMax));
 
-            switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+            if (uvMode == MeshUtility.UV_WHOLE) {
                     uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-                    break;
-                case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(0.75f, 0.25f, 0.75f, 0.75f, 0.5f, 0.75f, 0.5f, 0.25f));
-                    break;
             }
 
             indexArray.addAll(Arrays.asList(idx, (idx + 1), (idx + 2), idx, (idx + 2), (idx + 3)));
@@ -424,13 +413,8 @@ public class MeshUtility {
             vertexArray.addAll(Arrays.asList(xMax, yMin, zMin));
             vertexArray.addAll(Arrays.asList(xMax, yMax, zMin));
 
-            switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+            if (uvMode == MeshUtility.UV_WHOLE) {
                     uvArray.addAll(Arrays.asList(1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f));
-                    break;
-                case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(1.0f, 0.25f, 1.0f, 0.75f, 0.75f, 0.75f, 0.75f, 0.25f));
-                    break;
             }
 
             indexArray.addAll(Arrays.asList(idx, (idx + 1), (idx + 2), idx, (idx + 2), (idx + 3)));
@@ -444,13 +428,8 @@ public class MeshUtility {
             vertexArray.addAll(Arrays.asList(xMax, yMin, zMax));
             vertexArray.addAll(Arrays.asList(xMax, yMax, zMax));
 
-            switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+            if (uvMode == MeshUtility.UV_WHOLE) {
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
-                    break;
-                case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(0.25f, 0.25f, 0.25f, 0.75f, 0.5f, 0.75f, 0.5f, 0.25f));
-                    break;
             }
 
             indexArray.addAll(Arrays.asList(idx, (idx + 1), (idx + 2), idx, (idx + 2), (idx + 3)));
@@ -464,13 +443,8 @@ public class MeshUtility {
             vertexArray.addAll(Arrays.asList(xMax, yMax, zMin));
             vertexArray.addAll(Arrays.asList(xMax, yMax, zMax));
 
-            switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+            if (uvMode == MeshUtility.UV_WHOLE) {
                     uvArray.addAll(Arrays.asList(0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f));
-                    break;
-                case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(0.25f, 0.25f, 0.25f, 0.0f, 0.5f, 0.0f, 0.5f, 0.25f));
-                    break;
             }
 
             indexArray.addAll(Arrays.asList(idx, (idx + 1), (idx + 2), idx, (idx + 2), (idx + 3)));
@@ -484,13 +458,8 @@ public class MeshUtility {
             vertexArray.addAll(Arrays.asList(xMax, yMin, zMin));
             vertexArray.addAll(Arrays.asList(xMax, yMin, zMax));
 
-            switch (uvMode) {
-                case MeshUtility.UV_WHOLE:
+            if (uvMode == MeshUtility.UV_WHOLE) {
                     uvArray.addAll(Arrays.asList(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f));
-                    break;
-                case MeshUtility.UV_SKY_BOX:
-                    uvArray.addAll(Arrays.asList(0.25f, 1.0f, 0.25f, 0.75f, 0.5f, 0.75f, 0.5f, 1.0f));
-                    break;
             }
 
             indexArray.addAll(Arrays.asList(idx, (idx + 1), (idx + 2), idx, (idx + 2), (idx + 3)));

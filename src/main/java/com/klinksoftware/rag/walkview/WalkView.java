@@ -693,8 +693,9 @@ public class WalkView extends AWTGLCanvas {
     // draw regular scene
     //
     private void drawRegularScene(long tick) {
-        // draw the opaque meshes
         lastUsedTexture = null;
+
+        // draw the opaque meshes
         drawOpaqueNodeRecursive(scene.rootNode, tick);
 
         // add transparent trigs to sortable array
@@ -789,13 +790,12 @@ public class WalkView extends AWTGLCanvas {
         }
 
         // clear
-        glClear(((scene.skyBox) && (displayType != this.WV_DISPLAY_SKELETON)) ? GL_DEPTH_BUFFER_BIT : GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // setup the model matrixes, which move the meshes to
         // the node's absolute position, when skinning, the vertexes are
         // absolute so these just become the identity
         scene.setupNodeModelMatrixes();
-
 
         // start the program and setup
         // the drawing matrixes

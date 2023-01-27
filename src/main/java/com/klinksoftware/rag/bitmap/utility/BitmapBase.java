@@ -21,7 +21,6 @@ public class BitmapBase
 {
 
     public static final int DEFAULT_TEXTURE_SIZE = 1024;
-    public static final int DEFAULT_SKYBOX_TEXTURE_SIZE = 2048;
 
     public static final RagPoint NORMAL_CLEAR=new RagPoint(0.0f,0.0f,1.0f);
 

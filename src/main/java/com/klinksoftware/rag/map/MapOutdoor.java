@@ -15,11 +15,9 @@ public class MapOutdoor extends MapBase {
     private void buildRequiredBitmaps() {
         String[] wallBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapBrickRowWood", "BitmapGeometric", "BitmapHexagon", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapMosaic", "BitmapOrganic", "BitmapPlaster", "BitmapRockCracked", "BitmapStonePattern", "BitmapStoneRound", "BitmapStoneRow", "BitmapStoneRowWood", "BitmapTemple", "BitmapTile", "BitmapWoodBoard"};
         String[] outsideFloorBitmaps = {"BitmapDirt", "BitmapGrass", "BitmapStonePattern"};
-        String[] skyBoxBitmaps = {"BitmapSkyBoxMountain"};
 
         scene.bitmapGroup.add("wall_main", wallBitmaps);
         scene.bitmapGroup.add("floor", outsideFloorBitmaps);
-        scene.bitmapGroup.add("sky_box", skyBoxBitmaps);
     }
 
     @Override
@@ -47,9 +45,6 @@ public class MapOutdoor extends MapBase {
 
         // now create the meshes
         createRoomMeshes(rooms, false, false);
-
-        // any skybox
-        buildSkyBox();
 
         // get center point
         room = rooms.get(0);

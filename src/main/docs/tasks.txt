@@ -1,12 +1,11 @@
 
 
+- create randomized grid textures (gravel, road, rocks)
 
-
+- maze put in outside rooms
 
 map
  - open ceiling
- - skybox has bad uv (lines)
- - bigger skybox?  Move with player?
  - door frames?
 
 bitmaps
@@ -23,6 +22,7 @@ characters
  - humanoid / etc - more items (spikes, etc.)
 
 prop
+ - no pipe bitmap model the screws
  - desk: handles, possible pad on top
  - barrel has different ribs, maybe opening lid, dents
  - finish pc

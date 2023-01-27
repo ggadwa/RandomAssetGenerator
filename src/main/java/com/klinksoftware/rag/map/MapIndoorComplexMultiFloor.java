@@ -18,7 +18,6 @@ public class MapIndoorComplexMultiFloor extends MapBase {
         String[] platformBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapStonePattern", "BitmapWoodBoard"};
         String[] railingBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapStonePattern", "BitmapWoodBoard"};
         String[] stairBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapConcrete", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapStonePattern", "BitmapWoodBoard"};
-        String[] skyBoxBitmaps = {"BitmapSkyBoxMountain"};
 
         scene.bitmapGroup.add("wall_main", wallBitmaps);
         scene.bitmapGroup.add("wall_upper", wallBitmaps);
@@ -30,7 +29,6 @@ public class MapIndoorComplexMultiFloor extends MapBase {
         scene.bitmapGroup.add("platform", platformBitmaps);
         scene.bitmapGroup.add("railing", railingBitmaps);
         scene.bitmapGroup.add("stair", stairBitmaps);
-        scene.bitmapGroup.add("sky_box", skyBoxBitmaps);
     }
 
     @Override
@@ -76,9 +74,6 @@ public class MapIndoorComplexMultiFloor extends MapBase {
 
         // now create the meshes
         createRoomMeshes(rooms, true, false);
-
-        // skybox
-        buildSkyBox();
 
         // steps, platforms, windows
         buildSteps(rooms);
