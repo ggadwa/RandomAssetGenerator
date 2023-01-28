@@ -1,6 +1,7 @@
 
 
 - create randomized grid textures (gravel, road, rocks)
+- make an tile acoustic 
 
 - maze put in outside rooms
 
