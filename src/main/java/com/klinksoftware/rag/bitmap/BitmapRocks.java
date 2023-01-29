@@ -90,7 +90,7 @@ public class BitmapRocks extends BitmapBase {
         return (pnts);
     }
 
-    protected void drawTriangleGradient(int x0, int y0, int x1, int y1, int x2, int y2, float f0, float f1, float f2, RagPoint n0, RagPoint n1, RagPoint n2, RagColor color) {
+    protected void drawTriangleGradient(int x0, int y0, int x1, int y1, int x2, int y2, float f0, float f1, float f2, RagPoint n0, RagPoint n1, RagPoint n2, RagColor color, boolean doPerlinNoise, float colorFactorMin, float colorFactorAdd, boolean flipNormals) {
         int x, y, lx, rx, ty, my, by, tyX, myX, byX, idx;
         float f, fLx, fRx, fTyX, fMyX, fByX;
         RagPoint drawNormal, nLx, nRx, nTyX, nMyX, nByX;
@@ -213,15 +213,17 @@ public class BitmapRocks extends BitmapBase {
                 continue;
             }
 
-            idx = ((y * textureSize) + lx) * 4;
-
             for (x = lx; x < rx; x++) {
                 if ((x < 0) || (x >= textureSize)) {
-                    idx += 4;
                     continue;
                 }
 
                 f = fLx + (((fRx - fLx) * (float) (x - lx)) / (float) (rx - lx));
+                if (doPerlinNoise) {
+                    f *= (colorFactorMin + (colorFactorAdd * perlinNoiseColorFactor[(y * textureSize) + x]));
+                }
+
+                idx = ((y * textureSize) + x) * 4;
 
                 colorData[idx] = color.r * f;
                 colorData[idx + 1] = color.g * f;
@@ -230,13 +232,15 @@ public class BitmapRocks extends BitmapBase {
                 drawNormal.x = nLx.x + (((nRx.x - nLx.x) * (float) (x - lx)) / (float) (rx - lx));
                 drawNormal.y = nLx.y + (((nRx.y - nLx.y) * (float) (x - lx)) / (float) (rx - lx));
                 drawNormal.z = nLx.z + (((nRx.z - nLx.z) * (float) (x - lx)) / (float) (rx - lx));
+                if (flipNormals) {
+                    drawNormal.x = -drawNormal.x;
+                    drawNormal.y = -drawNormal.y;
+                }
                 drawNormal.normalize();
 
                 normalData[idx] = (drawNormal.x + 1.0f) * 0.5f;
                 normalData[idx + 1] = (drawNormal.y + 1.0f) * 0.5f;
                 normalData[idx + 2] = (drawNormal.z + 1.0f) * 0.5f;
-
-                idx += 4;
             }
         }
 
@@ -278,15 +282,17 @@ public class BitmapRocks extends BitmapBase {
                 continue;
             }
 
-            idx = ((y * textureSize) + lx) * 4;
-
             for (x = lx; x < rx; x++) {
                 if ((x < 0) || (x >= textureSize)) {
-                    idx += 4;
                     continue;
                 }
 
                 f = fLx + (((fRx - fLx) * (float) (x - lx)) / (float) (rx - lx));
+                if (doPerlinNoise) {
+                    f *= (colorFactorMin + (colorFactorAdd * perlinNoiseColorFactor[(y * textureSize) + x]));
+                }
+
+                idx = ((y * textureSize) + x) * 4;
 
                 colorData[idx] = color.r * f;
                 colorData[idx + 1] = color.g * f;
@@ -295,57 +301,67 @@ public class BitmapRocks extends BitmapBase {
                 drawNormal.x = nLx.x + (((nRx.x - nLx.x) * (float) (x - lx)) / (float) (rx - lx));
                 drawNormal.y = nLx.y + (((nRx.y - nLx.y) * (float) (x - lx)) / (float) (rx - lx));
                 drawNormal.z = nLx.z + (((nRx.z - nLx.z) * (float) (x - lx)) / (float) (rx - lx));
+                if (flipNormals) {
+                    drawNormal.x = -drawNormal.x;
+                    drawNormal.y = -drawNormal.y;
+                }
                 drawNormal.normalize();
 
                 normalData[idx] = (drawNormal.x + 1.0f) * 0.5f;
                 normalData[idx + 1] = (drawNormal.y + 1.0f) * 0.5f;
                 normalData[idx + 2] = (drawNormal.z + 1.0f) * 0.5f;
-
-                idx += 4;
             }
         }
     }
 
-    private void drawTriangleGradientWrap(int x0, int y0, int x1, int y1, int x2, int y2, float f0, float f1, float f2, RagPoint n0, RagPoint n1, RagPoint n2, RagColor color) {
+    private void drawTriangleGradientWrap(int x0, int y0, int x1, int y1, int x2, int y2, float f0, float f1, float f2, RagPoint n0, RagPoint n1, RagPoint n2, RagColor color, boolean doPerlinNoise, float colorFactorMin, float colorFactorAdd, boolean flipNormals) {
         int txtSize;
 
         // regular triangle
-        drawTriangleGradient(x0, y0, x1, y1, x2, y2, f0, f1, f2, n0, n1, n2, color);
+        drawTriangleGradient(x0, y0, x1, y1, x2, y2, f0, f1, f2, n0, n1, n2, color, doPerlinNoise, colorFactorMin, colorFactorAdd, flipNormals);
 
         // fix the wrap by drawing a triangle on the other side
         txtSize = textureSize - 1;
         if ((x0 < 0) || (x1 < 0) || (x2 < 0)) {
-            drawTriangleGradient((txtSize + x0), y0, (txtSize + x1), y1, (txtSize + x2), y2, f0, f1, f2, n0, n1, n2, color);
+            drawTriangleGradient((txtSize + x0), y0, (txtSize + x1), y1, (txtSize + x2), y2, f0, f1, f2, n0, n1, n2, color, doPerlinNoise, colorFactorMin, colorFactorAdd, flipNormals);
         }
         if ((x0 >= textureSize) || (x1 >= textureSize) || (x2 >= textureSize)) {
-            drawTriangleGradient((x0 - txtSize), y0, (x1 - txtSize), y1, (x2 - txtSize), y2, f0, f1, f2, n0, n1, n2, color);
+            drawTriangleGradient((x0 - txtSize), y0, (x1 - txtSize), y1, (x2 - txtSize), y2, f0, f1, f2, n0, n1, n2, color, doPerlinNoise, colorFactorMin, colorFactorAdd, flipNormals);
         }
         if ((y0 < 0) || (y1 < 0) || (y2 < 0)) {
-            drawTriangleGradient(x0, (txtSize + y0), x1, (txtSize + y1), x2, (txtSize + y2), f0, f1, f2, n0, n1, n2, color);
+            drawTriangleGradient(x0, (txtSize + y0), x1, (txtSize + y1), x2, (txtSize + y2), f0, f1, f2, n0, n1, n2, color, doPerlinNoise, colorFactorMin, colorFactorAdd, flipNormals);
         }
         if ((y0 >= textureSize) || (y1 >= textureSize) || (y2 >= textureSize)) {
-            drawTriangleGradient(x0, (y0 - txtSize), x1, (y1 - txtSize), x2, (y2 - txtSize), f0, f1, f2, n0, n1, n2, color);
+            drawTriangleGradient(x0, (y0 - txtSize), x1, (y1 - txtSize), x2, (y2 - txtSize), f0, f1, f2, n0, n1, n2, color, doPerlinNoise, colorFactorMin, colorFactorAdd, flipNormals);
         }
     }
 
-    @Override
-    public void generateInternal() {
+    private void drawGravelLayer(int count, float randomVertexPercentage, float randomShowPercentage, RagColor baseCol) {
         int x, y;
+        boolean flipNormals;
         ArrayList<GridPoint> pnts;
         GridPoint pnt0, pnt1, pnt2, pnt3, midPnt;
-        RagColor baseCol, col;
+        RagColor col;
 
-        baseCol = getRandomColor();
-        drawRect(0, 0, textureSize, textureSize, COLOR_WHITE);
+        // perlin noise and random points
+        createPerlinNoiseData(32, 32);
+        pnts = createRandomGridVertexes(count, randomVertexPercentage);
 
-
-        int count = 32;
-        pnts = createRandomGridVertexes(count, 0.6f);
-
+        // draw the gravel layer
         midPnt = new GridPoint(0, 0);
 
         for (y = 0; y != count; y++) {
             for (x = 0; x != count; x++) {
+
+                // skip some
+                if (AppWindow.random.nextFloat() > randomShowPercentage) {
+                    continue;
+                }
+
+                // small percentage flipped
+                flipNormals = (AppWindow.random.nextFloat() > 0.85f);
+
+                // four triangles around random square
                 pnt0 = pnts.get((y * (count + 1)) + x);
                 pnt1 = pnts.get(((y * (count + 1)) + x) + 1);
                 pnt2 = pnts.get((((y + 1) * (count + 1)) + x));
@@ -356,12 +372,42 @@ public class BitmapRocks extends BitmapBase {
 
                 col = adjustColorRandom(baseCol, 0.8f, 0.2f);
 
-                drawTriangleGradientWrap(pnt0.x, pnt0.y, pnt1.x, pnt1.y, midPnt.x, midPnt.y, 0.5f, 0.5f, 1.0f, NORMAL_TOP_10, NORMAL_TOP_10, NORMAL_CLEAR, col);
-                drawTriangleGradientWrap(pnt1.x, pnt1.y, pnt3.x, pnt3.y, midPnt.x, midPnt.y, 0.5f, 0.5f, 1.0f, NORMAL_RIGHT_10, NORMAL_RIGHT_10, NORMAL_CLEAR, col);
-                drawTriangleGradientWrap(pnt3.x, pnt3.y, pnt2.x, pnt2.y, midPnt.x, midPnt.y, 0.5f, 0.5f, 1.0f, NORMAL_BOTTOM_10, NORMAL_BOTTOM_10, NORMAL_CLEAR, col);
-                drawTriangleGradientWrap(pnt2.x, pnt2.y, pnt0.x, pnt0.y, midPnt.x, midPnt.y, 0.5f, 0.5f, 1.0f, NORMAL_LEFT_10, NORMAL_LEFT_10, NORMAL_CLEAR, col);
+                drawTriangleGradientWrap(pnt0.x, pnt0.y, pnt1.x, pnt1.y, midPnt.x, midPnt.y, 0.5f, 0.5f, 1.0f, NORMAL_TOP_10, NORMAL_TOP_10, NORMAL_CLEAR, col, true, 0.75f, 0.25f, flipNormals);
+                drawTriangleGradientWrap(pnt1.x, pnt1.y, pnt3.x, pnt3.y, midPnt.x, midPnt.y, 0.5f, 0.5f, 1.0f, NORMAL_RIGHT_10, NORMAL_RIGHT_10, NORMAL_CLEAR, col, true, 0.75f, 0.25f, flipNormals);
+                drawTriangleGradientWrap(pnt3.x, pnt3.y, pnt2.x, pnt2.y, midPnt.x, midPnt.y, 0.5f, 0.5f, 1.0f, NORMAL_BOTTOM_10, NORMAL_BOTTOM_10, NORMAL_CLEAR, col, true, 0.75f, 0.25f, flipNormals);
+                drawTriangleGradientWrap(pnt2.x, pnt2.y, pnt0.x, pnt0.y, midPnt.x, midPnt.y, 0.5f, 0.5f, 1.0f, NORMAL_LEFT_10, NORMAL_LEFT_10, NORMAL_CLEAR, col, true, 0.75f, 0.25f, flipNormals);
             }
         }
+    }
+
+    @Override
+    public void generateInternal() {
+        int n, layerCount;
+        float showPercentage;
+        RagColor baseCol;
+
+        // background dirt
+        baseCol = new RagColor((0.3f + AppWindow.random.nextFloat(0.1f)), (0.1f + AppWindow.random.nextFloat(0.1f)), 0.0f);
+        drawRect(0, 0, textureSize, textureSize, baseCol);
+
+        createPerlinNoiseData(32, 32);
+        drawPerlinNoiseRect(0, 0, textureSize, textureSize, 0.5f, 1.0f);
+
+        createNormalNoiseData(2.5f, 0.5f);
+        drawNormalNoiseRect(0, 0, textureSize, textureSize);
+
+        // gravel layers
+        showPercentage = 0.8f;
+        layerCount = 2 + AppWindow.random.nextInt(3);
+
+        for (n = 0; n != layerCount; n++) {
+            baseCol = getRandomGrayColor(0.4f, 0.8f);
+            drawGravelLayer(((n == 0) ? 64 : 32), 0.8f, showPercentage, baseCol);
+            showPercentage -= 0.1f;
+        }
+
+        // blur
+        blur(colorData, 0, 0, textureSize, textureSize, (2 + AppWindow.random.nextInt(textureSize / 125)), true);
 
         // finish with the metallic-roughness
         createMetallicRoughnessMap(0.35f, 0.3f);

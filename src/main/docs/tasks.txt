@@ -1,7 +1,11 @@
 
 
 - create randomized grid textures (gravel, road, rocks)
-- make an tile acoustic 
+
+- make an tile acoustic (diamond panels)
+
+
+- underground + outside use 4 triangles instead of two
 
 - maze put in outside rooms
 
