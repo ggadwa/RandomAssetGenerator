@@ -21,7 +21,7 @@ public class PropJunction extends PropBase {
 
         scene.bitmapGroup.add("computer", new String[]{"BitmapComputer"});
         scene.bitmapGroup.add("panel", new String[]{"BitmapMetal", "BitmapMetalPlank", "BitmapMetalPlate"});
-        scene.bitmapGroup.add("pipe", new String[]{"BitmapPipe"});
+        scene.bitmapGroup.add("pipe", new String[]{"BitmapMetal", "BitmapMetalPlank", "BitmapMetalPlate"});
 
         // sizes
         junctionWidth = MapBase.SEGMENT_SIZE * (0.4f + AppWindow.random.nextFloat(0.2f));

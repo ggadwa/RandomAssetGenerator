@@ -37,7 +37,7 @@ public class PropPipe extends PropBase {
         float pipeLength, endLength;
         Mesh mesh, mesh2;
 
-        scene.bitmapGroup.add("pipe", new String[]{"BitmapPipe"});
+        scene.bitmapGroup.add("pipe", new String[]{"BitmapMetal", "BitmapMetalPlank", "BitmapMetalPlate"});
 
         pipeRadius = 0.5f + AppWindow.random.nextFloat(0.5f);
         pipeLength = 2.0f + AppWindow.random.nextFloat(3.0f);

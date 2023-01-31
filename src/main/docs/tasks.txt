@@ -1,8 +1,9 @@
 
+- be able to combine rock mountain chunks into one normal/color
+- do road
 
-- create randomized grid textures (gravel, road, rocks)
+- combine drawTriangle -> drawTriangleGradient
 
-- make an tile acoustic (diamond panels)
 
 
 - underground + outside use 4 triangles instead of two
@@ -14,7 +15,6 @@ map
  - door frames?
 
 bitmaps
- - gravel (like dirt)
  - computer access panels have handles?
 
 characters
@@ -27,7 +27,7 @@ characters
  - humanoid / etc - more items (spikes, etc.)
 
 prop
- - no pipe bitmap model the screws
+ - add modeled screws to pips
  - desk: handles, possible pad on top
  - barrel has different ribs, maybe opening lid, dents
  - finish pc

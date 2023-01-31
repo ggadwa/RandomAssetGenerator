@@ -14,7 +14,7 @@ public class MapOutdoor extends MapBase {
 
     private void buildRequiredBitmaps() {
         String[] wallBitmaps = {"BitmapBrickPattern", "BitmapBrickRow", "BitmapBrickRowWood", "BitmapGeometric", "BitmapHexagon", "BitmapMetalPlank", "BitmapMetalPlate", "BitmapMosaic", "BitmapOrganic", "BitmapPlaster", "BitmapRockCracked", "BitmapStonePattern", "BitmapStoneRound", "BitmapStoneRow", "BitmapStoneRowWood", "BitmapTemple", "BitmapTile", "BitmapWoodBoard"};
-        String[] outsideFloorBitmaps = {"BitmapDirt", "BitmapGrass", "BitmapStonePattern"};
+        String[] outsideFloorBitmaps = {"BitmapDirt", "BitmapGrass", "BitmapGravel", "BitmapStonePattern"};
 
         scene.bitmapGroup.add("wall_main", wallBitmaps);
         scene.bitmapGroup.add("floor", outsideFloorBitmaps);

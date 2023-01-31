@@ -12,7 +12,7 @@ public class MapUnderground extends MapBase {
 
     private void buildRequiredBitmaps() {
         String[] wallBitmaps = {"BitmapDirt", "BitmapRockCracked", "BitmapConcrete"};
-        String[] floorBitmaps = {"BitmapDirt", "BitmapGrass", "BitmapConcrete"};
+        String[] floorBitmaps = {"BitmapDirt", "BitmapGrass", "BitmapGravel", "BitmapConcrete"};
 
         scene.bitmapGroup.add("wall_main", wallBitmaps);
         scene.bitmapGroup.add("floor", floorBitmaps);
