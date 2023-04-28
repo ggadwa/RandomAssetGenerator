@@ -14,8 +14,8 @@ public class PropPillar extends PropBase {
     private static final int[] COLUMN_SIDE_COUNTS = {4, 8, 16};
 
     @Override
-    public float getCameraRotateY() {
-        return (10.0f);
+    public RagPoint getCameraAngle() {
+        return (new RagPoint(0.0f, 10.0f, 0.0f));
     }
 
     @Override

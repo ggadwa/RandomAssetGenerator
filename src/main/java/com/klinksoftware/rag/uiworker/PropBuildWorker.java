@@ -44,7 +44,7 @@ public class PropBuildWorker extends SwingWorker<Integer, Void> {
         AppWindow.toolBar.reset(false);
 
         // and set the walk view
-        AppWindow.walkView.setCameraCenterRotate(prop.getCameraDistance(), prop.getCameraRotateX(), prop.getCameraRotateY(), prop.getCameraOffsetY(), prop.getCameraLightDistance());
+        AppWindow.walkView.setCameraCenterRotate(prop.getCameraDistance(), prop.getCameraAngle(), prop.getCameraOffsetY(), prop.getCameraFixedLightPoint(), 20, 90, 20);
         AppWindow.walkView.setIncommingScene(prop.scene);
 
         appWindow.walkLabel.setGeneratedTitle("Model", seed);

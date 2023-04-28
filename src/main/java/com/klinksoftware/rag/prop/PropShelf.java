@@ -12,13 +12,8 @@ import com.klinksoftware.rag.prop.utility.PropInterface;
 public class PropShelf extends PropBase {
 
     @Override
-    public float getCameraRotateX() {
-        return (-15.0f);
-    }
-
-    @Override
-    public float getCameraRotateY() {
-        return (130.0f);
+    public RagPoint getCameraAngle() {
+        return (new RagPoint(-15.0f, 130.0f, 0.0f));
     }
 
     @Override

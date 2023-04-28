@@ -4,17 +4,24 @@ import static com.klinksoftware.rag.AppWindow.TOOLBAR_HEIGHT;
 import static com.klinksoftware.rag.AppWindow.WINDOW_WIDTH;
 import com.klinksoftware.rag.walkview.WalkView;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.event.ChangeListener;
 
 public class ToolBar extends JToolBar {
 
-    private JToggleButton lightButton, flyButton;
+    public static final int SLIDER_WIDTH = 150;
+
+    private JToggleButton flyButton;
     private JToggleButton renderButton, colorButton, normalButton, MetallicRoughnessButton, emissiveButton, skeletonButton;
+    private JSlider lightIntensitySlider, lightExponentSlider, lightAmbientSlider;
 
     public ToolBar() {
         ButtonGroup bg;
@@ -22,12 +29,6 @@ public class ToolBar extends JToolBar {
         setFloatable(false);
         setBounds(0, 0, WINDOW_WIDTH, TOOLBAR_HEIGHT);
         this.setBackground(new Color(0.9f, 0.9f, 1.0f));
-
-        lightButton = addButton("tool_light", "Min or Max Light", false, null, (e) -> {
-            AppWindow.walkView.setLightIntensity(((JToggleButton) e.getSource()).isSelected());
-        });
-
-        addSeparator();
 
         flyButton = addButton("tool_fly", "Fly Mode", false, null, (e) -> {
             AppWindow.walkView.setFlyMode(((JToggleButton) e.getSource()).isSelected());
@@ -55,6 +56,30 @@ public class ToolBar extends JToolBar {
         skeletonButton = addButton("tool_skeleton", "Show Skeleton Only", false, bg, (e) -> {
             AppWindow.walkView.setDisplayType(WalkView.WV_DISPLAY_SKELETON);
         });
+
+        addSeparator();
+
+        addIcon("tool_light", "Light Intensity");
+
+        lightIntensitySlider = addSlider("Light Intensity", (e) -> {
+            AppWindow.walkView.setLightIntensity(((JSlider) e.getSource()).getValue());
+        });
+
+        addSeparator();
+
+        addIcon("tool_exponent", "Light Exponent");
+
+        lightExponentSlider = addSlider("Light Exponent", (e) -> {
+            AppWindow.walkView.setLightExponent(((JSlider) e.getSource()).getValue());
+        });
+
+        addSeparator();
+
+        addIcon("tool_ambient", "Light Ambient");
+
+        lightAmbientSlider = addSlider("Light Ambient", (e) -> {
+            AppWindow.walkView.setLightAmbient(((JSlider) e.getSource()).getValue());
+        });
     }
 
     private JToggleButton addButton(String imageName, String toolTipText, boolean highlighted, ButtonGroup bg, ActionListener al) {
@@ -77,8 +102,37 @@ public class ToolBar extends JToolBar {
         return (button);
     }
 
+    private void addIcon(String imageName, String toolTipText) {
+        JLabel label;
+
+        label = new JLabel(new ImageIcon(getClass().getResource("/graphics/" + imageName + ".png")));
+        label.setToolTipText(toolTipText);
+
+        add(label);
+    }
+
+    private JSlider addSlider(String toolTipText, ChangeListener cl) {
+        JSlider slider;
+
+        slider = new JSlider();
+        slider.setFocusable(false);
+        slider.setToolTipText(toolTipText);
+        slider.addChangeListener(cl);
+        slider.setPreferredSize(new Dimension(SLIDER_WIDTH, AppWindow.TOOLBAR_HEIGHT));
+        slider.setMaximumSize(new Dimension(SLIDER_WIDTH, AppWindow.TOOLBAR_HEIGHT));
+
+        add(slider);
+
+        return (slider);
+    }
+
+    public void resetLightSliders(int intensitySlider, int exponentSlider, int ambientSlider) {
+        lightIntensitySlider.setValue(intensitySlider);
+        lightExponentSlider.setValue(exponentSlider);
+        lightAmbientSlider.setValue(ambientSlider);
+    }
+
     public void reset(boolean enableSkeleton) {
-        lightButton.setSelected(false);
         flyButton.setSelected(false);
         renderButton.setSelected(true);
         colorButton.setSelected(false);

@@ -5,13 +5,14 @@ import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.character.utility.AnimationBuilder;
 import com.klinksoftware.rag.character.utility.CharacterBase;
 import com.klinksoftware.rag.character.utility.CharacterInterface;
+import com.klinksoftware.rag.utility.RagPoint;
 
 @CharacterInterface
 public class CharacterAnimal extends CharacterBase {
 
     @Override
-    public float getCameraRotateY() {
-        return (30.0f);
+    public RagPoint getCameraAngle() {
+        return (new RagPoint(0.0f, 30.0f, 0.0f));
     }
 
     @Override

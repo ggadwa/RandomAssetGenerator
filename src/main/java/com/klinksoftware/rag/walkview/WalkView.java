@@ -1,5 +1,6 @@
 package com.klinksoftware.rag.walkview;
 
+import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.scene.Animation;
 import com.klinksoftware.rag.scene.Scene;
 import com.klinksoftware.rag.scene.Node;
@@ -31,13 +32,19 @@ public class WalkView extends AWTGLCanvas {
     private static final float RAG_FAR_Z = 1000.0f;
     private static final float RAG_FOV=55.0f;
     private static final long RAG_PAINT_TICK = 33;
-    private static final float RAG_LIGHT_LOW_INTENSITY = 100.0f;
-    private static final float RAG_LIGHT_HIGH_INTENSITY = 500.0f;
+
+    private static final float RAG_LIGHT_INTENSITY_START = 10.0f;
+    private static final float RAG_LIGHT_INTENSITY_ADD = 510.0f;
+    private static final float RAG_LIGHT_EXPONENT_START = 1.0f;
+    private static final float RAG_LIGHT_EXPONENT_ADD = 40.0f;
+    private static final float RAG_LIGHT_AMBIENT_START = 0.0f;
+    private static final float RAG_LIGHT_AMBIENT_ADD = 1.0f;
 
     public int wid, high;
     private int vertexShaderId,fragmentShaderId,programId;
     private int vertexPositionAttribute, vertexUVAttribute, vertexNormalAttribute, vertexTangentAttribute, vertexJointAttribute, vertexWeightAttribute;
-    private int perspectiveMatrixUniformId, viewMatrixUniformId, modelMatrixUniformId, lightPositionIntensityUniformId;
+    private int perspectiveMatrixUniformId, viewMatrixUniformId, modelMatrixUniformId;
+    private int lightPositionUniformId, lightIntensityUniformId, lightExponentUniformId, lightAmbientUniformId;
     private int[] jointMatrixesUniformId;
     private int skinnedUniformId, displayTypeUniformId, highlightedUniformId, hasEmissiveUniformId, emissiveFactorUniformId, baseColorUniformId;
     private int displayType;
@@ -45,7 +52,7 @@ public class WalkView extends AWTGLCanvas {
     private float aspectRatio;
     public float cameraRotateDistance;
     private float cameraRotateOffsetY;
-    private float currentLightIntensity;
+    private float currentLightIntensity, currentLightExponent, currentLightAmbient;
     private boolean cameraCenterRotate;
     private Scene scene, incommingScene;
     private WalkViewTexture lastUsedTexture;
@@ -130,7 +137,9 @@ public class WalkView extends AWTGLCanvas {
         cameraRotateOffsetY = 0.0f;
         fixedLightPoint = null;
 
-        currentLightIntensity = RAG_LIGHT_LOW_INTENSITY;
+        currentLightIntensity = 0.0f;
+        currentLightExponent = 0.0f;
+        currentLightAmbient = 0.0f;
 
         // start opengl
         createCapabilities();
@@ -206,7 +215,10 @@ public class WalkView extends AWTGLCanvas {
         skinnedUniformId = glGetUniformLocation(programId, "skinned");
         displayTypeUniformId = glGetUniformLocation(programId, "displayType");
 
-        lightPositionIntensityUniformId = glGetUniformLocation(programId, "lightPositionIntensity");
+        lightPositionUniformId = glGetUniformLocation(programId, "lightPosition");
+        lightIntensityUniformId = glGetUniformLocation(programId, "lightIntensity");
+        lightExponentUniformId = glGetUniformLocation(programId, "lightExponent");
+        lightAmbientUniformId = glGetUniformLocation(programId, "lightAmbient");
 
         highlightedUniformId = glGetUniformLocation(programId, "highlighted");
 
@@ -261,16 +273,27 @@ public class WalkView extends AWTGLCanvas {
     //
     // display settings
     //
-    public void setLightIntensity(boolean selected) {
-        currentLightIntensity = selected ? RAG_LIGHT_HIGH_INTENSITY : RAG_LIGHT_LOW_INTENSITY;
-    }
-
     public void setFlyMode(boolean selected) {
         physics.flyMode = selected;
     }
 
     public void setDisplayType(int displayType) {
         this.displayType = displayType;
+    }
+
+    public void setLightIntensity(int sliderValue) {
+        System.out.println("int=" + sliderValue);
+        currentLightIntensity = RAG_LIGHT_INTENSITY_START + (((float) sliderValue / 100.0f) * RAG_LIGHT_INTENSITY_ADD);
+    }
+
+    public void setLightExponent(int sliderValue) {
+        System.out.println("exp=" + sliderValue);
+        currentLightExponent = RAG_LIGHT_EXPONENT_START + (((float) sliderValue / 100.0f) * RAG_LIGHT_EXPONENT_ADD);
+    }
+
+    public void setLightAmbient(int sliderValue) {
+        System.out.println("amb=" + sliderValue);
+        currentLightAmbient = RAG_LIGHT_AMBIENT_START + (((float) sliderValue / 100.0f) * RAG_LIGHT_AMBIENT_ADD);
     }
 
     //
@@ -287,21 +310,25 @@ public class WalkView extends AWTGLCanvas {
     // set the view cameras
     //
 
-    public void setCameraWalkView(float x, float y, float z, float feetOffsetY) {
+    public void setCameraWalkView(float x, float y, float z, float feetOffsetY, int intensitySlider, int exponentSlider, int ambientSlider) {
         cameraPoint.setFromValues(x, y, z);
         cameraAngle.setFromValues(0.0f, 0.0f, 0.0f);
         physics.cameraFeetOffsetY = feetOffsetY;
         cameraCenterRotate = false;
         fixedLightPoint = null;
+
+        AppWindow.toolBar.resetLightSliders(intensitySlider, exponentSlider, ambientSlider);
     }
 
-    public void setCameraCenterRotate(float dist, float rotateX, float rotateY, float offsetY, float lightDistance) {
+    public void setCameraCenterRotate(float dist, RagPoint angle, float offsetY, RagPoint lightPoint, int intensitySlider, int exponentSlider, int ambientSlider) {
         cameraRotateDistance=dist;
         cameraRotateOffsetY = offsetY;
-        cameraAngle.setFromValues(rotateX, rotateY, 0.0f);
+        cameraAngle.setFromPoint(angle);
         physics.cameraFeetOffsetY = 0.0f;
         cameraCenterRotate = true;
-        fixedLightPoint = new RagPoint(-1.5f, offsetY, lightDistance);
+        fixedLightPoint = new RagPoint(lightPoint);
+
+        AppWindow.toolBar.resetLightSliders(intensitySlider, exponentSlider, ambientSlider);
     }
 
     //
@@ -820,9 +847,13 @@ public class WalkView extends AWTGLCanvas {
             } else {
                 convertToEyeCoordinates(cameraPoint, lightEyePoint);
             }
-            buf = stack.mallocFloat(4);
-            buf.put(lightEyePoint.x).put(lightEyePoint.y).put(lightEyePoint.z).put(currentLightIntensity).flip();
-            glUniform4fv(lightPositionIntensityUniformId, buf);
+            buf = stack.mallocFloat(3);
+            buf.put(lightEyePoint.x).put(lightEyePoint.y).put(lightEyePoint.z).flip();
+            glUniform3fv(lightPositionUniformId, buf);
+
+            glUniform1f(lightIntensityUniformId, currentLightIntensity);
+            glUniform1f(lightExponentUniformId, currentLightExponent);
+            glUniform1f(lightAmbientUniformId, currentLightAmbient);
 
             glUniform1i(displayTypeUniformId, displayType);
 

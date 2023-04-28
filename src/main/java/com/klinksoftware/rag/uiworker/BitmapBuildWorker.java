@@ -3,6 +3,7 @@ package com.klinksoftware.rag.uiworker;
 import com.klinksoftware.rag.bitmap.utility.BitmapBase;
 import com.klinksoftware.rag.AppWindow;
 import com.klinksoftware.rag.scene.Scene;
+import com.klinksoftware.rag.utility.RagPoint;
 import java.util.*;
 import javax.swing.*;
 
@@ -42,7 +43,7 @@ public class BitmapBuildWorker extends SwingWorker<Integer,Void>
         AppWindow.toolBar.reset(false);
 
         // and set the walk view
-        AppWindow.walkView.setCameraCenterRotate(4.0f, -25.0f, 225.0f, 0.0f, -2.0f);
+        AppWindow.walkView.setCameraCenterRotate(4.0f, new RagPoint(-25.0f, 225.0f, 0.0f), 0.0f, new RagPoint(-1.5f, 5.0f, -3.0f), 20, 90, 20);
         AppWindow.walkView.setIncommingScene(scene);
 
         appWindow.walkLabel.setGeneratedTitle("Bitmap", seed);

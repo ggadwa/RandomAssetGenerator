@@ -1,14 +1,27 @@
 
+
+- light intensity and exponent sliders in toolbar
+- put spinner in view
+
+
+
+
+
+
+
 - be able to combine rock mountain chunks into one normal/color
 - do road
+- do shale like rock (slanted layers)
 
 - combine drawTriangle -> drawTriangleGradient
 
-
+- in bitmap/model put light by camera
 
 - underground + outside use 4 triangles instead of two
 
 - maze put in outside rooms
+
+- give any brick like thing a random 1, 2, or 3 alt textures (not counting darkening)
 
 map
  - open ceiling

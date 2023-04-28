@@ -8,7 +8,10 @@ uniform lowp sampler2D emissiveTex;
 uniform int displayType;
 uniform vec3 baseColor;
 
-uniform highp vec4 lightPositionIntensity;   // xyz = position, w = intensity
+uniform highp vec3 lightPosition;
+uniform mediump float lightIntensity;
+uniform mediump float lightExponent;
+uniform mediump float lightAmbient;
 
 uniform bool highlighted, hasEmissive;
 uniform mediump float emissiveFactor;
@@ -21,10 +24,10 @@ out lowp vec4 outputPixel;
 
 void main(void)
 {
-    lowp float att;
-    highp float intensity,dist;
-    highp vec3 lightVector,lightVertexVector;
-    lowp vec3 bumpMap,metallicRoughnessMap;
+    lowp float att,bump,metallic;
+    highp float dist;
+    highp vec3 lightVector,lightVertexVector,bumpLightVertexVector;
+    lowp vec3 bumpMap,metallicRoughnessMap,metallicHalfVector,lightCol,metalCol;
     lowp vec4 pixel,tex;
 
     // color-only processing
@@ -72,29 +75,24 @@ void main(void)
 
     // the bump map
     bumpMap=normalize((texture(normalTex,fragUV).rgb*2.0)-1.0);
-    highp vec3 bumpLightVertexVector;
-    lowp float bump=0.0;
+    bump=0.0;
 
     // the metallic-roughness map
     metallicRoughnessMap=texture(metallicRoughnessTex,fragUV).rgb;
-    lowp vec3 metallicHalfVector;
-    lowp float metallic;
 
     // lights
-    lowp vec3 lightCol=vec3(0,0,0);
+    lightCol=vec3(lightAmbient,lightAmbient,lightAmbient);
 
     // this is a simple frag with one light
-    intensity=lightPositionIntensity.w;
-
     // get vector for light
-    lightVector=lightPositionIntensity.xyz-eyePosition;
+    lightVector=lightPosition-eyePosition;
 
     dist=length(lightVector);
-    if (dist<intensity) {
+    if (dist<lightIntensity) {
 
         // the lighting attenuation
-        att=1.0-(dist/intensity);
-        att+=pow(att,5.0);
+        att=1.0-(dist/lightIntensity);
+        att+=pow(att,lightExponent);
         lightCol+=(vec3(1,1,1)*att);
 
         // lights in tangent space
@@ -113,11 +111,19 @@ void main(void)
 
     // calculate the final lighting
     lightCol*=bump;
-    lightCol=clamp(lightCol,0.2,1.0);
+    lightCol=clamp(lightCol,lightAmbient,1.0);
+
+    metalCol=min(metallic,1.0)*lightCol;
 
     // finally create the pixel
     pixel.rgb=(tex.rgb*lightCol);
-    pixel.rgb+=(min(metallic,1.0)*lightCol);
+    //pixel.r+=clamp(metalCol.r,0.0,(1-pixel.r));
+    //pixel.g+=clamp(metalCol.g,0.0,(1-pixel.g));
+    //pixel.b+=clamp(metalCol.b,0.0,(1-pixel.b));
+
+
+    pixel.rgb+=metalCol;
+    //pixel.rgb=clamp(pixel.rgb,0.0,1.0);
     if (hasEmissive) pixel.rgb+=(texture(emissiveTex,fragUV.xy).rgb*emissiveFactor);
     pixel.a=tex.a;
 

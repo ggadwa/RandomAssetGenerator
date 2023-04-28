@@ -12,8 +12,8 @@ import com.klinksoftware.rag.prop.utility.PropInterface;
 public class PropTube extends PropBase {
 
     @Override
-    public float getCameraRotateY() {
-        return (10.0f);
+    public RagPoint getCameraAngle() {
+        return (new RagPoint(0.0f, 10.0f, 0.0f));
     }
 
     @Override

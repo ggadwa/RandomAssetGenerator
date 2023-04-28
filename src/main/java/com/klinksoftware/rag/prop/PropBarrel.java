@@ -14,8 +14,8 @@ public class PropBarrel extends PropBase {
     private static int BARREL_SIDE_COUNT = 24;
 
     @Override
-    public float getCameraRotateY() {
-        return (10.0f);
+    public RagPoint getCameraAngle() {
+        return (new RagPoint(0.0f, 10.0f, 0.0f));
     }
 
     @Override

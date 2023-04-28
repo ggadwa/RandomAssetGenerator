@@ -6,18 +6,14 @@ import com.klinksoftware.rag.map.utility.MapBase;
 import com.klinksoftware.rag.scene.Mesh;
 import com.klinksoftware.rag.utility.MeshUtility;
 import com.klinksoftware.rag.prop.utility.PropInterface;
+import com.klinksoftware.rag.utility.RagPoint;
 
 @PropInterface
 public class PropTable extends PropBase {
 
     @Override
-    public float getCameraRotateX() {
-        return (-15.0f);
-    }
-
-    @Override
-    public float getCameraRotateY() {
-        return (45.0f);
+    public RagPoint getCameraAngle() {
+        return (new RagPoint(-15.0f, 45.0f, 0.0f));
     }
 
     @Override

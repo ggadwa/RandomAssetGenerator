@@ -37,16 +37,8 @@ public class CharacterBase {
         return (8.0f);
     }
 
-    public float getCameraLightDistance() {
-        return (2.0f);
-    }
-
-    public float getCameraRotateX() {
-        return (0.0f);
-    }
-
-    public float getCameraRotateY() {
-        return (0.0f);
+    public RagPoint getCameraAngle() {
+        return (new RagPoint(0.0f, 0.0f, 0.0f));
     }
 
     public float getCameraOffsetY() {
@@ -57,6 +49,10 @@ public class CharacterBase {
         scene.getAbsoluteMixMaxVertexForRelativeVertexes(min, max);
 
         return ((max.y - min.y) / 2.0f);
+    }
+
+    public RagPoint getCameraFixedLightPoint() {
+        return (new RagPoint(0.0f, getCameraOffsetY(), 2.0f));
     }
 
     public void buildMeshes() {

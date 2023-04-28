@@ -10,6 +10,12 @@ public class RagPoint
         this.z=z;
     }
 
+    public RagPoint(RagPoint pnt) {
+        this.x = pnt.x;
+        this.y = pnt.y;
+        this.z = pnt.z;
+    }
+
     public void setFromPoint(RagPoint pnt) {
         this.x=pnt.x;
         this.y=pnt.y;

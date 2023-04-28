@@ -44,7 +44,7 @@ public class CharacterBuildWorker extends SwingWorker<Integer, Void> {
         AppWindow.toolBar.reset(true);
 
         // and set the walk view
-        AppWindow.walkView.setCameraCenterRotate(character.getCameraDistance(), character.getCameraRotateX(), character.getCameraRotateY(), character.getCameraOffsetY(), character.getCameraLightDistance());
+        AppWindow.walkView.setCameraCenterRotate(character.getCameraDistance(), character.getCameraAngle(), character.getCameraOffsetY(), character.getCameraFixedLightPoint(), 20, 90, 20);
         AppWindow.walkView.setIncommingScene(character.scene);
 
         appWindow.walkLabel.setGeneratedTitle("Model", seed);
